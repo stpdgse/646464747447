@@ -22,7 +22,7 @@ Non-goals (for this board)
 | Area | Decision |
 |---|---|
 | Approach | "Mix": own ESP32-S3 board plugs into sockets; the PCB carries real components of its own |
-| Brain | Owner's **ESP32-S3 N16R8** dev board (16 MB flash, 8 MB octal PSRAM), plugged into female headers |
+| Brain | Owner's **ESP32-S3-DevKitC-1 (N16R8)** dev board (16 MB flash, 8 MB octal PSRAM), plugged into female headers |
 | Screen | Ready-made 2.8" 240x320 SPI LCD module (ILI9341-class) on header pins |
 | Game storage | The LCD module's built-in microSD slot |
 | Emulation | Game Boy Color (original Game Boy comes with it) |
@@ -105,8 +105,9 @@ consolidating into as few parcels as possible matters more than any single part.
 
 ## 6. Risks and open questions
 
-1. **Exact ESP32-S3 dev board model and pinout.** Owner needs to read it off the board. Socket
-   footprint and pin mapping depend on it. (Open.)
+1. **ESP32-S3 dev board:** confirmed as the **ESP32-S3-DevKitC-1** (N16R8), two 22-pin headers
+   (J1, J3). Still open: measure the center-to-center distance between the two header rows on
+   the owner's board before the socket footprint is finalised.
 2. **Exact LCD module listing** to buy. Pinout and supply voltage must match the footprint. (Open.)
 3. **Game Boy Color speed on the S3** is unconfirmed. Mitigation: test the emulator on the
    owner's board with the screen on a breadboard *before* ordering the PCB.
