@@ -4,3 +4,20 @@
 *_sklib.py
 __pycache__/
 *.pyc
+
+# Game Boy handheld build intermediates (the final board, fab zip, BOM, template stay tracked)
+gbc-handheld/build/*.svg
+gbc-handheld/build/tpl*.png
+gbc-handheld/build/*.dsn
+gbc-handheld/build/*.ses
+gbc-handheld/build/freerouting.log
+gbc-handheld/build/route_run.log
+gbc-handheld/build/drc.json
+gbc-handheld/build/unplaced.kicad_pcb
+gbc-handheld/build/placed.kicad_pcb
+gbc-handheld/build/fab/
+gbc-handheld/build/*.kicad_prl
+gbc-handheld/build/*.kicad_pro
+*.bak
+gbc-handheld/build/top.png
+gbc-handheld/build/bottom.png

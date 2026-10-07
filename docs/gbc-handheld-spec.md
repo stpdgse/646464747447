@@ -295,3 +295,39 @@ Open items before ordering
 3. DevKitC-1 clone dimensions vs Espressif's drawing (section 11): paper template check.
 4. Speaker size and mounting (not on the PCB).
 5. Game Boy Color speed on the S3 (section 4), unconfirmed.
+
+## 14. Board layout v0.2 (placed, routed, checked)
+
+Files: `gbc-handheld/build_board.py` (place, autoroute, fix thermals), `build/gbc_handheld.kicad_pcb`
+(the routed board), `build/gbc_handheld_gerbers.zip` (JLCPCB upload), `build/template.pdf`
+(1:1 paper template), `build/BOM.md` / `BOM.csv` (shopping list), `ASSEMBLY.md` (soldering guide),
+`build/r_top.png`, `build/r_bottom.png` (renders), `build/drc.rpt`.
+
+Design
+- 2 layers, 90 x 98 mm, 3 mm corner radius, ground fill on both layers.
+- Top side: everything except the ESP32 sockets. LCD module sits above the board on four M3
+  standoffs, landscape (the portrait module rotated 90 degrees clockwise), header socket at the left.
+- Underside: ESP32-S3-DevKitC-1 on two 1x22 sockets, antenna end left, USB end overhanging the
+  right edge by 4.3 mm. Rows 22.86 mm apart, J1 above J3 as seen from the top.
+- Tracks 0.3 mm, power nets (+5V_USB, +5V_SW, +3V3) 0.6 mm. Vias 0.8/0.4 mm. Clearance 0.25 mm.
+- Cost tier: 90 x 98 mm stays inside JLCPCB's cheapest size tier (100 x 100 mm). Check the live quote.
+
+Checks run (all software; nothing tested on hardware)
+1. Geometry script: socket rows 53.34 mm long and 22.86 mm apart, LCD header 33.02 mm, mounting
+   holes 76.08 x 44.00 mm apart, USB end overhang >= 3 mm, all parts inside the outline margin.
+2. KiCad DRC: 0 violations, 0 unconnected items (starved thermal-relief warnings on ground pads
+   are fixed automatically by solid-connecting those pads and refilling).
+3. `verify_board.py`: every pad's net equals the netlist, nothing unrouted, tracks >= 0.2 mm, power
+   tracks >= 0.5 mm, smallest hole >= 0.3 mm, 2 layers, no SMD, only J1/J3 on the underside. A
+   deliberately wrong net in a copy of the board is reported as a failure.
+4. Gerber re-read with gerbonara (separate from KiCad): outline 90.10 x 98.10 mm, 125 plated
+   holes = 120 pad holes + 5 vias, no unplated holes.
+5. Paper template measured at true scale (90.1 x 98.1 mm).
+
+Not verified
+- Fit of the physical parts: the owner's DevKitC-1 clone, the chosen LCD module and the MAX98357A
+  module against the 1:1 template (`ASSEMBLY.md`, "Before you order").
+- MAX98357A header pin order, SD pad labels, backlight behaviour with the switch off (section 13).
+- Whether the amplifier module's body and speaker terminals clear the nearby buttons and the LCD.
+- Firmware: Game Boy Color speed on the S3 is unconfirmed.
+- Real-world: no board has been built.
