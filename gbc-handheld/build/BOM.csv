@@ -1,12 +1,13 @@
 Qty,Refs,Value,Part,Search for
-1,C_BULK,100uF,"Electrolytic capacitor, radial, 5 mm dia, 2 mm lead pitch, >= 10 V",elko 100uF 16V radial 5mm (RM2)
-1,C_HF,100nF,"Ceramic capacitor, 5 mm lead pitch",keramikkondensator 100nF RM5
+2,C_AMP C_BULK,100uF,"Electrolytic capacitor, radial, 5 mm dia, >= 10 V (2 or 2.5 mm leads both fit)",elko 100uF 16V radial 5mm
+1,C_HF,100nF,"Ceramic capacitor, 5 mm lead pitch, max 8 mm tall (sits under the LCD)",keramikkondensator 100nF RM5
 1,D_STATUS,,LED 3 mm,LED 3mm rot oder gruen
-2,J1 J3,,"Female header socket, 1x22, 2.54 mm","buchsenleiste 22 polig 2,54 / female header 22 pin 2.54mm (or cut longer strips)"
-1,JP_BL,,"Male pin header, 1x02, 2.54 mm (+ 1 jumper shunt)","stiftleiste 2,54 + jumper / jumperbruecke"
-1,J_AMP,,"Female header socket, 1x07, 2.54 mm","buchsenleiste 7 polig 2,54"
-1,J_LCD,,"Female header socket, 1x14, 2.54 mm","buchsenleiste 14 polig 2,54"
+2,J1 J3,,"Female header socket, 1x22, 2.54 mm, 8.5 mm tall","buchsenleiste 22 polig 2,54 (8,5 mm hoch); or cut from longer strips"
+1,J_AMP,,"Female header socket, 1x07, 2.54 mm, 8.5 mm tall","buchsenleiste 7 polig 2,54 (8,5 mm hoch)"
+1,J_LCD,,"Female header socket, 1x14, 2.54 mm, 8.5 mm tall","buchsenleiste 14 polig 2,54 (8,5 mm hoch)"
 1,J_SD,,"Male pin header, 1x04, 2.54 mm","stiftleiste 2,54 (break to 4 pins)"
-1,R_LED,1k,Resistor 1/4 W axial,"widerstand 1k 0,25W"
+2,R_BL R_LED,1k,Resistor 1/4 W axial,"widerstand 1k 0,25W"
+1,R_S1,15k,Resistor 1/4 W axial,"widerstand 15k 0,25W"
+1,R_S2,22k,Resistor 1/4 W axial,"widerstand 22k 0,25W"
 8,SW1 SW2 SW3 SW4 SW5 SW6 SW7 SW8,,"6 mm tactile push button, THT, 4 pins","taster 6x6mm THT, hoehe 5 mm (cap optional)"
-1,SW_PWR,,"Slide switch SPDT, C&K OS102011MS2Q or compatible",schiebeschalter OS102011MS2Q / SS12D00
+1,SW_PWR,,"Mini slide switch SS-12D00G3 (1P2T, 3 pins 2.54 mm, 0.5 A)",schiebeschalter SS12D00G3 / SS-12D00

@@ -1,12 +1,8 @@
 ** Drc report for gbc_handheld.kicad_pcb **
-** Created on 2026-10-07T07:24:44+0000 **
+** Created on 2026-10-07T08:16:35+0000 **
 ** Report includes: Errors, Warnings, Exclusions **
 
-** Found 1 DRC violations **
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(60.6000 mm, 50.6000 mm): Zone [GND] on F.Cu, priority 0
-    @(110.7000 mm, 112.0000 mm): PTH pad 6 [GND] of J_AMP
+** Found 0 DRC violations **
 
 ** Found 0 unconnected pads **
 

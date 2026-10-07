@@ -46,7 +46,8 @@ require_env() {
 install_kicad() {
     log "KiCad ${KICAD_PPA_VERSION} (PCBNew, kicad-cli, libraries)"
     apt-get update -qq
-    apt-get install -y -qq curl ca-certificates gnupg unzip python3-venv >/dev/null
+    apt-get install -y -qq curl ca-certificates gnupg unzip zip python3-venv \
+        gerbv librsvg2-bin poppler-utils >/dev/null   # checks: Gerber viewer, SVG->PNG, PDF tools
 
     local list="/etc/apt/sources.list.d/kicad-${KICAD_PPA_VERSION}.list"
     local key="/etc/apt/keyrings/kicad-ppa.gpg"
@@ -84,7 +85,7 @@ install_skidl() {
         /usr/bin/python3.12 -m venv --system-site-packages "${EDA_DIR}/venv"
     fi
     "${EDA_DIR}/venv/bin/pip" install -q --upgrade pip setuptools wheel
-    "${EDA_DIR}/venv/bin/pip" install -q skidl
+    "${EDA_DIR}/venv/bin/pip" install -q skidl gerbonara   # gerbonara: independent Gerber reader
     ok "$("${EDA_DIR}/venv/bin/pip" show skidl | grep -E '^Version')"
 }
 

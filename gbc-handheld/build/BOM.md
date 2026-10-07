@@ -4,27 +4,27 @@
 
 | Qty | Refs | Value | Part | Search for |
 |---|---|---|---|---|
-| 1 | C_BULK | 100uF | Electrolytic capacitor, radial, 5 mm dia, 2 mm lead pitch, >= 10 V | elko 100uF 16V radial 5mm (RM2) |
-| 1 | C_HF | 100nF | Ceramic capacitor, 5 mm lead pitch | keramikkondensator 100nF RM5 |
+| 2 | C_AMP C_BULK | 100uF | Electrolytic capacitor, radial, 5 mm dia, >= 10 V (2 or 2.5 mm leads both fit) | elko 100uF 16V radial 5mm |
+| 1 | C_HF | 100nF | Ceramic capacitor, 5 mm lead pitch, max 8 mm tall (sits under the LCD) | keramikkondensator 100nF RM5 |
 | 1 | D_STATUS |  | LED 3 mm | LED 3mm rot oder gruen |
-| 2 | J1 J3 |  | Female header socket, 1x22, 2.54 mm | buchsenleiste 22 polig 2,54 / female header 22 pin 2.54mm (or cut longer strips) |
-| 1 | JP_BL |  | Male pin header, 1x02, 2.54 mm (+ 1 jumper shunt) | stiftleiste 2,54 + jumper / jumperbruecke |
-| 1 | J_AMP |  | Female header socket, 1x07, 2.54 mm | buchsenleiste 7 polig 2,54 |
-| 1 | J_LCD |  | Female header socket, 1x14, 2.54 mm | buchsenleiste 14 polig 2,54 |
+| 2 | J1 J3 |  | Female header socket, 1x22, 2.54 mm, 8.5 mm tall | buchsenleiste 22 polig 2,54 (8,5 mm hoch); or cut from longer strips |
+| 1 | J_AMP |  | Female header socket, 1x07, 2.54 mm, 8.5 mm tall | buchsenleiste 7 polig 2,54 (8,5 mm hoch) |
+| 1 | J_LCD |  | Female header socket, 1x14, 2.54 mm, 8.5 mm tall | buchsenleiste 14 polig 2,54 (8,5 mm hoch) |
 | 1 | J_SD |  | Male pin header, 1x04, 2.54 mm | stiftleiste 2,54 (break to 4 pins) |
-| 1 | R_LED | 1k | Resistor 1/4 W axial | widerstand 1k 0,25W |
+| 2 | R_BL R_LED | 1k | Resistor 1/4 W axial | widerstand 1k 0,25W |
+| 1 | R_S1 | 15k | Resistor 1/4 W axial | widerstand 15k 0,25W |
+| 1 | R_S2 | 22k | Resistor 1/4 W axial | widerstand 22k 0,25W |
 | 8 | SW1 SW2 SW3 SW4 SW5 SW6 SW7 SW8 |  | 6 mm tactile push button, THT, 4 pins | taster 6x6mm THT, hoehe 5 mm (cap optional) |
-| 1 | SW_PWR |  | Slide switch SPDT, C&K OS102011MS2Q or compatible | schiebeschalter OS102011MS2Q / SS12D00 |
+| 1 | SW_PWR |  | Mini slide switch SS-12D00G3 (1P2T, 3 pins 2.54 mm, 0.5 A) | schiebeschalter SS12D00G3 / SS-12D00 |
 
 ## Not on the PCB
 
 | Qty | Item | Note |
 |---|---|---|
-| 1 | MAX98357A I2S amplifier module, 7-pin header (assumed order LRC BCLK DIN GAIN SD GND VIN) | VERIFY pin order on the listing photo |
+| 1 | MAX98357A I2S amplifier module, 7-pin header (assumed order LRC BCLK DIN GAIN SD GND VIN) | VERIFY pin order on the listing photo; body must point DOWN when plugged in |
 | 1 | 2.8 inch ILI9341 SPI 240x320 TFT module, MSP2807-style, 14-pin header, no touch needed | buy inside the EU if possible; see spec section 10 |
 | 1 | ESP32-S3-DevKitC-1 N16R8 (you already own it, pins soldered) |  |
 | 1 | Speaker 4-8 ohm, up to 3 W, small (28-40 mm) | wires to the amp module's own terminals |
-| 4 | M3 standoff, female-female, about 8.5 mm | length must match the socket height; see spec section 10 |
+| 4 | M3 standoff, female-female, 11 mm | 11 mm = 8.5 mm socket + 2.54 mm header spacer on the LCD; see spec section 15 |
 | 8 | M3 x 6 mm screws (4 below the PCB, 4 above through the LCD) |  |
 | 1 | Thin flexible wire, about 20 cm | 4 short wires from the LCD module's SD pads to J_SD |
-| 1 | Jumper shunt for the backlight header JP_BL | included if you buy pin headers with jumpers |

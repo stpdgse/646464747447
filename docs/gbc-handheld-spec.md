@@ -331,3 +331,60 @@ Not verified
 - Whether the amplifier module's body and speaker terminals clear the nearby buttons and the LCD.
 - Firmware: Game Boy Color speed on the S3 is unconfirmed.
 - Real-world: no board has been built.
+
+## 15. Full audit (v0.3): what was checked, what was wrong, what changed
+
+Requested: "check it a lot, with more images and tools, so it is 100% working: no cutting, no
+wrong tracks, no wrong footprints, everything fits". Everything below runs with one command,
+`gbc-handheld/check_all.sh`, which exits non-zero if anything fails. Each checker was also run
+on a deliberately broken input to prove it can fail (netlist with a renamed net, board with a
+wrong pad net, ESP32 mounted unflipped, drill file shifted 0.2 mm): all were rejected.
+
+### Problems found and fixed
+
+| # | Problem | How it was found | Fix |
+|---|---|---|---|
+| 1 | LCD standoffs specified as 8.5 mm. The LCD's pin header has a 2.54 mm plastic spacer, so the module sits 8.5 + 2.54 = 11.04 mm above the board | MSP2807 drawing side view: 8.38 - 5.84 = 2.54 | **11 mm standoffs**; BOM requires 8.5 mm tall sockets |
+| 2 | Slide switch C&K OS102011MS2Q is rated **100 mA**; it fed the LCD and the 3 W amp (~0.6 A peaks) | rating looked up (Digi-Key) | switch is now the **SS-12D00G3 (0.5 A)** with a project footprint, and it only feeds the LCD (~0.1 A); the amp runs from USB 5 V and is muted by GPIO41 |
+| 3 | No way for firmware to know the switch position | design review | 15k/22k divider to GPIO39 (PWR_SENSE): 2.82-3.12 V across USB 4.75-5.25 V |
+| 4 | LCD SDO (MISO) shared with the SD card; some ILI9341 boards do not release it | design review | LCD pin 9 left open (datasheet: allowed); SPI_MISO connects only ESP32 and SD |
+| 5 | Backlight jumper fed 3.3 V even with the LCD switched off | design review | backlight from GPIO42 through 1k (dimmable; safe even if the pin drives LEDs directly) |
+| 6 | Electrolytic caps: + and - pads only **0.40 mm** apart (KiCad 2.0 mm-pitch footprint), a short across 5 V if bridged | `check_3d.py` pad-gap check | 2.5 mm-pitch footprint: 0.9 mm gap |
+| 7 | Freerouting treated the ground fill as a perfect plane and left **C_HF's ground pad floating** in a cut-off copper island | KiCad DRC after the fill (Freerouting itself said "0 unrouted") | ground is routed as real tracks; the fill is added afterwards; every route attempt is accepted only if KiCad reports 0 unconnected |
+| 8 | Silkscreen labels 0.7 mm tall (below the 0.8 mm fab minimum) | KiCad DRC | all silkscreen text >= 1.0 mm |
+| 9 | Project footprint library and net-class rules not saved with the board, so KiCad's DRC could not enforce the 0.6 mm power tracks | KiCad DRC (`lib_footprint_issues`) | board saved with its `.kicad_pro` and a project `fp-lib-table` |
+| 10 | Shopping list said "widerstand 1k" for the 15k and 22k resistors | reading the generated BOM | search text uses each part's value |
+| 11 | Amp module plugged in pointing up would hit the LCD | `check_3d.py` | silkscreen "BODY POINTS DOWN" + assembly step |
+
+Two alarms were the checkers, not the board: the Gerber checker could not size KiCad's
+rounded-rectangle pad apertures (fixed: measure real outlines), and gerbonara's SVG renderer
+draws one board corner wrong (the Gerber arcs were checked by hand and rendered correctly with
+gerbv; gerbv now makes the Gerber pictures).
+
+### Checks and results on the final board
+
+| Check | Tool | Result |
+|---|---|---|
+| Schematic ERC | SKiDl | 0 errors, 0 warnings |
+| Netlist connections (amp, LCD, SD, switch, divider, LED, 8 buttons, every ESP32 header pin, forbidden pins) | `verify_netlist.py` | all pass |
+| Design rules incl. power-track net class, silkscreen, courtyards, thermal reliefs | KiCad DRC | 0 violations, 0 unconnected |
+| Every pad's net equals the netlist; track widths; holes; size; layers; no SMD | `verify_board.py` | all pass |
+| Real ESP32-S3-DevKitC-1 plugs in: all 44 pins land on a pad with the right signal | `check_plugfit.py` + Espressif DXF | 44/44 |
+| 3D: heights under the LCD (<= 8.84 mm) and amp; standoffs; screw heads; ESP32 below; SD card path; buttons reachable; pad gaps >= 0.6 mm; annular rings | `check_3d.py` | all pass |
+| Manufacturing files: outline 90 x 98 mm, every drill hit on copper both sides, rings >= 0.15 mm, mask openings, hole count | `check_gerbers.py` (gerbonara) + gerbv render | all pass |
+
+### Pictures (in `gbc-handheld/build/`)
+
+`3d_top.png`, `3d_bottom.png`, `3d_angled.png` (KiCad 3D renders with part models),
+`r_top.png`, `r_bottom.png` (layout incl. module outlines on the Fab layers),
+`gerber_top.png`, `gerber_bottom.png` (the manufacturing files drawn by gerbv),
+`fit_top.png` (every part coloured by height, modules and standoffs outlined),
+`fit_sections.png` (side cuts through the stack-up), `zoom_esp_top.png`, `zoom_esp_bot.png`
+(close-ups of the densest routing), `template.pdf` (1:1 paper template).
+
+### Still not verifiable from here
+
+- Your clone boards and modules against the drawings (paper template step in `ASSEMBLY.md`).
+- MAX98357A module pin order and size on the listing you buy; LCD SD pad labels.
+- Heights of the parts you actually buy (the table in `check_3d.py` lists every assumption).
+- Real-world behaviour: no board has been built; firmware is not written yet.

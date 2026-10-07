@@ -74,22 +74,43 @@ PLACE_CENTER = {
     "D_STATUS": (80, 93, 0),
     "C_BULK": (10, 62, 0),
     "C_HF": (10, 22, 0),
+    "R_BL": (12, 34, 0),       # under the LCD (2.5 mm tall, LCD clearance 8.8 mm)
+    "R_S1": (56, 47.5, 0),     # switch-sense divider, under the LCD near GPIO39
+    "R_S2": (68, 47.5, 0),
+    "C_AMP": (60.5, 65, 0),    # tall electrolytic: right of the amp module, outside the LCD
 }
 # Header-style parts placed by pin 1 position and direction of the pin row
 PLACE_ROW = {
     "J_LCD": ((LCD_HDR_X, LCD_HDR_PIN1_Y), "down"),
     "J_AMP": ((38.0, 62.0), "right"),
-    "J_SD": ((30.0, 58.0), "right"),
-    "JP_BL": ((22.0, 58.0), "right"),
+    "J_SD": ((22.0, 58.0), "right"),
 }
+
+# Amplifier module (MAX98357A breakout, about 19 x 18 mm). It plugs into J_AMP and lies flat
+# 11 mm above the board; its body MUST point down (+y), never up under the LCD.
+AMP_W, AMP_D, AMP_EDGE = 19.0, 18.0, 1.3     # width, depth from header edge, pin row to edge
+AMP_ROW_Y = 62.0
+AMP_ROW_X0 = 38.0
+AMP_CX = AMP_ROW_X0 + 3 * 2.54
+AMP_BOX = (AMP_CX - AMP_W / 2, AMP_ROW_Y - AMP_EDGE, AMP_CX + AMP_W / 2, AMP_ROW_Y - AMP_EDGE + AMP_D)
+
+# SD slot on the LCD module's back (outline drawing, back view, transformed to this mounting):
+# board x 33.6-63.1, y 5.3-23.7, the card enters from the module's top edge (y = 4).
+SD_SLOT_BOX = (33.6, 5.3, 63.1, 23.7)
 
 # Silkscreen labels: (text, x, y, size)
 LABELS = [
     ("UP", 18, 64.3, 1.0), ("DOWN", 18, 95.5, 1.0), ("LEFT", 8, 73.2, 1.0),
     ("RIGHT", 28, 73.2, 1.0), ("A", 80, 67.0, 1.4), ("B", 68, 77.0, 1.4),
     ("SELECT", 40, 87.0, 1.0), ("START", 52, 87.0, 1.0), ("PWR", 78, 55.5, 1.0),
-    ("LED", 80, 89.2, 1.0), ("+", 7, 59.0, 1.2), ("BL", 22, 54.8, 0.9),
-    ("SD wires", 30, 54.8, 0.9), ("AMP", 46, 59.0, 0.9),
+    ("LED", 80, 89.2, 1.0), ("+", 7, 59.0, 1.2), ("SD wires", 25.8, 55.0, 1.0),
+    ("AMP MODULE", AMP_CX, 71.5, 1.0), ("BODY POINTS DOWN", AMP_CX, 74.0, 1.0),
+    ("VCC", 7.3, 12.5, 1.0), ("USB", 87.6, 29.0, 1.0),
+]
+# Signal names printed next to each header pin: (ref, names in pin order, side, size)
+PIN_LABELS = [
+    ("J_AMP", ["LRC", "BCLK", "DIN", "GAIN", "SD", "GND", "VIN"], "above", 1.0),
+    ("J_SD", ["CS", "MOSI", "MISO", "SCK"], "below", 1.0),
 ]
 
 
@@ -120,8 +141,9 @@ def move_to(fp, x, y):
 # Step 1: unplaced board from the netlist
 # --------------------------------------------------------------------------
 def make_unplaced():
-    subprocess.run(["kinet2pcb", "-i", NETLIST, "-o", UNPLACED], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # -l HERE: also search the project's own footprint library (gbc.pretty)
+    subprocess.run(["kinet2pcb", "-i", NETLIST, "-o", UNPLACED, "-l", HERE, "-w", "--nobackup"],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return pcbnew.LoadBoard(UNPLACED)
 
 
@@ -215,15 +237,64 @@ def add_outline(b):
     arc((r, r), 180)             # top-left
 
 
-def add_text(b, text, x, y, size=1.0, layer=pcbnew.F_SilkS):
+def add_text(b, text, x, y, size=1.0, layer=pcbnew.F_SilkS, angle=0):
     t = pcbnew.PCB_TEXT(b)
     t.SetText(text)
     t.SetLayer(layer)
     t.SetPosition(at(x, y))
     t.SetTextSize(pcbnew.VECTOR2I(mm(size), mm(size)))
     t.SetTextThickness(mm(max(0.15, size * 0.15)))
-    t.SetMirrored(layer == pcbnew.B_SilkS)   # bottom-side text must be mirrored to read from the back
+    t.SetMirrored(layer in (pcbnew.B_SilkS, pcbnew.B_Fab))   # bottom text reads from the back
+    if angle:
+        t.SetTextAngleDegrees(angle)
     b.Add(t)
+
+
+def add_pin_labels(b):
+    for ref, names, side, size in PIN_LABELS:
+        fp = b.FindFootprintByReference(ref)
+        for i, name in enumerate(names, start=1):
+            x, y = pad_pos(fp, i)
+            off = 1.3 + 0.5 * size * len(name) * 0.9 + 0.2
+            add_text(b, name, x, y - off if side == "above" else y + off, size, angle=90)
+
+
+def add_rect(b, layer, x0, y0, x1, y1, width=0.12):
+    for (ax, ay), (bx, by) in (((x0, y0), (x1, y0)), ((x1, y0), (x1, y1)),
+                               ((x1, y1), (x0, y1)), ((x0, y1), (x0, y0))):
+        s = pcbnew.PCB_SHAPE(b)
+        s.SetShape(pcbnew.SHAPE_T_SEGMENT)
+        s.SetLayer(layer)
+        s.SetWidth(mm(width))
+        s.SetStart(at(ax, ay))
+        s.SetEnd(at(bx, by))
+        b.Add(s)
+
+
+def add_circle(b, layer, x, y, r, width=0.12):
+    s = pcbnew.PCB_SHAPE(b)
+    s.SetShape(pcbnew.SHAPE_T_CIRCLE)
+    s.SetLayer(layer)
+    s.SetWidth(mm(width))
+    s.SetCenter(at(x, y))
+    s.SetEnd(at(x + r, y))
+    b.Add(s)
+
+
+def add_module_outlines(b):
+    """Draw the plug-in modules on the Fab layers (documentation only, not manufactured)."""
+    add_rect(b, pcbnew.F_Fab, LCD_X, LCD_Y, LCD_X + LCD_W, LCD_Y + LCD_H)
+    add_text(b, "LCD MODULE (11 mm above board)", LCD_X + LCD_W / 2, LCD_Y + 2.0, 1.0, pcbnew.F_Fab)
+    add_rect(b, pcbnew.F_Fab, *SD_SLOT_BOX)
+    add_text(b, "SD SLOT (card enters from top edge)", (SD_SLOT_BOX[0] + SD_SLOT_BOX[2]) / 2,
+             SD_SLOT_BOX[1] + 2.0, 0.8, pcbnew.F_Fab)
+    add_rect(b, pcbnew.F_Fab, *AMP_BOX)
+    for x, y in LCD_HOLES:
+        add_circle(b, pcbnew.F_Fab, x, y, 3.2)      # M3 standoff, 6.4 mm across corners
+        add_circle(b, pcbnew.B_Fab, x, y, 2.75)     # M3 screw head, 5.5 mm
+    esp_y0, esp_y1 = ESP_YC - 12.7, ESP_YC + 12.7
+    add_rect(b, pcbnew.B_Fab, ESP_X0 - 1.44, esp_y0, ESP_USB_END_X, esp_y1)
+    add_text(b, "ESP32-S3-DevKitC-1 (underside)", ESP_X0 + 26, ESP_YC + 6.0, 1.0, pcbnew.B_Fab)
 
 
 def style_refs(b):
@@ -232,7 +303,7 @@ def style_refs(b):
     for fp in b.GetFootprints():
         ref = fp.GetReference()
         fp.Value().SetVisible(False)
-        fp.Reference().SetTextSize(pcbnew.VECTOR2I(mm(0.9), mm(0.9)))
+        fp.Reference().SetTextSize(pcbnew.VECTOR2I(mm(1.0), mm(1.0)))
         fp.Reference().SetTextThickness(mm(0.13))
         if (ref.startswith("SW") and ref != "SW_PWR") or ref == "D_STATUS":
             fp.Reference().SetVisible(False)
@@ -305,13 +376,16 @@ def place(b):
     add_outline(b)
     for text, x, y, size in LABELS:
         add_text(b, text, x, y, size)
-    add_text(b, "GBC-PRACTICE v0.2", BW / 2, BH - 1.8, 1.2)
+    add_text(b, "GBC-PRACTICE v0.3", 72.0, BH - 1.6, 1.0)
+    add_pin_labels(b)
+    add_module_outlines(b)
     # Seen from the back (mirrored) the USB end is on the LEFT, so the arrow points left.
     add_text(b, "<- USB END  ESP32-S3 DEVKITC-1 GOES ON THIS SIDE", 60, 29.0, 1.0, pcbnew.B_SilkS)
     style_refs(b)
     solid_connect_pads(b)
     set_rules(b)
-    add_ground_zones(b)
+    # No ground fill yet: Freerouting would treat it as a perfect plane and skip GND tracks,
+    # leaving pads that sit in cut-off copper islands unconnected. The fill is added after routing.
 
 
 def geometry_report(b):
@@ -360,7 +434,7 @@ def geometry_report(b):
 # --------------------------------------------------------------------------
 # Step 3: routing with Freerouting
 # --------------------------------------------------------------------------
-def autoroute(b, passes=60):
+def autoroute(b, passes=60, extra=()):
     pcbnew.ExportSpecctraDSN(b, DSN)
     java = os.environ.get("FREEROUTING_JAVA", "java")
     jar = os.environ["FREEROUTING_JAR"]
@@ -369,12 +443,21 @@ def autoroute(b, passes=60):
     log = os.path.join(BUILD, "freerouting.log")
     with open(log, "w") as f:
         subprocess.run([java, "-jar", jar, "-de", DSN, "-do", SES, "-mp", str(passes),
-                        "--gui.enabled=false"], stdout=f, stderr=subprocess.STDOUT,
+                        *extra, "--gui.enabled=false"], stdout=f, stderr=subprocess.STDOUT,
                        timeout=900, check=False)
     if not os.path.exists(SES) or os.path.getsize(SES) == 0:
         raise RuntimeError(f"Freerouting produced no SES file; see {log}")
     if not pcbnew.ImportSpecctraSES(b, SES):
         raise RuntimeError("could not import the Freerouting SES result")
+
+
+def save(b, path):
+    """Save board AND project file (net classes and rules live in the .kicad_pro in KiCad 9)."""
+    pcbnew.SaveBoard(path, b)
+    with open(os.path.join(os.path.dirname(path), "fp-lib-table"), "w") as f:
+        f.write('(fp_lib_table\n  (version 7)\n'
+                '  (lib (name "gbc")(type "KiCad")(uri "${KIPRJMOD}/../gbc.pretty")'
+                '(options "")(descr "GBC handheld project footprints"))\n)\n')
 
 
 def refill(b):
@@ -400,7 +483,7 @@ def settle_thermals(b, board_path, max_rounds=4):
     """
     import re
     for _ in range(max_rounds):
-        b.Save(board_path)
+        save(b, board_path)
         bad = [v for v in drc_violations(board_path) if v.get("type") == "starved_thermal"]
         pads = set()
         for v in bad:
@@ -434,19 +517,28 @@ def main(stage):
     place(b)
     print("=== geometry ===")
     ok = geometry_report(b)
-    b.Save(PLACED)
+    save(b, PLACED)
     print("saved", PLACED)
     if stage == "place":
         return 0 if ok else 1
-    print("=== autoroute ===")
-    autoroute(b)
-    refill(b)
-    print("=== thermal reliefs ===")
-    left = settle_thermals(b, ROUTED)
-    print(f"      starved thermal reliefs left: {left}")
-    print("=== connectivity ===")
-    unrouted = connectivity_report(b)
-    b.Save(ROUTED)
+    # Freerouting is multi-threaded and not deterministic: one run can leave a net it could not
+    # fit. Every attempt starts from the clean placed board and is accepted only if KiCad's own
+    # connectivity check (after the ground fill) reports nothing unconnected.
+    strategies = [(), (), ("-is", "random"), ("-is", "random"), ("-is", "sequential"), ()]
+    for attempt, extra in enumerate(strategies, start=1):
+        print(f"=== autoroute attempt {attempt} {' '.join(extra) or '(default)'} ===")
+        b = pcbnew.LoadBoard(PLACED)
+        set_rules(b)
+        autoroute(b, extra=extra)
+        add_ground_zones(b)
+        refill(b)
+        left = settle_thermals(b, ROUTED)
+        print(f"      starved thermal reliefs left: {left}")
+        unrouted = connectivity_report(b)
+        if unrouted == 0 and left == 0:
+            break
+        print(f"      attempt {attempt} rejected")
+    save(b, ROUTED)
     print("saved", ROUTED)
     return 0 if ok and unrouted == 0 else 1
 

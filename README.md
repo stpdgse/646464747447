@@ -47,7 +47,7 @@ freerouting -de board.dsn -do board.ses --gui.enabled=false
 ## Game Boy Color-style handheld (practice board)
 
 A beginner-solderable, all through-hole handheld: ESP32-S3-DevKitC-1 on the underside, a 2.8"
-ILI9341 LCD, 8 buttons, an I2S amplifier module. Board is 90 x 98 mm (inside JLCPCB's cheapest
+ILI9341 LCD, 8 buttons, an I2S amplifier module. Board v0.3 is 90 x 98 mm (inside JLCPCB's cheapest
 size tier). Full requirements and every verified fact: `docs/gbc-handheld-spec.md`.
 Build and soldering instructions: `gbc-handheld/ASSEMBLY.md`. Shopping list: `gbc-handheld/build/BOM.md`.
 
@@ -62,5 +62,8 @@ python3 gbc-handheld/verify_board.py                               # board vs ne
 kicad-cli pcb drc --severity-all --all-track-errors --output /tmp/drc.rpt gbc-handheld/build/gbc_handheld.kicad_pcb
 python3 -I gbc-handheld/make_bom.py gbc-handheld/build/gbc_handheld.net
 ```
+
+Or run every check, the fab export, BOM and all pictures in one go: `gbc-handheld/check_all.sh`
+(audit results and what each check proves: `docs/gbc-handheld-spec.md`, section 15).
 
 Nothing here has been tested on real hardware yet.

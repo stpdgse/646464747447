@@ -19,38 +19,35 @@ from verify_netlist import load  # noqa: E402  (reuses the independent netlist r
 # footprint -> (plain description, what to search for)
 BUY = {
     "Connector_PinSocket_2.54mm:PinSocket_1x22_P2.54mm_Vertical":
-        ("Female header socket, 1x22, 2.54 mm", "buchsenleiste 22 polig 2,54 / female header 22 pin 2.54mm (or cut longer strips)"),
+        ("Female header socket, 1x22, 2.54 mm, 8.5 mm tall", "buchsenleiste 22 polig 2,54 (8,5 mm hoch); or cut from longer strips"),
     "Connector_PinSocket_2.54mm:PinSocket_1x14_P2.54mm_Vertical":
-        ("Female header socket, 1x14, 2.54 mm", "buchsenleiste 14 polig 2,54"),
+        ("Female header socket, 1x14, 2.54 mm, 8.5 mm tall", "buchsenleiste 14 polig 2,54 (8,5 mm hoch)"),
     "Connector_PinSocket_2.54mm:PinSocket_1x07_P2.54mm_Vertical":
-        ("Female header socket, 1x07, 2.54 mm", "buchsenleiste 7 polig 2,54"),
+        ("Female header socket, 1x07, 2.54 mm, 8.5 mm tall", "buchsenleiste 7 polig 2,54 (8,5 mm hoch)"),
     "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical":
         ("Male pin header, 1x04, 2.54 mm", "stiftleiste 2,54 (break to 4 pins)"),
-    "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical":
-        ("Male pin header, 1x02, 2.54 mm (+ 1 jumper shunt)", "stiftleiste 2,54 + jumper / jumperbruecke"),
     "Button_Switch_THT:SW_PUSH_6mm":
         ("6 mm tactile push button, THT, 4 pins", "taster 6x6mm THT, hoehe 5 mm (cap optional)"),
-    "Button_Switch_THT:SW_Slide_SPDT_Straight_CK_OS102011MS2Q":
-        ("Slide switch SPDT, C&K OS102011MS2Q or compatible", "schiebeschalter OS102011MS2Q / SS12D00"),
+    "gbc:SW_Slide_SS12D00G3":
+        ("Mini slide switch SS-12D00G3 (1P2T, 3 pins 2.54 mm, 0.5 A)", "schiebeschalter SS12D00G3 / SS-12D00"),
     "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal":
         ("Resistor 1/4 W axial", "widerstand 1k 0,25W"),
     "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P5.00mm":
-        ("Ceramic capacitor, 5 mm lead pitch", "keramikkondensator 100nF RM5"),
-    "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm":
-        ("Electrolytic capacitor, radial, 5 mm dia, 2 mm lead pitch, >= 10 V", "elko 100uF 16V radial 5mm (RM2)"),
+        ("Ceramic capacitor, 5 mm lead pitch, max 8 mm tall (sits under the LCD)", "keramikkondensator 100nF RM5"),
+    "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm":
+        ("Electrolytic capacitor, radial, 5 mm dia, >= 10 V (2 or 2.5 mm leads both fit)", "elko 100uF 16V radial 5mm"),
     "LED_THT:LED_D3.0mm":
         ("LED 3 mm", "LED 3mm rot oder gruen"),
 }
 
 EXTRAS = [
-    ("1", "MAX98357A I2S amplifier module, 7-pin header (assumed order LRC BCLK DIN GAIN SD GND VIN)", "VERIFY pin order on the listing photo"),
+    ("1", "MAX98357A I2S amplifier module, 7-pin header (assumed order LRC BCLK DIN GAIN SD GND VIN)", "VERIFY pin order on the listing photo; body must point DOWN when plugged in"),
     ("1", "2.8 inch ILI9341 SPI 240x320 TFT module, MSP2807-style, 14-pin header, no touch needed", "buy inside the EU if possible; see spec section 10"),
     ("1", "ESP32-S3-DevKitC-1 N16R8 (you already own it, pins soldered)", ""),
     ("1", "Speaker 4-8 ohm, up to 3 W, small (28-40 mm)", "wires to the amp module's own terminals"),
-    ("4", "M3 standoff, female-female, about 8.5 mm", "length must match the socket height; see spec section 10"),
+    ("4", "M3 standoff, female-female, 11 mm", "11 mm = 8.5 mm socket + 2.54 mm header spacer on the LCD; see spec section 15"),
     ("8", "M3 x 6 mm screws (4 below the PCB, 4 above through the LCD)", ""),
     ("1", "Thin flexible wire, about 20 cm", "4 short wires from the LCD module's SD pads to J_SD"),
-    ("1", "Jumper shunt for the backlight header JP_BL", "included if you buy pin headers with jumpers"),
 ]
 
 
@@ -68,6 +65,8 @@ def main(path):
     rows = []
     for (fp, value), refs in sorted(groups.items(), key=lambda kv: natural(sorted(kv[1], key=natural)[0])):
         desc, search = BUY.get(fp, (fp, ""))
+        if fp.startswith("Resistor_"):
+            search = f"widerstand {value} 0,25W"      # the value, not a fixed example
         rows.append({"Qty": len(refs), "Refs": " ".join(sorted(refs, key=natural)),
                      "Value": value, "Part": desc, "Search for": search})
     out_dir = os.path.dirname(os.path.abspath(path))

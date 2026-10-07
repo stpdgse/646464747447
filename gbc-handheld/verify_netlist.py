@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent check of build/gbc_handheld.net (design v0.2, all through-hole).
+"""Independent check of build/gbc_handheld.net (design v0.3, all through-hole).
 
 Parses the KiCad netlist file itself with a small s-expression reader (not the
 SKiDl objects that wrote it) and asserts the connections that would wreck a
@@ -83,8 +83,8 @@ def main(path):
         n = net_of(ref, pin)
         return n is None or n.lower().startswith("unconnected")
 
-    # 5 connectors + 1 jumper header + 9 switches + 1 resistor + 2 capacitors + 1 LED
-    check(len(comps) == 19, f"19 parts expected, found {len(comps)}")
+    # 5 connectors + 9 switches + 4 resistors + 3 capacitors + 1 LED
+    check(len(comps) == 22, f"22 parts expected, found {len(comps)}")
     check(len(nets) >= 20, f"{len(nets)} nets parsed")
     check(all(c["fp"] for c in comps.values()), "every part has a footprint")
     # Beginner requirement: no surface-mount footprints at all
@@ -94,30 +94,48 @@ def main(path):
 
     # MAX98357A module header, assumed Adafruit order (VERIFY): LRC BCLK DIN GAIN SD GND VIN
     amp = {1: "AUDIO_LRC", 2: "AUDIO_BCLK", 3: "AUDIO_DIN", 5: "AUDIO_SD",
-           6: "GND", 7: "+5V_SW"}
+           6: "GND", 7: "+5V_USB"}
     for pin, want in amp.items():
         check(net_of("J_AMP", pin) == want, f"J_AMP pin {pin} on {want}")
     check(is_nc("J_AMP", 4), "J_AMP pin 4 (GAIN) left open = 9 dB")
 
     # LCD header (MSP2807): 1 VCC 2 GND 3 CS 4 RST 5 DC 6 MOSI 7 SCK 8 LED 9 MISO
     expect = {1: "+5V_SW", 2: "GND", 3: "LCD_CS", 4: "LCD_RST", 5: "LCD_DC",
-              6: "LCD_MOSI", 7: "LCD_SCK", 9: "LCD_MISO"}
+              6: "SPI_MOSI", 7: "SPI_SCK"}
     for pin, want in expect.items():
         check(net_of("J_LCD", pin) == want, f"LCD pin {pin} on {want}")
-    check(net_of("JP_BL", 1) == "+3V3" and same(("JP_BL", 2), ("J_LCD", 8)),
-          "backlight jumper: +3V3 -> LCD LED pin")
+    check(is_nc("J_LCD", 9), "LCD pin 9 (SDO/MISO) left open: cannot fight the SD card")
+    check(net_of("R_BL", 1) == "LCD_BL" and same(("R_BL", 2), ("J_LCD", 8))
+          and comps["R_BL"]["value"] == "1k", "backlight: GPIO net LCD_BL -> 1k -> LCD LED pin")
     for pin in (10, 11, 12, 13, 14):
         check(is_nc("J_LCD", pin), f"LCD touch pin {pin} not connected")
 
     # SD wires share the LCD SPI bus
-    check(net_of("J_SD", 1) == "SD_CS" and net_of("J_SD", 2) == "LCD_MOSI"
-          and net_of("J_SD", 3) == "LCD_MISO" and net_of("J_SD", 4) == "LCD_SCK",
-          "SD header: CS own pin, MOSI/MISO/SCK shared with the LCD")
+    check(net_of("J_SD", 1) == "SD_CS" and net_of("J_SD", 2) == "SPI_MOSI"
+          and net_of("J_SD", 3) == "SPI_MISO" and net_of("J_SD", 4) == "SPI_SCK",
+          "SD header: CS own pin, MOSI/MISO/SCK on the shared bus")
+    check(nets.get("SPI_MISO") and {r for r, _ in nets["SPI_MISO"]} == {"J1", "J_SD"},
+          "SPI_MISO connects only the ESP32 and the SD card")
 
     # Power switch must not short USB 5V to the switched rail
     check(net_of("SW_PWR", 2) == "+5V_USB" and net_of("SW_PWR", 1) == "+5V_SW",
           "power switch: common=+5V_USB, throw=+5V_SW")
     check(is_nc("SW_PWR", 3), "power switch third pin unused")
+    check(comps["SW_PWR"]["fp"] == "gbc:SW_Slide_SS12D00G3", "power switch footprint is the SS-12D00G3")
+    check({r for r, _ in nets["+5V_SW"]} == {"SW_PWR", "J_LCD", "C_BULK", "C_HF", "R_S1"},
+          "switched 5 V feeds only the LCD (+ its capacitors and the sense divider)")
+
+    # Switch-sense divider: values read from the netlist, voltage range computed
+    check(net_of("R_S1", 1) == "+5V_SW" and net_of("R_S1", 2) == "PWR_SENSE"
+          and net_of("R_S2", 1) == "PWR_SENSE" and net_of("R_S2", 2) == "GND",
+          "sense divider: +5V_SW -> R_S1 -> PWR_SENSE -> R_S2 -> GND")
+
+    def ohms(v):
+        return float(v.lower().replace("k", "e3").replace("m", "e6"))
+    r1, r2 = ohms(comps["R_S1"]["value"]), ohms(comps["R_S2"]["value"])
+    vmax, vmin = 5.25 * r2 / (r1 + r2), 4.75 * r2 / (r1 + r2)
+    check(vmax < 3.6 and vmin > 0.75 * 3.3,
+          f"PWR_SENSE stays within 3.3 V logic: {vmin:.2f}-{vmax:.2f} V for USB 4.75-5.25 V")
 
     # Dev board power pins: J1 pin 1/2 = 3V3, 21 = 5V, 22 = GND
     check(net_of("J1", 1) == "+3V3" and net_of("J1", 2) == "+3V3",
@@ -133,6 +151,8 @@ def main(path):
           "bulk electrolytic: + on +5V_SW, - on GND")
     check(net_of("C_HF", 1) == "+5V_SW" and net_of("C_HF", 2) == "GND",
           "100nF across +5V_SW and GND")
+    check(net_of("C_AMP", 1) == "+5V_USB" and net_of("C_AMP", 2) == "GND",
+          "amplifier bulk electrolytic: + on +5V_USB, - on GND")
 
     # Status LED
     check(net_of("R_LED", 1) == "STATUS_LED" and same(("R_LED", 2), ("D_STATUS", 2))
@@ -153,8 +173,9 @@ def main(path):
                  ("J1", 6): "BTN_A", ("J1", 7): "BTN_B", ("J1", 8): "BTN_START",
                  ("J1", 9): "BTN_SELECT", ("J1", 10): "AUDIO_BCLK",
                  ("J1", 11): "AUDIO_LRC", ("J1", 12): "LCD_RST", ("J1", 15): "LCD_DC",
-                 ("J1", 16): "LCD_CS", ("J1", 17): "LCD_MOSI", ("J1", 18): "LCD_SCK",
-                 ("J1", 19): "LCD_MISO", ("J1", 20): "STATUS_LED",
+                 ("J1", 16): "LCD_CS", ("J1", 17): "SPI_MOSI", ("J1", 18): "SPI_SCK",
+                 ("J1", 19): "SPI_MISO", ("J1", 20): "STATUS_LED",
+                 ("J3", 6): "LCD_BL", ("J3", 9): "PWR_SENSE",
                  ("J3", 4): "BTN_UP", ("J3", 5): "BTN_DOWN",
                  ("J3", 7): "AUDIO_SD", ("J3", 8): "AUDIO_DIN", ("J3", 18): "SD_CS"}
     for (ref, pin), want in positions.items():
