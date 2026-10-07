@@ -109,10 +109,12 @@ consolidating into as few parcels as possible matters more than any single part.
    listing, male pins already soldered), a DevKitC-1 clone with two 22-pin headers and two
    USB-C ports. Its labels match the standard DevKitC-1 layout (VERIFY against the seller's pin
    diagram, clones can differ). GPIO35-37 are broken out on the board but used internally by the
-   octal PSRAM, so they must stay unconnected. Header row spacing is **25.4 mm (1 in)** per a KiCad
-   forum thread (see section 8). **Trap:** the official KiCad library footprint for this board
-   reportedly uses 22.86 mm, which is wrong; do not use it unchecked. The 1:1 paper printout
-   check in section 7 (step 4) covers this against the owner's real board.
+   octal PSRAM, so they must stay unconnected. **Header row spacing is 22.86 mm (0.9 in)**,
+   read from the hole coordinates in Espressif's own DXF (columns at x = 1.270 and 24.130 mm,
+   2.540 mm pitch, 22 holes per row; the 25.4 mm figure is the board WIDTH, holes sit 1.27 mm in
+   from each edge). An earlier version of this spec said 25.4 mm, taken from a KiCad forum post;
+   that was wrong and is corrected here. This is Espressif's official board: the owner's diymore
+   clone may differ, so the 1:1 paper-template check in section 7 (step 4) is still required.
 2. **Exact LCD module listing** to buy. Pinout and supply voltage must match the footprint. (Open.)
 3. **Game Boy Color speed on the S3** is unconfirmed. Mitigation: test the emulator on the
    owner's board with the screen on a breadboard *before* ordering the PCB.
@@ -138,7 +140,8 @@ consolidating into as few parcels as possible matters more than any single part.
 - PaperBoy S3, Game Boy at 60 fps on ESP32-S3: https://www.cnx-software.com/2026/07/02/paperboy-game-boy-emulator-works-at-60-fps-on-esp32-s3-e-ink-devkit/
 - ESP32-S3 vs P4 guide: https://www.elecrow.com/blog/esp32-s31-vs-s3-vs-p4-complete-2026-selection-guide.html
 - Teensy Game Boy emulator: https://www.pjrc.com/game-boy-emulator
-- DevKitC-1 header row spacing (25.4 mm vs library 22.86 mm): https://forum.kicad.info/t/pin-distance-in-esp32-s3-devkitc-1/71001
+- DevKitC-1 official dimensions (PDF and DXF, hole coordinates give 22.86 mm row spacing): https://dl.espressif.com/dl/schematics/esp_idf/DXF_ESP32-S3-DevKitC-1_V1.1_20220429.pdf and .dxf
+- (Incorrect) KiCad forum claim of 25.4 mm row spacing, superseded by the DXF above: https://forum.kicad.info/t/pin-distance-in-esp32-s3-devkitc-1/71001
 - ESP32-S3-DevKitC-1 user guide: https://docs.espressif.com/projects/esp-idf/en/v5.2.3/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html
 
 ## 9. Schematic status (v0.1, step 3 of the plan)
@@ -226,3 +229,27 @@ Consequences for the board
   x = 6.92 and 83.00 mm, y = 3.00 and 47.00 mm from the module's top-left corner, and the
   header runs vertically along the left edge with pin 1 at the top.
 - Add four short wires (module SD pads to `J_SD`), and keep a clear zone under the SD slot.
+
+## 11. ESP32-S3-DevKitC-1 mechanical data (Espressif DXF, board V1.1)
+
+| Item | Value |
+|---|---|
+| Board size | 25.40 x 62.74 mm |
+| Header rows | 2 x 22 holes, 2.54 mm pitch, **22.86 mm between the rows**, 1.27 mm in from each long edge |
+| Pin 1 end (antenna end) | first hole 1.44 mm from the board end |
+| Pin 22 end (USB end) | last hole **7.96 mm** from the board end (USB connectors sit there) |
+| Hole span | 21 x 2.54 = 53.34 mm |
+| Row/pin mapping | antenna end up, USB down, component side up: J1 is the LEFT row, J3 the RIGHT row |
+
+Layout consequence: to keep the board within JLCPCB's cheapest size tier (100 x 100 mm,
+USD 2 for 5 two-layer boards; larger boards cost more, exact price from their calculator),
+the ESP32 board is mounted on the **underside** of the PCB below the LCD, with its USB end
+overhanging a board edge.
+
+## 12. Hand-solderability requirement (beginner)
+
+The owner has only soldered through-hole parts on perfboard and has never soldered SMD or
+ordered a PCB. **The board must be hand-solderable by a beginner.** Decision: no SMD parts.
+All components are through-hole or plug-in (sockets, headers, tactile switches, slide switch,
+axial or radial resistors and capacitors, a 3 mm LED, and a DIP-8 or module amplifier). The
+SMD PAM8302A design in `schematic.py` is therefore being replaced; see the amplifier decision.
