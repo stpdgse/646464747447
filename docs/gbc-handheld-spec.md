@@ -105,9 +105,12 @@ consolidating into as few parcels as possible matters more than any single part.
 
 ## 6. Risks and open questions
 
-1. **ESP32-S3 dev board:** confirmed as the **ESP32-S3-DevKitC-1** (N16R8), two 22-pin headers
-   (J1, J3). Still open: measure the center-to-center distance between the two header rows on
-   the owner's board before the socket footprint is finalised.
+1. **ESP32-S3 dev board:** confirmed as the **diymore "ESP32 S3 DevKitC 1 N16R8"** (Amazon.de
+   listing, male pins already soldered), a DevKitC-1 clone with two 22-pin headers and two
+   USB-C ports. Its labels match the standard DevKitC-1 layout (VERIFY against the seller's pin
+   diagram, clones can differ). GPIO35-37 are broken out on the board but used internally by the
+   octal PSRAM, so they must stay unconnected. Still open: measure the center-to-center distance
+   between the two header rows on the owner's board before the socket footprint is finalised.
 2. **Exact LCD module listing** to buy. Pinout and supply voltage must match the footprint. (Open.)
 3. **Game Boy Color speed on the S3** is unconfirmed. Mitigation: test the emulator on the
    owner's board with the screen on a breadboard *before* ordering the PCB.
