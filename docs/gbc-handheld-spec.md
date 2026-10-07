@@ -140,3 +140,49 @@ consolidating into as few parcels as possible matters more than any single part.
 - Teensy Game Boy emulator: https://www.pjrc.com/game-boy-emulator
 - DevKitC-1 header row spacing (25.4 mm vs library 22.86 mm): https://forum.kicad.info/t/pin-distance-in-esp32-s3-devkitc-1/71001
 - ESP32-S3-DevKitC-1 user guide: https://docs.espressif.com/projects/esp-idf/en/v5.2.3/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html
+
+## 9. Schematic status (v0.1, step 3 of the plan)
+
+Files: `gbc-handheld/schematic.py` (SKiDl source), `gbc-handheld/build/gbc_handheld.net`
+(generated KiCad netlist), `gbc-handheld/build/pinmap.md` (generated GPIO table),
+`gbc-handheld/verify_netlist.py` (independent checker).
+
+Reproduce: `source /etc/profile.d/eda.sh && python3 gbc-handheld/schematic.py &&
+python3 -I gbc-handheld/verify_netlist.py gbc-handheld/build/gbc_handheld.net`
+
+What was checked
+- SKiDl ERC: 0 errors, 0 warnings.
+- Independent netlist check: all checks pass on the real netlist (power rails, amp pinout, LCD
+  header, SD header, switch, LED, 8 buttons, every GPIO header position, forbidden pins left
+  unconnected). The checker was also run on two deliberately broken copies and failed them.
+- Netlist converted to a real KiCad PCB (`kinet2pcb`): all 29 footprints load, 32 nets.
+
+Facts verified from primary sources while building it
+- ESP32-S3-DevKitC-1 J1/J3 pin order: Espressif user guide v1.1 tables.
+- PAM8302A SOP-8 pinout read from the Diodes datasheet drawing: 1 /SD, 2 NC, 3 IN+, 4 IN-,
+  5 VO+, 6 VDD, 7 GND, 8 VO-. Gain A = 20 log[2 (RF/RI)], RI min 10k internal, RF 80k.
+- **Buy `PAM8302AADCR` (SOP-8).** `PAM8302AASCR` is the MSOP-8 package, too small to hand-solder.
+- KiCad has no PAM8302A symbol (only the different PAM8301), so the script defines its own.
+- MSP2807 14-pin header: 1 VCC, 2 GND, 3 CS, 4 RESET, 5 DC, 6 SDI(MOSI), 7 SCK, 8 LED,
+  9 SDO(MISO), 10-14 touch. The datasheet lists **no SD pins**.
+
+Design values
+- GPIO: buttons 1,2,4,5,6,7,15,16; LCD 8-13; status LED 14; audio PWM 17; SD CS 21; 18 reserved.
+  The script refuses (assert) any signal on GPIO 0,3,19,20,26-38,43-48.
+- Audio: PWM -> 1k + 10nF low-pass (~16 kHz) -> 220nF + 22k per input -> PAM8302A. Gain is about
+  14 dB (2 x 80k / (10k + 22k)); firmware must keep the PWM amplitude low to avoid clipping.
+  Supply decoupling 1uF + 10uF per the datasheet. /SD pulled high (always on).
+- Power switch: SPDT, common = USB 5 V, throw = switched 5 V for the LCD and amp only.
+- LCD backlight pin from 3V3 through a 0R resistor (R_BL), per the MSP2807 datasheet note.
+
+Open items (must be resolved before layout is frozen)
+1. **SD slot pins (provisional).** The MSP2807 datasheet and wiki list no SD pins. `J_SD` is a
+   4-pin socket guessed as CS, MOSI, MISO, SCK, sharing the LCD SPI bus. Pick the exact module
+   listing and confirm the SD pin order and that the pins exist; otherwise remove `J_SD`.
+2. **Backlight and power switch.** With the switch off and USB plugged in, 3V3 still reaches the
+   LCD LED pin through R_BL; the module may glow faintly or back-feed. Check the module's backlight
+   circuit; fix by removing R_BL or switching 3V3 too.
+3. **Speaker choice** (8 ohm, size) and whether to add a ferrite bead / bulk cap for EMI.
+4. **Footprints are 2.54 mm sockets** sized for the DevKitC-1 at 25.4 mm row spacing; confirm with
+   the 1:1 paper printout before ordering.
+5. **Game Boy Color speed** on the S3 is still unconfirmed (section 4).

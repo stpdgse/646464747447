@@ -1,0 +1,6 @@
+# SKiDl working files
+*.log
+*.erc
+*_sklib.py
+__pycache__/
+*.pyc
