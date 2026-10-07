@@ -251,5 +251,47 @@ overhanging a board edge.
 The owner has only soldered through-hole parts on perfboard and has never soldered SMD or
 ordered a PCB. **The board must be hand-solderable by a beginner.** Decision: no SMD parts.
 All components are through-hole or plug-in (sockets, headers, tactile switches, slide switch,
-axial or radial resistors and capacitors, a 3 mm LED, and a DIP-8 or module amplifier). The
-SMD PAM8302A design in `schematic.py` is therefore being replaced; see the amplifier decision.
+axial or radial resistors and capacitors, a 3 mm LED, and a plug-in amplifier module). The
+SMD PAM8302A design from schematic v0.1 (sections 3.3 and 9) is **superseded** by v0.2, see
+section 13.
+
+## 13. Schematic v0.2 (all through-hole) — current design
+
+Decision (owner): audio amplifier = **MAX98357A I2S digital amplifier module** on a 7-pin socket.
+Everything else is through-hole or plug-in. 19 parts, no SMD footprints.
+
+| Ref | Part | Footprint |
+|---|---|---|
+| J1, J3 | ESP32-S3-DevKitC-1 header sockets, 2 x 1x22 female | 2.54 mm socket, rows 22.86 mm apart |
+| J_LCD | LCD module header socket, 1x14 female | 2.54 mm socket |
+| J_SD | 4-pin header, 4 wires to the module's SD pads | 2.54 mm pin header |
+| J_AMP | MAX98357A module socket, 1x7 female | 2.54 mm socket |
+| JP_BL | backlight jumper, 2-pin header + shunt | 2.54 mm pin header |
+| SW1-SW8 | 6 mm tactile buttons (D-pad, A, B, Start, Select) | THT 6 mm |
+| SW_PWR | SPDT slide switch (C&K OS102011MS2Q type) | THT |
+| R_LED | 1k, 1/4 W axial | THT |
+| D_STATUS | 3 mm LED | THT |
+| C_BULK | 100 uF electrolytic, >=10 V, radial 5 mm | THT, polarised |
+| C_HF | 100 nF ceramic, disc | THT |
+
+Also needed, not on the PCB: 4x M3 standoffs + screws (LCD), speaker (4-8 ohm, 3 W max) wired to
+the amp module's own terminals, 4 short wires for the SD pads, one jumper shunt.
+
+Audio: I2S on GPIO17 (BCLK), GPIO18 (LRC), GPIO40 (DIN), GPIO41 (SD / mute). The module's own
+SD pull-up gives a mono mix; the ESP32 can pull SD low to mute. GAIN is left open (9 dB).
+Facts from the Adafruit guide: SD below 0.16 V = shutdown, 0.16-0.77 V = (L+R)/2, 0.77-1.4 V
+= right only, above 1.4 V = left only; GAIN open = 9 dB; VIN 2.7-5.5 V. Driving SD high from a
+3.3 V GPIO selects LEFT only, so use open-drain/high-Z for "on" in firmware, low for mute.
+
+Checks on v0.2: SKiDl ERC clean; `verify_netlist.py` 101 checks pass (and fails a deliberately
+broken copy); netlist converts to a PCB with 19 footprints, none SMD.
+
+Open items before ordering
+1. **MAX98357A module pin order.** The header order `LRC BCLK DIN GAIN SD GND VIN` is assumed
+   from the Adafruit breakout; clones may differ or reverse it. Pick the listing, read its
+   silkscreen photo, and set `AMP_ORDER` in `schematic.py` (one line). Module is about 19 x 18 mm.
+2. LCD module: listing with shipping inside the EU; confirm SD pad labels and the 14-pin header
+   dimensions on the real module (1:1 paper template before ordering PCBs).
+3. DevKitC-1 clone dimensions vs Espressif's drawing (section 11): paper template check.
+4. Speaker size and mounting (not on the PCB).
+5. Game Boy Color speed on the S3 (section 4), unconfirmed.

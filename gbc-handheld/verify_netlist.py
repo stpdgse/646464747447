@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent check of build/gbc_handheld.net.
+"""Independent check of build/gbc_handheld.net (design v0.2, all through-hole).
 
 Parses the KiCad netlist file itself with a small s-expression reader (not the
 SKiDl objects that wrote it) and asserts the connections that would wreck a
@@ -79,37 +79,37 @@ def main(path):
         na, nb = net_of(*a), net_of(*b)
         return na is not None and na == nb
 
-    # 5 connectors + 9 switches + 6 resistors + 7 capacitors + 1 LED + 1 amp
-    check(len(comps) == 29, f"29 parts expected, found {len(comps)}")
-    check(len(nets) >= 25, f"{len(nets)} nets parsed")
-    check(all(c["fp"] for c in comps.values()), "every part has a footprint")
+    def is_nc(ref, pin):
+        n = net_of(ref, pin)
+        return n is None or n.lower().startswith("unconnected")
 
-    # PAM8302A SOP-8 pinout (datasheet): 1 /SD 3 IN+ 4 IN- 5 VO+ 6 VDD 7 GND 8 VO-
-    check(net_of("U_AMP", 6) == "+5V_SW", "amp VDD (pin 6) on +5V_SW")
-    check(net_of("U_AMP", 7) == "GND", "amp GND (pin 7) on GND")
-    check(same(("J_SPK", 1), ("U_AMP", 5)), "speaker + on amp VO+ (pin 5)")
-    check(same(("J_SPK", 2), ("U_AMP", 8)), "speaker - on amp VO- (pin 8)")
-    check(net_of("U_AMP", 5) not in (None, net_of("U_AMP", 8)),
-          "amp outputs are on different nets")
-    check(same(("R_SD", 2), ("U_AMP", 1)) and net_of("R_SD", 1) == "+5V_SW",
-          "amp /SD (pin 1) pulled high to +5V_SW via R_SD")
-    check(net_of("U_AMP", 3) not in (None, net_of("U_AMP", 4)),
-          "amp IN+ and IN- are separate nets")
-    check(same(("R_INP", 2), ("U_AMP", 3)) and same(("R_INN", 2), ("U_AMP", 4)),
-          "input resistors feed IN+ and IN-")
-    check(same(("C_INP", 1), ("R_F", 2)) and net_of("C_INN", 1) == "GND",
-          "IN+ path from the filtered PWM, IN- path from GND")
-    check(net_of("R_F", 1) == "AUDIO_PWM", "PWM filter input is AUDIO_PWM")
+    # 5 connectors + 1 jumper header + 9 switches + 1 resistor + 2 capacitors + 1 LED
+    check(len(comps) == 19, f"19 parts expected, found {len(comps)}")
+    check(len(nets) >= 20, f"{len(nets)} nets parsed")
+    check(all(c["fp"] for c in comps.values()), "every part has a footprint")
+    # Beginner requirement: no surface-mount footprints at all
+    smd = [r for r, c in comps.items() if re.search(r"(?i)_SMD|SOIC|SOP|QFN|0805|0603|0402",
+                                                    c["fp"] or "")]
+    check(not smd, f"no SMD footprints (found: {smd})")
+
+    # MAX98357A module header, assumed Adafruit order (VERIFY): LRC BCLK DIN GAIN SD GND VIN
+    amp = {1: "AUDIO_LRC", 2: "AUDIO_BCLK", 3: "AUDIO_DIN", 5: "AUDIO_SD",
+           6: "GND", 7: "+5V_SW"}
+    for pin, want in amp.items():
+        check(net_of("J_AMP", pin) == want, f"J_AMP pin {pin} on {want}")
+    check(is_nc("J_AMP", 4), "J_AMP pin 4 (GAIN) left open = 9 dB")
 
     # LCD header (MSP2807): 1 VCC 2 GND 3 CS 4 RST 5 DC 6 MOSI 7 SCK 8 LED 9 MISO
     expect = {1: "+5V_SW", 2: "GND", 3: "LCD_CS", 4: "LCD_RST", 5: "LCD_DC",
               6: "LCD_MOSI", 7: "LCD_SCK", 9: "LCD_MISO"}
     for pin, want in expect.items():
         check(net_of("J_LCD", pin) == want, f"LCD pin {pin} on {want}")
-    check(same(("R_BL", 2), ("J_LCD", 8)) and net_of("R_BL", 1) == "+3V3",
-          "LCD backlight pin fed from +3V3 through R_BL")
+    check(net_of("JP_BL", 1) == "+3V3" and same(("JP_BL", 2), ("J_LCD", 8)),
+          "backlight jumper: +3V3 -> LCD LED pin")
+    for pin in (10, 11, 12, 13, 14):
+        check(is_nc("J_LCD", pin), f"LCD touch pin {pin} not connected")
 
-    # SD pins share the LCD SPI bus
+    # SD wires share the LCD SPI bus
     check(net_of("J_SD", 1) == "SD_CS" and net_of("J_SD", 2) == "LCD_MOSI"
           and net_of("J_SD", 3) == "LCD_MISO" and net_of("J_SD", 4) == "LCD_SCK",
           "SD header: CS own pin, MOSI/MISO/SCK shared with the LCD")
@@ -117,6 +117,7 @@ def main(path):
     # Power switch must not short USB 5V to the switched rail
     check(net_of("SW_PWR", 2) == "+5V_USB" and net_of("SW_PWR", 1) == "+5V_SW",
           "power switch: common=+5V_USB, throw=+5V_SW")
+    check(is_nc("SW_PWR", 3), "power switch third pin unused")
 
     # Dev board power pins: J1 pin 1/2 = 3V3, 21 = 5V, 22 = GND
     check(net_of("J1", 1) == "+3V3" and net_of("J1", 2) == "+3V3",
@@ -126,6 +127,12 @@ def main(path):
           "ground pins on GND")
     check(len({"GND", "+3V3", "+5V_USB", "+5V_SW"} & set(nets)) == 4,
           "all four power nets exist")
+
+    # Capacitors: electrolytic + side on the switched 5 V rail
+    check(net_of("C_BULK", 1) == "+5V_SW" and net_of("C_BULK", 2) == "GND",
+          "bulk electrolytic: + on +5V_SW, - on GND")
+    check(net_of("C_HF", 1) == "+5V_SW" and net_of("C_HF", 2) == "GND",
+          "100nF across +5V_SW and GND")
 
     # Status LED
     check(net_of("R_LED", 1) == "STATUS_LED" and same(("R_LED", 2), ("D_STATUS", 2))
@@ -144,29 +151,28 @@ def main(path):
     # GPIO pin positions vs Espressif's tables (J1/J3 pin number -> GPIO)
     positions = {("J1", 4): "BTN_LEFT", ("J1", 5): "BTN_RIGHT",
                  ("J1", 6): "BTN_A", ("J1", 7): "BTN_B", ("J1", 8): "BTN_START",
-                 ("J1", 9): "BTN_SELECT", ("J1", 10): "AUDIO_PWM",
-                 ("J1", 12): "LCD_RST", ("J1", 15): "LCD_DC", ("J1", 16): "LCD_CS",
-                 ("J1", 17): "LCD_MOSI", ("J1", 18): "LCD_SCK",
+                 ("J1", 9): "BTN_SELECT", ("J1", 10): "AUDIO_BCLK",
+                 ("J1", 11): "AUDIO_LRC", ("J1", 12): "LCD_RST", ("J1", 15): "LCD_DC",
+                 ("J1", 16): "LCD_CS", ("J1", 17): "LCD_MOSI", ("J1", 18): "LCD_SCK",
                  ("J1", 19): "LCD_MISO", ("J1", 20): "STATUS_LED",
-                 ("J3", 4): "BTN_UP", ("J3", 5): "BTN_DOWN", ("J3", 18): "SD_CS"}
+                 ("J3", 4): "BTN_UP", ("J3", 5): "BTN_DOWN",
+                 ("J3", 7): "AUDIO_SD", ("J3", 8): "AUDIO_DIN", ("J3", 18): "SD_CS"}
     for (ref, pin), want in positions.items():
         check(net_of(ref, pin) == want, f"{ref} pin {pin} carries {want}")
 
     # Forbidden header positions must stay unconnected
-    # (J1 3=RST 13=GPIO3 14=GPIO46; J3 2,3=UART0 6-9=JTAG 10=GPIO38 11-13=PSRAM
+    # (J1 3=RST 13=GPIO3 14=GPIO46; J3 2,3=UART0 10=GPIO38 11-13=PSRAM
     #  14=GPIO0 15=GPIO45 16,17=GPIO48/47 19,20=USB)
     forbidden_pos = [("J1", 3), ("J1", 13), ("J1", 14), ("J3", 2), ("J3", 3),
                      ("J3", 10), ("J3", 11), ("J3", 12), ("J3", 13), ("J3", 14),
                      ("J3", 15), ("J3", 16), ("J3", 17), ("J3", 19), ("J3", 20)]
     for ref, pin in forbidden_pos:
-        n = net_of(ref, pin)
-        check(n is None or n.startswith("unconnected") or "NC" in n.upper(),
-              f"{ref} pin {pin} left unconnected (got {n})")
+        check(is_nc(ref, pin), f"{ref} pin {pin} left unconnected (got {net_of(ref, pin)})")
 
     # No signal net may dangle with a single node (power and no-connects aside)
     skip = {"GND", "+3V3", "+5V_USB", "+5V_SW"}
     for name, nodes in nets.items():
-        if name in skip or name.startswith("unconnected"):
+        if name in skip or name.lower().startswith("unconnected"):
             continue
         check(len(nodes) >= 2, f"net {name} has {len(nodes)} nodes")
 

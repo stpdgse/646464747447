@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-"""Game Boy Color-style handheld: schematic as code (SKiDl, KiCad 9 libraries).
+"""Game Boy Color-style handheld, v0.2: schematic as code (SKiDl, KiCad 9 libraries).
+
+ALL THROUGH-HOLE / PLUG-IN: the owner is a beginner and must be able to hand-solder it.
 
 Run (after `source /etc/profile.d/eda.sh`, see ../setup-eda.sh):
     python3 gbc-handheld/schematic.py
 
-Writes build/gbc_handheld.net (KiCad netlist), build/gbc_handheld.erc, and
-build/pinmap.md (ESP32 header assignment). Spec: ../docs/gbc-handheld-spec.md
+Writes build/gbc_handheld.net (KiCad netlist) and build/pinmap.md (GPIO table).
+Spec: ../docs/gbc-handheld-spec.md
 
-Sources checked while writing this (see the spec for links):
+Sources checked while writing this (links in the spec):
   * ESP32-S3-DevKitC-1 v1.1 header tables J1/J3 (Espressif user guide)
-  * PAM8302A datasheet (Diodes Inc., Rev 2-5): SOP-8 pinout, typical circuit,
-    gain A = 20*log[2*(RF/RI)], RI(min) = 10k internal, RF = 80k
-  * MSP2807 datasheet (14-pin header, no SD pins listed there)
-Items still marked VERIFY need the real parts in hand or a closer look.
+  * MSP2807 datasheet + outline drawing (14-pin header; SD signals are bare pads)
+  * MAX98357A breakout behaviour (Adafruit guide): GAIN open = 9 dB; SD low = shutdown,
+    1M pull-up to VIN on the breakout = (L+R)/2 mono mix; VIN 2.7-5.5 V
+Items marked VERIFY need the real parts / final listings before ordering.
 """
 import os
 from skidl import *  # noqa: F401,F403
@@ -23,18 +25,19 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "build")
 os.makedirs(OUT, exist_ok=True)
 
 # --------------------------------------------------------------------------
-# Footprints (all verified to exist in the KiCad 9 library)
+# Footprints (all verified to exist in the KiCad 9 library). No SMD anywhere.
 # --------------------------------------------------------------------------
 FP_SOCKET22 = "Connector_PinSocket_2.54mm:PinSocket_1x22_P2.54mm_Vertical"
 FP_SOCKET14 = "Connector_PinSocket_2.54mm:PinSocket_1x14_P2.54mm_Vertical"
+FP_SOCKET7 = "Connector_PinSocket_2.54mm:PinSocket_1x07_P2.54mm_Vertical"
 FP_HDR4 = "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
 FP_HDR2 = "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
 FP_TACT = "Button_Switch_THT:SW_PUSH_6mm"
 FP_SLIDE = "Button_Switch_THT:SW_Slide_SPDT_Straight_CK_OS102011MS2Q"
-FP_SOIC8 = "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"  # PAM8302A *ADCR* (SOP-8)
-FP_R = "Resistor_SMD:R_0805_2012Metric"
-FP_C = "Capacitor_SMD:C_0805_2012Metric"
-FP_LED = "LED_SMD:LED_0805_2012Metric"
+FP_R = "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+FP_C_DISC = "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P5.00mm"
+FP_C_ELEC = "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm"
+FP_LED = "LED_THT:LED_D3.0mm"
 
 # --------------------------------------------------------------------------
 # Nets
@@ -48,7 +51,6 @@ for n in (gnd, v3v3, v5_usb, v5_sw):
 
 # --------------------------------------------------------------------------
 # ESP32-S3-DevKitC-1 headers (verified against Espressif's J1/J3 tables)
-# Pin number -> function. Numbers are header positions 1..22.
 # --------------------------------------------------------------------------
 J1_MAP = {1: "3V3", 2: "3V3", 3: "RST", 4: "GPIO4", 5: "GPIO5", 6: "GPIO6",
           7: "GPIO7", 8: "GPIO15", 9: "GPIO16", 10: "GPIO17", 11: "GPIO18",
@@ -91,7 +93,6 @@ def gpio(n, net_name):
     return net
 
 
-# Power / ground / unused pins on the ESP32 headers
 for hdr, mp in ((j1, J1_MAP), (j3, J3_MAP)):
     for num, fn in mp.items():
         if fn == "3V3":
@@ -110,14 +111,17 @@ def mark_unused_header_pins():
             if not pin.is_connected():
                 pin += NC
 
+
 # --------------------------------------------------------------------------
 # GPIO assignment (see build/pinmap.md for the generated table)
 # --------------------------------------------------------------------------
 GPIO_USED = {}
 
+
 def assign(n, name):
     GPIO_USED[n] = name
     return gpio(n, name)
+
 
 # Buttons: switch between the GPIO and GND, internal pull-up in firmware.
 BUTTONS = [("UP", 1), ("DOWN", 2), ("LEFT", 4), ("RIGHT", 5),
@@ -128,7 +132,7 @@ for i, (label, g) in enumerate(BUTTONS, start=1):
     sw[1] += assign(g, f"BTN_{label}")
     sw[2] += gnd
 
-# LCD (SPI2/FSPI default "IO_MUX" pins: CS=10, MOSI=11, SCK=12, MISO=13)
+# LCD (FSPI default IO_MUX pins: CS=10, MOSI=11, SCK=12, MISO=13)
 lcd_cs = assign(10, "LCD_CS")
 lcd_mosi = assign(11, "LCD_MOSI")
 lcd_sck = assign(12, "LCD_SCK")
@@ -136,12 +140,16 @@ lcd_miso = assign(13, "LCD_MISO")
 lcd_dc = assign(9, "LCD_DC")
 lcd_rst = assign(8, "LCD_RST")
 sd_cs = assign(21, "SD_CS")
-audio_pwm = assign(17, "AUDIO_PWM")
 status_led = assign(14, "STATUS_LED")
-RESERVED = {18: "spare (future L button / second status)"}
+# I2S audio to the MAX98357A module. Any free GPIO works through the ESP32-S3 GPIO matrix.
+audio_bclk = assign(17, "AUDIO_BCLK")
+audio_lrc = assign(18, "AUDIO_LRC")
+audio_din = assign(40, "AUDIO_DIN")
+audio_mute = assign(41, "AUDIO_SD")
 
 # --------------------------------------------------------------------------
-# LCD module socket: MSP2807, 14-pin header (verified from the datasheet)
+# LCD module socket: MSP2807, 14-pin header (verified from the datasheet and the
+# manufacturer's outline drawing). The module's back faces our board.
 # 1 VCC 2 GND 3 CS 4 RESET 5 DC 6 SDI(MOSI) 7 SCK 8 LED 9 SDO(MISO)
 # 10 T_CLK 11 T_CS 12 T_DIN 13 T_DO 14 T_IRQ  (touch: not used)
 # --------------------------------------------------------------------------
@@ -155,21 +163,21 @@ j_lcd[5] += lcd_dc
 j_lcd[6] += lcd_mosi
 j_lcd[7] += lcd_sck
 j_lcd[9] += lcd_miso
-# Backlight: datasheet says tie to 3.3 V for always-on. Series 0R so it can be
-# changed to a GPIO or removed. VERIFY against the chosen module listing.
-r_bl = Part("Device", "R", ref="R_BL", value="0R", footprint=FP_R)
-r_bl[1] += v3v3
-r_bl[2] += j_lcd[8]
 for pin in (10, 11, 12, 13, 14):
     j_lcd[pin] += NC
 
+# Backlight: the datasheet says tie LED to 3.3 V for always-on. A 2-pin header with a
+# jumper shunt (a cheap plastic bridge) lets you connect or remove it with no soldering.
+# VERIFY against the chosen module's backlight circuit.
+jp_bl = Part("Connector_Generic", "Conn_01x02", ref="JP_BL",
+             footprint=FP_HDR2, value="Backlight jumper")
+jp_bl[1] += v3v3
+jp_bl[2] += j_lcd[8]
+
 # SD slot: the module's SD interface (SD_CS, SD_MOSI, SD_MISO, SD_SCK) is four bare
-# round SOLDER PADS on the module's back, NOT a header (MSP2807 datasheet photo and the
-# DIANN listing photo; the manufacturer's outline drawing shows no SD header).
-# The pads sit on the glass side of the PCB and cannot plug into a socket, so the owner
-# solders four short wires from those pads to this 4-pin header. Pin order below is the
-# module silkscreen read bottom to top: SD_CS, SD_MOSI, SD_MISO, SD_SCK.
-# VERIFY on the real module that the pad labels match before soldering.
+# round SOLDER PADS on the module's back, NOT a header. The owner solders four short
+# wires from those pads to this 4-pin header. Pin order = module silkscreen read
+# bottom to top: SD_CS, SD_MOSI, SD_MISO, SD_SCK. VERIFY on the real module.
 j_sd = Part("Connector_Generic", "Conn_01x04", ref="J_SD",
             footprint=FP_HDR4, value="SD wires: CS MOSI MISO SCK")
 j_sd[1] += sd_cs
@@ -179,7 +187,7 @@ j_sd[4] += lcd_sck
 
 # --------------------------------------------------------------------------
 # Power switch: SPDT slide. Common = USB 5 V, throw A = switched 5 V.
-# Cuts power to the LCD and amplifier. It does NOT power the ESP32 off.
+# Cuts power to the LCD and the amplifier. It does NOT power the ESP32 off.
 # --------------------------------------------------------------------------
 sw_pwr = Part("Switch", "SW_SPDT", ref="SW_PWR", footprint=FP_SLIDE,
               value="Power (slide)")
@@ -187,86 +195,44 @@ sw_pwr[2] += v5_usb
 sw_pwr[1] += v5_sw
 sw_pwr[3] += NC
 
-# Bulk + local decoupling for the switched rail
-c_bulk = Part("Device", "C", ref="C_BULK", value="10uF", footprint=FP_C)
-c_hf = Part("Device", "C", ref="C_HF", value="100nF", footprint=FP_C)
-for c in (c_bulk, c_hf):
-    c[1] += v5_sw
-    c[2] += gnd
+# Bulk (electrolytic, mind the polarity) + high-frequency decoupling on the switched rail
+c_bulk = Part("Device", "C_Polarized", ref="C_BULK", value="100uF",
+              footprint=FP_C_ELEC)
+c_bulk[1] += v5_sw     # + side
+c_bulk[2] += gnd       # - side (stripe)
+c_hf = Part("Device", "C", ref="C_HF", value="100nF", footprint=FP_C_DISC)
+c_hf[1] += v5_sw
+c_hf[2] += gnd
 
 # --------------------------------------------------------------------------
-# Status LED on GPIO14
+# Status LED on GPIO14 (3 mm, through-hole)
 # --------------------------------------------------------------------------
 r_led = Part("Device", "R", ref="R_LED", value="1k", footprint=FP_R)
-d_led = Part("Device", "LED", ref="D_STATUS", value="LED", footprint=FP_LED)
+d_led = Part("Device", "LED", ref="D_STATUS", value="LED 3mm", footprint=FP_LED)
 r_led[1] += status_led
 r_led[2] += d_led[2]   # anode (KiCad LED symbol: 1=K, 2=A)
 d_led[1] += gnd
 
 # --------------------------------------------------------------------------
-# Audio: PWM -> RC low-pass -> PAM8302A (SOP-8) -> speaker header
-# Pin order VERIFIED from the datasheet: 1 /SD, 2 NC, 3 IN+, 4 IN-, 5 VO+,
-# 6 VDD, 7 GND, 8 VO-.  BUY: PAM8302AADCR (SOP-8). The AASCR is MSOP-8.
+# Audio: MAX98357A I2S amplifier module on a 7-pin socket. The module's own screw
+# terminal or pads carry the speaker; no audio parts are needed on our board.
+# Header order assumed from the Adafruit breakout silkscreen, left to right with the
+# module front facing up:  LRC, BCLK, DIN, GAIN, SD, GND, VIN.
+# VERIFY against the exact module listing: clones sometimes reverse the order. If so,
+# reverse AMP_ORDER here and re-run; nothing else changes.
+# GAIN left open = 9 dB. SD: the module pulls it to VIN (mono mix); the ESP32 can pull
+# it low to mute (firmware: drive low, or high-Z for normal).
 # --------------------------------------------------------------------------
-pam8302a = Part(
-    tool=SKIDL, name="PAM8302A", dest=TEMPLATE, ref_prefix="U",
-    pins=[
-        Pin(num=1, name="~{SD}", func=Pin.types.INPUT),
-        Pin(num=2, name="NC", func=Pin.types.NOCONNECT),
-        Pin(num=3, name="IN+", func=Pin.types.INPUT),
-        Pin(num=4, name="IN-", func=Pin.types.INPUT),
-        Pin(num=5, name="VO+", func=Pin.types.OUTPUT),
-        Pin(num=6, name="VDD", func=Pin.types.PWRIN),
-        Pin(num=7, name="GND", func=Pin.types.PWRIN),
-        Pin(num=8, name="VO-", func=Pin.types.OUTPUT),
-    ],
-)
-u_amp = pam8302a(ref="U_AMP", footprint=FP_SOIC8, value="PAM8302AADCR")
-u_amp[2] += NC
-u_amp[6] += v5_sw
-u_amp[7] += gnd
-
-# Supply decoupling per datasheet: 1uF close to VDD plus 10uF
-c_amp1 = Part("Device", "C", ref="C_AMP1", value="1uF", footprint=FP_C)
-c_amp10 = Part("Device", "C", ref="C_AMP10", value="10uF", footprint=FP_C)
-for c in (c_amp1, c_amp10):
-    c[1] += v5_sw
-    c[2] += gnd
-
-# Always-on: pull /SD high. (A GPIO mute can replace this later.)
-r_sd = Part("Device", "R", ref="R_SD", value="100k", footprint=FP_R)
-r_sd[1] += v5_sw
-r_sd[2] += u_amp[1]
-
-# PWM low-pass: 1k + 10nF, corner ~16 kHz
-r_f = Part("Device", "R", ref="R_F", value="1k", footprint=FP_R)
-c_f = Part("Device", "C", ref="C_F", value="10nF", footprint=FP_C)
-audio_filt = Net("AUDIO_FILT")
-r_f[1] += audio_pwm
-r_f[2] += audio_filt
-c_f[1] += audio_filt
-c_f[2] += gnd
-
-# Input network, symmetrical (datasheet typical circuit): Ci then R, per input.
-# Ci = 0.22uF -> high-pass corner ~72 Hz with RI=10k.
-# External R = 22k sets gain A = 20*log(2*80k/(10k+22k)) = ~14 dB.
-# Keep the PWM amplitude low in firmware to avoid clipping into 5 V.
-c_inp = Part("Device", "C", ref="C_INP", value="220nF", footprint=FP_C)
-r_inp = Part("Device", "R", ref="R_INP", value="22k", footprint=FP_R)
-c_inn = Part("Device", "C", ref="C_INN", value="220nF", footprint=FP_C)
-r_inn = Part("Device", "R", ref="R_INN", value="22k", footprint=FP_R)
-amp_inp, amp_inn = Net("AMP_IN_P"), Net("AMP_IN_N")
-audio_filt += c_inp[1]
-c_inp[2] += r_inp[1]
-amp_inp += r_inp[2], u_amp[3]
-gnd += c_inn[1]
-c_inn[2] += r_inn[1]
-amp_inn += r_inn[2], u_amp[4]
-
-j_spk = Part("Connector_Generic", "Conn_01x02", ref="J_SPK",
-             footprint=FP_HDR2, value="Speaker 8R")
-j_spk[1] += u_amp[5]   # VO+
-j_spk[2] += u_amp[8]   # VO-
+AMP_ORDER = ["LRC", "BCLK", "DIN", "GAIN", "SD", "GND", "VIN"]
+j_amp = Part("Connector_Generic", "Conn_01x07", ref="J_AMP",
+             footprint=FP_SOCKET7, value="MAX98357A: " + " ".join(AMP_ORDER))
+amp_nets = {"LRC": audio_lrc, "BCLK": audio_bclk, "DIN": audio_din,
+            "SD": audio_mute, "GND": gnd, "VIN": v5_sw}
+for idx, name in enumerate(AMP_ORDER, start=1):
+    if name == "GAIN":
+        j_amp[idx] += NC
+    else:
+        j_amp[idx] += amp_nets[name]
 
 
 # --------------------------------------------------------------------------
@@ -277,8 +243,6 @@ def write_pinmap():
              "| GPIO | Signal |", "|---|---|"]
     for n in sorted(GPIO_USED):
         lines.append(f"| GPIO{n} | {GPIO_USED[n]} |")
-    for n, why in sorted(RESERVED.items()):
-        lines.append(f"| GPIO{n} | reserved: {why} |")
     lines += ["", "Forbidden on this board: " +
               ", ".join(f"GPIO{n}" for n in sorted(FORBIDDEN)) + "."]
     with open(os.path.join(OUT, "pinmap.md"), "w") as f:
