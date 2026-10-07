@@ -109,8 +109,10 @@ consolidating into as few parcels as possible matters more than any single part.
    listing, male pins already soldered), a DevKitC-1 clone with two 22-pin headers and two
    USB-C ports. Its labels match the standard DevKitC-1 layout (VERIFY against the seller's pin
    diagram, clones can differ). GPIO35-37 are broken out on the board but used internally by the
-   octal PSRAM, so they must stay unconnected. Still open: measure the center-to-center distance
-   between the two header rows on the owner's board before the socket footprint is finalised.
+   octal PSRAM, so they must stay unconnected. Header row spacing is **25.4 mm (1 in)** per a KiCad
+   forum thread (see section 8). **Trap:** the official KiCad library footprint for this board
+   reportedly uses 22.86 mm, which is wrong; do not use it unchecked. The 1:1 paper printout
+   check in section 7 (step 4) covers this against the owner's real board.
 2. **Exact LCD module listing** to buy. Pinout and supply voltage must match the footprint. (Open.)
 3. **Game Boy Color speed on the S3** is unconfirmed. Mitigation: test the emulator on the
    owner's board with the screen on a breadboard *before* ordering the PCB.
@@ -136,3 +138,5 @@ consolidating into as few parcels as possible matters more than any single part.
 - PaperBoy S3, Game Boy at 60 fps on ESP32-S3: https://www.cnx-software.com/2026/07/02/paperboy-game-boy-emulator-works-at-60-fps-on-esp32-s3-e-ink-devkit/
 - ESP32-S3 vs P4 guide: https://www.elecrow.com/blog/esp32-s31-vs-s3-vs-p4-complete-2026-selection-guide.html
 - Teensy Game Boy emulator: https://www.pjrc.com/game-boy-emulator
+- DevKitC-1 header row spacing (25.4 mm vs library 22.86 mm): https://forum.kicad.info/t/pin-distance-in-esp32-s3-devkitc-1/71001
+- ESP32-S3-DevKitC-1 user guide: https://docs.espressif.com/projects/esp-idf/en/v5.2.3/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html
