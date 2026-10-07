@@ -27,7 +27,7 @@ os.makedirs(OUT, exist_ok=True)
 # --------------------------------------------------------------------------
 FP_SOCKET22 = "Connector_PinSocket_2.54mm:PinSocket_1x22_P2.54mm_Vertical"
 FP_SOCKET14 = "Connector_PinSocket_2.54mm:PinSocket_1x14_P2.54mm_Vertical"
-FP_SOCKET4 = "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical"
+FP_HDR4 = "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
 FP_HDR2 = "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
 FP_TACT = "Button_Switch_THT:SW_PUSH_6mm"
 FP_SLIDE = "Button_Switch_THT:SW_Slide_SPDT_Straight_CK_OS102011MS2Q"
@@ -163,11 +163,15 @@ r_bl[2] += j_lcd[8]
 for pin in (10, 11, 12, 13, 14):
     j_lcd[pin] += NC
 
-# SD slot: the MSP2807 datasheet lists no SD pins. Many modules put the slot on
-# a separate 4-pin header (SD_CS, SD_MOSI, SD_MISO, SD_SCK). PROVISIONAL.
-# VERIFY the pin order against the exact module listing before ordering.
+# SD slot: the module's SD interface (SD_CS, SD_MOSI, SD_MISO, SD_SCK) is four bare
+# round SOLDER PADS on the module's back, NOT a header (MSP2807 datasheet photo and the
+# DIANN listing photo; the manufacturer's outline drawing shows no SD header).
+# The pads sit on the glass side of the PCB and cannot plug into a socket, so the owner
+# solders four short wires from those pads to this 4-pin header. Pin order below is the
+# module silkscreen read bottom to top: SD_CS, SD_MOSI, SD_MISO, SD_SCK.
+# VERIFY on the real module that the pad labels match before soldering.
 j_sd = Part("Connector_Generic", "Conn_01x04", ref="J_SD",
-            footprint=FP_SOCKET4, value="SD pins (provisional)")
+            footprint=FP_HDR4, value="SD wires: CS MOSI MISO SCK")
 j_sd[1] += sd_cs
 j_sd[2] += lcd_mosi
 j_sd[3] += lcd_miso

@@ -176,9 +176,12 @@ Design values
 - LCD backlight pin from 3V3 through a 0R resistor (R_BL), per the MSP2807 datasheet note.
 
 Open items (must be resolved before layout is frozen)
-1. **SD slot pins (provisional).** The MSP2807 datasheet and wiki list no SD pins. `J_SD` is a
-   4-pin socket guessed as CS, MOSI, MISO, SCK, sharing the LCD SPI bus. Pick the exact module
-   listing and confirm the SD pin order and that the pins exist; otherwise remove `J_SD`.
+1. **SD pads (resolved in design, verify on the real module).** The module's SD interface is
+   four bare round **solder pads** on its back (datasheet photo, DIANN listing photo), not a
+   header, and they cannot plug into a socket. `J_SD` is now a 4-pin header on our PCB; the
+   owner solders four short wires from the module's SD pads to it, in the order SD_CS, SD_MOSI,
+   SD_MISO, SD_SCK (silkscreen read bottom to top). Confirm the pad labels on the real module.
+   Fallback if wiring is unwanted: drop the module slot and use ROMs from the 16 MB flash.
 2. **Backlight and power switch.** With the switch off and USB plugged in, 3V3 still reaches the
    LCD LED pin through R_BL; the module may glow faintly or back-feed. Check the module's backlight
    circuit; fix by removing R_BL or switching 3V3 too.
@@ -186,3 +189,40 @@ Open items (must be resolved before layout is frozen)
 4. **Footprints are 2.54 mm sockets** sized for the DevKitC-1 at 25.4 mm row spacing; confirm with
    the 1:1 paper printout before ordering.
 5. **Game Boy Color speed** on the S3 is still unconfirmed (section 4).
+
+## 10. LCD module: chosen listing and mechanical data
+
+Listing the owner found: **DIANN 2.8" ILI9341 SPI TFT 240x320, "No Touch Function" variant**
+(Amazon.com, $9.99 plus about $13.94 shipping and import charges to Germany, about $24 total
+for one module at the time of the screenshot). The back-of-board photo shows silkscreen
+matching the MSP2807 pin order, "V1.1", and the four SD pads. Not yet bought.
+
+**Cost warning:** shipping and import charges are more than the module. The $25-40 project
+budget would be mostly spent on this one part. Look for the same module sold within the EU
+(for example amazon.de or a German electronics shop) before buying. The pinout and drawing
+below are the MSP2807 reference design; a clone may differ slightly, so measure the real
+module before ordering PCBs.
+
+Mechanical data from the manufacturer's outline drawing (`MSP2807_Size.pdf` on lcdwiki.com,
+revision V1.0, PCB marked V1.2), unmarked tolerance +/-0.2 mm. Module held portrait, front view:
+
+| Item | Value |
+|---|---|
+| PCB size | 50.00 x 86.00 mm, 1.60 mm thick |
+| Glass (LCD) | 50.00 x 69.20 mm; viewable 45.20 x 59.45; active 43.20 x 57.60 |
+| Mounting holes | 4x, 3.20 mm drill (4.70 mm pad), spacing 44.00 x 76.08 mm, 3.00 mm from the sides, top pair 3.00 mm from the top edge |
+| 14-pin header | on the bottom short edge, centred on the 50 mm width, 13 x 2.54 = 33.02 mm long, 8.49 mm from each side, pin row 2.00 mm up from the bottom edge |
+| Header pin order | back view: pin 14 (T_IRQ) left ... pin 1 (VCC) right; so pin 1 is on the left in the front view |
+| Heights | total thickness excluding header 5.60 mm; header height 11.17 mm; total including header 12.78 mm |
+| SD slot | on the back, right of centre; opens toward one long edge. Keep tall parts out from under it |
+| SD pads | 4 round pads (labels SD_SCK, SD_MISO, SD_MOSI, SD_CS), not on the 14-pin header |
+
+Consequences for the board
+- A 1x14 female socket at 2.54 mm pitch matches the header (33.02 mm span confirmed).
+- Add four **M3 standoffs and screws** (hole positions above) to carry the module; standoff
+  length must match the socket height (about 8.5 mm for a standard female header; VERIFY
+  against the pins' protrusion, 5.84 mm in the drawing).
+- If the module is mounted landscape (86 x 50, rotated 90 degrees clockwise), holes land at
+  x = 6.92 and 83.00 mm, y = 3.00 and 47.00 mm from the module's top-left corner, and the
+  header runs vertically along the left edge with pin 1 at the top.
+- Add four short wires (module SD pads to `J_SD`), and keep a clear zone under the SD slot.
