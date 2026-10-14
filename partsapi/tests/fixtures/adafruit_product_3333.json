@@ -1,0 +1,44 @@
+{
+ "product_id": "3333",
+ "product_image": "https://cdn-shop.adafruit.com/640x480/3333-05.jpg",
+ "product_image_alt": "A Black woman's manicured hand holds a round microcontroller with lit up LEDs.",
+ "image_is_video": "0",
+ "product_name": "Circuit Playground Express",
+ "product_model": "",
+ "product_mpn": "ADA3333",
+ "product_master_category": "966",
+ "product_manufacturer": "Adafruit",
+ "product_price": "24.95",
+ "product_shipping_weight": "15.4",
+ "product_url": "https://www.adafruit.com/product/3333",
+ "product_stock": "in stock",
+ "products_hts": "8542.90.0000",
+ "products_coo": "CN",
+ "discontinue_status": "None",
+ "products_coming_soon": "0",
+ "products_rohs": "1",
+ "products_virtual": "0",
+ "date_added": "2017-05-16 14:57:49",
+ "parent_pid": 0,
+ "discount_pricing": [
+  {
+   "discounted_price": "24.95",
+   "discounted_percent": 0,
+   "show_qty": "1-9",
+   "min_qty": 1
+  },
+  {
+   "discounted_price": "22.46",
+   "discounted_percent": "10",
+   "show_qty": "10-99",
+   "min_qty": 10
+  },
+  {
+   "discounted_price": "19.96",
+   "discounted_percent": "20",
+   "show_qty": "100+",
+   "min_qty": 100
+  }
+ ],
+ "products_description": "<p><strong>Circuit Playground Express</strong> is the next step towards a perfect introduction to electronics and programming. We&#39;ve taken the original Circuit Playground Classic and made it even better! Not only did we pack even more sensors in, we also made it even easier to program.</p><p>Start your journey with <a href=\"https://learn.adafruit.com/makecode\"><strong>Microsoft MakeCode</strong> block-based or Javascript programming</a>. Then, you can use the same board to try <strong>CircuitPython</strong>, with the Python interpreter running right on the Express. As you progress, you can advance to using <strong>Arduino IDE</strong>, which has full support of all the hardware down to the low level, so you can make powerful projects.You can even use <strong>code.org CS Discoveries</strong> to learn all about coding right in your browser!</p><p><strong><a href=\"https://learn.adafruit.com/adafruit-circuit-playground-express\">Check out our detailed guide with a tour of Circuit Playground Express and details on getting started using MakeCode, CircuitPython, code.org CS Discoveries or Arduino!</a></strong></p><p>Because you can program the same board in 4 different ways - the Express has great value and re-usability. From beginners to experts, Circuit Playground Express has something for everyone. <a href=\"https://www.adafruit.com/products/3000\">If you are looking for our original, Arduino-only Circuit Playground, check out the Circuit Playground Classic.</a></p><p>The board is round and has alligator-clip pads around it so you don&#39;t have to solder or sew to make it work. You can power it from USB,&nbsp;<a href=\"https://www.adafruit.com/products/727\">a AAA battery pack</a>, or with a Lipoly battery (for advanced users). Circuit Playground Express has built-in USB support. Built in USB means you plug it in to program it and it just shows up, no special cable or adapter required. Just program your code into the board then take it on the go!</p><p>Here&#39;s some of the great goodies baked in to each Circuit Playground Express:</p><ul><li>10 x mini NeoPixels, each one can display any color</li><li>1 x Motion sensor (LIS3DH triple-axis accelerometer with tap detection, free-fall detection)</li><li>1 x Temperature sensor (thermistor)</li><li>1 x Light sensor (phototransistor). Can also act as a color sensor and pulse sensor.</li><li>1 x Sound sensor (MEMS microphone)</li><li>1 x Mini speaker with class D amplifier (7.5mm magnetic speaker/buzzer)</li><li>2 x Push buttons, labeled A and B</li><li>1 x Slide switch</li><li>Infrared receiver and transmitter - can receive and transmit any remote control codes, as well as send messages between Circuit Playground Expresses. Can also act as a proximity sensor.</li><li>8 x alligator-clip friendly input/output pins</li><li>Includes I2C, UART, 8 pins that can do analog inputs, multiple PWM output</li><li>7 pads can act as capacitive touch inputs and the 1 remaining is a true analog output</li><li>Green &quot;ON&quot; LED so you know its powered</li><li>Red &quot;#13&quot; LED for basic blinking</li><li>Reset button</li><li>ATSAMD21 ARM Cortex M0 Processor, running at 3.3V and 48MHz</li><li>2 MB of SPI Flash storage, used primarily with CircuitPython to store code and libraries.</li><li>MicroUSB port for programming and debugging</li><li>USB port can act like serial port, keyboard, mouse, joystick or MIDI!</li></ul><p><strong><a href=\"https://learn.adafruit.com/adafruit-circuit-playground-express\">Check out our detailed guide with a tour of Circuit Playground Express and details on getting started using MakeCode, CircuitPython, code.org CS Discoveries or Arduino!</a></strong></p><p><strong><img class=\"video-insert\" alt=\"https://www.youtube.com/embed/CnUNMbtX4PE?si=YLh0dZ1OCRsB1W08\" contenteditable=\"false\" allowfullscreen=\"true\" frameborder=\"0\" src=\"https://img.youtube.com/vi/CnUNMbtX4PE/hqdefault.jpg\" /></strong></p><p><img class=\"video-insert\" alt=\"https://www.youtube.com/embed/4lGRgO40UhM\" allowfullscreen=\"true\" frameborder=\"0\" tc-textcontent=\"true\" data-tc-id=\"w-0.5099210493495225\" contenteditable=\"false\" src=\"https://img.youtube.com/vi/4lGRgO40UhM/hqdefault.jpg\" /></p><p><img class=\"video-insert\" alt=\"//www.youtube.com/embed/4gRkm7nJEo0?start=475\" allowfullscreen=\"true\" frameborder=\"0\" contenteditable=\"false\" src=\"https://img.youtube.com/vi/4gRkm7nJEo0/hqdefault.jpg\" /></p><p><img class=\"video-insert\" alt=\"https://www.youtube.com/embed/A75kY7uhahI?start=14\" contenteditable=\"false\" allowfullscreen=\"true\" frameborder=\"0\" src=\"https://img.youtube.com/vi/A75kY7uhahI/hqdefault.jpg\" /></p>"
+}

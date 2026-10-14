@@ -9,11 +9,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from . import digikey, jlc, lcsc, mouser, parts, reichelt
+from . import adafruit, digikey, jlc, lcsc, mouser, parts, reichelt, sparkfun
 from .errors import PartsApiError
 from .filters import ATTR_ALIASES
 
-VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt, "digikey": digikey, "mouser": mouser}
+VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt, "digikey": digikey, "mouser": mouser, "adafruit": adafruit, "sparkfun": sparkfun}
 COMMANDS = ["findpart", "facets", "getpart", "getpartprice", "getprice", "getstock", "getattributes",
             "getpics", "getpic", "getdatasheet", "get3dmodel", "getsymbol", "getfootprint"]
 

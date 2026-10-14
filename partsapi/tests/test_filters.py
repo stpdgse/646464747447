@@ -63,6 +63,11 @@ def test_quoted_values_after_operators():
     assert f.exclude_terms == ["two words"]
 
 
+def test_negated_exact_attribute_names():
+    f = parse_query('-@"Number of Pins":>=8 @"Form Factor":qwiic').filter
+    assert [(n, c.negate, e) for n, c, e in f.attrs] == [("Number of Pins", True, True), ("Form Factor", False, True)]
+
+
 def test_strict_modes():
     assert parse_query("resistor 0603", strict=True).filter.all_terms == ["resistor", "0603"]
     assert parse_query("resistor 0603", strict=False).filter.all_terms == []

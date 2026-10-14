@@ -347,3 +347,36 @@ def test_cli_mouser_findpart_end_to_end(session, monkeypatch, capsys):
     assert cli.main(["mouser", "findpart", "lm358", "--exclude", "dip", "--max-price", "0.3", "--sort", "price", "--table"]) == 0
     lines = capsys.readouterr().out.strip().splitlines()
     assert [l.split()[0] for l in lines[2:]] == ["863-LM358ADR"]
+
+
+# ------------------------------------------------------------------ Adafruit / SparkFun in the cross-vendor layer and CLI
+def test_adafruit_and_sparkfun_are_opt_in_for_cross_vendor_calls():
+    assert "adafruit" not in parts.default_vendors() and "sparkfun" not in parts.default_vendors()
+    assert set(parts.VENDORS) >= {"adafruit", "sparkfun"}
+
+
+def test_cli_adafruit_end_to_end(session, monkeypatch, capsys, tmp_path):
+    from partsapi import adafruit as adafruit_module
+    from partsapi.adafruit import Adafruit
+    session.add("GET", "/api/products", FakeResponse(200, json_data=fixture_json("adafruit_catalog_small.json")))
+    session.add("GET", "/api/category/", FakeResponse(200, json_data={"category_name": "Feather"}))
+    monkeypatch.setattr(adafruit_module, "_default", Adafruit(make_http(session), cache_dir=tmp_path))
+    assert cli.main(["adafruit", "findpart", "feather", "--max-price", "15", "--sort", "price", "--table"]) == 0
+    lines = capsys.readouterr().out.strip().splitlines()
+    assert [l.split()[0] for l in lines[2:]] == ["4884", "5980"]
+    assert cli.main(["adafruit", "findpart", "feather", "--has-datasheet"]) == 2           # unsupported => clean error, exit 2
+    assert "does not support has:datasheet" in capsys.readouterr().err
+
+
+def test_cli_sparkfun_end_to_end(session, monkeypatch, capsys):
+    from partsapi import sparkfun as sparkfun_module
+    from partsapi.sparkfun import SparkFun
+    session.add("POST", "/graphql", FakeResponse(200, json_data=fixture_json("sparkfun_search.json")))
+    monkeypatch.setattr(sparkfun_module, "_default", SparkFun(make_http(session)))
+    assert cli.main(["sparkfun", "findpart", "qwiic led", "--in-stock", "--sort", "price", "--table"]) == 0
+    out = capsys.readouterr().out.strip().splitlines()
+    assert out[0].split()[:2] == ["code", "mpn"] and len(out) >= 3
+    assert cli.main(["sparkfun", "findpart", "qwiic", "--mfr", "x"]) == 2
+    assert "mfr" in capsys.readouterr().err
+    with pytest.raises(SystemExit):
+        cli.main(["sparkfun", "findpart", "x", "--library", "basic"])

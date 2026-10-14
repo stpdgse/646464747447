@@ -61,6 +61,24 @@ def make_http(session: FakeSession) -> Http:
     return Http(session, retries=2, backoff=0, min_interval=0, cache_ttl=60)
 
 
+VENDOR_ENV = ("DIGIKEY_CLIENT_ID", "DIGIKEY_CLIENT_SECRET", "DIGIKEY_SITE", "DIGIKEY_LANGUAGE", "DIGIKEY_CURRENCY", "DIGIKEY_SANDBOX",
+              "DK_CLIENT_ID", "DK_CLIENT_SECRET", "DK_SITE", "DK_LANGUAGE", "DK_CURRENCY", "DK_SANDBOX", "MOUSER_API_KEY")
+
+
+@pytest.fixture(autouse=True)
+def _isolate_vendor_credentials(request, monkeypatch):
+    """Offline tests must behave the same on a machine that has real DigiKey / Mouser credentials in its environment."""
+    if "live" in request.keywords:
+        return
+    for name in VENDOR_ENV:
+        monkeypatch.delenv(name, raising=False)
+    from partsapi import digikey, mouser
+
+    monkeypatch.setattr(digikey._default, "client_id", None)
+    monkeypatch.setattr(digikey._default, "client_secret", None)
+    monkeypatch.setattr(mouser._default, "api_key", None)
+
+
 @pytest.fixture
 def session() -> FakeSession:
     return FakeSession()

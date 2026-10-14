@@ -1,0 +1,900 @@
+{
+ "data": {
+  "products": {
+   "total_count": 115,
+   "page_info": {
+    "total_pages": 39
+   },
+   "items": [
+    {
+     "sku": "BOB-15932",
+     "name": "SparkFun Qwiic Button - Red LED",
+     "uid": "NTc3OQ==",
+     "url_key": "sparkfun-qwiic-button-red-led",
+     "url_suffix": ".html",
+     "stock_status": "IN_STOCK",
+     "only_x_left_in_stock": null,
+     "min_sale_qty": 1,
+     "max_sale_qty": 10000,
+     "country_of_manufacture": "US",
+     "short_description": {
+      "html": "<p>The SparkFun Qwiic Button with red LED simplifies all of those nasty worries away into an easy-to-use I<sup>2</sup>C device; no soldering is required.</p>"
+     },
+     "image": {
+      "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/5/15932-SparkFun_Qwiic_Button_-_Red-01.jpg"
+     },
+     "media_gallery": [
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/5/15932-SparkFun_Qwiic_Button_-_Red-01.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/W/9/W94Jyv0Xua8.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/5/15932-SparkFun_Qwiic_Button_-_Red-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/5/15932-SparkFun_Qwiic_Button_-_Red-03.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/5/15932-SparkFun_Qwiic_Button_-_Red-04.jpg",
+       "disabled": false
+      }
+     ],
+     "price_range": {
+      "minimum_price": {
+       "regular_price": {
+        "value": 5.5,
+        "currency": "USD"
+       },
+       "final_price": {
+        "value": 5.5,
+        "currency": "USD"
+       }
+      }
+     },
+     "price_tiers": [],
+     "categories": [
+      {
+       "uid": "OTQz",
+       "name": "Components",
+       "url_path": "components",
+       "level": 2
+      },
+      {
+       "uid": "MTEyMA==",
+       "name": "Buttons and Switches",
+       "url_path": "components/buttons-and-switches",
+       "level": 3
+      },
+      {
+       "uid": "MTEyMw==",
+       "name": "Button",
+       "url_path": "components/buttons-and-switches/button",
+       "level": 4
+      },
+      {
+       "uid": "MTMxMg==",
+       "name": "Special Categories",
+       "url_path": "special-categories",
+       "level": 2
+      },
+      {
+       "uid": "MTg0Mw==",
+       "name": "SparkFun Originals",
+       "url_path": "special-categories/sparkfun-originals",
+       "level": 3
+      },
+      {
+       "uid": "Mjk2MA==",
+       "name": "Qwiic",
+       "url_path": "special-categories/qwiic",
+       "level": 3
+      }
+     ]
+    },
+    {
+     "sku": "BOB-16842",
+     "name": "SparkFun Qwiic Button - Green LED",
+     "uid": "NTc4Mg==",
+     "url_key": "sparkfun-qwiic-button-green-led",
+     "url_suffix": ".html",
+     "stock_status": "IN_STOCK",
+     "only_x_left_in_stock": null,
+     "min_sale_qty": 1,
+     "max_sale_qty": 10000,
+     "country_of_manufacture": "US",
+     "short_description": {
+      "html": "<p>The SparkFun Qwiic Button with green LED simplifies all of those nasty worries away into an easy-to-use I<sup>2</sup>C device; no soldering is required.</p>"
+     },
+     "image": {
+      "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/6/16842-SparkFun_Qwiic_Button_-_Green_LED-01.jpg"
+     },
+     "media_gallery": [
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/6/16842-SparkFun_Qwiic_Button_-_Green_LED-01.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/W/9/W94Jyv0Xua8_1.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/6/16842-SparkFun_Qwiic_Button_-_Green_LED-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/6/16842-SparkFun_Qwiic_Button_-_Green_LED-03.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/6/16842-SparkFun_Qwiic_Button_-_Green_LED-04.jpg",
+       "disabled": false
+      }
+     ],
+     "price_range": {
+      "minimum_price": {
+       "regular_price": {
+        "value": 4.95,
+        "currency": "USD"
+       },
+       "final_price": {
+        "value": 4.95,
+        "currency": "USD"
+       }
+      }
+     },
+     "price_tiers": [],
+     "categories": [
+      {
+       "uid": "OTQz",
+       "name": "Components",
+       "url_path": "components",
+       "level": 2
+      },
+      {
+       "uid": "MTEyMA==",
+       "name": "Buttons and Switches",
+       "url_path": "components/buttons-and-switches",
+       "level": 3
+      },
+      {
+       "uid": "MTEyMw==",
+       "name": "Button",
+       "url_path": "components/buttons-and-switches/button",
+       "level": 4
+      },
+      {
+       "uid": "MTMxMg==",
+       "name": "Special Categories",
+       "url_path": "special-categories",
+       "level": 2
+      },
+      {
+       "uid": "MTg0Mw==",
+       "name": "SparkFun Originals",
+       "url_path": "special-categories/sparkfun-originals",
+       "level": 3
+      },
+      {
+       "uid": "Mjk2MA==",
+       "name": "Qwiic",
+       "url_path": "special-categories/qwiic",
+       "level": 3
+      }
+     ]
+    },
+    {
+     "sku": "COM-18354",
+     "name": "SparkFun Qwiic LED Stick - APA102C",
+     "uid": "NTU5OQ==",
+     "url_key": "sparkfun-qwiic-led-stick-apa102c",
+     "url_suffix": ".html",
+     "stock_status": "IN_STOCK",
+     "only_x_left_in_stock": null,
+     "min_sale_qty": 1,
+     "max_sale_qty": 10000,
+     "country_of_manufacture": "US",
+     "short_description": {
+      "html": "<p>Add 10 addressable APA102 LEDs to your project effortlessly with this Qwiic-enabled I<sup>2</sup>C LED stick.</p>"
+     },
+     "image": {
+      "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-01.jpg"
+     },
+     "media_gallery": [
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-01.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/N/c/NcjTMzVoCg8.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-04.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-03.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/Q/w/Qwiic_LED_Stick_Hookup_Guide-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/Q/w/Qwiic_LED_Stick_Thumbnail.gif",
+       "disabled": false
+      }
+     ],
+     "price_range": {
+      "minimum_price": {
+       "regular_price": {
+        "value": 12.5,
+        "currency": "USD"
+       },
+       "final_price": {
+        "value": 12.5,
+        "currency": "USD"
+       }
+      }
+     },
+     "price_tiers": [
+      {
+       "quantity": 10,
+       "final_price": {
+        "value": 11.88,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 25,
+       "final_price": {
+        "value": 11.25,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 100,
+       "final_price": {
+        "value": 10.63,
+        "currency": "USD"
+       }
+      }
+     ],
+     "categories": [
+      {
+       "uid": "OTQz",
+       "name": "Components",
+       "url_path": "components",
+       "level": 2
+      },
+      {
+       "uid": "MTEwMg==",
+       "name": "LEDs and Illumination",
+       "url_path": "components/leds-and-illumination",
+       "level": 3
+      },
+      {
+       "uid": "MTE2Mg==",
+       "name": "Addressable",
+       "url_path": "components/leds-and-illumination/addressable",
+       "level": 4
+      },
+      {
+       "uid": "MTMxMg==",
+       "name": "Special Categories",
+       "url_path": "special-categories",
+       "level": 2
+      },
+      {
+       "uid": "MTg0Mw==",
+       "name": "SparkFun Originals",
+       "url_path": "special-categories/sparkfun-originals",
+       "level": 3
+      },
+      {
+       "uid": "Mjk2MA==",
+       "name": "Qwiic",
+       "url_path": "special-categories/qwiic",
+       "level": 3
+      }
+     ]
+    }
+   ],
+   "aggregations": [
+    {
+     "label": "Price",
+     "attribute_code": "price",
+     "count": 6,
+     "options": [
+      {
+       "label": "0-5",
+       "value": "0_5",
+       "count": 4
+      },
+      {
+       "label": "5-10",
+       "value": "5_10",
+       "count": 17
+      },
+      {
+       "label": "10-15",
+       "value": "10_15",
+       "count": 9
+      },
+      {
+       "label": "15-20",
+       "value": "15_20",
+       "count": 16
+      },
+      {
+       "label": "20-25",
+       "value": "20_25",
+       "count": 9
+      },
+      {
+       "label": "25-0",
+       "value": "25_0",
+       "count": 60
+      }
+     ]
+    },
+    {
+     "label": "Qwiic Connector?",
+     "attribute_code": "sf_global_qwiic_connector",
+     "count": 1,
+     "options": [
+      {
+       "label": "Yes",
+       "value": "8262",
+       "count": 80
+      }
+     ]
+    },
+    {
+     "label": "Form Factor",
+     "attribute_code": "sf_global_form_factor",
+     "count": 5,
+     "options": [
+      {
+       "label": "Qwiic Mini (1” x .50”)",
+       "value": "5800",
+       "count": 3
+      },
+      {
+       "label": "1\" x 1\"",
+       "value": "5803",
+       "count": 16
+      },
+      {
+       "label": "Thing+/Feather (2.3in\" x .9in\")",
+       "value": "5806",
+       "count": 7
+      },
+      {
+       "label": "RedBoard/Arduino Uno (2.7\" x 2.1\")",
+       "value": "5809",
+       "count": 3
+      },
+      {
+       "label": "Pro Micro (1.37” x .7”)",
+       "value": "8268",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "label": "Qwiic Product Type",
+     "attribute_code": "sf_qwiic_product_type",
+     "count": 8,
+     "options": [
+      {
+       "label": "Sensors",
+       "value": "8273",
+       "count": 23
+      },
+      {
+       "label": "Development Boards",
+       "value": "8276",
+       "count": 22
+      },
+      {
+       "label": "GPS / GNSS",
+       "value": "8279",
+       "count": 1
+      },
+      {
+       "label": "Audio",
+       "value": "8282",
+       "count": 2
+      },
+      {
+       "label": "Components",
+       "value": "8285",
+       "count": 14
+      },
+      {
+       "label": "Displays",
+       "value": "8291",
+       "count": 8
+      },
+      {
+       "label": "IoT & Wireless",
+       "value": "8294",
+       "count": 11
+      },
+      {
+       "label": "Kits",
+       "value": "8297",
+       "count": 11
+      }
+     ]
+    },
+    {
+     "label": "Featured Originals",
+     "attribute_code": "sparkfun_original_favorites",
+     "count": 8,
+     "options": [
+      {
+       "label": "Sensors",
+       "value": "8671",
+       "count": 11
+      },
+      {
+       "label": "Dev Boards",
+       "value": "8674",
+       "count": 10
+      },
+      {
+       "label": "IoT & Wireless",
+       "value": "8680",
+       "count": 9
+      },
+      {
+       "label": "Kits",
+       "value": "8683",
+       "count": 5
+      },
+      {
+       "label": "Displays",
+       "value": "8686",
+       "count": 3
+      },
+      {
+       "label": "RFID",
+       "value": "8689",
+       "count": 1
+      },
+      {
+       "label": "Components",
+       "value": "8698",
+       "count": 4
+      },
+      {
+       "label": "Audio",
+       "value": "8695",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "Qwiic Sensor Type",
+     "attribute_code": "sf_qwiic_sensor_type",
+     "count": 8,
+     "options": [
+      {
+       "label": "Biometrics",
+       "value": "8342",
+       "count": 3
+      },
+      {
+       "label": "Distance",
+       "value": "8351",
+       "count": 6
+      },
+      {
+       "label": "Environmental",
+       "value": "8354",
+       "count": 2
+      },
+      {
+       "label": "Imaging",
+       "value": "8360",
+       "count": 3
+      },
+      {
+       "label": "Infrared",
+       "value": "8363",
+       "count": 3
+      },
+      {
+       "label": "RFID",
+       "value": "8378",
+       "count": 2
+      },
+      {
+       "label": "Sensor Kits",
+       "value": "8381",
+       "count": 3
+      },
+      {
+       "label": "Air Movement",
+       "value": "8387",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "Qwiic IoT & Wireless Type",
+     "attribute_code": "sf_qwiic_iot_wireless_type",
+     "count": 4,
+     "options": [
+      {
+       "label": "Bluetooth",
+       "value": "8617",
+       "count": 13
+      },
+      {
+       "label": "LoRa",
+       "value": "8623",
+       "count": 1
+      },
+      {
+       "label": "WiFi",
+       "value": "8638",
+       "count": 10
+      },
+      {
+       "label": "Wireless Kits",
+       "value": "8644",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "label": "Qwiic Displays Type",
+     "attribute_code": "sf_qwiic_displays_type",
+     "count": 1,
+     "options": [
+      {
+       "label": "Alphanumeric Displays",
+       "value": "8614",
+       "count": 8
+      }
+     ]
+    },
+    {
+     "label": "Qwiic Components Type",
+     "attribute_code": "sf_qwiic_components_type",
+     "count": 4,
+     "options": [
+      {
+       "label": "Buttons and Switches",
+       "value": "8557",
+       "count": 3
+      },
+      {
+       "label": "Encoders",
+       "value": "8572",
+       "count": 1
+      },
+      {
+       "label": "LEDs and Illumination",
+       "value": "8578",
+       "count": 9
+      },
+      {
+       "label": "Power",
+       "value": "8590",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "Qwiic Dev Board Type",
+     "attribute_code": "sf_qwiic_dev_board_type",
+     "count": 6,
+     "options": [
+      {
+       "label": "Microcontrollers",
+       "value": "8417",
+       "count": 24
+      },
+      {
+       "label": "Single Board Computers",
+       "value": "8420",
+       "count": 4
+      },
+      {
+       "label": "Prototyping Boards",
+       "value": "8426",
+       "count": 1
+      },
+      {
+       "label": "FPGA",
+       "value": "8438",
+       "count": 4
+      },
+      {
+       "label": "Miscellaneous",
+       "value": "8447",
+       "count": 1
+      },
+      {
+       "label": "Dev Kits",
+       "value": "8450",
+       "count": 6
+      }
+     ]
+    },
+    {
+     "label": "Qwiic Kit Type",
+     "attribute_code": "sf_qwiic_kits_type",
+     "count": 1,
+     "options": [
+      {
+       "label": "Education Kits",
+       "value": "8647",
+       "count": 6
+      }
+     ]
+    },
+    {
+     "label": "MicroPython libraries",
+     "attribute_code": "sf_global_micropython_libraries",
+     "count": 1,
+     "options": [
+      {
+       "label": "Yes",
+       "value": "1",
+       "count": 20
+      }
+     ]
+    },
+    {
+     "label": "Brands",
+     "attribute_code": "sf_our_brands",
+     "count": 14,
+     "options": [
+      {
+       "label": "Ambiq Micro",
+       "value": "5812",
+       "count": 2
+      },
+      {
+       "label": "u-blox",
+       "value": "5815",
+       "count": 2
+      },
+      {
+       "label": "Digi International",
+       "value": "5819",
+       "count": 3
+      },
+      {
+       "label": "Espressif Systems",
+       "value": "5822",
+       "count": 9
+      },
+      {
+       "label": "Raspberry Pi",
+       "value": "5825",
+       "count": 6
+      },
+      {
+       "label": "Sensirion",
+       "value": "5831",
+       "count": 1
+      },
+      {
+       "label": "Bosch Sensortec",
+       "value": "5840",
+       "count": 2
+      },
+      {
+       "label": "Myoware",
+       "value": "5873",
+       "count": 1
+      },
+      {
+       "label": "NVIDIA",
+       "value": "5879",
+       "count": 1
+      },
+      {
+       "label": "Arduino",
+       "value": "5885",
+       "count": 3
+      },
+      {
+       "label": "Alchitry",
+       "value": "5954",
+       "count": 4
+      },
+      {
+       "label": "Renesas",
+       "value": "5969",
+       "count": 1
+      },
+      {
+       "label": "Nordic Semiconductor",
+       "value": "5972",
+       "count": 1
+      },
+      {
+       "label": "Garmin",
+       "value": "6114",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "Distance Sensor Type",
+     "attribute_code": "sf_sensors_distance_type",
+     "count": 2,
+     "options": [
+      {
+       "label": "Time of Flight",
+       "value": "8402",
+       "count": 4
+      },
+      {
+       "label": "LED",
+       "value": "8408",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "Audio Board Functions",
+     "attribute_code": "sf_audio_functions",
+     "count": 3,
+     "options": [
+      {
+       "label": "Amplifier",
+       "value": "3028",
+       "count": 3
+      },
+      {
+       "label": "Microphone",
+       "value": "3022",
+       "count": 2
+      },
+      {
+       "label": "Tuner",
+       "value": "3031",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "label": "Sensor Type",
+     "attribute_code": "sf_sensors_environmental_type",
+     "count": 2,
+     "options": [
+      {
+       "label": "Particulate Matter & Dust",
+       "value": "8864",
+       "count": 1
+      },
+      {
+       "label": "Soil Moisture",
+       "value": "8867",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "label": "SparkFun Original",
+     "attribute_code": "sf_original_product",
+     "count": 1,
+     "options": [
+      {
+       "label": "Yes",
+       "value": "1",
+       "count": 99
+      }
+     ]
+    },
+    {
+     "label": "EMG Sensor Type",
+     "attribute_code": "sf_sensors_EMG_Sensor_Type",
+     "count": 1,
+     "options": [
+      {
+       "label": "Surface EMG (sEMG)",
+       "value": "8741",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "label": "Current Range",
+     "attribute_code": "sf_sensors_current_range_sensor_type",
+     "count": 1,
+     "options": [
+      {
+       "label": "Up to 30A",
+       "value": "8825",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "Current Sensor Type",
+     "attribute_code": "sf_sensors_current_sensor_type",
+     "count": 1,
+     "options": [
+      {
+       "label": "DC Current Sensors",
+       "value": "8795",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "Air Quality Sensor Type",
+     "attribute_code": "sf_sensors_air_quality_Sensor_Type",
+     "count": 1,
+     "options": [
+      {
+       "label": "Dust, Smoke & Particle Sensors",
+       "value": "8759",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "GNSS Product Type",
+     "attribute_code": "sf_qwiic_gps_gnss_type",
+     "count": 1,
+     "options": [
+      {
+       "label": "GNSS Boards",
+       "value": "8494",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "GNSS Module",
+     "attribute_code": "sf_gnss_module",
+     "count": 1,
+     "options": [
+      {
+       "label": "ZED-F9P",
+       "value": "6053",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "label": "Corrections Source",
+     "attribute_code": "sf_gnss_rtk_corrections_source",
+     "count": 2,
+     "options": [
+      {
+       "label": "PointPerfect MQTT",
+       "value": "5894",
+       "count": 1
+      },
+      {
+       "label": "NTRIP",
+       "value": "5900",
+       "count": 1
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -5,16 +5,17 @@ from __future__ import annotations
 import warnings
 from typing import Any, Optional
 
-from . import digikey, jlc, lcsc, mouser, reichelt
+from . import adafruit, digikey, jlc, lcsc, mouser, reichelt, sparkfun
 from .errors import PartsApiError
 from .models import Part
 
-VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt, "digikey": digikey, "mouser": mouser}
+VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt, "digikey": digikey, "mouser": mouser, "adafruit": adafruit, "sparkfun": sparkfun}
 KEYLESS = ("jlc", "lcsc", "reichelt")
 
 
 def default_vendors() -> tuple[str, ...]:
-    """Keyless vendors always; DigiKey / Mouser only when their credentials are configured."""
+    """JLCPCB, LCSC and Reichelt always; DigiKey / Mouser only when their credentials are configured. Adafruit and
+    SparkFun (hobby shops with their own part numbers, so rarely a match for an MPN) are only used when you name them."""
     return KEYLESS + tuple(v for v in ("digikey", "mouser") if VENDORS[v].is_configured())
 
 

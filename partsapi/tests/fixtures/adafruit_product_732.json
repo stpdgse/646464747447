@@ -1,0 +1,44 @@
+{
+ "product_id": "732",
+ "product_image": "https://cdn-shop.adafruit.com/640x480/732-05.jpg",
+ "product_image_alt": "Angled shot of MCP23017 i2c 16 input/output port expander.",
+ "image_is_video": "0",
+ "product_name": "MCP23017 - i2c 16 input/output port expander",
+ "product_model": "",
+ "product_mpn": "ADA732",
+ "product_master_category": "153",
+ "product_manufacturer": null,
+ "product_price": "6.95",
+ "product_shipping_weight": "9.1",
+ "product_url": "https://www.adafruit.com/product/732",
+ "product_stock": "in stock",
+ "products_hts": "8542.39.00.00",
+ "products_coo": "TH",
+ "discontinue_status": "None",
+ "products_coming_soon": "0",
+ "products_rohs": "1",
+ "products_virtual": "0",
+ "date_added": "2012-02-28 11:54:58",
+ "parent_pid": 0,
+ "discount_pricing": [
+  {
+   "discounted_price": "6.95",
+   "discounted_percent": 0,
+   "show_qty": "1-9",
+   "min_qty": 1
+  },
+  {
+   "discounted_price": "6.26",
+   "discounted_percent": "10",
+   "show_qty": "10-99",
+   "min_qty": 10
+  },
+  {
+   "discounted_price": "5.56",
+   "discounted_percent": "20",
+   "show_qty": "100+",
+   "min_qty": 100
+  }
+ ],
+ "products_description": "<p>Add another 16 pins to your microcontroller using an MCP23017 port expander. The MCP23017 uses two i2c pins (these can be shared with other i2c devices), and in exchange gives you 16 general purpose pins. You can set each of 16 pins to be input, output, or input with a pullup. There&#39;s even the ability to get an interrupt via an external pin when any of the inputs change so you don&#39;t have to keep polling the chip.<br /><br />Use this chip from 2.7-5.5V (good for any 3.3V or 5V setup), and you can sink/source up to 20mA from any of the I/O pins so this will work for LEDs and such. Team it up with a high-power MOSFET if you need more juice. DIP package means it will plug into any breadboard or perfboard.<br /><br />You can set the i2c address by tying the ADDR0-2 pins to power or ground, for up to 8 unique addresses. That means 8 chips can share a single i2c bus - that&#39;s 128 I/O pins!<br /><br />We used this chip in our <a href=\"http://www.adafruit.com/products/716\">RGB LCD + Keypad shield</a> to both control an LCD and read a 5-way keypad and found it to be very reliable and easy to get up and running. <a href=\"https://github.com/adafruit/Adafruit-MCP23017-Arduino-Library\">We even have an Arduino library with example code written which will set pin state, read and write from individual pins, and set the pullups.</a></p><p><img class=\"video-insert\" alt=\"https://www.youtube.com/embed/ouhHKlIrG-I\" allowfullscreen=\"true\" frameborder=\"0\" contenteditable=\"false\" src=\"https://img.youtube.com/vi/ouhHKlIrG-I/hqdefault.jpg\" /></p><p><img class=\"video-insert\" alt=\"https://www.youtube.com/embed/EC1X_Jj68Xo\" allowfullscreen=\"true\" frameborder=\"0\" contenteditable=\"false\" src=\"https://img.youtube.com/vi/EC1X_Jj68Xo/hqdefault.jpg\" /></p><p><img class=\"video-insert\" alt=\"https://www.youtube.com/embed/rUuwO3Q8N6o?start=566\" allowfullscreen=\"true\" frameborder=\"0\" contenteditable=\"false\" src=\"https://img.youtube.com/vi/rUuwO3Q8N6o/hqdefault.jpg\" /></p><p><img class=\"video-insert\" alt=\"https://www.youtube.com/embed/vxDZktaVE_M?start=566\" allowfullscreen=\"true\" frameborder=\"0\" contenteditable=\"false\" src=\"https://img.youtube.com/vi/vxDZktaVE_M/hqdefault.jpg\" /></p>"
+}

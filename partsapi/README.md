@@ -1,11 +1,12 @@
 # partsapi
 
-One Python API for **JLCPCB parts**, **LCSC**, **Reichelt**, **DigiKey** and **Mouser**: search, price, stock,
-pictures, datasheets and 3D models, with the same function names and the same filter language on every vendor.
-DigiKey and Mouser use their official APIs and need a free key (see [DigiKey and Mouser](#digikey-and-mouser)).
+One Python API for **JLCPCB parts**, **LCSC**, **Reichelt**, **DigiKey**, **Mouser**, **Adafruit** and **SparkFun**:
+search, price, stock, pictures, datasheets and 3D models, with the same function names and the same filter language on
+every vendor. JLCPCB, LCSC, Reichelt, Adafruit and SparkFun need no key; DigiKey and Mouser use their official APIs and
+need a free one (see [DigiKey and Mouser](#digikey-and-mouser) and [Adafruit and SparkFun](#adafruit-and-sparkfun)).
 
 ```python
-from partsapi import jlc, lcsc, reichelt, digikey, mouser
+from partsapi import jlc, lcsc, reichelt, digikey, mouser, adafruit, sparkfun
 
 jlc.findpart("10k 0603 resistor", library="basic", limit=5)   # -> [Part, ...]
 jlc.getpartprice("C25804", qty=1000)                          # -> 0.0043  (USD, unit price at qty)
@@ -25,6 +26,8 @@ reichelt.get3dmodel("LM358DT")                                # resolved via the
 
 digikey.getpartprice("296-1395-1-ND", qty=100)                # needs DIGIKEY_CLIENT_ID / _SECRET
 mouser.findpart("lm358 is:instock -dip", sort="price")         # needs MOUSER_API_KEY
+adafruit.findpart("feather rp2040 is:instock", sort="price")   # no key; searches a cached copy of the catalogue
+sparkfun.findpart('sensor cat:"Environmental Sensors" @"Sensor Type":humidity')   # no key
 
 from partsapi import parts
 parts.prices("LM358DT", qty=10)                               # one row per vendor, not ranked
@@ -167,6 +170,38 @@ working without keys; name them in `vendors=` to require them (a missing key the
   number in the LCSC/EasyEDA library, exact match only (same as Reichelt). Image and datasheet links are downloaded with a
   browser User-Agent; some manufacturer-hosted datasheets still refuse scripted downloads.
 
+## Adafruit and SparkFun
+
+Two hobby-electronics shops, both **keyless** and both read through interfaces the shops publish for their own use. They
+sell boards, breakouts and modules under their own part numbers, so they rarely match a manufacturer part number: that is
+why `parts.findpart()` / `parts.prices()` use them only when you name them (`vendors=("adafruit", "sparkfun")`).
+
+| | `adafruit` | `sparkfun` |
+|---|---|---|
+| Source | public JSON product API (`/api/products`, `/api/product/<id>`) | public storefront GraphQL (`/graphql`, Magento) |
+| How search works | the catalogue (~8 MB, 5,600 products) is downloaded **once**, cached on disk for 24 h (`PARTSAPI_CACHE_DIR`, `off` disables) and searched locally; the site search is never called | queries go to SparkFun (relevance order); ~1 request per page of 100, 1 s apart |
+| Codes | product id (`4884`, `ADA4884` or the URL) | SKU (`SEN-19833`) |
+| Price | USD, with quantity tiers | USD, with quantity tiers |
+| Stock | "in stock" without a count, or a number; discontinued products are hidden unless `include_discontinued=True` | in / out of stock only (the API gives no counts) |
+| Server-side filters | - (local) | search words, `cat:` (category ids), `@"Facet name":value` (SparkFun's curated facets, e.g. "Form Factor", "Sensor Type") |
+| Attributes | none in the catalogue (`getattributes` returns `Key: value` bullets when a description has them) | none per product (the GraphQL field errors); use `facets()` |
+| Datasheet | PDFs linked under the product page's "Downloads"; otherwise the error points to the Learn guide | datasheet / schematic PDFs linked on the product page (`Part.extra["documents"]`) |
+| Pictures | 1200x900, falling back to 640x480 | full gallery |
+| 3D models | no (`NoModelError`) | no (`NoModelError`) |
+| Not available | `mfr:` (mostly empty), `has:datasheet`, `has:3dmodel`, `lib:`, `is:preferred` | `mfr:`, `is:rohs`, `has:datasheet`, `has:3dmodel`, `lib:`, `is:preferred` |
+
+* **What they are, and are not.** Neither is a parametric catalogue like DigiKey or LCSC: no manufacturer part numbers, no
+  attribute tables, no stock counts at SparkFun. They are useful for "which Adafruit / SparkFun board do I buy, what does it
+  cost at 10 pieces, is it in stock".
+* **Politeness and robots.txt.** Adafruit's `robots.txt` asks crawlers to avoid `/api/` and `/search`; SparkFun's excludes
+  its HTML search pages. This is a tool you run, not a crawler: Adafruit's catalogue is fetched once a day, nothing hits a
+  search page, and both modules identify themselves as `partsapi` with a 1 s gap between requests. If either shop objects
+  to that use, stop using the module.
+* **Facets.** `sparkfun.facets("sensor")` returns SparkFun's own filter options with counts. An `@"Name":value` filter that
+  matches no single facet raises `ValueError` listing the ones that exist, instead of silently returning nothing.
+* **Adafruit categories.** Result lists get a category name through one tiny request per distinct category (remembered).
+  `cat:` loads Adafruit's category tree once (about 27 KB cached, fetched from a larger endpoint) and matches the full path.
+
 ## How it works, and what to know
 
 * **Unofficial (JLCPCB, LCSC, Reichelt).** These sites publish no API. JLCPCB and LCSC are called at the JSON endpoints
@@ -201,6 +236,6 @@ DigiKey / Mouser credentials), all subclasses of `PartsApiError`.
 ## Tests
 
 ```bash
-pytest                               # 246 offline tests against recorded and schema-derived fixtures
-PARTSAPI_LIVE=1 pytest -m live       # hits the real sites (DigiKey / Mouser tests need your keys)
+pytest                               # 312 offline tests against recorded and schema-derived fixtures
+PARTSAPI_LIVE=1 pytest -m live       # hits the real sites (DigiKey / Mouser tests need your keys; Adafruit and SparkFun need none)
 ```

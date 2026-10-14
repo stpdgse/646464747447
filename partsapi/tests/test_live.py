@@ -1,7 +1,7 @@
 """Hits the real websites. Run with:  PARTSAPI_LIVE=1 pytest -m live"""
 import pytest
 
-from partsapi import digikey, jlc, lcsc, mouser, reichelt
+from partsapi import adafruit, digikey, jlc, lcsc, mouser, reichelt, sparkfun
 
 pytestmark = pytest.mark.live
 
@@ -72,3 +72,24 @@ def test_mouser_live():
     p = mouser.getpart(out[0].code)
     assert p.mpn and p.price_breaks and p.price_for(1) > 0
     assert mouser.getprice(out[0].code, 100) > 0
+
+
+def test_adafruit_live(tmp_path):
+    out = adafruit.findpart("feather rp2040 is:instock", limit=5, sort="price")
+    assert out and all("rp2040" in p.description.lower() and p.stock.in_stock for p in out)
+    p = adafruit.getpart("732")
+    assert "MCP23017" in p.description and p.price_for(10) < p.price_for(1) and p.datasheet_url.endswith(".pdf")
+    assert adafruit.getdatasheet("732")[:4] == b"%PDF"
+    assert adafruit.getpic("732")[:3] == b"\xff\xd8\xff"
+    assert adafruit.findpart("sensor cat:thermistor price:<5", limit=3)
+
+
+def test_sparkfun_live(tmp_path):
+    out = sparkfun.findpart("qwiic sensor is:instock", limit=5, sort="price")
+    assert out and all(p.stock.in_stock for p in out)
+    hum = sparkfun.findpart('sensor cat:"Environmental Sensors" @"Sensor Type":humidity', limit=5)
+    assert hum and all(p.category and p.category.startswith("Sensors") for p in hum)
+    p = sparkfun.getpart("COM-18354")
+    assert p.price_for(100) < p.price_for(1) and p.datasheet_url.endswith(".pdf")
+    assert sparkfun.getdatasheet("COM-18354")[:4] == b"%PDF"
+    assert sparkfun.getpic("COM-18354")[:3] == b"\xff\xd8\xff"

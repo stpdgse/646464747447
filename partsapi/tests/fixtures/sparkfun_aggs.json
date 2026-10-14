@@ -1,0 +1,253 @@
+{
+ "data": {
+  "products": {
+   "total_count": 771,
+   "items": [
+    {
+     "sku": "SEN-11574",
+     "name": "Pulse Sensor",
+     "uid": "NzE5Mg==",
+     "url_key": "pulse-sensor",
+     "url_suffix": ".html",
+     "stock_status": "IN_STOCK",
+     "only_x_left_in_stock": null,
+     "min_sale_qty": 1,
+     "max_sale_qty": 10000,
+     "country_of_manufacture": "TW",
+     "short_description": {
+      "html": ""
+     },
+     "image": {
+      "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-pulse-sensor-kit-feature.jpg"
+     },
+     "media_gallery": [
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-pulse-sensor-kit-feature.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-pulse-sensor-kit-top.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-01.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/f/P/fPODzvU3Iwo.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-04.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-03.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-05.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/1/11574-07.jpg",
+       "disabled": false
+      }
+     ],
+     "price_range": {
+      "minimum_price": {
+       "regular_price": {
+        "value": 29.95,
+        "currency": "USD"
+       },
+       "final_price": {
+        "value": 29.95,
+        "currency": "USD"
+       }
+      }
+     },
+     "price_tiers": [
+      {
+       "quantity": 25,
+       "final_price": {
+        "value": 28.45,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 100,
+       "final_price": {
+        "value": 26.96,
+        "currency": "USD"
+       }
+      }
+     ],
+     "categories": [
+      {
+       "uid": "OTUy",
+       "name": "Sensors",
+       "url_path": "sensors",
+       "level": 2
+      },
+      {
+       "uid": "MTMxMg==",
+       "name": "Special Categories",
+       "url_path": "special-categories",
+       "level": 2
+      },
+      {
+       "uid": "MTQzNQ==",
+       "name": "Biometrics",
+       "url_path": "sensors/biometrics",
+       "level": 3
+      },
+      {
+       "uid": "MzAwNA==",
+       "name": "Pulse & Heart",
+       "url_path": "sensors/biometrics/pulse-heart",
+       "level": 4
+      },
+      {
+       "uid": "MzAyOQ==",
+       "name": "Items $20 - $30",
+       "url_path": "special-categories/items-20",
+       "level": 3
+      }
+     ]
+    }
+   ],
+   "aggregations": [
+    {
+     "label": "Price",
+     "attribute_code": "price",
+     "count": 6,
+     "options": [
+      {
+       "label": "0-5",
+       "value": "0_5",
+       "count": 131
+      },
+      {
+       "label": "5-10",
+       "value": "5_10",
+       "count": 105
+      },
+      {
+       "label": "10-15",
+       "value": "10_15",
+       "count": 87
+      },
+      {
+       "label": "15-20",
+       "value": "15_20",
+       "count": 63
+      },
+      {
+       "label": "20-25",
+       "value": "20_25",
+       "count": 62
+      },
+      {
+       "label": "25-0",
+       "value": "25_0",
+       "count": 323
+      }
+     ]
+    },
+    {
+     "label": "Form Factor",
+     "attribute_code": "sf_global_form_factor",
+     "count": 7,
+     "options": [
+      {
+       "label": "Qwiic Micro (.75\" x .30\")",
+       "value": "5797",
+       "count": 10
+      },
+      {
+       "label": "Qwiic Mini (1” x .50”)",
+       "value": "5800",
+       "count": 9
+      },
+      {
+       "label": "1\" x 1\"",
+       "value": "5803",
+       "count": 77
+      },
+      {
+       "label": "Thing+/Feather (2.3in\" x .9in\")",
+       "value": "5806",
+       "count": 13
+      },
+      {
+       "label": "RedBoard/Arduino Uno (2.7\" x 2.1\")",
+       "value": "5809",
+       "count": 6
+      },
+      {
+       "label": "Pro Mini (0.7\" x 1.3”)",
+       "value": "8265",
+       "count": 2
+      },
+      {
+       "label": "Pro Micro (1.37” x .7”)",
+       "value": "8268",
+       "count": 4
+      }
+     ]
+    },
+    {
+     "label": "Sensor Type",
+     "attribute_code": "sf_sensors_environmental_type",
+     "count": 8,
+     "options": [
+      {
+       "label": "Air Quality & VOCs",
+       "value": "8846",
+       "count": 9
+      },
+      {
+       "label": "Barometric Pressure",
+       "value": "8849",
+       "count": 17
+      },
+      {
+       "label": "Carbon Dioxide (CO₂)",
+       "value": "8852",
+       "count": 7
+      },
+      {
+       "label": "Gas Detection",
+       "value": "8855",
+       "count": 10
+      },
+      {
+       "label": "Humidity",
+       "value": "8858",
+       "count": 16
+      },
+      {
+       "label": "Magnetic Field & Position",
+       "value": "8861",
+       "count": 10
+      },
+      {
+       "label": "Soil Moisture",
+       "value": "8867",
+       "count": 8
+      },
+      {
+       "label": "Temperature",
+       "value": "8870",
+       "count": 40
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
