@@ -85,6 +85,25 @@ def test_expired_access_token_is_refreshed_once(session, tmp_path):
     assert len(paths(session, "/auth/token")) == 2
 
 
+def test_network_or_server_errors_are_not_reported_as_bad_credentials(session, tmp_path):
+    import requests
+    from partsapi.errors import BlockedError, PartsApiError
+
+    def boom(**k):
+        raise requests.ConnectionError("no route to host")
+    session.add("POST", "/auth/token", boom)
+    with pytest.raises(PartsApiError) as e:
+        TME(make_http(session), "a", "b", cache_dir=tmp_path).findpart("lm358")
+    assert not isinstance(e.value, AuthError) and "no route" in str(e.value)
+    s2 = FakeSession().add("POST", "/auth/token", FakeResponse(500, text="oops"))
+    with pytest.raises(BlockedError):                                    # 5xx after retries
+        TME(make_http(s2), "a", "b", cache_dir=tmp_path).findpart("lm358")
+    s3 = FakeSession().add("POST", "/auth/token", FakeResponse(418, text="teapot"))
+    with pytest.raises(PartsApiError) as e3:
+        TME(make_http(s3), "a", "b", cache_dir=tmp_path).findpart("lm358")
+    assert not isinstance(e3.value, AuthError)
+
+
 def test_rejected_credentials(session, tmp_path):
     session.add("POST", "/auth/token", FakeResponse(400, text='{"error":"invalid_request","error_description":"E_TOKEN_NOT_FOUND"}'))
     with pytest.raises(AuthError, match="14 May 2026"):

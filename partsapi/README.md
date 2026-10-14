@@ -228,6 +228,23 @@ only use v2; older applications use a legacy signed API that this client does no
 * **Category tree.** About 400 KB, fetched once and cached for 7 days (`PARTSAPI_CACHE_DIR`); used for category paths and `cat:`.
 * **Verification status.** Run against the real TME API with a real application, including the parametric search.
 
+## Credentials
+
+DigiKey, Mouser and TME need keys (see their sections). The library reads them from environment variables, and loads a
+`.env`-style file for you at `import partsapi` (never overriding variables that are already set). First file found wins:
+`$PARTSAPI_ENV_FILE`, `./.env`, `~/.config/partsapi/env`. Start from `.env.example`:
+
+```bash
+mkdir -p ~/.config/partsapi && cp .env.example ~/.config/partsapi/env && chmod 600 ~/.config/partsapi/env   # then edit it
+```
+
+* **Only this package's variables are accepted** (`DIGIKEY_*`, `DK_*`, `MOUSER_*`, `TME_*`, `PARTSAPI_*`); a stray `PATH=` or
+  `LD_PRELOAD=` line in the file is ignored. A file readable by other users triggers a warning.
+* **Never commit the file.** `.env` is git-ignored here. Encrypting it does not help while the key lives next to it, and a
+  committed secret stays in git history for good; for CI or a cloud environment use that platform's secrets / environment
+  variables instead. `PARTSAPI_NO_DOTENV=1` switches the automatic load off; `partsapi.load_env(path, override=False)` does it by hand.
+* **A secret that has been pasted into a chat, a ticket or a log should be regenerated** in the vendor's portal.
+
 ## How it works, and what to know
 
 * **Unofficial (JLCPCB, LCSC, Reichelt).** These sites publish no API. JLCPCB and LCSC are called at the JSON endpoints

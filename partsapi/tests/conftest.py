@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import copy
+import os
 import json
 from pathlib import Path
 from typing import Any, Callable, Optional
 
 import pytest
 
-from partsapi._http import Http
+if os.environ.get("PARTSAPI_LIVE") != "1":  # offline runs must not read the developer's real credentials file
+    os.environ["PARTSAPI_NO_DOTENV"] = "1"
+
+from partsapi._http import Http  # noqa: E402
 
 FIX = Path(__file__).parent / "fixtures"
 

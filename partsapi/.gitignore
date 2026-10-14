@@ -3,3 +3,9 @@
 __pycache__/
 build/
 dist/
+
+# credentials: never commit
+.env
+.env.*
+!.env.example
+*.env

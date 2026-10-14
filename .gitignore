@@ -31,3 +31,8 @@ gbc-handheld/build/schematic*.erc
 gbc-handheld/build/*.kicad_pcb-bak
 gbc-handheld/build/placed.kicad_pro
 gbc-handheld/build/unplaced.kicad_pro
+
+# credentials: never commit
+.env
+.env.*
+!.env.example

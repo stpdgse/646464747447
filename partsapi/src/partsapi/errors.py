@@ -21,6 +21,14 @@ class BlockedError(PartsApiError):
         self.status = status
 
 
+class HttpError(PartsApiError):
+    """An HTTP error status other than 404 / 401 / 403 / 405 (those have their own exceptions). ``status`` is the code."""
+
+    def __init__(self, message: str = "", status: "int | None" = None) -> None:
+        super().__init__(message)
+        self.status = status
+
+
 class AuthError(PartsApiError):
     """Missing or rejected API credentials (DigiKey client id/secret, Mouser API key)."""
 

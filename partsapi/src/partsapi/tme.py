@@ -35,7 +35,7 @@ from . import easyeda as _easyeda
 from ._cache import DiskCache, default_dir
 from ._http import Http
 from ._util import PathLike, safe_name, save_bytes, to_float, to_int
-from .errors import AuthError, BlockedError, NotFoundError, PartsApiError
+from .errors import AuthError, BlockedError, HttpError, NotFoundError, PartsApiError
 from .filters import (ParsedQuery, PartFilter, build_filter, package_matches, parse_query,
                       reject_unsupported, sort_parts)
 from .models import Model3D, Part, PriceBreak, Stock, pick_price
@@ -146,9 +146,9 @@ class TME:
         basic = base64.b64encode(f"{self.token}:{self.secret}".encode()).decode()
         try:
             resp = self.http.request("POST", f"{BASE}/auth/token", data={"grant_type": "client_credentials"}, headers={"Authorization": f"Basic {basic}"})
-        except (BlockedError, PartsApiError) as exc:
-            if isinstance(exc, BlockedError) and exc.status not in (401, 403):
-                raise
+        except (BlockedError, HttpError) as exc:
+            if exc.status not in (400, 401, 403):
+                raise                                   # 429 / 5xx / ...: not a credentials problem
             raise AuthError("TME rejected the token/secret (only applications created after 14 May 2026 work with this v2 client; "
                             "check TME_TOKEN is the long value and TME_SECRET the short one)") from exc
         data = self.http._json(resp, "TME token endpoint")

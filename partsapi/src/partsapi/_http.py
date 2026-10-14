@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 import requests
 
-from .errors import BlockedError, NotFoundError, PartsApiError
+from .errors import BlockedError, HttpError, NotFoundError, PartsApiError
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -93,7 +93,7 @@ class Http:
         if resp.status_code in (401, 403, 405) or "Access Denied" in resp.text[:300]:
             raise BlockedError(f"{shown} -> HTTP {resp.status_code} (bot protection or bad credentials?)", resp.status_code)
         if resp.status_code >= 400:
-            raise PartsApiError(f"{shown} -> HTTP {resp.status_code}")
+            raise HttpError(f"{shown} -> HTTP {resp.status_code}", resp.status_code)
         return resp
 
     # -- cached helpers -------------------------------------------------------------
