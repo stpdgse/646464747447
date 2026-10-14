@@ -132,7 +132,8 @@ def test_lcsc_findpart_code_shortcut_and_keyword(session):
     assert [p.code for p in c.findpart("C25804")] == ["C25804"]
     assert not any("components/search" in x["url"] for x in session.calls)
     session.add("POST", "components/search", FakeResponse(200, json_data=SEARCH_PAYLOAD))
-    assert [p.code for p in c.findpart("LM358", limit=3)] == ["C25804"]
+    # the canned detail is a resistor, so word-strictness would (rightly) reject it for "LM358"
+    assert [p.code for p in c.findpart("LM358", limit=3, strict=False)] == ["C25804"]
 
 
 def test_lcsc_assets(session, tmp_path):

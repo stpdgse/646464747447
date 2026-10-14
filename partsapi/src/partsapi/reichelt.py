@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 from urllib.parse import quote, urljoin
 
 from bs4 import BeautifulSoup
@@ -27,10 +27,13 @@ from . import easyeda as _easyeda
 from ._http import Http
 from ._util import PathLike, ext_from_url, safe_name, save_bytes
 from .errors import NoModelError, NotFoundError, ParseError
+from .filters import ParsedQuery, PartFilter, build_filter, facets as _facets, parse_query, sort_parts
 from .models import Model3D, Part, PriceBreak, Stock, pick_price
 
 BASE = "https://www.reichelt.de"
 DEFAULT_LOCALE = "de/de"
+# check groups a search result card can answer without opening the product page
+_CARD_HAS = ("text", "code", "manufacturer", "package", "description", "price", "attrs", "image")
 
 
 def parse_price(text: str) -> Optional[float]:
@@ -69,21 +72,68 @@ class Reichelt:
     def _search_url(self, query: str) -> str:
         return f"{BASE}/{self.locale}/shop/suche/{quote(query.strip(), safe='')}"
 
-    def findpart(self, query: str, *, limit: int = 30) -> list[Part]:
-        """Search the shop. Returns the first result page (no stock/datasheet details - use ``getpart``)."""
-        if not query.strip():
+    def findpart(
+        self,
+        query: str,
+        *,
+        limit: int = 30,
+        where: Union[None, str, PartFilter] = None,
+        sort: Union[None, str, Callable[[Part], Any]] = None,
+        reverse: bool = False,
+        qty: int = 1,
+        max_fetch: int = 30,
+        parse: bool = True,
+        strict: Optional[bool] = None,
+    ) -> list[Part]:
+        """Search the shop, with the full filter syntax of :mod:`partsapi.filters`.
+
+        Reichelt returns one result page (about 10-30 articles). Manufacturer, package, price, description
+        and the attribute table on the result cards are filtered directly; if the filter also needs
+        stock, datasheet, MPN or RoHS, the surviving articles' product pages are fetched (at most
+        ``max_fetch``). Attribute names are German ("Bauform", "Versorgungsspannung"); the aliases
+        ``res cap ind tol power volt curr freq temp`` know the German names. ``lib:`` / ``is:preferred`` do not exist here.
+        """
+        if not query.strip() and not where:
             raise ValueError("empty query")
-        html = self.http.get_text(self._search_url(query))
-        soup = BeautifulSoup(html, "lxml")
-        parts: list[Part] = []
-        for card in soup.select("div.al_gallery_article"):
-            part = self._parse_card(card)
-            if part is not None:
+        pq = parse_query(query, qty=qty, strict=strict) if parse else ParsedQuery([query] if query.strip() else [], [], PartFilter(qty=qty))
+        flt = pq.filter
+        if where is not None:
+            flt.merge(build_filter(where, qty))
+        if flt.flags & {"preferred", "basic", "extended"} or any(n == "library" for n, _ in flt.fields):
+            raise ValueError("lib:/is:preferred are JLCPCB concepts and do not exist on Reichelt")
+        queries = [k for k in pq.server_queries() if k.strip()]
+        if not queries:
+            raise ValueError("Reichelt search needs at least one search word")
+        card_skip = {"mpn", "category", "datasheet", "stock", "rohs", "library"}
+        needs_detail = flt.requires_detail(set(_CARD_HAS))
+        found: dict[str, Part] = {}
+        for kw in queries:
+            html = self.http.get_text(self._search_url(kw))
+            for card in BeautifulSoup(html, "lxml").select("div.al_gallery_article"):
+                part = self._parse_card(card)
+                if part is None or part.code in found:
+                    continue
                 self._urls[_norm(part.code)] = part.url or ""
-                parts.append(part)
-            if len(parts) >= limit:
-                break
-        return parts
+                if flt.matches(part, card_skip):
+                    found[part.code] = part
+        parts = list(found.values())
+        if needs_detail:
+            full: list[Part] = []
+            for part in parts[:max_fetch]:
+                try:
+                    detail = self.getpart(part.code)
+                except NotFoundError:
+                    continue
+                if flt.matches(detail):
+                    full.append(detail)
+            parts = full
+        if sort:
+            parts = sort_parts(parts, sort, reverse=reverse, qty=qty)
+        return parts[:limit]
+
+    def facets(self, query: str, **kw: Any) -> dict[str, Any]:
+        """Counts over the search results (computed locally)."""
+        return _facets(self.findpart(query, **kw))
 
     def _parse_card(self, card: Tag) -> Optional[Part]:
         code = _meta(card, "productID")
@@ -106,6 +156,7 @@ class Reichelt:
             code=code,
             manufacturer=_meta(card, "sku"),
             description=_meta(card, "name"),
+            package=attrs.get("Bauform") or attrs.get("Gehäuse"),
             url=url,
             image_urls=[image] if image else [],
             price_breaks=[PriceBreak(1, None, price, "EUR", True, 0.19)] if price is not None else [],
@@ -241,7 +292,8 @@ class Reichelt:
 _default = Reichelt()
 
 
-def findpart(query: str, *, limit: int = 30) -> list[Part]: return _default.findpart(query, limit=limit)
+def findpart(query: str, **kw: Any) -> list[Part]: return _default.findpart(query, **kw)
+def facets(query: str, **kw: Any) -> dict[str, Any]: return _default.facets(query, **kw)
 def getpart(code: str) -> Part: return _default.getpart(code)
 def getpartprice(code: str, qty: Optional[int] = None): return _default.getpartprice(code, qty)
 getprice = getpartprice

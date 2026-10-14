@@ -15,16 +15,25 @@ search and then hydrates each hit from LCSC. A bare C-number skips the search en
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 from . import easyeda as _easyeda
 from ._http import Http
 from ._util import PathLike, ext_from_url, is_lcsc_code, safe_name, save_bytes, to_float, to_int
 from .errors import NotFoundError, ParseError
+from .filters import ParsedQuery, PartFilter, build_filter, facets as _facets, parse_query, sort_parts
 from .models import Model3D, Part, PriceBreak, Stock, pick_price
 
 DETAIL = "https://wmsc.lcsc.com/ftps/wm/product/detail"
 SITE = "https://www.lcsc.com"
+
+
+def _stub(hit: dict[str, Any]) -> Part:
+    """A Part with only what EasyEDA's search result carries - enough for cheap pre-filtering."""
+    cls = (hit.get("library_class") or "").lower()
+    return Part(vendor="lcsc", code=hit["code"], mpn=hit.get("mpn"), manufacturer=hit.get("manufacturer"),
+                package=hit.get("package"), description=hit.get("title"),
+                extra={"library_type": "basic" if "basic" in cls else "extended" if "extended" in cls else None})
 
 
 def _abs(url: Optional[str]) -> Optional[str]:
@@ -116,20 +125,82 @@ class LCSC:
             raise ParseError(f"unexpected LCSC response: {str(data)[:200]}")
         return _parse(data["result"])
 
-    def findpart(self, query: str, *, limit: int = 10) -> list[Part]:
-        """Search by MPN / keyword / C-number. Each hit is fetched in full from LCSC."""
+    def findpart(
+        self,
+        query: str,
+        *,
+        limit: int = 10,
+        where: Union[None, str, PartFilter] = None,
+        sort: Union[None, str, Callable[[Part], Any]] = None,
+        reverse: bool = False,
+        qty: int = 1,
+        max_pages: int = 3,
+        max_fetch: int = 60,
+        parse: bool = True,
+        strict: Optional[bool] = None,
+    ) -> list[Part]:
+        """Search by MPN / keyword / C-number, with the full filter syntax of :mod:`partsapi.filters`.
+
+        The catalogue is searched through EasyEDA (up to ``max_pages`` pages of 100). Manufacturer, MPN,
+        package and ``lib:basic|extended`` are checked on those cheap results first; only survivors are
+        fetched in full from LCSC (at most ``max_fetch``), then price/stock/attribute/etc. filters apply.
+        ``lib:`` is JLCPCB's class from the EasyEDA library; ``is:preferred`` is JLCPCB-only (use :mod:`jlc`).
+        With ``sort`` every candidate is fetched first, so the order is over those candidates only.
+        """
         q = query.strip()
-        if is_lcsc_code(q):
+        if is_lcsc_code(q) and not where:
             return [self.getpart(q)]
-        parts: list[Part] = []
-        for hit in self._easyeda.search(q, limit=limit * 2):
-            try:
-                parts.append(self.getpart(hit["code"]))
-            except NotFoundError:
-                continue  # in the EDA library but not (or no longer) sold
-            if len(parts) >= limit:
+        pq = parse_query(q, qty=qty, strict=strict) if parse else ParsedQuery([q] if q else [], [], PartFilter(qty=qty))
+        flt = pq.filter
+        if where is not None:
+            flt.merge(build_filter(where, qty))
+        if "preferred" in flt.flags:
+            raise ValueError("is:preferred is a JLCPCB concept; use partsapi.jlc.findpart")
+        queries = [k for k in pq.server_queries() if k.strip()]
+        if not queries:
+            raise ValueError("LCSC search needs at least one search word (filters alone are not enough; try jlc.findpart)")
+        cheap_skip = {"text", "attrs", "price", "stock", "datasheet", "image", "rohs", "description", "category"}
+        wanted = limit if not sort else 10**9
+        found: dict[str, Part] = {}
+        seen: set[str] = set()
+        fetched = 0
+        for kw in queries:
+            for pg in range(1, max_pages + 1):
+                hits = self._easyeda.search(kw, limit=100, page=pg)
+                for h in hits:
+                    code = h["code"]
+                    if code in seen:
+                        continue
+                    seen.add(code)
+                    if not flt.matches(_stub(h), cheap_skip):
+                        continue
+                    if fetched >= max_fetch:
+                        break
+                    fetched += 1
+                    try:
+                        part = self.getpart(code)
+                    except NotFoundError:
+                        continue  # in the EDA library but not (or no longer) sold
+                    lib = _stub(h).extra.get("library_type")
+                    if lib:
+                        part.extra["library_type"] = lib
+                    if flt.matches(part):
+                        found[code] = part
+                    if len(found) >= wanted:
+                        break
+                if len(found) >= wanted or len(hits) < 100 or fetched >= max_fetch:
+                    break
+            if len(found) >= wanted or fetched >= max_fetch:
                 break
-        return parts
+        out = list(found.values())
+        if sort:
+            out = sort_parts(out, sort, reverse=reverse, qty=qty)
+        return out[:limit]
+
+    def facets(self, query: str, **kw: Any) -> dict[str, Any]:
+        """Counts of manufacturers, packages, attribute values, price and stock ranges over the search results
+        (computed locally from :meth:`findpart`; LCSC has no server-side facets we can reach)."""
+        return _facets(self.findpart(query, **kw))
 
     def getpartprice(self, code: str, qty: Optional[int] = None) -> Union[list[PriceBreak], float]:
         breaks = self.getpart(code).price_breaks
@@ -192,14 +263,9 @@ class LCSC:
 _default = LCSC()
 
 
-def __getattr__(name: str) -> Any:
-    if name == "currency":
-        return _default.currency
-    raise AttributeError(name)
-
-
 def set_currency(code: str) -> None: _default.currency = code
-def findpart(query: str, *, limit: int = 10) -> list[Part]: return _default.findpart(query, limit=limit)
+def findpart(query: str, **kw: Any) -> list[Part]: return _default.findpart(query, **kw)
+def facets(query: str, **kw: Any) -> dict[str, Any]: return _default.facets(query, **kw)
 def getpart(code: str) -> Part: return _default.getpart(code)
 def getpartprice(code: str, qty: Optional[int] = None): return _default.getpartprice(code, qty)
 getprice = getpartprice

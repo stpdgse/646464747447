@@ -40,7 +40,7 @@ def test_search_body_includes_filters(session):
     c.findpart("10k 0603", limit=5, page=2, library="extended", preferred=True, in_stock_only=True,
                min_stock=100, brands=["UNI-ROYAL"], attributes={"Tolerance": "±1%"})
     body = session.calls[-1]["json"]
-    assert body["keyword"] == "10k 0603" and body["pageSize"] == 5 and body["currentPage"] == 2
+    assert body["keyword"] == "10k 0603" and body["pageSize"] == 72  # digit words are checked client-side, so read full pages and body["currentPage"] == 2
     assert body["componentLibraryType"] == "expand"
     assert body["preferredComponentFlag"] is True
     assert body["presaleType"] == "stock" and body["startStockNumber"] == 100
@@ -57,7 +57,9 @@ def test_default_search_includes_out_of_stock(session):
 def test_input_validation(session):
     c = client(session)
     with pytest.raises(ValueError):
-        c.findpart("x", limit=73)
+        c.findpart("x", limit=0)
+    with pytest.raises(ValueError):
+        c.findpart("x", limit=5001)
     with pytest.raises(ValueError):
         c.findpart("x", library="premium")
     with pytest.raises(ValueError):

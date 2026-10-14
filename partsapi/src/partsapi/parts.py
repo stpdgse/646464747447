@@ -2,6 +2,7 @@
 net USD (or the currency you set), Reichelt's are EUR gross incl. VAT."""
 from __future__ import annotations
 
+import warnings
 from typing import Any, Optional
 
 from . import jlc, lcsc, reichelt
@@ -11,13 +12,19 @@ from .models import Part
 VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt}
 
 
-def findpart(query: str, *, limit: int = 5, vendors: tuple[str, ...] = ("jlc", "lcsc", "reichelt")) -> dict[str, list[Part]]:
-    """Search several vendors; a vendor that errors yields an empty list (the error is in ``errors``)."""
+def findpart(query: str, *, limit: int = 5, vendors: tuple[str, ...] = ("jlc", "lcsc", "reichelt"),
+             where: Any = None, sort: Any = None, reverse: bool = False, qty: int = 1, **kw: Any) -> dict[str, list[Part]]:
+    """Run the same query (full filter syntax) on several vendors.
+
+    A vendor that cannot honour the query (error, or a filter that does not exist there such as
+    ``is:preferred`` on Reichelt) contributes an empty list and a ``UserWarning`` saying why.
+    """
     out: dict[str, list[Part]] = {}
     for v in vendors:
         try:
-            out[v] = VENDORS[v].findpart(query, limit=limit)
-        except PartsApiError:
+            out[v] = VENDORS[v].findpart(query, limit=limit, where=where, sort=sort, reverse=reverse, qty=qty, **kw)
+        except (PartsApiError, ValueError) as exc:
+            warnings.warn(f"{v}: {exc}", stacklevel=2)
             out[v] = []
     return out
 
@@ -32,7 +39,7 @@ def prices(mpn_or_code: str, qty: int = 1, *, vendors: tuple[str, ...] = ("jlc",
     rows: list[dict[str, Any]] = []
     for v in vendors:
         try:
-            hits = VENDORS[v].findpart(mpn_or_code, limit=10)
+            hits = VENDORS[v].findpart(mpn_or_code, limit=10, parse=False)
         except PartsApiError as exc:
             rows.append({"vendor": v, "error": str(exc)})
             continue

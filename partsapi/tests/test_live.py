@@ -33,3 +33,20 @@ def test_reichelt_everything():
     assert p.price_breaks[0].unit_price > 0 and p.stock.in_stock in (True, False)
     assert reichelt.getpic("LM358DT")[:4] in (b"\x89PNG", b"\xff\xd8\xff\xe0", b"\xff\xd8\xff\xe1")
     assert reichelt.get3dmodel("LM358DT").data.startswith(b"ISO-10303")
+
+
+def test_filters_live():
+    # JLCPCB: numeric ranges resolved against the real catalogue, pushed to the server, sorted by price
+    rs = jlc.findpart("cat:resistor res:10k..100k tol:<=1% pkg:=0603 lib:basic is:instock", limit=5, sort="price")
+    assert rs and all(p.package == "0603" and p.extra["library_type"] == "basic" for p in rs)
+    assert all(10_000 <= float(p.attributes["Resistance"].replace("kΩ", "")) * 1000 <= 100_000 for p in rs)
+    assert [p.price_for(1) for p in rs] == sorted(p.price_for(1) for p in rs)
+    assert jlc.findpart("cat:resistor res:>1000000000000", limit=3) == []
+    assert any(p.mpn.startswith("LM358") for p in jlc.findpart("lm358 OR lm324 mfr:ti|onsemi|stmicro stock:>=1000", limit=10))
+    f = jlc.facets("", category="capacitor")
+    assert f["total"] > 100_000 and "Capacitance" in f["attributes"] and f["counts"]["basic"] > 0
+    # LCSC and Reichelt: client-side filters over real results
+    ls = lcsc.findpart("lm358 pkg:soic is:instock", limit=3, max_fetch=12)
+    assert ls and all("soic" in p.package.lower() and p.stock.in_stock for p in ls)
+    rr = reichelt.findpart("LM358 -dip price:<=0.2", sort="price")
+    assert rr and all(p.price_for(1) <= 0.2 and "DIP" not in p.code for p in rr)

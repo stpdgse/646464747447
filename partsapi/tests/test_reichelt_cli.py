@@ -24,15 +24,16 @@ def reichelt(session) -> Reichelt:
 
 
 def test_search_cards(session):
-    parts = reichelt(session).findpart("LM358")
+    parts = reichelt(session).findpart("LM358", strict=False)
     assert len(parts) == 10
+    assert len(reichelt(FakeSession()).findpart("LM358")) == 5  # default: "LMV 358" is not "LM358"
     p = next(x for x in parts if x.code == "LM358DT")
     assert p.manufacturer == "STMICROELECTRONICS"  # card quirk: itemprop=sku is the manufacturer
     assert p.price_for(1) == 0.15 and p.price_breaks[0].currency == "EUR" and p.price_breaks[0].incl_vat
     assert p.attributes["Bauform"] == "SOIC-8"
     assert p.url.endswith(PRODUCT_URL)
     assert p.image_urls and p.image_urls[0].startswith("https://cdn-reichelt.de/")
-    assert len(reichelt(FakeSession()).findpart("LM358", limit=3)) == 3
+    assert len(reichelt(FakeSession()).findpart("LM358", limit=3, strict=False)) == 3
 
 
 def test_search_url_is_encoded(session):

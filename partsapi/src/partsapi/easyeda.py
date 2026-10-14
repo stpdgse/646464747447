@@ -43,10 +43,11 @@ class EasyEDA:
             raise NotFoundError(f"EasyEDA has no component for {code}")
         return data["result"]
 
-    def search(self, keyword: str, limit: int = 25) -> list[dict[str, Any]]:
+    def search(self, keyword: str, limit: int = 25, page: int = 1) -> list[dict[str, Any]]:
         """Keyword search of the LCSC library as exposed by EasyEDA.
 
         Returns light dicts: ``code, mpn, manufacturer, package, library_class, title, smt, uuid``.
+        ``page`` is 1-based; one page holds at most 100 hits.
         """
         body = {
             "type": "3",
@@ -55,6 +56,8 @@ class EasyEDA:
             "returnListStyle": "classifyarr",
             "wd": keyword,
             "version": EDITOR_VERSION,
+            "page": str(page),
+            "pageSize": str(max(1, min(limit, 100))),
         }
         resp = self.http.request("POST", f"{BASE}/api/components/search", data=body)
         payload = self.http._json(resp, f"{BASE}/api/components/search")
