@@ -1,7 +1,7 @@
 """Hits the real websites. Run with:  PARTSAPI_LIVE=1 pytest -m live"""
 import pytest
 
-from partsapi import adafruit, digikey, jlc, lcsc, mouser, reichelt, sparkfun
+from partsapi import adafruit, digikey, jlc, lcsc, mouser, reichelt, sparkfun, tme
 
 pytestmark = pytest.mark.live
 
@@ -93,3 +93,15 @@ def test_sparkfun_live(tmp_path):
     assert p.price_for(100) < p.price_for(1) and p.datasheet_url.endswith(".pdf")
     assert sparkfun.getdatasheet("COM-18354")[:4] == b"%PDF"
     assert sparkfun.getpic("COM-18354")[:3] == b"\xff\xd8\xff"
+
+
+@pytest.mark.skipif(not tme.is_configured(), reason="set TME_TOKEN / TME_SECRET")
+def test_tme_live(tmp_path):
+    p = tme.getpart("LM358DT")
+    assert p.mpn == "LM358DT" and p.price_breaks and p.stock.quantity is not None and p.attributes and p.datasheet_url
+    assert tme.getprice("LM358DT", 100) > 0 and tme.getdatasheet("LM358DT")[:4] == b"%PDF"
+    out = tme.findpart("lm358 is:instock price:<0.5", sort="price", limit=5)
+    assert out and all(x.stock.in_stock for x in out)
+    r = tme.findpart("resistor res:10k..100k tol:<=1% pkg:0603 is:instock", limit=5, sort="price")
+    assert r and all(x.package == "0603" and x.stock.in_stock for x in r)
+    assert tme.facets("lm358")["total"] > 10

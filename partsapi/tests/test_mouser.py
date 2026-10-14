@@ -32,6 +32,15 @@ def test_parse_part():
     assert p.attributes["Number of Channels"] == "2 Channel" and p.datasheet_url.endswith("lm358.pdf")
 
 
+def test_repeated_attribute_names_keep_every_value():
+    # real Mouser data: "Verpackung" (Packaging) is listed once per packaging option
+    raw = {"MouserPartNumber": "X", "ProductAttributes": [
+        {"AttributeName": "Verpackung", "AttributeValue": "Reel"}, {"AttributeName": "Verpackung", "AttributeValue": "Cut Tape"},
+        {"AttributeName": "Verpackung", "AttributeValue": "MouseReel"}, {"AttributeName": "Verpackung", "AttributeValue": "Reel"},
+        {"AttributeName": "Standardpackungsmenge", "AttributeValue": "2500"}, {"AttributeName": "Empty", "AttributeValue": ""}]}
+    assert _parse(raw).attributes == {"Verpackung": "Reel, Cut Tape, MouseReel", "Standardpackungsmenge": "2500"}
+
+
 def test_parse_european_prices_and_missing_stock():
     p = _parse(KW["SearchResults"]["Parts"][1])
     assert [(b.unit_price, b.currency) for b in p.price_breaks] == [(0.125, "EUR"), (0.09, "EUR")]
@@ -90,13 +99,12 @@ def test_server_side_options(session, query, option):
 def test_client_side_filters(session):
     c = client(session)
     assert [p.code for p in c.findpart("lm358")] == ["595-LM358DR", "511-LM358N", "863-LM358ADR"]
-    assert [p.code for p in c.findpart("lm358 mfr:texas|onsemi pkg:soic")] == ["595-LM358DR", "863-LM358ADR"]
+    assert [p.code for p in c.findpart("lm358 mfr:texas|onsemi")] == ["595-LM358DR", "863-LM358ADR"]
     assert [p.code for p in c.findpart("lm358 mfr:=onsemi")] == ["863-LM358ADR"]
     assert [p.code for p in c.findpart("lm358 -dip is:instock")] == ["595-LM358DR", "863-LM358ADR"]
     assert [p.code for p in c.findpart("lm358 price:<0.3")] == ["511-LM358N", "863-LM358ADR"]                   # 0.55 is too dear
     assert [p.code for p in c.findpart("lm358 price:<0.3", qty=100)] == ["595-LM358DR", "511-LM358N", "863-LM358ADR"]  # 0.255 at 100 pcs
     assert [p.code for p in c.findpart("lm358 stock:>=1000")] == ["595-LM358DR"]
-    assert [p.code for p in c.findpart("lm358 volt:>=32V")] == ["595-LM358DR"]
     assert [p.code for p in c.findpart("lm358 is:rohs")] == ["595-LM358DR", "511-LM358N"]
 
 
@@ -137,6 +145,9 @@ def test_unsupported_filters(session):
     c = client(session)
     for q in ("lm358 is:preferred", "lm358 lib:basic", "lm358 has:3dmodel", "mfr:ti"):
         with pytest.raises(ValueError):
+            c.findpart(q)
+    for q in ("lm358 volt:>=32V", "lm358 pkg:soic", 'lm358 @"Package / Case":soic', "resistor res:10k"):
+        with pytest.raises(ValueError, match="no technical attributes"):
             c.findpart(q)
 
 

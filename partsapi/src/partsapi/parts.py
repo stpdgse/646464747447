@@ -5,18 +5,18 @@ from __future__ import annotations
 import warnings
 from typing import Any, Optional
 
-from . import adafruit, digikey, jlc, lcsc, mouser, reichelt, sparkfun
+from . import adafruit, digikey, jlc, lcsc, mouser, reichelt, sparkfun, tme
 from .errors import PartsApiError
 from .models import Part
 
-VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt, "digikey": digikey, "mouser": mouser, "adafruit": adafruit, "sparkfun": sparkfun}
+VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt, "digikey": digikey, "mouser": mouser, "tme": tme, "adafruit": adafruit, "sparkfun": sparkfun}
 KEYLESS = ("jlc", "lcsc", "reichelt")
 
 
 def default_vendors() -> tuple[str, ...]:
-    """JLCPCB, LCSC and Reichelt always; DigiKey / Mouser only when their credentials are configured. Adafruit and
+    """JLCPCB, LCSC and Reichelt always; DigiKey / Mouser / TME only when their credentials are configured. Adafruit and
     SparkFun (hobby shops with their own part numbers, so rarely a match for an MPN) are only used when you name them."""
-    return KEYLESS + tuple(v for v in ("digikey", "mouser") if VENDORS[v].is_configured())
+    return KEYLESS + tuple(v for v in ("digikey", "mouser", "tme") if VENDORS[v].is_configured())
 
 
 def findpart(query: str, *, limit: int = 5, vendors: Optional[tuple[str, ...]] = None,

@@ -1,12 +1,13 @@
 # partsapi
 
-One Python API for **JLCPCB parts**, **LCSC**, **Reichelt**, **DigiKey**, **Mouser**, **Adafruit** and **SparkFun**:
-search, price, stock, pictures, datasheets and 3D models, with the same function names and the same filter language on
-every vendor. JLCPCB, LCSC, Reichelt, Adafruit and SparkFun need no key; DigiKey and Mouser use their official APIs and
-need a free one (see [DigiKey and Mouser](#digikey-and-mouser) and [Adafruit and SparkFun](#adafruit-and-sparkfun)).
+One Python API for **JLCPCB parts**, **LCSC**, **Reichelt**, **DigiKey**, **Mouser**, **TME**, **Adafruit** and
+**SparkFun**: search, price, stock, pictures, datasheets and 3D models, with the same function names and the same filter
+language on every vendor. JLCPCB, LCSC, Reichelt, Adafruit and SparkFun need no key; DigiKey, Mouser and TME use their
+official APIs and need a free one (see [DigiKey and Mouser](#digikey-and-mouser), [TME](#tme) and
+[Adafruit and SparkFun](#adafruit-and-sparkfun)).
 
 ```python
-from partsapi import jlc, lcsc, reichelt, digikey, mouser, adafruit, sparkfun
+from partsapi import jlc, lcsc, reichelt, digikey, mouser, tme, adafruit, sparkfun
 
 jlc.findpart("10k 0603 resistor", library="basic", limit=5)   # -> [Part, ...]
 jlc.getpartprice("C25804", qty=1000)                          # -> 0.0043  (USD, unit price at qty)
@@ -26,6 +27,7 @@ reichelt.get3dmodel("LM358DT")                                # resolved via the
 
 digikey.getpartprice("296-1395-1-ND", qty=100)                # needs DIGIKEY_CLIENT_ID / _SECRET
 mouser.findpart("lm358 is:instock -dip", sort="price")         # needs MOUSER_API_KEY
+tme.findpart("resistor res:10k..100k tol:<=1% pkg:0603 is:instock", sort="price")   # needs TME_TOKEN / TME_SECRET
 adafruit.findpart("feather rp2040 is:instock", sort="price")   # no key; searches a cached copy of the catalogue
 sparkfun.findpart('sensor cat:"Environmental Sensors" @"Sensor Type":humidity')   # no key
 
@@ -110,8 +112,8 @@ What each vendor does with a filter:
 |---|---|---|---|---|---|
 | in-stock, RoHS, datasheet / image | **server-side** (RoHS: client) | - | - | **server-side** | in-stock + RoHS server-side |
 | library, preferred, exact package / brand | **server-side** | `lib:` on search hits | - | n/a | n/a |
-| min stock, manufacturer, category | min stock + exact brand | after fetch | on cards | **server-side** (names resolved to DigiKey ids) | client-side |
-| numeric attributes (`res:10k..100k`) | **server-side** when a category is known: real catalogue values are looked up and the matching ones sent | after fetch | on result cards | **server-side** when one *leaf* category is selected (`cat:"Chip Resistor - Surface Mount"`, not `cat:resistors`); else client-side | client-side |
+| min stock, manufacturer, category | min stock + exact brand | after fetch | on cards | **server-side** (names resolved to DigiKey ids) | manufacturer client-side; no category data to filter on |
+| numeric attributes (`res:10k..100k`) | **server-side** when a category is known: real catalogue values are looked up and the matching ones sent | after fetch | on result cards | **server-side** when one *leaf* category is selected (`cat:"Chip Resistor - Surface Mount"`, not `cat:resistors`); else client-side | **not available** (Mouser's API returns no attributes) |
 | sorting | client-side | client-side | client-side | **server-side** for price (qty 1) / stock / mpn / code / manufacturer | client-side |
 | everything else | client-side while paging up to `max_pages` x 72 | on the cheap search hits, the rest after fetching each survivor (`max_fetch`) | on cards; stock / datasheet / MPN / RoHS fetch the product pages of survivors (`max_fetch`) | client-side while paging, 50 per call | client-side while paging, 50 per call |
 
@@ -145,15 +147,13 @@ Both use the vendors' **official** APIs, which need a free key. The keys are rea
 | Prices | standard pricing in the site/currency you configured (net of tax for the US site) | as Mouser formats them for your account; `PriceBreak.currency` is Mouser's code |
 | Budget | one call per page of 50 plus occasional lookups (manufacturer/category lists are cached) | one call per page of 50; calls are spaced 2 s apart (Mouser allows about 30/min) |
 
-`parts.default_vendors()` includes them only when configured, so `parts.findpart(...)` and `parts.prices(...)` keep
+`parts.default_vendors()` includes DigiKey, Mouser and TME only when configured, so `parts.findpart(...)` and `parts.prices(...)` keep
 working without keys; name them in `vendors=` to require them (a missing key then becomes a warning / an error row).
 
-* **Verification status.** **DigiKey** was run against the real production API with a real app (search, filters, sort,
-  parametric filters, facets, part details, pricing, pictures, datasheets - see `tests/test_live.py`), and several details
-  of this README come from what the live responses showed. **Mouser** is written against Mouser's published OpenAPI
-  schema and its error path was exercised with a wrong key, but it has **not** been run against a real key; the offline
-  fixtures for both are schema-derived (`tests/fixtures/*_synthetic.json`), not recordings. To confirm Mouser on your
-  account: `MOUSER_API_KEY=... PARTSAPI_LIVE=1 pytest -m live` (the live tests skip themselves without keys).
+* **Verification status.** **DigiKey** and **Mouser** were run against the real services with real accounts (search, filters,
+  sorting, details, pricing, stock, pictures, datasheets - see `tests/test_live.py`), and several details of this README
+  come from what the live responses showed. The offline fixtures for both are schema-derived
+  (`tests/fixtures/*_synthetic.json`), not recordings. Live tests skip themselves without keys.
 * **DigiKey package types.** One DigiKey product has several orderable variations (cut tape, reel, Digi-Reel). `Part.code`
   is the variation you asked for (or the first), and `Part.extra["variations"]` lists all with their own stock, minimum
   order quantity and price ladder. `getprice("LM358DR", qty)` picks the cheapest variation orderable at `qty`.
@@ -164,8 +164,12 @@ working without keys; name them in `vendors=` to require them (a missing key the
   category name before substring matches. DigiKey needs at least one search word.
 * **Package sizes.** DigiKey writes chip sizes as `0201 (0603 Metric)`: imperial first. A bare `pkg:0603` means imperial
   0603 (`0603 (1608 Metric)`) and does *not* match `0201 (0603 Metric)`; use `pkg:"1608 Metric"` for metric names.
-* **Mouser.** The API can only filter by RoHS and in-stock; everything else is applied while paging (`max_pages`, default 3
-  x 50 results). Mouser's manufacturer-filtered V2 search is not used because its `pageNumber` base is unspecified.
+* **Mouser.** The API can only filter by RoHS and in-stock server-side; manufacturer, price, stock and text are applied while
+  paging (`max_pages`, default 3 x 50 results). It returns **no technical attributes and no package size** (only packaging
+  options), so `res:` / `volt:` / `pkg:` / `@"Name":` filters raise `ValueError`; put the value in the search words
+  (`resistor 0603 10k` is matched against Mouser's description) or use DigiKey / TME / LCSC. Language and currency follow
+  your Mouser account (a German account gets German text and EUR). Some parts have no datasheet link at all. Mouser's
+  manufacturer-filtered V2 search is not used because its `pageNumber` base is unspecified.
 * **3D models, pictures, datasheets.** Neither vendor serves 3D models, so `get3dmodel` resolves the manufacturer part
   number in the LCSC/EasyEDA library, exact match only (same as Reichelt). Image and datasheet links are downloaded with a
   browser User-Agent; some manufacturer-hosted datasheets still refuse scripted downloads.
@@ -202,6 +206,28 @@ why `parts.findpart()` / `parts.prices()` use them only when you name them (`ven
 * **Adafruit categories.** Result lists get a category name through one tiny request per distinct category (remembered).
   `cat:` loads Adafruit's category tree once (about 27 KB cached, fetched from a larger endpoint) and matches the full path.
 
+## TME
+
+Official TME API **v2**, free token + secret from https://developers.tme.eu/ (applications created after 14 May 2026 can
+only use v2; older applications use a legacy signed API that this client does not support).
+
+| | |
+|---|---|
+| Environment | `TME_TOKEN` (the long value), `TME_SECRET` (the short one); optional `TME_COUNTRY=DE`, `TME_CURRENCY=EUR` |
+| Auth | OAuth2 client credentials, 5-minute access tokens refreshed automatically |
+| Prices | per your TME country: for Germany **gross incl. 19 % VAT** (`PriceBreak.incl_vat`, `vat_rate`) |
+| Stock | real unit counts |
+| Server-side | search words (2-40 chars), `cat:` (category id, includes sub-categories; unknown names get "similar" suggestions), `mfr:` when it names exactly one manufacturer, `is:instock`, sorting by price (single unit) / code / mpn, **parametric filters** (`res:10k..100k`, `tol:<=1%`, `pkg:0603`, `@"Name":value`) |
+| Client-side | everything else, over up to `max_pages` x 100 hits; every hit is completed with prices, stock and parameters (batches of 50) |
+| Not available | `is:rohs`, `lib:`, `is:preferred`, `has:3dmodel`; 3D models come from the LCSC/EasyEDA library by exact MPN like the other distributors |
+
+* **Package sizes.** TME lists passives as "Case - inch" `0603` and "Case - mm" `1608`, and metric `0603` is imperial 0201.
+  `pkg:0603` therefore means the inch size and never matches the mm facet; ICs use the "Case" parameter (`pkg:so8`).
+* **Ambiguous parameter names.** `res` matches "Resistance", "Coil resistance", ...; the parameter whose name *is* the word wins,
+  otherwise the condition is applied client-side. Parameter values that are ranges (`3...30V DC`) never satisfy a numeric condition.
+* **Category tree.** About 400 KB, fetched once and cached for 7 days (`PARTSAPI_CACHE_DIR`); used for category paths and `cat:`.
+* **Verification status.** Run against the real TME API with a real application, including the parametric search.
+
 ## How it works, and what to know
 
 * **Unofficial (JLCPCB, LCSC, Reichelt).** These sites publish no API. JLCPCB and LCSC are called at the JSON endpoints
@@ -236,6 +262,6 @@ DigiKey / Mouser credentials), all subclasses of `PartsApiError`.
 ## Tests
 
 ```bash
-pytest                               # 312 offline tests against recorded and schema-derived fixtures
-PARTSAPI_LIVE=1 pytest -m live       # hits the real sites (DigiKey / Mouser tests need your keys; Adafruit and SparkFun need none)
+pytest                               # 347 offline tests against recorded and schema-derived fixtures
+PARTSAPI_LIVE=1 pytest -m live       # hits the real sites (DigiKey / Mouser / TME tests need your keys; Adafruit and SparkFun need none)
 ```

@@ -352,6 +352,17 @@ class PartFilter:
         needles = tuple(_squash(n) for n in ATTR_ALIASES.get(wanted.casefold(), (wanted,)))
         return any(n in _squash(attr_name) for n in needles)
 
+    @classmethod
+    def best_attr_name(cls, names: Iterable[str], wanted: str, exact: bool = False) -> Optional[str]:
+        """The one attribute name ``wanted`` refers to, or ``None`` if none / still ambiguous. When several names contain the
+        word (``res`` -> "Resistance", "Coil resistance", ...), the one that *is* the word wins."""
+        hits = [n for n in names if cls.attr_name_matches(n, wanted, exact)]
+        if len(hits) <= 1:
+            return hits[0] if hits else None
+        needles = {_squash(n) for n in ATTR_ALIASES.get(wanted.casefold(), (wanted,))}
+        same = [n for n in hits if _squash(n) in needles]
+        return same[0] if len(same) == 1 else None
+
     def _attr_ok(self, p: Part, name: str, cond: Cond, exact: bool) -> bool:
         hits = [v for k, v in p.attributes.items() if self.attr_name_matches(k, name, exact)]
         if not hits:

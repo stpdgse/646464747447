@@ -10,9 +10,11 @@ Needs a (free) Search API key from https://www.mouser.com/api-hub/ ::
     mouser.getstock("LM358DR")
     mouser.getpic("595-LM358DR", save_to="out/")
 
-Written against Mouser's published OpenAPI schema (V1 keyword / part-number search). Mouser's API is deliberately
-small: it can filter server-side only by RoHS and in-stock; every other filter (manufacturer, package, price,
-attributes, ...) is checked here while paging through results (50 per request). Mouser rate-limits per key
+Checked against the live API. Mouser's API is deliberately small: it can filter server-side only by RoHS and in-stock;
+manufacturer, price, stock and text filters are checked here while paging through results (50 per request). It returns
+**no technical attributes** (only packaging) and no package size, so ``res:`` / ``volt:`` / ``pkg:`` / ``@"Name":`` filters
+raise ``ValueError``: put such values in the search words instead ("resistor 0603 10k" is matched against Mouser's
+description). Language and currency follow your Mouser account (a German account gets German text and EUR). Mouser rate-limits per key
 (the default spacing of 2 s between calls keeps you under 30 calls/minute); each page is one call, so
 ``max_pages`` bounds how much a filtered search can spend. Prices are in your account's currency, as formatted
 by Mouser; ``PriceBreak.currency`` carries the code Mouser reports.
@@ -60,7 +62,11 @@ def _stock_qty(p: dict[str, Any]) -> Optional[int]:
 
 
 def _parse(p: dict[str, Any], currency: str = "USD") -> Part:
-    attrs = {a["AttributeName"]: a.get("AttributeValue") for a in p.get("ProductAttributes") or [] if a.get("AttributeName")}
+    attrs: dict[str, str] = {}
+    for a in p.get("ProductAttributes") or []:  # a name can repeat ("Packaging": Reel, Cut Tape, MouseReel): keep all values
+        name, value = a.get("AttributeName"), a.get("AttributeValue")
+        if name and value:
+            attrs[name] = f"{attrs[name]}, {value}" if name in attrs and value not in attrs[name].split(", ") else attrs.get(name, value)
     package = next((v for k, v in attrs.items() if _squash(k) in PKG_ATTRS), None)
     qty = _stock_qty(p)
     rohs = str(p.get("ROHSStatus") or "")
@@ -162,6 +168,9 @@ class Mouser:
         if where is not None:
             flt.merge(build_filter(where, qty))
         reject_unsupported(flt, "mouser", flags={"preferred", "basic", "extended"}, has={"3dmodel"}, library=True)
+        if flt.attrs or any(n == "package" for n, _ in flt.fields):
+            raise ValueError("mouser's API returns no technical attributes or package (only packaging), so res:/volt:/pkg:/@name: filters "
+                             "cannot work; put the value in the search words instead (e.g. 'resistor 0603 10k') or use digikey / lcsc")
         queries = [k for k in pq.server_queries() if k.strip()]
         if not queries:
             raise ValueError("Mouser search needs at least one search word")

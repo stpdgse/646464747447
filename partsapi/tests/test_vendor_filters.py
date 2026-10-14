@@ -380,3 +380,15 @@ def test_cli_sparkfun_end_to_end(session, monkeypatch, capsys):
     assert "mfr" in capsys.readouterr().err
     with pytest.raises(SystemExit):
         cli.main(["sparkfun", "findpart", "x", "--library", "basic"])
+
+
+def test_tme_is_included_by_default_only_when_configured(monkeypatch):
+    assert "tme" not in parts.default_vendors()
+    monkeypatch.setattr(parts.tme._default, "token", "t")
+    monkeypatch.setattr(parts.tme._default, "secret", "s")
+    assert "tme" in parts.default_vendors()
+
+
+def test_cli_tme_credentials_and_errors(capsys):
+    assert cli.main(["tme", "findpart", "lm358"]) == 1
+    assert "TME_TOKEN" in capsys.readouterr().err

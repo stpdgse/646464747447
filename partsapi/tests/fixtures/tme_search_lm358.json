@@ -1,0 +1,140 @@
+{
+ "status": "OK",
+ "data": {
+  "products": {
+   "elements": [
+    {
+     "product_status": [],
+     "symbol": "MIKROE-4357",
+     "ean": "",
+     "customer_symbol": "",
+     "category": {
+      "id": 113614,
+      "name": "Add-on boards"
+     },
+     "manufacturer_symbols": [
+      "MIKROE-4357",
+      "BRUSHLESS 12 CLICK"
+     ],
+     "manufacturer": {
+      "id": 830,
+      "name": "MIKROE"
+     },
+     "description": "Click board; prototype board; Comp: L6235,LM358; 5VDC",
+     "multiples": 1,
+     "minimal_amount": 1,
+     "weight": {
+      "value": 25.1,
+      "unit": "g"
+     },
+     "unit": {
+      "id": "ST",
+      "short_name": "pcs",
+      "singular_translation": "Piece",
+      "plural_translation": null
+     },
+     "packing": {
+      "elements": []
+     },
+     "assets": {
+      "primary_photo": {
+       "prime": "//ce8dc832c.cloudimg.io/v7/_cdn_/1F/31/C0/00/0/791537_1.jpg?width=640&height=480&wat=1&wat_url=_tme-wrk_%2Ftme_new.png&wat_scale=100p&ci_sign=5217eea278e047c3a0d066cf9380318e9beacaf6",
+       "thumbnail": "//ce8dc832c.cloudimg.io/v7/_cdn_/1F/31/C0/00/0/791537_1.jpg?width=100&height=75&q=75&ci_sign=22c70c07eb1abe1e0b6e597855ea1b9fe7a2c472",
+       "high_resolution": "//ce8dc832c.cloudimg.io/v7/_cdn_/1F/31/C0/00/0/791537_1.jpg?width=1440&height=1080&wat=1&wat_url=_tme-wrk_%2Ftme_new.png&wat_scale=100p&ci_sign=d4ac4ea138c69740aa72347178d3129eedb35fcb"
+      }
+     },
+     "notification": null
+    },
+    {
+     "product_status": [],
+     "symbol": "LM358DT",
+     "ean": "",
+     "customer_symbol": "",
+     "category": {
+      "id": 112843,
+      "name": "SMD operational amplifiers"
+     },
+     "manufacturer_symbols": [
+      "LM358DT"
+     ],
+     "manufacturer": {
+      "id": 35,
+      "name": "STMicroelectronics"
+     },
+     "description": "IC: operational amplifier; 1.1MHz; Ch: 2; 3÷30VDC; SO8; reel,tape",
+     "multiples": 1,
+     "minimal_amount": 1,
+     "weight": {
+      "value": 0.079,
+      "unit": "g"
+     },
+     "unit": {
+      "id": "ST",
+      "short_name": "pcs",
+      "singular_translation": "Piece",
+      "plural_translation": null
+     },
+     "packing": {
+      "elements": [
+       {
+        "id": "RL1",
+        "translation": null,
+        "amount": 2500
+       }
+      ]
+     },
+     "assets": {
+      "primary_photo": {
+       "prime": "//ce8dc832c.cloudimg.io/v7/_cdn_/A9/A5/40/00/0/285338_1.jpg?width=640&height=480&wat=1&wat_url=_tme-wrk_%2Ftme_new.png&wat_scale=100p&ci_sign=f0bee21ffea27f905e10bd7bef271cd4e2b785fe",
+       "thumbnail": "//ce8dc832c.cloudimg.io/v7/_cdn_/A9/A5/40/00/0/285338_1.jpg?width=100&height=75&q=75&ci_sign=e896150f0f1315963e6dc4666f8716eaf0e763fd",
+       "high_resolution": null
+      }
+     },
+     "notification": null
+    }
+   ]
+  },
+  "parameters": null,
+  "counters": {
+   "pages": 30,
+   "count": 59,
+   "page": 1,
+   "categories": {
+    "elements": [
+     {
+      "id": 112140,
+      "products_count": 59
+     },
+     {
+      "id": 100421,
+      "products_count": 58
+     },
+     {
+      "id": 100283,
+      "products_count": 58
+     },
+     {
+      "id": 100216,
+      "products_count": 58
+     },
+     {
+      "id": 112843,
+      "products_count": 50
+     },
+     {
+      "id": 112844,
+      "products_count": 8
+     },
+     {
+      "id": 113614,
+      "products_count": 1
+     },
+     {
+      "id": 100636,
+      "products_count": 1
+     }
+    ]
+   }
+  }
+ }
+}

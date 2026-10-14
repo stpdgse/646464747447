@@ -62,7 +62,8 @@ def make_http(session: FakeSession) -> Http:
 
 
 VENDOR_ENV = ("DIGIKEY_CLIENT_ID", "DIGIKEY_CLIENT_SECRET", "DIGIKEY_SITE", "DIGIKEY_LANGUAGE", "DIGIKEY_CURRENCY", "DIGIKEY_SANDBOX",
-              "DK_CLIENT_ID", "DK_CLIENT_SECRET", "DK_SITE", "DK_LANGUAGE", "DK_CURRENCY", "DK_SANDBOX", "MOUSER_API_KEY")
+              "DK_CLIENT_ID", "DK_CLIENT_SECRET", "DK_SITE", "DK_LANGUAGE", "DK_CURRENCY", "DK_SANDBOX", "MOUSER_API_KEY",
+              "TME_TOKEN", "TME_SECRET", "TME_COUNTRY", "TME_CURRENCY")
 
 
 @pytest.fixture(autouse=True)
@@ -72,11 +73,13 @@ def _isolate_vendor_credentials(request, monkeypatch):
         return
     for name in VENDOR_ENV:
         monkeypatch.delenv(name, raising=False)
-    from partsapi import digikey, mouser
+    from partsapi import digikey, mouser, tme
 
     monkeypatch.setattr(digikey._default, "client_id", None)
     monkeypatch.setattr(digikey._default, "client_secret", None)
     monkeypatch.setattr(mouser._default, "api_key", None)
+    monkeypatch.setattr(tme._default, "token", None)
+    monkeypatch.setattr(tme._default, "secret", None)
 
 
 @pytest.fixture

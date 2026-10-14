@@ -1,0 +1,32 @@
+{
+ "status": "OK",
+ "data": {
+  "elements": [
+   {
+    "id": 77,
+    "name": "TEXAS INSTRUMENTS",
+    "products_count": 23652
+   },
+   {
+    "id": 442,
+    "name": "YAGEO",
+    "products_count": 12455
+   },
+   {
+    "id": 35,
+    "name": "STMicroelectronics",
+    "products_count": 10493
+   },
+   {
+    "id": 1284,
+    "name": "ROHM SEMICONDUCTOR",
+    "products_count": 8122
+   },
+   {
+    "id": 68,
+    "name": "Analog Devices",
+    "products_count": 4803
+   }
+  ]
+ }
+}

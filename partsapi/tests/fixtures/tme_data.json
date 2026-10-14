@@ -1,0 +1,78 @@
+{
+ "status": "OK",
+ "data": {
+  "elements": [
+   {
+    "stock_quantity": 2250,
+    "symbol": "LM358DT",
+    "unit": {
+     "id": "ST",
+     "short_name": "pcs",
+     "singular_translation": "Piece",
+     "plural_translation": null
+    },
+    "prices": {
+     "elements": [
+      {
+       "amount": 1,
+       "price": 0.13,
+       "special": false
+      },
+      {
+       "amount": 5,
+       "price": 0.112,
+       "special": false
+      },
+      {
+       "amount": 10,
+       "price": 0.102,
+       "special": false
+      },
+      {
+       "amount": 25,
+       "price": 0.0928,
+       "special": false
+      },
+      {
+       "amount": 50,
+       "price": 0.088,
+       "special": false
+      },
+      {
+       "amount": 100,
+       "price": 0.0833,
+       "special": false
+      },
+      {
+       "amount": 200,
+       "price": 0.0774,
+       "special": false
+      },
+      {
+       "amount": 250,
+       "price": 0.0762,
+       "special": false
+      },
+      {
+       "amount": 500,
+       "price": 0.0726,
+       "special": false
+      },
+      {
+       "amount": 2500,
+       "price": 0.0666,
+       "special": false
+      }
+     ],
+     "tax": {
+      "type": "VAT",
+      "rate": 19.0
+     },
+     "currency": "EUR",
+     "type": "GROSS"
+    },
+    "deliveries": null
+   }
+  ]
+ }
+}
