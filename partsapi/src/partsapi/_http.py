@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import threading
 import time
 from typing import Any, Optional
@@ -16,6 +17,12 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
 )
 RETRY_STATUS = {429, 500, 502, 503, 504}
+_SECRET = re.compile(r"(?i)((?:api[_-]?key|client[_-]?secret|token)=)[^&\s]+")
+
+
+def redact(url: str) -> str:
+    """Hide API keys that travel in the query string before a URL goes into a message."""
+    return _SECRET.sub(r"\1***", url)
 
 
 class Http:
@@ -71,21 +78,22 @@ class Http:
             else:
                 if resp.status_code not in RETRY_STATUS:
                     return self._check(resp, url)
-                last_exc = BlockedError(f"{url} -> HTTP {resp.status_code}")
+                last_exc = BlockedError(f"{redact(url)} -> HTTP {resp.status_code}", resp.status_code)
             if attempt < self.retries:
                 time.sleep(self.backoff * (2**attempt))
         if isinstance(last_exc, BlockedError):
             raise last_exc
-        raise PartsApiError(f"request to {url} failed: {last_exc}") from last_exc
+        raise PartsApiError(f"request to {redact(url)} failed: {redact(str(last_exc))}") from last_exc
 
     @staticmethod
     def _check(resp: requests.Response, url: str) -> requests.Response:
+        shown = redact(url)
         if resp.status_code == 404:
-            raise NotFoundError(f"{url} -> HTTP 404")
+            raise NotFoundError(f"{shown} -> HTTP 404")
         if resp.status_code in (401, 403, 405) or "Access Denied" in resp.text[:300]:
-            raise BlockedError(f"{url} -> HTTP {resp.status_code} (bot protection?)")
+            raise BlockedError(f"{shown} -> HTTP {resp.status_code} (bot protection or bad credentials?)", resp.status_code)
         if resp.status_code >= 400:
-            raise PartsApiError(f"{url} -> HTTP {resp.status_code}")
+            raise PartsApiError(f"{shown} -> HTTP {resp.status_code}")
         return resp
 
     # -- cached helpers -------------------------------------------------------------
@@ -132,4 +140,4 @@ class Http:
         try:
             return resp.json()
         except ValueError as exc:
-            raise PartsApiError(f"{url} did not return JSON: {resp.text[:200]!r}") from exc
+            raise PartsApiError(f"{redact(url)} did not return JSON: {resp.text[:200]!r}") from exc

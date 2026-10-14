@@ -1,7 +1,7 @@
 """Hits the real websites. Run with:  PARTSAPI_LIVE=1 pytest -m live"""
 import pytest
 
-from partsapi import jlc, lcsc, reichelt
+from partsapi import digikey, jlc, lcsc, mouser, reichelt
 
 pytestmark = pytest.mark.live
 
@@ -50,3 +50,25 @@ def test_filters_live():
     assert ls and all("soic" in p.package.lower() and p.stock.in_stock for p in ls)
     rr = reichelt.findpart("LM358 -dip price:<=0.2", sort="price")
     assert rr and all(p.price_for(1) <= 0.2 and "DIP" not in p.code for p in rr)
+
+
+@pytest.mark.skipif(not digikey.is_configured(), reason="set DIGIKEY_CLIENT_ID / DIGIKEY_CLIENT_SECRET")
+def test_digikey_live():
+    p = digikey.getpart("LM358DR")
+    assert p.mpn == "LM358DR" and p.price_breaks and p.stock.quantity is not None and p.attributes
+    assert digikey.getprice("LM358DR", 100) > 0
+    out = digikey.findpart("lm358 mfr:texas is:instock price:<1", sort="price", limit=5)
+    assert out and all(x.stock.in_stock for x in out)
+    r = digikey.findpart("resistor cat:resistors res:10k..100k tol:<=1% pkg:0603 is:instock", limit=5, sort="price")
+    assert r and all("0603" in (x.package or "") for x in r)
+    assert digikey.facets("resistor")["total"] > 1000
+    assert digikey.getpic("LM358DR")[:2] in (b"\xff\xd8", b"\x89P")
+
+
+@pytest.mark.skipif(not mouser.is_configured(), reason="set MOUSER_API_KEY")
+def test_mouser_live():
+    out = mouser.findpart("LM358 is:instock -dip", limit=5, sort="price")
+    assert out and all(x.stock.in_stock for x in out)
+    p = mouser.getpart(out[0].code)
+    assert p.mpn and p.price_breaks and p.price_for(1) > 0
+    assert mouser.getprice(out[0].code, 100) > 0

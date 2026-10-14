@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 from pathlib import Path
 from typing import Any, Callable, Optional
@@ -48,7 +49,8 @@ class FakeSession:
         return self
 
     def request(self, method: str, url: str, **kw: Any) -> FakeResponse:
-        self.calls.append({"method": method.upper(), "url": url, **kw})
+        # snapshot like a real transport: the body is serialised at send time, later mutation must not show up
+        self.calls.append({"method": method.upper(), "url": url, **{k: copy.deepcopy(v) for k, v in kw.items()}})
         for m, part, fn in self.routes:
             if m == method.upper() and part in url:
                 return fn(url=url, **kw)

@@ -5,22 +5,28 @@ from __future__ import annotations
 import warnings
 from typing import Any, Optional
 
-from . import jlc, lcsc, reichelt
+from . import digikey, jlc, lcsc, mouser, reichelt
 from .errors import PartsApiError
 from .models import Part
 
-VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt}
+VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt, "digikey": digikey, "mouser": mouser}
+KEYLESS = ("jlc", "lcsc", "reichelt")
 
 
-def findpart(query: str, *, limit: int = 5, vendors: tuple[str, ...] = ("jlc", "lcsc", "reichelt"),
+def default_vendors() -> tuple[str, ...]:
+    """Keyless vendors always; DigiKey / Mouser only when their credentials are configured."""
+    return KEYLESS + tuple(v for v in ("digikey", "mouser") if VENDORS[v].is_configured())
+
+
+def findpart(query: str, *, limit: int = 5, vendors: Optional[tuple[str, ...]] = None,
              where: Any = None, sort: Any = None, reverse: bool = False, qty: int = 1, **kw: Any) -> dict[str, list[Part]]:
-    """Run the same query (full filter syntax) on several vendors.
+    """Run the same query (full filter syntax) on several vendors (default: see :func:`default_vendors`).
 
     A vendor that cannot honour the query (error, or a filter that does not exist there such as
     ``is:preferred`` on Reichelt) contributes an empty list and a ``UserWarning`` saying why.
     """
     out: dict[str, list[Part]] = {}
-    for v in vendors:
+    for v in vendors or default_vendors():
         try:
             out[v] = VENDORS[v].findpart(query, limit=limit, where=where, sort=sort, reverse=reverse, qty=qty, **kw)
         except (PartsApiError, ValueError) as exc:
@@ -29,15 +35,15 @@ def findpart(query: str, *, limit: int = 5, vendors: tuple[str, ...] = ("jlc", "
     return out
 
 
-def prices(mpn_or_code: str, qty: int = 1, *, vendors: tuple[str, ...] = ("jlc", "lcsc", "reichelt")) -> list[dict[str, Any]]:
+def prices(mpn_or_code: str, qty: int = 1, *, vendors: Optional[tuple[str, ...]] = None) -> list[dict[str, Any]]:
     """Best-matching part per vendor and its unit price at ``qty``.
 
-    A C-number is looked up directly at JLCPCB/LCSC; otherwise the first search hit whose MPN or article
-    number equals the query (ignoring case/spaces/dashes) is used.
+    A C-number is looked up directly at JLCPCB/LCSC; otherwise the first search hit whose MPN or vendor code
+    equals the query (ignoring case/spaces/dashes) is used. DigiKey and Mouser are included only if configured.
     """
     norm = lambda s: "".join(ch for ch in (s or "").upper() if ch.isalnum())  # noqa: E731
     rows: list[dict[str, Any]] = []
-    for v in vendors:
+    for v in vendors or default_vendors():
         try:
             hits = VENDORS[v].findpart(mpn_or_code, limit=10, parse=False)
         except PartsApiError as exc:

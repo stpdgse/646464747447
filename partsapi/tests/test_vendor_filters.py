@@ -4,7 +4,7 @@ import json
 import pytest
 
 from conftest import FakeResponse, FakeSession, fixture_json, fixture_text, make_http
-from partsapi import cli, jlc, lcsc, parts
+from partsapi import cli, jlc, parts
 from partsapi.jlc import JLC
 from partsapi.lcsc import LCSC
 from partsapi.reichelt import Reichelt
@@ -302,3 +302,48 @@ def test_cli_jlc_facets(session, monkeypatch, capsys):
     monkeypatch.setattr(jlc, "_default", scoped_client(session))
     assert cli.main(["jlc", "facets", "", "--category", "resistor"]) == 0
     assert json.loads(capsys.readouterr().out)["total"] == 99
+
+
+# ------------------------------------------------------------------ DigiKey / Mouser in the cross-vendor layer and CLI
+def test_default_vendors_include_key_gated_ones_only_when_configured(monkeypatch):
+    monkeypatch.setattr(parts.digikey._default, "client_id", None)
+    monkeypatch.setattr(parts.mouser._default, "api_key", None)
+    assert parts.default_vendors() == ("jlc", "lcsc", "reichelt")
+    monkeypatch.setattr(parts.mouser._default, "api_key", "k")
+    assert parts.default_vendors() == ("jlc", "lcsc", "reichelt", "mouser")
+    monkeypatch.setattr(parts.digikey._default, "client_id", "a")
+    monkeypatch.setattr(parts.digikey._default, "client_secret", "b")
+    assert parts.default_vendors() == ("jlc", "lcsc", "reichelt", "digikey", "mouser")
+
+
+def test_explicit_unconfigured_vendor_warns_instead_of_raising(monkeypatch):
+    monkeypatch.setattr(parts.digikey._default, "client_id", None)
+    with pytest.warns(UserWarning, match="digikey: DigiKey needs DIGIKEY_CLIENT_ID"):
+        assert parts.findpart("lm358", vendors=("digikey",)) == {"digikey": []}
+
+
+def test_parts_prices_reports_auth_error_rows(monkeypatch):
+    monkeypatch.setattr(parts.mouser._default, "api_key", None)
+    rows = parts.prices("LM358", vendors=("mouser",))
+    assert rows[0]["vendor"] == "mouser" and "MOUSER_API_KEY" in rows[0]["error"]
+
+
+def test_cli_credential_and_filter_errors(monkeypatch, capsys):
+    monkeypatch.setattr(parts.digikey._default, "client_id", None)
+    assert cli.main(["digikey", "findpart", "lm358"]) == 1
+    assert "DIGIKEY_CLIENT_ID" in capsys.readouterr().err
+    monkeypatch.setattr(parts.mouser._default, "api_key", "k")
+    assert cli.main(["mouser", "findpart", "lm358", "--preferred"]) == 2          # unsupported filter => ValueError => exit 2
+    assert "does not support is:preferred" in capsys.readouterr().err
+    with pytest.raises(SystemExit):
+        cli.main(["digikey", "findpart", "x", "--library", "basic"])
+
+
+def test_cli_mouser_findpart_end_to_end(session, monkeypatch, capsys):
+    from partsapi import mouser as mouser_module
+    from partsapi.mouser import Mouser
+    session.add("POST", "/v1/search/keyword", FakeResponse(200, json_data=fixture_json("mouser_keyword_synthetic.json")))
+    monkeypatch.setattr(mouser_module, "_default", Mouser(make_http(session), "k"))
+    assert cli.main(["mouser", "findpart", "lm358", "--exclude", "dip", "--max-price", "0.3", "--sort", "price", "--table"]) == 0
+    lines = capsys.readouterr().out.strip().splitlines()
+    assert [l.split()[0] for l in lines[2:]] == ["863-LM358ADR"]

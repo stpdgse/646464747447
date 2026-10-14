@@ -1,0 +1,232 @@
+{
+ "Errors": [],
+ "SearchResults": {
+  "NumberOfResult": 3,
+  "Parts": [
+   {
+    "Availability": "1,234 In Stock",
+    "DataSheetUrl": "https://www.ti.com/lit/ds/symlink/lm358.pdf",
+    "Description": "Operational Amplifiers - Op Amps Dual Low Power",
+    "FactoryStock": "0",
+    "ImagePath": "https://www.mouser.com/images/texasinstruments/images/LM358DR.jpg",
+    "Category": "Op Amps",
+    "LeadTime": "56 Days",
+    "LifecycleStatus": "",
+    "Manufacturer": "Texas Instruments",
+    "ManufacturerPartNumber": "LM358DR",
+    "Min": "1",
+    "Mult": "1",
+    "MouserPartNumber": "595-LM358DR",
+    "ProductAttributes": [
+     {
+      "AttributeName": "Package / Case",
+      "AttributeValue": "SOIC-8"
+     },
+     {
+      "AttributeName": "Number of Channels",
+      "AttributeValue": "2 Channel"
+     },
+     {
+      "AttributeName": "Supply Voltage - Max",
+      "AttributeValue": "32 V"
+     },
+     {
+      "AttributeName": "Packaging",
+      "AttributeValue": "Reel"
+     }
+    ],
+    "PriceBreaks": [
+     {
+      "Quantity": 1,
+      "Price": "$0.55",
+      "Currency": "USD"
+     },
+     {
+      "Quantity": 10,
+      "Price": "$0.371",
+      "Currency": "USD"
+     },
+     {
+      "Quantity": 100,
+      "Price": "$0.255",
+      "Currency": "USD"
+     },
+     {
+      "Quantity": 2500,
+      "Price": "$0.18",
+      "Currency": "USD"
+     }
+    ],
+    "AlternatePackagings": [
+     {
+      "APMfrPN": "LM358DRG4"
+     }
+    ],
+    "ProductDetailUrl": "https://www.mouser.com/ProductDetail/Texas-Instruments/LM358DR?qs=abc",
+    "Reeling": false,
+    "ROHSStatus": "RoHS Compliant",
+    "REACH-SVHC": [],
+    "UnitWeightKg": {
+     "UnitWeight": 7.6e-05
+    },
+    "StandardCost": {
+     "Standardcost": 0.2
+    },
+    "IsDiscontinued": "false",
+    "AvailabilityInStock": "1234",
+    "AvailabilityOnOrder": [
+     {
+      "Quantity": 5000,
+      "Date": "11/12/2026"
+     }
+    ],
+    "InfoMessages": [],
+    "ProductCompliance": [
+     {
+      "ComplianceName": "USHTS",
+      "ComplianceValue": "8542330001"
+     }
+    ],
+    "TradeCompliance": [
+     {
+      "ComplianceName": "ECCN",
+      "ComplianceValue": "EAR99"
+     }
+    ]
+   },
+   {
+    "Availability": "None",
+    "DataSheetUrl": "https://www.ti.com/lit/ds/symlink/lm358.pdf",
+    "Description": "Operational Amplifiers - Op Amps Dual Low Power",
+    "FactoryStock": "0",
+    "ImagePath": "https://www.mouser.com/images/texasinstruments/images/LM358DR.jpg",
+    "Category": "Op Amps",
+    "LeadTime": "56 Days",
+    "LifecycleStatus": "",
+    "Manufacturer": "STMicroelectronics",
+    "ManufacturerPartNumber": "LM358N",
+    "Min": "1",
+    "Mult": "1",
+    "MouserPartNumber": "511-LM358N",
+    "ProductAttributes": [
+     {
+      "AttributeName": "Package / Case",
+      "AttributeValue": "DIP-8"
+     }
+    ],
+    "PriceBreaks": [
+     {
+      "Quantity": 1,
+      "Price": "0,125 €",
+      "Currency": "EUR"
+     },
+     {
+      "Quantity": 50,
+      "Price": "0,09 €",
+      "Currency": "EUR"
+     }
+    ],
+    "AlternatePackagings": [
+     {
+      "APMfrPN": "LM358DRG4"
+     }
+    ],
+    "ProductDetailUrl": "https://www.mouser.com/ProductDetail/Texas-Instruments/LM358DR?qs=abc",
+    "Reeling": false,
+    "ROHSStatus": "RoHS Compliant",
+    "REACH-SVHC": [],
+    "UnitWeightKg": {
+     "UnitWeight": 7.6e-05
+    },
+    "StandardCost": {
+     "Standardcost": 0.2
+    },
+    "IsDiscontinued": "false",
+    "AvailabilityInStock": "",
+    "AvailabilityOnOrder": [
+     {
+      "Quantity": 5000,
+      "Date": "11/12/2026"
+     }
+    ],
+    "InfoMessages": [],
+    "ProductCompliance": [
+     {
+      "ComplianceName": "USHTS",
+      "ComplianceValue": "8542330001"
+     }
+    ],
+    "TradeCompliance": [
+     {
+      "ComplianceName": "ECCN",
+      "ComplianceValue": "EAR99"
+     }
+    ]
+   },
+   {
+    "Availability": "500 In Stock",
+    "DataSheetUrl": "https://www.ti.com/lit/ds/symlink/lm358.pdf",
+    "Description": "Operational Amplifiers - Op Amps Dual Low Power",
+    "FactoryStock": "0",
+    "ImagePath": "https://www.mouser.com/images/texasinstruments/images/LM358DR.jpg",
+    "Category": "Op Amps",
+    "LeadTime": "56 Days",
+    "LifecycleStatus": "",
+    "Manufacturer": "onsemi",
+    "ManufacturerPartNumber": "LM358ADR",
+    "Min": "1",
+    "Mult": "1",
+    "MouserPartNumber": "863-LM358ADR",
+    "ProductAttributes": [
+     {
+      "AttributeName": "Package / Case",
+      "AttributeValue": "SOIC-8"
+     }
+    ],
+    "PriceBreaks": [
+     {
+      "Quantity": 1,
+      "Price": "$0.2",
+      "Currency": "USD"
+     }
+    ],
+    "AlternatePackagings": [
+     {
+      "APMfrPN": "LM358DRG4"
+     }
+    ],
+    "ProductDetailUrl": "https://www.mouser.com/ProductDetail/Texas-Instruments/LM358DR?qs=abc",
+    "Reeling": false,
+    "ROHSStatus": "RoHS non-compliant",
+    "REACH-SVHC": [],
+    "UnitWeightKg": {
+     "UnitWeight": 7.6e-05
+    },
+    "StandardCost": {
+     "Standardcost": 0.2
+    },
+    "IsDiscontinued": "false",
+    "AvailabilityInStock": "500",
+    "AvailabilityOnOrder": [
+     {
+      "Quantity": 5000,
+      "Date": "11/12/2026"
+     }
+    ],
+    "InfoMessages": [],
+    "ProductCompliance": [
+     {
+      "ComplianceName": "USHTS",
+      "ComplianceValue": "8542330001"
+     }
+    ],
+    "TradeCompliance": [
+     {
+      "ComplianceName": "ECCN",
+      "ComplianceValue": "EAR99"
+     }
+    ]
+   }
+  ]
+ }
+}

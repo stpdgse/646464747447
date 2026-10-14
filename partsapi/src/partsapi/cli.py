@@ -9,11 +9,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from . import jlc, lcsc, parts, reichelt
+from . import digikey, jlc, lcsc, mouser, parts, reichelt
 from .errors import PartsApiError
 from .filters import ATTR_ALIASES
 
-VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt}
+VENDORS = {"jlc": jlc, "lcsc": lcsc, "reichelt": reichelt, "digikey": digikey, "mouser": mouser}
 COMMANDS = ["findpart", "facets", "getpart", "getpartprice", "getprice", "getstock", "getattributes",
             "getpics", "getpic", "getdatasheet", "get3dmodel", "getsymbol", "getfootprint"]
 
@@ -137,7 +137,7 @@ def run(args: argparse.Namespace) -> Any:
         if where:
             kw["where"] = where
         if args.library:
-            if args.vendor == "reichelt":
+            if args.vendor not in ("jlc", "lcsc"):
                 raise SystemExit("--library only applies to jlc and lcsc")
             where = (where + " " if where else "") + f"lib:{args.library}"
             kw["where"] = where
@@ -173,6 +173,9 @@ def main(argv: list[str] | None = None) -> int:
     except PartsApiError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
+    except ValueError as exc:  # unsupported filter, bad argument
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     if isinstance(result, str):  # --table
         print(result)
         return 0

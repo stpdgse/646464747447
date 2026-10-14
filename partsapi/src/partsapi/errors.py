@@ -11,7 +11,18 @@ class NotFoundError(PartsApiError):
 
 
 class BlockedError(PartsApiError):
-    """The site refused the request (bot protection, 403, 429 after retries)."""
+    """The site refused the request (bot protection, 403, 429 after retries).
+
+    ``status`` is the HTTP status code when there was one.
+    """
+
+    def __init__(self, message: str = "", status: "int | None" = None) -> None:
+        super().__init__(message)
+        self.status = status
+
+
+class AuthError(PartsApiError):
+    """Missing or rejected API credentials (DigiKey client id/secret, Mouser API key)."""
 
 
 class NoModelError(NotFoundError):

@@ -21,7 +21,7 @@ from . import easyeda as _easyeda
 from ._http import Http
 from ._util import PathLike, ext_from_url, is_lcsc_code, safe_name, save_bytes, to_float, to_int
 from .errors import NotFoundError, ParseError
-from .filters import ParsedQuery, PartFilter, build_filter, facets as _facets, parse_query, sort_parts
+from .filters import ParsedQuery, PartFilter, build_filter, facets as _facets, parse_query, reject_unsupported, sort_parts
 from .models import Model3D, Part, PriceBreak, Stock, pick_price
 
 DETAIL = "https://wmsc.lcsc.com/ftps/wm/product/detail"
@@ -58,7 +58,6 @@ def _parse(r: dict[str, Any]) -> Part:
     total = to_int(r.get("stockNumber"))
     overseas = r.get("overseasStockVO") or {}
     domestic = r.get("domesticStockVO") or {}
-    slug = r.get("productModel") or code
     return Part(
         vendor="lcsc",
         code=code,
@@ -154,8 +153,7 @@ class LCSC:
         flt = pq.filter
         if where is not None:
             flt.merge(build_filter(where, qty))
-        if "preferred" in flt.flags:
-            raise ValueError("is:preferred is a JLCPCB concept; use partsapi.jlc.findpart")
+        reject_unsupported(flt, "lcsc", flags={"preferred"}, has={"3dmodel"})
         queries = [k for k in pq.server_queries() if k.strip()]
         if not queries:
             raise ValueError("LCSC search needs at least one search word (filters alone are not enough; try jlc.findpart)")

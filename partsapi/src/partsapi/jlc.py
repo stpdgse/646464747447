@@ -22,7 +22,7 @@ from . import easyeda as _easyeda
 from ._http import Http
 from ._util import PathLike, ext_from_url, is_lcsc_code, safe_name, save_bytes, to_int
 from .errors import NotFoundError, PartsApiError
-from .filters import ParsedQuery, PartFilter, build_filter, parse_query, parse_quantity, sort_parts
+from .filters import ParsedQuery, PartFilter, build_filter, parse_query, parse_quantity, reject_unsupported, sort_parts
 from .models import Model3D, Part, PriceBreak, Stock, pick_price
 
 BASE = "https://jlcpcb.com"
@@ -180,6 +180,7 @@ class JLC:
         if extra:
             body.update(extra)
 
+        reject_unsupported(flt, "jlc", has={"3dmodel"})
         client_side = not flt.empty
         wanted = limit if not sort else 10**9
         page_size = MAX_PAGE_SIZE if (client_side or sort) else min(limit, MAX_PAGE_SIZE)

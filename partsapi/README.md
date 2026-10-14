@@ -1,10 +1,11 @@
 # partsapi
 
-One Python API for **JLCPCB parts**, **LCSC** and **Reichelt**: search, price, stock, pictures, datasheets and
-3D models, with the same function names on every vendor.
+One Python API for **JLCPCB parts**, **LCSC**, **Reichelt**, **DigiKey** and **Mouser**: search, price, stock,
+pictures, datasheets and 3D models, with the same function names and the same filter language on every vendor.
+DigiKey and Mouser use their official APIs and need a free key (see [DigiKey and Mouser](#digikey-and-mouser)).
 
 ```python
-from partsapi import jlc, lcsc, reichelt
+from partsapi import jlc, lcsc, reichelt, digikey, mouser
 
 jlc.findpart("10k 0603 resistor", library="basic", limit=5)   # -> [Part, ...]
 jlc.getpartprice("C25804", qty=1000)                          # -> 0.0043  (USD, unit price at qty)
@@ -22,32 +23,38 @@ reichelt.getstock("LM358DT")                                  # in_stock + deliv
 reichelt.getdatasheet("LM358DT", save_to="out/")
 reichelt.get3dmodel("LM358DT")                                # resolved via the MPN, see below
 
+digikey.getpartprice("296-1395-1-ND", qty=100)                # needs DIGIKEY_CLIENT_ID / _SECRET
+mouser.findpart("lm358 is:instock -dip", sort="price")         # needs MOUSER_API_KEY
+
 from partsapi import parts
 parts.prices("LM358DT", qty=10)                               # one row per vendor, not ranked
 ```
 
 Install: `pip install -e partsapi` (needs `requests`, `beautifulsoup4`, `lxml`).
-CLI: `python -m partsapi jlc getpartprice C25804 --qty 1000`, `python -m partsapi reichelt getstock LM358DT`,
+CLI: `python -m partsapi digikey findpart lm358 --mfr texas --in-stock --sort price --table`,
+`python -m partsapi jlc getpartprice C25804 --qty 1000`, `python -m partsapi reichelt getstock LM358DT`,
 `python -m partsapi lcsc get3dmodel C2913204 --fmt obj --out out/`, `python -m partsapi prices LM358DT --qty 10`.
 
 ## Functions
 
-| | `jlc` | `lcsc` | `reichelt` |
-|---|---|---|---|
-| `findpart(query, limit=, where=, sort=, qty=)` | yes (+ `library`, `preferred`, `in_stock_only`, `min_stock`, `brands`, `packages`, `attributes`, `category`, `subcategory`, `has_datasheet`, `has_image`, `max_pages`, `page`) | yes (+ `max_pages`, `max_fetch`) | yes (first result page, + `max_fetch`) |
-| `facets(query)` | whole-catalogue counts | over results | over results |
-| `getpart(code)` - everything, as `Part` | yes | yes | yes (code or product URL) |
-| `getpartprice(code, qty=None)` / `getprice` | ladder, or unit price at `qty` | same | single unit price |
-| `getstock(code)` | quantity | quantity + shipping split | in/out of stock + delivery text |
-| `getattributes(code)` | yes | yes | yes |
-| `getpics(code)` / `getpic(code, save_to=)` | yes | yes | yes |
-| `getdatasheet(code, save_to=)` | yes | yes | yes |
-| `get3dmodel(code, fmt="step"\|"obj", save_to=)` | yes | yes | yes (via MPN) |
-| `getsymbol` / `getfootprint` (SVG) | - | yes | - |
+| | `jlc` | `lcsc` | `reichelt` | `digikey` | `mouser` |
+|---|---|---|---|---|---|
+| `findpart(query, limit=, where=, sort=, qty=)` | yes (+ `library`, `preferred`, `in_stock_only`, `min_stock`, `brands`, `packages`, `attributes`, `category`, `subcategory`, `has_datasheet`, `has_image`, `max_pages`, `page`) | yes (+ `max_pages`, `max_fetch`) | yes (first result page, + `max_fetch`) | yes (+ `max_pages`, `extra`) | yes (+ `max_pages`) |
+| `facets(query)` | whole-catalogue counts | over results | over results | server-side counts | over results |
+| `getpart(code)` - everything, as `Part` | yes | yes | yes (code or product URL) | yes (DigiKey number or MPN, `manufacturer=`) | yes (Mouser number or MPN) |
+| `getpartprice(code, qty=None)` / `getprice` | ladder, or unit price at `qty` | same | single unit price | same, per package type | same |
+| `getstock(code)` | quantity | quantity + shipping split | in/out of stock + delivery text | quantity + per-package split | quantity + on-order dates |
+| `getattributes(code)` | yes | yes | yes | yes (all parameters) | yes |
+| `getpics(code)` / `getpic(code, save_to=)` | yes | yes | yes | yes | yes |
+| `getdatasheet(code, save_to=)` | yes | yes | yes | yes | yes |
+| `get3dmodel(code, fmt="step"\|"obj", save_to=)` | yes | yes | yes (via MPN) | yes (via MPN) | yes (via MPN) |
+| `getsymbol` / `getfootprint` (SVG) | - | yes | - | - | - |
 
 Part numbers: JLCPCB and LCSC share the `C12345` numbering. Reichelt uses its own article numbers (`LM358DT`).
-Every function also exists as a method on `JLC()`, `LCSC()`, `Reichelt()` if you want your own `Http` (timeouts,
-proxy, rate limit, cache TTL).
+DigiKey numbers are per package type (`296-1395-1-ND` = cut tape, `-2-ND` = reel); an MPN works too. Mouser numbers look
+like `595-LM358DR`; an exact MPN works too.
+Every function also exists as a method on `JLC()`, `LCSC()`, `Reichelt()`, `DigiKey()`, `Mouser()` if you want your own
+`Http` (timeouts, proxy, rate limit, cache TTL) or explicit credentials.
 
 ## Search terms and filters
 
@@ -96,16 +103,21 @@ list you already have: `partsapi.filters.facets(parts)`.
 
 What each vendor does with a filter:
 
-| | JLCPCB | LCSC | Reichelt |
-|---|---|---|---|
-| library, preferred, in-stock, min stock, datasheet/image, exact package/brand | **server-side** | - | - |
-| numeric attributes (`res:10k..100k`) | **server-side** when a category is known (`cat:resistor` or `category=`): the real catalogue values are looked up and the matching ones sent to JLCPCB. Ambiguous names or negations are checked client-side | after fetch | on result cards |
-| everything else | client-side while paging up to `max_pages` x 72 | manufacturer / MPN / package / `lib:` on the cheap search hits, the rest after fetching each survivor (`max_fetch`) | on cards; stock / datasheet / MPN / RoHS fetch the product pages of survivors (`max_fetch`) |
+| | JLCPCB | LCSC | Reichelt | DigiKey | Mouser |
+|---|---|---|---|---|---|
+| in-stock, RoHS, datasheet / image | **server-side** (RoHS: client) | - | - | **server-side** | in-stock + RoHS server-side |
+| library, preferred, exact package / brand | **server-side** | `lib:` on search hits | - | n/a | n/a |
+| min stock, manufacturer, category | min stock + exact brand | after fetch | on cards | **server-side** (names resolved to DigiKey ids) | client-side |
+| numeric attributes (`res:10k..100k`) | **server-side** when a category is known: real catalogue values are looked up and the matching ones sent | after fetch | on result cards | **server-side** when exactly one category is selected *and* the facet values provably cover it; else client-side | client-side |
+| sorting | client-side | client-side | client-side | **server-side** for price (qty 1) / stock / mpn / code / manufacturer | client-side |
+| everything else | client-side while paging up to `max_pages` x 72 | on the cheap search hits, the rest after fetching each survivor (`max_fetch`) | on cards; stock / datasheet / MPN / RoHS fetch the product pages of survivors (`max_fetch`) | client-side while paging, 50 per call | client-side while paging, 50 per call |
 
 Without a category, an attribute-only JLCPCB query (`res:>=10k` and nothing else) can only filter the pages it
 reads; give it `cat:` or `category=` / `subcategory=` and it filters the whole catalogue. `limit` goes up to 5000 on JLCPCB.
-Unsupported combinations raise `ValueError` (`is:preferred` on LCSC/Reichelt, `lib:` on Reichelt, filters with no search
-word on LCSC/Reichelt); `parts.findpart` turns those into a warning and an empty list for that vendor.
+Unsupported combinations raise `ValueError` (`is:preferred` anywhere but JLCPCB, `lib:` on Reichelt / DigiKey / Mouser,
+`has:3dmodel` anywhere but DigiKey, filters with no search word on LCSC / Reichelt / DigiKey / Mouser); `parts.findpart`
+turns those into a warning and an empty list for that vendor. `mfr:` is a *contains* match on the vendor's spelling
+("Texas Instruments", not "TI"): use `mfr:texas`, or `mfr:=name` for equality.
 
 CLI:
 
@@ -117,10 +129,44 @@ partsapi reichelt findpart LM358 --exclude dip --max-price 0.2 --table
 partsapi jlc facets "" --category capacitor
 ```
 
+## DigiKey and Mouser
+
+Both use the vendors' **official** APIs, which need a free key. The keys are read from the environment (or passed to
+`DigiKey(...)` / `Mouser(...)`), never written anywhere, and are redacted from error messages.
+
+| | DigiKey | Mouser |
+|---|---|---|
+| Get access | an app at https://developer.digikey.com/ with **Product Information V4** enabled | a Search API key at https://www.mouser.com/api-hub/ |
+| Environment | `DIGIKEY_CLIENT_ID`, `DIGIKEY_CLIENT_SECRET`; optional `DIGIKEY_SITE=US`, `DIGIKEY_LANGUAGE=en`, `DIGIKEY_CURRENCY=USD`, `DIGIKEY_SANDBOX=1` | `MOUSER_API_KEY` |
+| Auth | two-legged OAuth2 (client credentials), token cached and refreshed automatically | key in the query string |
+| Prices | standard pricing in the site/currency you configured (net of tax for the US site) | as Mouser formats them for your account; `PriceBreak.currency` is Mouser's code |
+| Budget | one call per page of 50 plus occasional lookups (manufacturer/category lists are cached) | one call per page of 50; calls are spaced 2 s apart (Mouser allows about 30/min) |
+
+`parts.default_vendors()` includes them only when configured, so `parts.findpart(...)` and `parts.prices(...)` keep
+working without keys; name them in `vendors=` to require them (a missing key then becomes a warning / an error row).
+
+* **Verification status.** These two modules are written against the vendors' published OpenAPI schemas (Mouser V1/V2,
+  DigiKey Product Information v4), their error paths were exercised against the live services with deliberately wrong
+  credentials, and the logic is covered by offline tests whose fixtures are built from those schemas
+  (`tests/fixtures/*_synthetic.json` - not recordings). **They have not been run against a real account**, because the
+  development environment had no keys. Run `DIGIKEY_CLIENT_ID=... DIGIKEY_CLIENT_SECRET=... MOUSER_API_KEY=...
+  PARTSAPI_LIVE=1 pytest -m live` once to confirm them on your account; the live tests skip themselves without keys.
+* **DigiKey package types.** One DigiKey product has several orderable variations (cut tape, reel, Digi-Reel). `Part.code`
+  is the variation you asked for (or the first), and `Part.extra["variations"]` lists all with their own stock, minimum
+  order quantity and price ladder. `getprice("LM358DR", qty)` picks the cheapest variation orderable at `qty`.
+* **DigiKey parametric pushdown is conservative.** It sends attribute filters to DigiKey only for a single selected
+  category, and only if the facet values' product counts add up to the category total (so no value can be missing);
+  otherwise the condition is applied client-side. Narrow with `cat:` for best results. DigiKey needs a search word.
+* **Mouser.** The API can only filter by RoHS and in-stock; everything else is applied while paging (`max_pages`, default 3
+  x 50 results). Mouser's manufacturer-filtered V2 search is not used because its `pageNumber` base is unspecified.
+* **3D models, pictures, datasheets.** Neither vendor serves 3D models, so `get3dmodel` resolves the manufacturer part
+  number in the LCSC/EasyEDA library, exact match only (same as Reichelt). Image and datasheet links are downloaded with a
+  browser User-Agent; some manufacturer-hosted datasheets still refuse scripted downloads.
+
 ## How it works, and what to know
 
-* **Unofficial.** None of these sites publishes this API. JLCPCB and LCSC are called at the JSON endpoints their
-  own web pages use; Reichelt is parsed from HTML (schema.org microdata). Any of them can change without notice -
+* **Unofficial (JLCPCB, LCSC, Reichelt).** These sites publish no API. JLCPCB and LCSC are called at the JSON endpoints
+  their own web pages use; Reichelt is parsed from HTML (schema.org microdata). DigiKey and Mouser are official APIs. Any of them can change without notice -
   the parsers raise `ParseError` instead of returning wrong data, and `tests/test_live.py` tells you what broke.
   Check each site's terms before heavy use. Requests are throttled (0.25 s per host, 0.5 s for Reichelt),
   retried with backoff on 429/5xx, and cached for 5 minutes.
@@ -145,11 +191,12 @@ partsapi jlc facets "" --category capacitor
 ## Errors
 
 `NotFoundError` (no such part/asset), `NoModelError` (a `NotFoundError`), `BlockedError` (403/bot protection,
-or 429 after retries), `ParseError` (site layout changed), all subclasses of `PartsApiError`.
+or 429 after retries; `.status` has the HTTP code), `ParseError` (site layout changed), `AuthError` (missing or rejected
+DigiKey / Mouser credentials), all subclasses of `PartsApiError`.
 
 ## Tests
 
 ```bash
-pytest                               # 177 offline tests against recorded fixtures
-PARTSAPI_LIVE=1 pytest -m live       # hits the real sites
+pytest                               # 232 offline tests against recorded and schema-derived fixtures
+PARTSAPI_LIVE=1 pytest -m live       # hits the real sites (DigiKey / Mouser tests need your keys)
 ```

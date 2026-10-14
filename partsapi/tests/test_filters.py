@@ -1,5 +1,3 @@
-import copy
-
 import pytest
 
 from partsapi.filters import (Cond, PartFilter, build_filter, facets, parse_quantity, parse_query, sort_parts)
@@ -56,6 +54,13 @@ def test_parse_query_everything():
     assert [(n, e) for n, _, e in f.attrs] == [("res", False), ("Number of Pins", True)]
     # digit words and phrases are enforced client-side; plain words ("resistor") are left to the vendor
     assert set(f.all_terms) == {"0603", "thick film"}
+
+
+def test_quoted_values_after_operators():
+    f = parse_query('cat:="Chip Resistor - Surface Mount" desc:"dual op" pkg:>="a b" -"two words"').filter
+    assert [(n, c.op, c.operands) for n, c in f.fields] == [("category", "eq", ["Chip Resistor - Surface Mount"]),
+                                                            ("description", "auto", ["dual op"]), ("package", "ge", ["a b"])]
+    assert f.exclude_terms == ["two words"]
 
 
 def test_strict_modes():

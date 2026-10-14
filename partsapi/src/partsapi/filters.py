@@ -205,7 +205,7 @@ _FIELD_KEYS = {
     "stock": "stock", "price": "price",
 }
 _FLAGS = {"preferred", "instock", "rohs", "basic", "extended"}
-_HAS = {"datasheet", "image", "picture", "photo", "price", "stock"}
+_HAS = {"datasheet", "image", "picture", "photo", "price", "stock", "3dmodel"}
 
 
 # --------------------------------------------------------------------------------------
@@ -326,7 +326,7 @@ class PartFilter:
         if name == "manufacturer" and cond.op == "auto":  # "(UNI-ROYAL(Uniroyal Elec))" -> substring is right
             return value is not None and any(o.casefold() in value.casefold() for o in cond.operands)
         if value is None and name == "package":
-            value = p.attributes.get("Bauform")
+            value = next((v for k, v in p.attributes.items() if _squash(k) in ("bauform", "gehäuse", "gehause", "packagecase", "package", "case")), None)
         return cond.test(value)
 
     @staticmethod
@@ -357,10 +357,19 @@ class PartFilter:
         return bool(need - set(available))
 
 
+def reject_unsupported(flt: PartFilter, vendor: str, *, flags: Iterable[str] = (), has: Iterable[str] = (), library: bool = False) -> None:
+    """Raise ``ValueError`` if ``flt`` uses a filter ``vendor`` cannot evaluate."""
+    bad = [f"is:{f}" for f in flt.flags if f in set(flags)] + [f"has:{h}" for h in flt.has if h in set(has)]
+    if library and any(n == "library" for n, _ in flt.fields):
+        bad.append("lib:")
+    if bad:
+        raise ValueError(f"{vendor} does not support {', '.join(sorted(bad))}")
+
+
 # --------------------------------------------------------------------------------------
 # Query parser
 # --------------------------------------------------------------------------------------
-_TOKEN = re.compile(r'''(?:-|@)?(?:"[^"]*"|[^\s:"]+)(?::(?:"[^"]*"|\S*))?|\S+''')
+_TOKEN = re.compile(r'''(?:-|@)?(?:"[^"]*"|[^\s:"]+)(?::(?:[<>=!~]*"[^"]*"|\S*))?|\S+''')
 
 
 @dataclass
@@ -382,7 +391,9 @@ class ParsedQuery:
 
 
 def _unquote(s: str) -> str:
-    return s[1:-1] if len(s) >= 2 and s[0] == s[-1] == '"' else s
+    """Strip quotes, also after an operator: ``"a b"`` -> ``a b``; ``="a b"`` -> ``=a b``."""
+    m = re.fullmatch(r'([<>=!~]*)"(.*)"', s)
+    return m.group(1) + m.group(2) if m else s
 
 
 def parse_query(query: str, base: Optional[PartFilter] = None, qty: int = 1, strict: Optional[bool] = None) -> ParsedQuery:

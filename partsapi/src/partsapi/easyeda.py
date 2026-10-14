@@ -103,6 +103,18 @@ class EasyEDA:
         legacy = (data_str.get("head") or {}).get("uuid_3d")
         return legacy or None
 
+    def get3dmodel_by_mpn(self, mpn: str, fmt: str = "step", save_to: Optional[PathLike] = None) -> Model3D:
+        """3D model for a part from any vendor, matched on an **exact** manufacturer part number (case, spaces
+        and dashes ignored) against the LCSC library. ``Model3D.source_code`` names the LCSC part used."""
+        norm = lambda s: "".join(ch for ch in (s or "").upper() if ch.isalnum())  # noqa: E731
+        hits = [h for h in self.search(mpn, limit=50) if norm(h.get("mpn")) == norm(mpn)]
+        for h in hits:
+            try:
+                return self.get3dmodel(h["code"], fmt, save_to)
+            except NoModelError:
+                continue
+        raise NoModelError(f"no 3D model found in the EasyEDA/LCSC library for MPN {mpn!r} ({len(hits)} exact match(es))")
+
     def get3dmodel(self, lcsc_code: str, fmt: str = "step", save_to: Optional[PathLike] = None) -> Model3D:
         fmt = fmt.lower()
         if fmt not in ("step", "stp", "obj"):

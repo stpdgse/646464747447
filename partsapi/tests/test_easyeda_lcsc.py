@@ -1,6 +1,6 @@
 import pytest
 
-from conftest import FakeResponse, FakeSession, fixture_json, make_http
+from conftest import FakeResponse, fixture_json, make_http
 from partsapi.easyeda import EasyEDA
 from partsapi.errors import NoModelError, NotFoundError, ParseError
 from partsapi.lcsc import LCSC

@@ -25,28 +25,15 @@ from bs4.element import Tag
 
 from . import easyeda as _easyeda
 from ._http import Http
-from ._util import PathLike, ext_from_url, safe_name, save_bytes
+from ._util import PathLike, ext_from_url, parse_price, safe_name, save_bytes
 from .errors import NoModelError, NotFoundError, ParseError
-from .filters import ParsedQuery, PartFilter, build_filter, facets as _facets, parse_query, sort_parts
+from .filters import ParsedQuery, PartFilter, build_filter, facets as _facets, parse_query, reject_unsupported, sort_parts
 from .models import Model3D, Part, PriceBreak, Stock, pick_price
 
 BASE = "https://www.reichelt.de"
 DEFAULT_LOCALE = "de/de"
 # check groups a search result card can answer without opening the product page
 _CARD_HAS = ("text", "code", "manufacturer", "package", "description", "price", "attrs", "image")
-
-
-def parse_price(text: str) -> Optional[float]:
-    """'0,15 €' -> 0.15, '1.234,50 €' -> 1234.5, 'ab 2,99 €' -> 2.99. None if no number."""
-    m = re.search(r"\d[\d.]*(?:,\d+)?|\d+", text.replace("\xa0", " "))
-    if not m:
-        return None
-    num = m.group(0)
-    num = num.replace(".", "").replace(",", ".") if "," in num else num
-    try:
-        return float(num)
-    except ValueError:
-        return None
 
 
 def _norm(s: str) -> str:
@@ -99,8 +86,7 @@ class Reichelt:
         flt = pq.filter
         if where is not None:
             flt.merge(build_filter(where, qty))
-        if flt.flags & {"preferred", "basic", "extended"} or any(n == "library" for n, _ in flt.fields):
-            raise ValueError("lib:/is:preferred are JLCPCB concepts and do not exist on Reichelt")
+        reject_unsupported(flt, "reichelt", flags={"preferred", "basic", "extended"}, has={"3dmodel"}, library=True)
         queries = [k for k in pq.server_queries() if k.strip()]
         if not queries:
             raise ValueError("Reichelt search needs at least one search word")
@@ -275,18 +261,10 @@ class Reichelt:
     def get3dmodel(self, code: str, fmt: str = "step", save_to: Optional[PathLike] = None) -> Model3D:
         """Reichelt hosts no 3D models. The part's manufacturer part number is matched exactly against the
         LCSC/EasyEDA library and that model is returned (see ``Model3D.source_code``)."""
-        part = self.getpart(code)
-        mpn = part.mpn
+        mpn = self.getpart(code).mpn
         if not mpn:
             raise NoModelError(f"{code}: Reichelt lists no manufacturer part number to look a model up by")
-        wanted = _norm(mpn)
-        hits = [h for h in self._easyeda.search(mpn, limit=50) if _norm(h.get("mpn") or "") == wanted]
-        for h in hits:
-            try:
-                return self._easyeda.get3dmodel(h["code"], fmt, save_to)
-            except NoModelError:
-                continue
-        raise NoModelError(f"no 3D model found in the EasyEDA/LCSC library for MPN {mpn!r} ({len(hits)} exact match(es))")
+        return self._easyeda.get3dmodel_by_mpn(mpn, fmt, save_to)
 
 
 _default = Reichelt()

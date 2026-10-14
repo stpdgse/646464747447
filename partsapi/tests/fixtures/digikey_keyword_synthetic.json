@@ -1,0 +1,592 @@
+{
+ "Products": [
+  {
+   "Description": {
+    "ProductDescription": "IC OPAMP GP 2 CIRCUIT 8SOIC",
+    "DetailedDescription": "General Purpose Amplifier 2 Circuit 8-SOIC"
+   },
+   "Manufacturer": {
+    "Id": 296,
+    "Name": "Texas Instruments"
+   },
+   "ManufacturerProductNumber": "LM358DR",
+   "UnitPrice": 0.42,
+   "ProductUrl": "https://www.digikey.com/en/products/detail/texas-instruments/LM358DR/404297",
+   "DatasheetUrl": "//www.ti.com/lit/ds/symlink/lm358.pdf",
+   "PhotoUrl": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/1/lm358.jpg",
+   "ProductVariations": [
+    {
+     "DigiKeyProductNumber": "296-1395-1-ND",
+     "PackageType": {
+      "Id": 2,
+      "Name": "Cut Tape (CT)"
+     },
+     "StandardPricing": [
+      {
+       "BreakQuantity": 1,
+       "UnitPrice": 0.42,
+       "TotalPrice": 0.42
+      },
+      {
+       "BreakQuantity": 10,
+       "UnitPrice": 0.3,
+       "TotalPrice": 3.0
+      },
+      {
+       "BreakQuantity": 100,
+       "UnitPrice": 0.2,
+       "TotalPrice": 20.0
+      }
+     ],
+     "MyPricing": [],
+     "MarketPlace": false,
+     "TariffActive": false,
+     "Supplier": {
+      "Id": 1,
+      "Name": "DigiKey"
+     },
+     "QuantityAvailableforPackageType": 120000,
+     "MaxQuantityForDistribution": 0,
+     "MinimumOrderQuantity": 1,
+     "StandardPackage": 1,
+     "DigiReelFee": 0
+    },
+    {
+     "DigiKeyProductNumber": "296-1395-2-ND",
+     "PackageType": {
+      "Id": 1,
+      "Name": "Tape & Reel (TR)"
+     },
+     "StandardPricing": [
+      {
+       "BreakQuantity": 2500,
+       "UnitPrice": 0.12,
+       "TotalPrice": 300.0
+      },
+      {
+       "BreakQuantity": 5000,
+       "UnitPrice": 0.11,
+       "TotalPrice": 550.0
+      }
+     ],
+     "MyPricing": [],
+     "MarketPlace": false,
+     "TariffActive": false,
+     "Supplier": {
+      "Id": 1,
+      "Name": "DigiKey"
+     },
+     "QuantityAvailableforPackageType": 100000,
+     "MaxQuantityForDistribution": 0,
+     "MinimumOrderQuantity": 2500,
+     "StandardPackage": 2500,
+     "DigiReelFee": 0
+    },
+    {
+     "DigiKeyProductNumber": "296-1395-6-ND",
+     "PackageType": {
+      "Id": 3,
+      "Name": "Digi-Reel®"
+     },
+     "StandardPricing": [
+      {
+       "BreakQuantity": 1,
+       "UnitPrice": 0.42,
+       "TotalPrice": 0.42
+      },
+      {
+       "BreakQuantity": 100,
+       "UnitPrice": 0.2,
+       "TotalPrice": 20.0
+      }
+     ],
+     "MyPricing": [],
+     "MarketPlace": false,
+     "TariffActive": false,
+     "Supplier": {
+      "Id": 1,
+      "Name": "DigiKey"
+     },
+     "QuantityAvailableforPackageType": 120000,
+     "MaxQuantityForDistribution": 0,
+     "MinimumOrderQuantity": 1,
+     "StandardPackage": 1,
+     "DigiReelFee": 0
+    }
+   ],
+   "QuantityAvailable": 120000,
+   "ProductStatus": {
+    "Id": 0,
+    "Status": "Active"
+   },
+   "BackOrderNotAllowed": false,
+   "NormallyStocking": true,
+   "Discontinued": false,
+   "EndOfLife": false,
+   "Ncnr": false,
+   "Parameters": [
+    {
+     "ParameterId": 16,
+     "ParameterText": "Package / Case",
+     "ParameterType": "String",
+     "ValueId": "1",
+     "ValueText": "8-SOIC (0.154\", 3.90mm Width)"
+    },
+    {
+     "ParameterId": 2,
+     "ParameterText": "Number of Circuits",
+     "ParameterType": "String",
+     "ValueId": "2",
+     "ValueText": "2"
+    },
+    {
+     "ParameterId": 3,
+     "ParameterText": "Voltage - Supply, Single/Dual (±)",
+     "ParameterType": "String",
+     "ValueId": "7",
+     "ValueText": "3V ~ 32V, ±1.5V ~ 16V"
+    },
+    {
+     "ParameterId": 4,
+     "ParameterText": "Current - Supply",
+     "ParameterType": "String",
+     "ValueId": "8",
+     "ValueText": "700µA"
+    }
+   ],
+   "BaseProductNumber": {
+    "Id": 1,
+    "Name": "LM358"
+   },
+   "Category": {
+    "CategoryId": 685,
+    "ParentId": 0,
+    "Name": "Integrated Circuits (ICs)",
+    "ProductCount": 1,
+    "NewProductCount": 0,
+    "ChildCategories": [
+     {
+      "CategoryId": 686,
+      "ParentId": 685,
+      "Name": "Linear - Amplifiers - Instrumentation, OP Amps, Buffer Amps",
+      "ProductCount": 1,
+      "ChildCategories": []
+     }
+    ]
+   },
+   "ManufacturerLeadWeeks": "6",
+   "ManufacturerPublicQuantity": 50000,
+   "Series": {
+    "Id": 10,
+    "Name": "LM358"
+   },
+   "Classifications": {
+    "ReachStatus": "REACH Unaffected",
+    "RohsStatus": "ROHS3 Compliant",
+    "MoistureSensitivityLevel": "1 (Unlimited)",
+    "ExportControlClassNumber": "EAR99",
+    "HtsusCode": "8542.33.0001"
+   },
+   "OtherNames": [
+    "LM358DRG4"
+   ]
+  },
+  {
+   "Description": {
+    "ProductDescription": "RES 10K OHM 1% 1/10W 0603",
+    "DetailedDescription": "10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603"
+   },
+   "Manufacturer": {
+    "Id": 603,
+    "Name": "YAGEO"
+   },
+   "ManufacturerProductNumber": "RC0603FR-0710KL",
+   "UnitPrice": 0.1,
+   "ProductUrl": "https://www.digikey.com/en/products/detail/yageo/RC0603FR-0710KL/726880",
+   "DatasheetUrl": "https://www.yageo.com/upload/media/product/RC_L.pdf",
+   "PhotoUrl": "https://mm.digikey.com/res.jpg",
+   "ProductVariations": [
+    {
+     "DigiKeyProductNumber": "311-10.0KHRCT-ND",
+     "PackageType": {
+      "Id": 2,
+      "Name": "Cut Tape (CT)"
+     },
+     "StandardPricing": [
+      {
+       "BreakQuantity": 1,
+       "UnitPrice": 0.1,
+       "TotalPrice": 0.1
+      },
+      {
+       "BreakQuantity": 10,
+       "UnitPrice": 0.034,
+       "TotalPrice": 0.34
+      },
+      {
+       "BreakQuantity": 100,
+       "UnitPrice": 0.0146,
+       "TotalPrice": 1.46
+      },
+      {
+       "BreakQuantity": 1000,
+       "UnitPrice": 0.0089,
+       "TotalPrice": 8.9
+      }
+     ],
+     "MyPricing": [],
+     "MarketPlace": false,
+     "TariffActive": false,
+     "Supplier": {
+      "Id": 1,
+      "Name": "DigiKey"
+     },
+     "QuantityAvailableforPackageType": 900000,
+     "MaxQuantityForDistribution": 0,
+     "MinimumOrderQuantity": 1,
+     "StandardPackage": 1,
+     "DigiReelFee": 0
+    },
+    {
+     "DigiKeyProductNumber": "311-10.0KHRTR-ND",
+     "PackageType": {
+      "Id": 1,
+      "Name": "Tape & Reel (TR)"
+     },
+     "StandardPricing": [
+      {
+       "BreakQuantity": 5000,
+       "UnitPrice": 0.0034,
+       "TotalPrice": 17.0
+      }
+     ],
+     "MyPricing": [],
+     "MarketPlace": false,
+     "TariffActive": false,
+     "Supplier": {
+      "Id": 1,
+      "Name": "DigiKey"
+     },
+     "QuantityAvailableforPackageType": 900000,
+     "MaxQuantityForDistribution": 0,
+     "MinimumOrderQuantity": 5000,
+     "StandardPackage": 5000,
+     "DigiReelFee": 0
+    }
+   ],
+   "QuantityAvailable": 1800000,
+   "ProductStatus": {
+    "Id": 0,
+    "Status": "Active"
+   },
+   "NormallyStocking": true,
+   "Discontinued": false,
+   "EndOfLife": false,
+   "Parameters": [
+    {
+     "ParameterId": 2085,
+     "ParameterText": "Resistance",
+     "ParameterType": "String",
+     "ValueId": "a",
+     "ValueText": "10 kOhms"
+    },
+    {
+     "ParameterId": 3,
+     "ParameterText": "Tolerance",
+     "ParameterType": "String",
+     "ValueId": "b",
+     "ValueText": "±1%"
+    },
+    {
+     "ParameterId": 2,
+     "ParameterText": "Power (Watts)",
+     "ParameterType": "String",
+     "ValueId": "c",
+     "ValueText": "0.1W, 1/10W"
+    },
+    {
+     "ParameterId": 16,
+     "ParameterText": "Package / Case",
+     "ParameterType": "String",
+     "ValueId": "d",
+     "ValueText": "0603 (1608 Metric)"
+    }
+   ],
+   "Category": {
+    "CategoryId": 52,
+    "ParentId": 0,
+    "Name": "Resistors",
+    "ProductCount": 1,
+    "ChildCategories": [
+     {
+      "CategoryId": 53,
+      "ParentId": 52,
+      "Name": "Chip Resistor - Surface Mount",
+      "ProductCount": 1,
+      "ChildCategories": []
+     }
+    ]
+   },
+   "Classifications": {
+    "RohsStatus": "ROHS3 Compliant",
+    "ReachStatus": "REACH Unaffected"
+   }
+  },
+  {
+   "Description": {
+    "ProductDescription": "RES 10K OHM 1% 1/10W 0603",
+    "DetailedDescription": "10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603"
+   },
+   "Manufacturer": {
+    "Id": 603,
+    "Name": "YAGEO"
+   },
+   "ManufacturerProductNumber": "RC0603FR-07100KL",
+   "UnitPrice": 0.1,
+   "ProductUrl": "https://www.digikey.com/en/products/detail/yageo/RC0603FR-0710KL/726880",
+   "DatasheetUrl": "https://www.yageo.com/upload/media/product/RC_L.pdf",
+   "PhotoUrl": "https://mm.digikey.com/res.jpg",
+   "ProductVariations": [
+    {
+     "DigiKeyProductNumber": "311-100KHRCT-ND",
+     "PackageType": {
+      "Id": 2,
+      "Name": "Cut Tape (CT)"
+     },
+     "StandardPricing": [
+      {
+       "BreakQuantity": 1,
+       "UnitPrice": 0.1,
+       "TotalPrice": 0.1
+      },
+      {
+       "BreakQuantity": 100,
+       "UnitPrice": 0.02,
+       "TotalPrice": 2.0
+      }
+     ],
+     "MyPricing": [],
+     "MarketPlace": false,
+     "TariffActive": false,
+     "Supplier": {
+      "Id": 1,
+      "Name": "DigiKey"
+     },
+     "QuantityAvailableforPackageType": 0,
+     "MaxQuantityForDistribution": 0,
+     "MinimumOrderQuantity": 1,
+     "StandardPackage": 1,
+     "DigiReelFee": 0
+    }
+   ],
+   "QuantityAvailable": 0,
+   "ProductStatus": {
+    "Id": 0,
+    "Status": "Active"
+   },
+   "NormallyStocking": true,
+   "Discontinued": false,
+   "EndOfLife": false,
+   "Parameters": [
+    {
+     "ParameterId": 2085,
+     "ParameterText": "Resistance",
+     "ParameterType": "String",
+     "ValueId": "a",
+     "ValueText": "100 kOhms"
+    },
+    {
+     "ParameterId": 3,
+     "ParameterText": "Tolerance",
+     "ParameterType": "String",
+     "ValueId": "b",
+     "ValueText": "±1%"
+    },
+    {
+     "ParameterId": 2,
+     "ParameterText": "Power (Watts)",
+     "ParameterType": "String",
+     "ValueId": "c",
+     "ValueText": "0.1W, 1/10W"
+    },
+    {
+     "ParameterId": 16,
+     "ParameterText": "Package / Case",
+     "ParameterType": "String",
+     "ValueId": "d",
+     "ValueText": "0603 (1608 Metric)"
+    }
+   ],
+   "Category": {
+    "CategoryId": 52,
+    "ParentId": 0,
+    "Name": "Resistors",
+    "ProductCount": 1,
+    "ChildCategories": [
+     {
+      "CategoryId": 53,
+      "ParentId": 52,
+      "Name": "Chip Resistor - Surface Mount",
+      "ProductCount": 1,
+      "ChildCategories": []
+     }
+    ]
+   },
+   "Classifications": {
+    "RohsStatus": "Non-RoHS Compliant"
+   }
+  },
+  {
+   "Description": {
+    "ProductDescription": "RES 10K OHM 1% 1/10W 0603",
+    "DetailedDescription": "10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603"
+   },
+   "Manufacturer": {
+    "Id": 10,
+    "Name": "Panasonic Electronic Components"
+   },
+   "ManufacturerProductNumber": "ERJ-3EKF1002V",
+   "UnitPrice": 0.1,
+   "ProductUrl": "https://www.digikey.com/en/products/detail/yageo/RC0603FR-0710KL/726880",
+   "DatasheetUrl": "https://www.yageo.com/upload/media/product/RC_L.pdf",
+   "PhotoUrl": "https://mm.digikey.com/res.jpg",
+   "ProductVariations": [
+    {
+     "DigiKeyProductNumber": "P10.0KHCT-ND",
+     "PackageType": {
+      "Id": 2,
+      "Name": "Cut Tape (CT)"
+     },
+     "StandardPricing": [
+      {
+       "BreakQuantity": 1,
+       "UnitPrice": 0.08,
+       "TotalPrice": 0.08
+      }
+     ],
+     "MyPricing": [],
+     "MarketPlace": false,
+     "TariffActive": false,
+     "Supplier": {
+      "Id": 1,
+      "Name": "DigiKey"
+     },
+     "QuantityAvailableforPackageType": 500,
+     "MaxQuantityForDistribution": 0,
+     "MinimumOrderQuantity": 1,
+     "StandardPackage": 1,
+     "DigiReelFee": 0
+    }
+   ],
+   "QuantityAvailable": 500,
+   "ProductStatus": {
+    "Id": 0,
+    "Status": "Active"
+   },
+   "NormallyStocking": true,
+   "Discontinued": false,
+   "EndOfLife": false,
+   "Parameters": [
+    {
+     "ParameterId": 2085,
+     "ParameterText": "Resistance",
+     "ParameterType": "String",
+     "ValueId": "a",
+     "ValueText": "1 MOhms"
+    },
+    {
+     "ParameterId": 3,
+     "ParameterText": "Tolerance",
+     "ParameterType": "String",
+     "ValueId": "b",
+     "ValueText": "±1%"
+    },
+    {
+     "ParameterId": 2,
+     "ParameterText": "Power (Watts)",
+     "ParameterType": "String",
+     "ValueId": "c",
+     "ValueText": "0.1W, 1/10W"
+    },
+    {
+     "ParameterId": 16,
+     "ParameterText": "Package / Case",
+     "ParameterType": "String",
+     "ValueId": "d",
+     "ValueText": "0603 (1608 Metric)"
+    }
+   ],
+   "Category": {
+    "CategoryId": 52,
+    "ParentId": 0,
+    "Name": "Resistors",
+    "ProductCount": 1,
+    "ChildCategories": [
+     {
+      "CategoryId": 53,
+      "ParentId": 52,
+      "Name": "Chip Resistor - Surface Mount",
+      "ProductCount": 1,
+      "ChildCategories": []
+     }
+    ]
+   },
+   "Classifications": {
+    "RohsStatus": "ROHS3 Compliant",
+    "ReachStatus": "REACH Unaffected"
+   }
+  }
+ ],
+ "ProductsCount": 4,
+ "ExactMatches": [],
+ "FilterOptions": {
+  "Manufacturers": [
+   {
+    "Id": 296,
+    "Value": "Texas Instruments",
+    "ProductCount": 1
+   },
+   {
+    "Id": 603,
+    "Value": "YAGEO",
+    "ProductCount": 2
+   }
+  ],
+  "Packaging": [
+   {
+    "Id": 2,
+    "Value": "Cut Tape (CT)",
+    "ProductCount": 4
+   }
+  ],
+  "Status": [
+   {
+    "Id": 0,
+    "Value": "Active",
+    "ProductCount": 4
+   }
+  ],
+  "Series": [],
+  "TopCategories": [
+   {
+    "RootCategory": {
+     "Id": 52,
+     "Name": "Resistors",
+     "ProductCount": 3
+    },
+    "Category": {
+     "Id": 53,
+     "Name": "Chip Resistor - Surface Mount",
+     "ProductCount": 3
+    },
+    "Score": 1.0
+   }
+  ],
+  "ParametricFilters": []
+ },
+ "SearchLocaleUsed": {
+  "Site": "US",
+  "Language": "en",
+  "Currency": "USD"
+ }
+}
