@@ -3,7 +3,7 @@
 Needs a (free) API app from https://developer.digikey.com/ with the *Product Information V4* product
 enabled. Credentials come from the environment or the constructor::
 
-    export DIGIKEY_CLIENT_ID=...   DIGIKEY_CLIENT_SECRET=...
+    export DIGIKEY_CLIENT_ID=...   DIGIKEY_CLIENT_SECRET=...      (DK_CLIENT_ID / DK_CLIENT_SECRET also work)
     # optional: DIGIKEY_SITE=US  DIGIKEY_LANGUAGE=en  DIGIKEY_CURRENCY=USD  DIGIKEY_SANDBOX=1
 
 Two-legged OAuth2 (client credentials) is used, so no browser login is needed.
@@ -41,6 +41,11 @@ PAGE = 50  # API maximum per request
 SORT_FIELDS = {"price": "Price", "stock": "QuantityAvailable", "mpn": "ManufacturerProductNumber",
                "code": "DigiKeyProductNumber", "manufacturer": "Manufacturer"}
 PKG_PARAMS = ("package / case", "supplier device package", "package")
+
+
+def _env(name: str) -> Optional[str]:
+    """``DIGIKEY_<NAME>``, falling back to the short ``DK_<NAME>`` spelling."""
+    return os.environ.get(f"DIGIKEY_{name}") or os.environ.get(f"DK_{name}") or None
 
 
 def _abs(url: Optional[str]) -> Optional[str]:
@@ -145,12 +150,12 @@ class DigiKey:
         sandbox: Optional[bool] = None,
     ) -> None:
         self.http = http or Http(min_interval=0.5)
-        self.client_id = client_id or os.environ.get("DIGIKEY_CLIENT_ID")
-        self.client_secret = client_secret or os.environ.get("DIGIKEY_CLIENT_SECRET")
-        self.site = site or os.environ.get("DIGIKEY_SITE", "US")
-        self.language = language or os.environ.get("DIGIKEY_LANGUAGE", "en")
-        self.currency = currency or os.environ.get("DIGIKEY_CURRENCY", "USD")
-        self.sandbox = sandbox if sandbox is not None else os.environ.get("DIGIKEY_SANDBOX", "") not in ("", "0", "false")
+        self.client_id = client_id or _env("CLIENT_ID")
+        self.client_secret = client_secret or _env("CLIENT_SECRET")
+        self.site = site or _env("SITE") or "US"
+        self.language = language or _env("LANGUAGE") or "en"
+        self.currency = currency or _env("CURRENCY") or "USD"
+        self.sandbox = sandbox if sandbox is not None else (_env("SANDBOX") or "").lower() not in ("", "0", "false")
         self.base = SANDBOX if self.sandbox else PROD
         self._token: Optional[str] = None
         self._expires = 0.0

@@ -137,7 +137,7 @@ Both use the vendors' **official** APIs, which need a free key. The keys are rea
 | | DigiKey | Mouser |
 |---|---|---|
 | Get access | an app at https://developer.digikey.com/ with **Product Information V4** enabled | a Search API key at https://www.mouser.com/api-hub/ |
-| Environment | `DIGIKEY_CLIENT_ID`, `DIGIKEY_CLIENT_SECRET`; optional `DIGIKEY_SITE=US`, `DIGIKEY_LANGUAGE=en`, `DIGIKEY_CURRENCY=USD`, `DIGIKEY_SANDBOX=1` | `MOUSER_API_KEY` |
+| Environment | `DIGIKEY_CLIENT_ID`, `DIGIKEY_CLIENT_SECRET` (or `DK_CLIENT_ID`, `DK_CLIENT_SECRET`); optional `DIGIKEY_SITE=US`, `DIGIKEY_LANGUAGE=en`, `DIGIKEY_CURRENCY=USD`, `DIGIKEY_SANDBOX=1` | `MOUSER_API_KEY` |
 | Auth | two-legged OAuth2 (client credentials), token cached and refreshed automatically | key in the query string |
 | Prices | standard pricing in the site/currency you configured (net of tax for the US site) | as Mouser formats them for your account; `PriceBreak.currency` is Mouser's code |
 | Budget | one call per page of 50 plus occasional lookups (manufacturer/category lists are cached) | one call per page of 50; calls are spaced 2 s apart (Mouser allows about 30/min) |

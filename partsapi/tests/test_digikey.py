@@ -334,3 +334,16 @@ def test_parameter_filter_does_not_leak_between_or_alternatives(session):
     real = [c for c in searches(session) if c["json"]["Limit"] != 1]
     assert "ParameterFilterRequest" in real[0]["json"]["FilterOptionsRequest"]
     assert "ParameterFilterRequest" not in real[1]["json"]["FilterOptionsRequest"]
+
+
+def test_short_dk_environment_names_work_and_long_names_win(session, monkeypatch):
+    for k in ("DIGIKEY_CLIENT_ID", "DIGIKEY_CLIENT_SECRET", "DIGIKEY_SANDBOX"):
+        monkeypatch.delenv(k, raising=False)
+    monkeypatch.setenv("DK_CLIENT_ID", "short-id")
+    monkeypatch.setenv("DK_CLIENT_SECRET", "short-secret")
+    monkeypatch.setenv("DK_SANDBOX", "1")
+    c = DigiKey(make_http(session))
+    assert c.is_configured() and (c.client_id, c.client_secret) == ("short-id", "short-secret")
+    assert c.sandbox and c.base == "https://sandbox-api.digikey.com"
+    monkeypatch.setenv("DIGIKEY_CLIENT_ID", "long-id")
+    assert DigiKey(make_http(session)).client_id == "long-id"
