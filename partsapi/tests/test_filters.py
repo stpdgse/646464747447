@@ -167,3 +167,17 @@ def test_facets():
     assert f["price_range"] == (0.1, 0.5) and f["in_stock"] == 3 and f["with_datasheet"] == 3
     assert dict(f["attributes"]["Resistance"]) == {"10kΩ": 3}
     assert facets([])["price_range"] is None
+
+
+@pytest.mark.parametrize("flt,text,ok", [
+    ("0603", "0603 (1608 Metric)", True),         # imperial 0603
+    ("0603", "0201 (0603 Metric)", False),        # metric 0603 is imperial 0201: a different, smaller part
+    ("0201", "0201 (0603 Metric)", True),
+    ("0603", "0603", True), ("0603", "R0603", True), ("0603", "0805", False),
+    ("1608 Metric", "0603 (1608 Metric)", True),  # longer filters still match the full text
+    ("soic", '8-SOIC (0.154", 3.90mm Width)', True),
+    ("0603|0805", "0805 (2012 Metric)", True),
+])
+def test_package_size_rule(flt, text, ok):
+    p = part(pkg=text)
+    assert build_filter(f"pkg:{flt}" if " " not in flt else f'pkg:"{flt}"').matches(p) is ok

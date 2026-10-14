@@ -176,6 +176,21 @@ class Cond:
         return operand.casefold() in text.casefold()
 
 
+_IMPERIAL_METRIC = re.compile(r"^\s*(\d{4})\s*\(\s*\d{4}\s*Metric\s*\)")
+
+
+def package_matches(cond: "Cond", text: Optional[str]) -> bool:
+    """``cond.test`` for package names, with one size rule: DigiKey writes chip sizes as "0201 (0603 Metric)" -
+    imperial first, metric in brackets. A bare 4-digit filter like ``pkg:0603`` means the *imperial* size, so it must
+    not match "0201 (0603 Metric)" (which is a different, smaller part). Longer filters still match the full text.
+    """
+    if text is not None and cond.op in ("auto", "eq", "ne") and all(re.fullmatch(r"\d{4}", o) for o in cond.operands):
+        m = _IMPERIAL_METRIC.match(text)
+        if m:
+            text = m.group(1)
+    return cond.test(text)
+
+
 def _squash(s: str) -> str:
     return re.sub(r"[^0-9a-zäöüß]+", "", s.casefold())
 
@@ -327,7 +342,7 @@ class PartFilter:
             return value is not None and any(o.casefold() in value.casefold() for o in cond.operands)
         if value is None and name == "package":
             value = next((v for k, v in p.attributes.items() if _squash(k) in ("bauform", "gehäuse", "gehause", "packagecase", "package", "case")), None)
-        return cond.test(value)
+        return package_matches(cond, value) if name == "package" else cond.test(value)
 
     @staticmethod
     def attr_name_matches(attr_name: str, wanted: str, exact: bool = False) -> bool:

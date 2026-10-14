@@ -119,9 +119,9 @@ def test_filters_are_pushed_to_digikey(session):
     assert fo["SearchOptions"] == ["InStock", "RohsCompliant", "HasDatasheet", "HasProductPhoto", "Has3DModel"]
     assert fo["MinimumQuantityAvailable"] == 1000
     assert fo["ManufacturerFilter"] == [{"Id": "603"}]
-    assert fo["CategoryFilter"] == [{"Id": "52"}, {"Id": "53"}]      # "resistors" is contained in both names
-    client(session).findpart("resistor cat:=Resistors")
-    assert searches(session)[-1]["json"]["FilterOptionsRequest"]["CategoryFilter"] == [{"Id": "52"}]
+    assert fo["CategoryFilter"] == [{"Id": "52"}]                    # exact name beats substring ("...Resistor - Surface Mount")
+    client(session).findpart("resistor cat:chip")                    # no exact name: substring fallback
+    assert searches(session)[-1]["json"]["FilterOptionsRequest"]["CategoryFilter"] == [{"Id": "53"}]
 
 
 def test_manufacturer_substring_resolves_to_all_matching_ids(session):
@@ -223,13 +223,25 @@ def test_complete_facets_become_parameter_filter(session):
         "ParameterFilters": [{"ParameterId": 2085, "FilterValues": [{"Id": "v10"}, {"Id": "v47"}, {"Id": "v1m"}]}]}
 
 
-def test_incomplete_facets_are_not_pushed(session):
-    probe = parametric_response(500, VALUES)                       # counts add up to 100, not 500
+def test_facet_counts_below_total_still_push(session):
+    # real DigiKey facets never add up to the total (products lacking the parameter): that must not block pushdown
+    probe = parametric_response(500, VALUES)
     answers = iter([probe, KW])
     session.add("POST", "/v1/oauth2/token", FakeResponse(200, json_data=TOKEN))
     session.add("POST", SEARCH, lambda **kw: FakeResponse(200, json_data=next(answers)))
     session.add("GET", "/search/categories", FakeResponse(200, json_data=fixture_json("digikey_categories_synthetic.json")))
     DigiKey(make_http(session), "a", "b").findpart("resistor cat:=\"Chip Resistor - Surface Mount\" res:>=10k")
+    assert "ParameterFilterRequest" in searches(session)[1]["json"]["FilterOptionsRequest"]
+
+
+def test_category_without_parametric_facets_stays_client_side(session):
+    # real behaviour: top-level categories return no ParametricFilters
+    top = json.loads(json.dumps(KW)); top["FilterOptions"]["ParametricFilters"] = []
+    answers = iter([top, KW])
+    session.add("POST", "/v1/oauth2/token", FakeResponse(200, json_data=TOKEN))
+    session.add("POST", SEARCH, lambda **kw: FakeResponse(200, json_data=next(answers)))
+    session.add("GET", "/search/categories", FakeResponse(200, json_data=fixture_json("digikey_categories_synthetic.json")))
+    DigiKey(make_http(session), "a", "b").findpart("resistor cat:=Resistors res:>=10k")
     assert "ParameterFilterRequest" not in searches(session)[1]["json"]["FilterOptionsRequest"]
 
 
@@ -324,9 +336,9 @@ def test_facets(session):
 
 
 def test_parameter_filter_does_not_leak_between_or_alternatives(session):
-    # first alternative resolves a parametric filter; the second one's facets are incomplete => must not inherit it
-    complete, incomplete = parametric_response(100, VALUES), parametric_response(500, VALUES)
-    answers = iter([complete, KW, incomplete, KW])
+    # first alternative resolves a parametric filter; the second one has no facets => must not inherit it
+    with_facets, without = parametric_response(100, VALUES), json.loads(json.dumps(KW))
+    answers = iter([with_facets, KW, without, KW])
     session.add("POST", "/v1/oauth2/token", FakeResponse(200, json_data=TOKEN))
     session.add("POST", SEARCH, lambda **kw: FakeResponse(200, json_data=next(answers)))
     session.add("GET", "/search/categories", FakeResponse(200, json_data=fixture_json("digikey_categories_synthetic.json")))
@@ -347,3 +359,23 @@ def test_short_dk_environment_names_work_and_long_names_win(session, monkeypatch
     assert c.sandbox and c.base == "https://sandbox-api.digikey.com"
     monkeypatch.setenv("DIGIKEY_CLIENT_ID", "long-id")
     assert DigiKey(make_http(session)).client_id == "long-id"
+
+
+def test_default_variation_is_the_one_orderable_in_the_smallest_quantity():
+    prod = json.loads(json.dumps(KW["Products"][0]))
+    ct, reel, digireel = prod["ProductVariations"]
+    prod["ProductVariations"] = [reel, ct, digireel]          # reel (MOQ 2500) first, as the live API returns it
+    p = _parse(prod, "USD")
+    assert p.code == "296-1395-1-ND" and p.extra["min_order_qty"] == 1 and p.price_breaks[0].min_qty == 1
+    assert _parse(prod, "USD", code="296-1395-2-ND").code == "296-1395-2-ND"     # explicit number still wins
+
+
+def test_package_filter_is_pushed_as_the_package_case_parameter(session):
+    values = [("a", "0201 (0603 Metric)", 5), ("b", "0603 (1608 Metric)", 9), ("c", "0805 (2012 Metric)", 7)]
+    answers = iter([parametric_response(21, values, pid=16, name="Package / Case"), KW])
+    session.add("POST", "/v1/oauth2/token", FakeResponse(200, json_data=TOKEN))
+    session.add("POST", SEARCH, lambda **kw: FakeResponse(200, json_data=next(answers)))
+    session.add("GET", "/search/categories", FakeResponse(200, json_data=fixture_json("digikey_categories_synthetic.json")))
+    DigiKey(make_http(session), "a", "b").findpart('resistor cat:="Chip Resistor - Surface Mount" pkg:0603')
+    sent = searches(session)[1]["json"]["FilterOptionsRequest"]["ParameterFilterRequest"]
+    assert sent["ParameterFilters"] == [{"ParameterId": 16, "FilterValues": [{"Id": "b"}]}]   # not the 0201 (0603 Metric) value

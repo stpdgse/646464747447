@@ -59,8 +59,8 @@ def test_digikey_live():
     assert digikey.getprice("LM358DR", 100) > 0
     out = digikey.findpart("lm358 mfr:texas is:instock price:<1", sort="price", limit=5)
     assert out and all(x.stock.in_stock for x in out)
-    r = digikey.findpart("resistor cat:resistors res:10k..100k tol:<=1% pkg:0603 is:instock", limit=5, sort="price")
-    assert r and all("0603" in (x.package or "") for x in r)
+    r = digikey.findpart('resistor cat:"Chip Resistor - Surface Mount" res:10k..100k tol:<=1% pkg:0603 is:instock', limit=5, sort="price")
+    assert r and all("0603" in (x.package or "") and x.stock.in_stock for x in r)
     assert digikey.facets("resistor")["total"] > 1000
     assert digikey.getpic("LM358DR")[:2] in (b"\xff\xd8", b"\x89P")
 

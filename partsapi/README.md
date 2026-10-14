@@ -108,7 +108,7 @@ What each vendor does with a filter:
 | in-stock, RoHS, datasheet / image | **server-side** (RoHS: client) | - | - | **server-side** | in-stock + RoHS server-side |
 | library, preferred, exact package / brand | **server-side** | `lib:` on search hits | - | n/a | n/a |
 | min stock, manufacturer, category | min stock + exact brand | after fetch | on cards | **server-side** (names resolved to DigiKey ids) | client-side |
-| numeric attributes (`res:10k..100k`) | **server-side** when a category is known: real catalogue values are looked up and the matching ones sent | after fetch | on result cards | **server-side** when exactly one category is selected *and* the facet values provably cover it; else client-side | client-side |
+| numeric attributes (`res:10k..100k`) | **server-side** when a category is known: real catalogue values are looked up and the matching ones sent | after fetch | on result cards | **server-side** when one *leaf* category is selected (`cat:"Chip Resistor - Surface Mount"`, not `cat:resistors`); else client-side | client-side |
 | sorting | client-side | client-side | client-side | **server-side** for price (qty 1) / stock / mpn / code / manufacturer | client-side |
 | everything else | client-side while paging up to `max_pages` x 72 | on the cheap search hits, the rest after fetching each survivor (`max_fetch`) | on cards; stock / datasheet / MPN / RoHS fetch the product pages of survivors (`max_fetch`) | client-side while paging, 50 per call | client-side while paging, 50 per call |
 
@@ -145,18 +145,22 @@ Both use the vendors' **official** APIs, which need a free key. The keys are rea
 `parts.default_vendors()` includes them only when configured, so `parts.findpart(...)` and `parts.prices(...)` keep
 working without keys; name them in `vendors=` to require them (a missing key then becomes a warning / an error row).
 
-* **Verification status.** These two modules are written against the vendors' published OpenAPI schemas (Mouser V1/V2,
-  DigiKey Product Information v4), their error paths were exercised against the live services with deliberately wrong
-  credentials, and the logic is covered by offline tests whose fixtures are built from those schemas
-  (`tests/fixtures/*_synthetic.json` - not recordings). **They have not been run against a real account**, because the
-  development environment had no keys. Run `DIGIKEY_CLIENT_ID=... DIGIKEY_CLIENT_SECRET=... MOUSER_API_KEY=...
-  PARTSAPI_LIVE=1 pytest -m live` once to confirm them on your account; the live tests skip themselves without keys.
+* **Verification status.** **DigiKey** was run against the real production API with a real app (search, filters, sort,
+  parametric filters, facets, part details, pricing, pictures, datasheets - see `tests/test_live.py`), and several details
+  of this README come from what the live responses showed. **Mouser** is written against Mouser's published OpenAPI
+  schema and its error path was exercised with a wrong key, but it has **not** been run against a real key; the offline
+  fixtures for both are schema-derived (`tests/fixtures/*_synthetic.json`), not recordings. To confirm Mouser on your
+  account: `MOUSER_API_KEY=... PARTSAPI_LIVE=1 pytest -m live` (the live tests skip themselves without keys).
 * **DigiKey package types.** One DigiKey product has several orderable variations (cut tape, reel, Digi-Reel). `Part.code`
   is the variation you asked for (or the first), and `Part.extra["variations"]` lists all with their own stock, minimum
   order quantity and price ladder. `getprice("LM358DR", qty)` picks the cheapest variation orderable at `qty`.
-* **DigiKey parametric pushdown is conservative.** It sends attribute filters to DigiKey only for a single selected
-  category, and only if the facet values' product counts add up to the category total (so no value can be missing);
-  otherwise the condition is applied client-side. Narrow with `cat:` for best results. DigiKey needs a search word.
+* **DigiKey parametric filters need a leaf category.** DigiKey only returns parameter / value ids for leaf categories, so
+  `res:10k..100k tol:<=1% pkg:0603` is sent to DigiKey (and searches the whole catalogue) only with something like
+  `cat:"Chip Resistor - Surface Mount"`; with `cat:resistors` or no category those conditions are applied client-side
+  to the pages read (`max_pages` x 50), which can miss matches when results are sorted by price. `cat:` prefers an exact
+  category name before substring matches. DigiKey needs at least one search word.
+* **Package sizes.** DigiKey writes chip sizes as `0201 (0603 Metric)`: imperial first. A bare `pkg:0603` means imperial
+  0603 (`0603 (1608 Metric)`) and does *not* match `0201 (0603 Metric)`; use `pkg:"1608 Metric"` for metric names.
 * **Mouser.** The API can only filter by RoHS and in-stock; everything else is applied while paging (`max_pages`, default 3
   x 50 results). Mouser's manufacturer-filtered V2 search is not used because its `pageNumber` base is unspecified.
 * **3D models, pictures, datasheets.** Neither vendor serves 3D models, so `get3dmodel` resolves the manufacturer part
@@ -197,6 +201,6 @@ DigiKey / Mouser credentials), all subclasses of `PartsApiError`.
 ## Tests
 
 ```bash
-pytest                               # 232 offline tests against recorded and schema-derived fixtures
+pytest                               # 246 offline tests against recorded and schema-derived fixtures
 PARTSAPI_LIVE=1 pytest -m live       # hits the real sites (DigiKey / Mouser tests need your keys)
 ```

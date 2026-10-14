@@ -31,7 +31,7 @@ from . import easyeda as _easyeda
 from ._http import Http
 from ._util import PathLike, ext_from_url, safe_name, save_bytes, to_int
 from .errors import AuthError, BlockedError, NotFoundError, PartsApiError
-from .filters import (ParsedQuery, PartFilter, build_filter, parse_query, parse_quantity,
+from .filters import (ParsedQuery, PartFilter, build_filter, package_matches, parse_query, parse_quantity,
                       reject_unsupported, sort_parts)
 from .models import Model3D, Part, PriceBreak, Stock, pick_price
 
@@ -78,8 +78,10 @@ def _cat_key(s: str) -> str:
 def _parse(prod: dict[str, Any], currency: str = "USD", code: Optional[str] = None) -> Part:
     """Map a v4 ``Product`` to a :class:`Part`. ``code`` picks the variation (package type) to price."""
     variations = prod.get("ProductVariations") or []
+    # the variation asked for by DigiKey number, else the one orderable in the smallest quantity (cut tape / Digi-Reel
+    # before a 2500-piece reel)
     chosen = next((v for v in variations if code and (v.get("DigiKeyProductNumber") or "").casefold() == code.casefold()), None) \
-        or (variations[0] if variations else {})
+        or (min(variations, key=lambda v: to_int(v.get("MinimumOrderQuantity")) or 1) if variations else {})
     params = prod.get("Parameters") or []
     attrs = {p["ParameterText"]: p.get("ValueText") for p in params if p.get("ParameterText")}
     package = next((attrs[k] for k in attrs if k.casefold() in PKG_PARAMS), None)
@@ -230,7 +232,9 @@ class DigiKey:
         ids: list[int] = []
         for op in cond_operands:
             want = _cat_key(op)
-            ids += [i for i, name in flat if (_cat_key(name) == want if exact else want and want in _cat_key(name))]
+            same = [i for i, name in flat if _cat_key(name) == want]
+            # an exact name ("Resistors") beats substring matches ("...Resistor Networks", thermistors, ...)
+            ids += same or ([i for i, name in flat if want and want in _cat_key(name)] if not exact else [])
         return list(dict.fromkeys(ids))
 
     def _manufacturer_ids(self, cond_operands: list[str], exact: bool) -> list[int]:
@@ -267,8 +271,8 @@ class DigiKey:
         """Search DigiKey with the full filter syntax of :mod:`partsapi.filters`.
 
         Pushed to DigiKey: ``is:instock``, ``is:rohs``, ``has:datasheet|image|3dmodel``, ``stock:>=N``, manufacturer and
-        category (by DigiKey id), numeric/text parametric filters (when the category's facet values provably cover all
-        its products) and sorting by price / stock / mpn / code / manufacturer. Everything else is checked client-side
+        category (by DigiKey id), numeric/text parametric filters (for one *leaf* category, e.g.
+        ``cat:"Chip Resistor - Surface Mount"``) and sorting by price / stock / mpn / code / manufacturer. Everything else is checked client-side
         while paging (50 per page, at most ``max_pages``). At least one search word is required; narrow with ``cat:``.
         ``extra`` is merged into ``FilterOptionsRequest`` (e.g. ``{"StatusFilter": [{"Id": "0"}]}``).
         """
@@ -360,28 +364,30 @@ class DigiKey:
         return fo
 
     def _resolve_params(self, kw: str, flt: PartFilter, fo: dict[str, Any]) -> Union[None, str, dict[str, Any]]:
-        """Turn attribute conditions into DigiKey parametric filters, but only when it is provably complete.
+        """Turn attribute conditions into DigiKey parametric filters.
 
-        Needs exactly one category. DigiKey's facet values for the parameter must account for every product in
-        the category (sum of counts == total); otherwise a value could be missing and results silently lost, so the
-        condition stays client-side. Returns a ``ParameterFilterRequest``, ``"none"`` (no value can match) or ``None``.
+        Needs exactly one category, and it must be a *leaf* category: DigiKey only returns parametric facets
+        (parameter ids and value ids) for those, e.g. ``cat:"Chip Resistor - Surface Mount"`` but not ``cat:resistors``.
+        For each condition the parameter's real values are tested and the matching value ids sent. Checked against the
+        live API: facet value lists are not capped (they vary with the query, up to thousands of values) and
+        products without a value for a parameter cannot satisfy a positive condition anyway. Every result is still
+        re-checked client-side. Returns a ``ParameterFilterRequest``, ``"none"`` (no value can match) or ``None``
+        (nothing to push: no category, a non-leaf category, ambiguous or negated conditions).
         """
-        todo = [(n, c, e) for n, c, e in flt.attrs if not c.negate]
+        todo: list[tuple[str, Any, bool, bool]] = [(n, c, e, False) for n, c, e in flt.attrs if not c.negate]
+        todo += [("Package / Case", c, True, True) for n, c in flt.fields if n == "package" and not c.negate]
         cats = fo.get("CategoryFilter") or []
         if not todo or len(cats) != 1:
             return None
         probe = self._search(kw, 0, 1, {k: v for k, v in fo.items() if k != "ParameterFilterRequest"}, None)
-        total = to_int(probe.get("ProductsCount")) or 0
         facets = (probe.get("FilterOptions") or {}).get("ParametricFilters") or []
         out: list[dict[str, Any]] = []
-        for name, cond, exact in todo:
+        for name, cond, exact, is_package in todo:
             hits = [f for f in facets if flt.attr_name_matches(f.get("ParameterName") or "", name, exact)]
             if len(hits) != 1:
                 continue
-            vals = hits[0].get("FilterValues") or []
-            if not total or sum(to_int(v.get("ProductCount")) or 0 for v in vals) < total:
-                continue  # facet values do not provably cover the category
-            ok = [v for v in vals if cond.test(v.get("ValueName"))]
+            test = package_matches if is_package else (lambda c, t: c.test(t))
+            ok = [v for v in hits[0].get("FilterValues") or [] if test(cond, v.get("ValueName"))]
             if not ok:
                 return "none"
             out.append({"ParameterId": hits[0]["ParameterId"], "FilterValues": [{"Id": str(v["ValueId"])} for v in ok]})

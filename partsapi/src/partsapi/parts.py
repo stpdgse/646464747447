@@ -45,7 +45,7 @@ def prices(mpn_or_code: str, qty: int = 1, *, vendors: Optional[tuple[str, ...]]
     rows: list[dict[str, Any]] = []
     for v in vendors or default_vendors():
         try:
-            hits = VENDORS[v].findpart(mpn_or_code, limit=10, parse=False)
+            hits = VENDORS[v].findpart(mpn_or_code, limit=30, parse=False)
         except PartsApiError as exc:
             rows.append({"vendor": v, "error": str(exc)})
             continue
