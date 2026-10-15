@@ -1,0 +1,201 @@
+(footprint "SW_Slide_SS12D00G3"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "Mini slide switch SS-12D00G3, 1P2T, 3 pins 2.54 mm, body 8.8 x 4.0 mm, 0.5 A 50 V DC")
+	(tags "slide switch SPDT SS12D00 SS-12D00G3")
+	(property "Reference" "REF**"
+		(at 2.54 -3.2 0)
+		(layer "F.SilkS")
+		(uuid "1280a085-f791-4701-abc6-c4d14a86f5cb")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "SS-12D00G3"
+		(at 2.54 3.2 0)
+		(layer "F.Fab")
+		(uuid "33e8d5dc-df82-4ece-ba7b-34b751d200e9")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "c5f11e39-f8fa-468d-a01d-9e66a7e90e4d")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "7f196d48-db32-4479-9819-bcc6e4d33661")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_line
+		(start -1.979999 -2.12)
+		(end 7.06 -2.12)
+		(stroke
+			(width 0.12)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "df69f720-9b55-4546-b1d5-39805aaea40f")
+	)
+	(fp_line
+		(start -1.979999 2.12)
+		(end -1.979999 -2.12)
+		(stroke
+			(width 0.12)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "1678c66c-79d5-4ef6-ac68-836181cf794e")
+	)
+	(fp_line
+		(start 7.06 -2.12)
+		(end 7.06 2.12)
+		(stroke
+			(width 0.12)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "f48bb26a-deca-4fb1-a586-ddc3088d55c1")
+	)
+	(fp_line
+		(start 7.06 2.12)
+		(end -1.979999 2.12)
+		(stroke
+			(width 0.12)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "6d90243d-38b7-4833-ba65-bec85258146d")
+	)
+	(fp_line
+		(start -2.21 -2.35)
+		(end 7.29 -2.35)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "362a9b83-f315-4cc1-abc9-409d15aee9f8")
+	)
+	(fp_line
+		(start -2.21 2.35)
+		(end -2.21 -2.35)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "04b4ce89-f11a-4711-934d-3cd49a11dd91")
+	)
+	(fp_line
+		(start 7.29 -2.35)
+		(end 7.29 2.35)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "c5bf9326-8892-4fb2-b9c1-968a06de6d2e")
+	)
+	(fp_line
+		(start 7.29 2.35)
+		(end -2.21 2.35)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "F.CrtYd")
+		(uuid "48c22f75-1cb7-43e1-a301-7e20c1a440e4")
+	)
+	(fp_line
+		(start -1.86 -2)
+		(end 6.94 -2)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.Fab")
+		(uuid "1366e887-42c5-4bfc-bbab-499e0e783a4c")
+	)
+	(fp_line
+		(start -1.86 2)
+		(end -1.86 -2)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.Fab")
+		(uuid "a2da5f65-c3ac-474f-8eb1-b2b33690f751")
+	)
+	(fp_line
+		(start 6.94 -2)
+		(end 6.94 2)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.Fab")
+		(uuid "9534bbae-0685-425a-9f62-935548562a79")
+	)
+	(fp_line
+		(start 6.94 2)
+		(end -1.86 2)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.Fab")
+		(uuid "214e82b5-605b-4d26-bd00-cae8e8bc0cbe")
+	)
+	(pad "1" thru_hole rect
+		(at 0 0)
+		(size 1.8 1.8)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(thermal_bridge_angle 45)
+		(uuid "8c12e0fb-2bd8-4268-aa09-684dde00e462")
+	)
+	(pad "2" thru_hole circle
+		(at 2.54 0)
+		(size 1.8 1.8)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8fb42702-ee76-4877-93b4-3314d949f283")
+	)
+	(pad "3" thru_hole circle
+		(at 5.08 0)
+		(size 1.8 1.8)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "2aea109a-d350-42f2-ab0d-bb3b2d267da6")
+	)
+	(embedded_fonts no)
+)

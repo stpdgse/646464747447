@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Parts Search</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23267a5f'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h8' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Parts Search</h1>
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-search" aria-selected="true" data-tab="search">Search</button>
+    <button role="tab" id="tab-compare" aria-selected="false" data-tab="compare">Compare prices</button>
+    <button role="tab" id="tab-help" aria-selected="false" data-tab="help">Filter syntax</button>
+  </nav>
+  <button id="lock" class="ghost" hidden>Lock</button>
+</header>
+
+<main>
+  <section id="view-search" class="view">
+    <form id="search-form" autocomplete="off">
+      <div class="searchbar">
+        <input id="q" type="search" placeholder='e.g.  resistor 10k 0603   ·   lm358 OR lm324 -dip   ·   feather rp2040' aria-label="Search" autofocus>
+        <button class="primary" type="submit" id="go">Search</button>
+        <button class="ghost opt-toggle" type="button" id="opt-toggle" aria-expanded="false" aria-controls="options">Options ▾</button>
+      </div>
+      <div class="options" id="options">
+        <label>Qty <input id="qty" type="number" min="1" value="1" inputmode="numeric"></label>
+        <label>Sort
+          <select id="sort">
+            <option value="">relevance</option><option value="price">price (low first)</option><option value="stock">stock</option>
+            <option value="mpn">part number</option><option value="manufacturer">manufacturer</option><option value="package">package</option>
+          </select>
+        </label>
+        <label class="check"><input id="desc" type="checkbox"> reverse</label>
+        <label>Results <select id="limit"><option>10</option><option selected>20</option><option>50</option><option>100</option></select></label>
+        <label class="check"><input id="instock" type="checkbox"> In stock</label>
+        <label>Max price <input id="maxprice" type="number" min="0" step="any" placeholder="any" inputmode="decimal"></label>
+        <label class="grow">More filters <input id="where" type="text" placeholder='res:10k..100k  tol:<=1%  pkg:0603  mfr:ti  cat:resistor  lib:basic'></label>
+      </div>
+      <div id="vendors" class="vendors" aria-label="Vendors"></div>
+      <p id="effective" class="effective" aria-live="polite"></p>
+      <div class="examples">
+        <span>Try:</span>
+        <button type="button" class="chip" data-ex="0">10k 0603 resistors, JLCPCB basic</button>
+        <button type="button" class="chip" data-ex="1">LM358, cheapest in stock</button>
+        <button type="button" class="chip" data-ex="2">100 nF ≥50 V caps (TME)</button>
+        <button type="button" class="chip" data-ex="3">Humidity sensors (SparkFun)</button>
+        <button type="button" class="chip" data-ex="4">RP2040 boards (Adafruit)</button>
+      </div>
+    </form>
+    <div id="results"></div>
+  </section>
+
+  <section id="view-compare" class="view" hidden>
+    <form id="compare-form" autocomplete="off">
+      <div class="searchbar">
+        <input id="cq" type="search" placeholder="Exact manufacturer part number, e.g. LM358DR" aria-label="Part number">
+        <label class="qtybox">Qty <input id="cqty" type="number" min="1" value="10" inputmode="numeric"></label>
+        <button class="primary" type="submit">Compare</button>
+      </div>
+      <p class="hint">Looks the part up at every vendor you enabled on the Search tab. Prices are shown side by side and never ranked across
+      currencies or between net and VAT-inclusive prices.</p>
+    </form>
+    <div id="compare-results"></div>
+  </section>
+
+  <section id="view-help" class="view" hidden>
+    <div class="help">
+      <h2>Search syntax</h2>
+      <p>Everything works the same on every vendor. Put it in the search box or in <em>More filters</em>.</p>
+      <table>
+        <tr><th>Write</th><th>Meaning</th></tr>
+        <tr><td><code>resistor 0603</code></td><td>all words (words with digits must appear in the part text)</td></tr>
+        <tr><td><code>"thick film"</code></td><td>exact phrase</td></tr>
+        <tr><td><code>lm358 OR lm324</code></td><td>alternatives</td></tr>
+        <tr><td><code>-automotive</code> · <code>-"low power"</code></td><td>exclude</td></tr>
+        <tr><td><code>mfr:ti|onsemi</code> · <code>mfr:=TI</code></td><td>manufacturer contains / equals (spelled as the vendor spells it: "Texas Instruments")</td></tr>
+        <tr><td><code>pkg:0603</code> · <code>pkg:=SOIC-8</code></td><td>package (bare <code>0603</code> means the imperial size)</td></tr>
+        <tr><td><code>cat:resistor</code> · <code>mpn:LM358</code> · <code>code:C25804</code></td><td>category, part number, vendor code</td></tr>
+        <tr><td><code>lib:basic</code> · <code>is:preferred</code></td><td>JLCPCB library class (JLCPCB / LCSC only)</td></tr>
+        <tr><td><code>is:instock</code> · <code>is:rohs</code> · <code>has:datasheet</code></td><td>flags (not every vendor supports every flag)</td></tr>
+        <tr><td><code>stock:&gt;=1000</code> · <code>price:&lt;0.01</code></td><td>numbers; price is the unit price at the quantity you set</td></tr>
+        <tr><td><code>res:10k..100k</code> · <code>cap:100n</code> · <code>tol:&lt;=1%</code> · <code>volt:&gt;=50V</code></td><td>attributes with units: <code>10k</code> = <code>10kΩ</code>, <code>100n</code> = <code>0.1µF</code></td></tr>
+        <tr><td><code>@"Number of Pins":&gt;=8</code></td><td>any attribute by its exact name</td></tr>
+      </table>
+      <h2>Good to know</h2>
+      <ul>
+        <li>Vendors that need an API key show a grey dot until the server has the key. Mouser has no technical attributes at all.</li>
+        <li>DigiKey applies attribute filters server-side inside one leaf category: <code>cat:"Chip Resistor - Surface Mount" res:10k..100k</code>.</li>
+        <li>Sorting orders the results that were read, except where the vendor sorts server-side (DigiKey, TME).</li>
+        <li>Open a result for the full price ladder, all attributes, datasheet and 3D-model download (STEP / OBJ, matched by exact part number).</li>
+        <li>Use <em>Filters</em> on a vendor's result block to see which manufacturers, packages and attribute values exist, and click one to add it.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<div id="overlay" class="overlay" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+    <button id="dlg-close" class="close" aria-label="Close">×</button>
+    <div id="dlg-body"></div>
+  </div>
+</div>
+
+<div id="login" class="overlay" hidden>
+  <form class="dialog narrow" id="login-form">
+    <h2 id="login-title">Access key</h2>
+    <p class="hint">This server is password protected.</p>
+    <input type="text" name="username" value="parts-search" autocomplete="username" hidden>
+    <input id="key" type="password" autocomplete="current-password" placeholder="Access key" aria-label="Access key">
+    <p id="login-error" class="error" role="alert"></p>
+    <button class="primary" type="submit">Unlock</button>
+  </form>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

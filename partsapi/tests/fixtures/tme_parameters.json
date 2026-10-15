@@ -1,0 +1,128 @@
+{
+ "status": "OK",
+ "data": {
+  "elements": [
+   {
+    "symbol": "LM358DT",
+    "parameters": {
+     "elements": [
+      {
+       "id": 2,
+       "name": "Manufacturer",
+       "values": [
+        {
+         "id": 35,
+         "value": "STMicroelectronics"
+        }
+       ]
+      },
+      {
+       "id": 367,
+       "name": "Type of integrated circuit",
+       "values": [
+        {
+         "id": 1444060,
+         "value": "operational amplifier"
+        }
+       ]
+      },
+      {
+       "id": 397,
+       "name": "Bandwidth",
+       "values": [
+        {
+         "id": 1494435,
+         "value": "1.1MHz"
+        }
+       ]
+      },
+      {
+       "id": 383,
+       "name": "Number of channels",
+       "values": [
+        {
+         "id": 1443907,
+         "value": "2"
+        }
+       ]
+      },
+      {
+       "id": 10,
+       "name": "Mounting",
+       "values": [
+        {
+         "id": 1452498,
+         "value": "SMT"
+        }
+       ]
+      },
+      {
+       "id": 3175,
+       "name": "Voltage supply range",
+       "values": [
+        {
+         "id": 1902331,
+         "value": "3...30V DC"
+        }
+       ]
+      },
+      {
+       "id": 35,
+       "name": "Case",
+       "values": [
+        {
+         "id": 1441256,
+         "value": "SO8"
+        }
+       ]
+      },
+      {
+       "id": 32,
+       "name": "Operating temperature",
+       "values": [
+        {
+         "id": 1819337,
+         "value": "0...70°C"
+        }
+       ]
+      },
+      {
+       "id": 2388,
+       "name": "Slew rate",
+       "values": [
+        {
+         "id": 1548130,
+         "value": "0.6V/μs"
+        }
+       ]
+      },
+      {
+       "id": 804,
+       "name": "Integrated circuit features",
+       "values": [
+        {
+         "id": 1880812,
+         "value": "low power"
+        }
+       ]
+      },
+      {
+       "id": 909,
+       "name": "Kind of package",
+       "values": [
+        {
+         "id": 1443488,
+         "value": "reel"
+        },
+        {
+         "id": 1437179,
+         "value": "tape"
+        }
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

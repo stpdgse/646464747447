@@ -1,0 +1,129 @@
+{
+ "data": {
+  "products": {
+   "items": [
+    {
+     "sku": "COM-18354",
+     "name": "SparkFun Qwiic LED Stick - APA102C",
+     "uid": "NTU5OQ==",
+     "url_key": "sparkfun-qwiic-led-stick-apa102c",
+     "url_suffix": ".html",
+     "stock_status": "IN_STOCK",
+     "only_x_left_in_stock": null,
+     "min_sale_qty": 1,
+     "max_sale_qty": 10000,
+     "country_of_manufacture": "US",
+     "short_description": {
+      "html": "<p>Add 10 addressable APA102 LEDs to your project effortlessly with this Qwiic-enabled I<sup>2</sup>C LED stick.</p>"
+     },
+     "image": {
+      "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-01.jpg"
+     },
+     "media_gallery": [
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-01.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/N/c/NcjTMzVoCg8.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-04.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18354-SparkFun_Qwiic_LED_Stick_-_APA102C-03.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/Q/w/Qwiic_LED_Stick_Hookup_Guide-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/Q/w/Qwiic_LED_Stick_Thumbnail.gif",
+       "disabled": false
+      }
+     ],
+     "price_range": {
+      "minimum_price": {
+       "regular_price": {
+        "value": 12.5,
+        "currency": "USD"
+       },
+       "final_price": {
+        "value": 12.5,
+        "currency": "USD"
+       }
+      }
+     },
+     "price_tiers": [
+      {
+       "quantity": 10,
+       "final_price": {
+        "value": 11.88,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 25,
+       "final_price": {
+        "value": 11.25,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 100,
+       "final_price": {
+        "value": 10.63,
+        "currency": "USD"
+       }
+      }
+     ],
+     "categories": [
+      {
+       "uid": "OTQz",
+       "name": "Components",
+       "url_path": "components",
+       "level": 2
+      },
+      {
+       "uid": "MTEwMg==",
+       "name": "LEDs and Illumination",
+       "url_path": "components/leds-and-illumination",
+       "level": 3
+      },
+      {
+       "uid": "MTE2Mg==",
+       "name": "Addressable",
+       "url_path": "components/leds-and-illumination/addressable",
+       "level": 4
+      },
+      {
+       "uid": "MTMxMg==",
+       "name": "Special Categories",
+       "url_path": "special-categories",
+       "level": 2
+      },
+      {
+       "uid": "MTg0Mw==",
+       "name": "SparkFun Originals",
+       "url_path": "special-categories/sparkfun-originals",
+       "level": 3
+      },
+      {
+       "uid": "Mjk2MA==",
+       "name": "Qwiic",
+       "url_path": "special-categories/qwiic",
+       "level": 3
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

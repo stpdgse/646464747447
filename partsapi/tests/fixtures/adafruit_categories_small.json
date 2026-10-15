@@ -1,0 +1,163 @@
+[
+ {
+  "category_id": "965",
+  "category_name": "Circuit Playground",
+  "category_description": "",
+  "products_count": 0,
+  "subcategories": [
+   {
+    "category_id": "966",
+    "category_name": "Express",
+    "category_description": "",
+    "products_count": 0,
+    "subcategories": [],
+    "products": [],
+    "category_url": "https://www.adafruit.com/categories/966"
+   }
+  ],
+  "products": [],
+  "category_url": "https://www.adafruit.com/categories/965"
+ },
+ {
+  "category_id": "943",
+  "category_name": "Feather",
+  "category_description": "",
+  "products_count": 0,
+  "subcategories": [
+   {
+    "category_id": "946",
+    "category_name": "Boards",
+    "category_description": "",
+    "products_count": 0,
+    "subcategories": [],
+    "products": [],
+    "category_url": "https://www.adafruit.com/categories/946"
+   }
+  ],
+  "products": [],
+  "category_url": "https://www.adafruit.com/categories/943"
+ },
+ {
+  "category_id": "105",
+  "category_name": "Raspberry Pi",
+  "category_description": "",
+  "products_count": 0,
+  "subcategories": [
+   {
+    "category_id": "875",
+    "category_name": "RP2040 / Pico",
+    "category_description": "",
+    "products_count": 0,
+    "subcategories": [
+     {
+      "category_id": "436",
+      "category_name": "Feather",
+      "category_description": "",
+      "products_count": 0,
+      "subcategories": [],
+      "products": [],
+      "category_url": "https://www.adafruit.com/categories/436"
+     }
+    ],
+    "products": [],
+    "category_url": "https://www.adafruit.com/categories/875"
+   }
+  ],
+  "products": [],
+  "category_url": "https://www.adafruit.com/categories/105"
+ },
+ {
+  "category_id": "42",
+  "category_name": "Breakout Boards",
+  "category_description": "",
+  "products_count": 0,
+  "subcategories": [
+   {
+    "category_id": "864",
+    "category_name": "Level Shifters & Expanders",
+    "category_description": "",
+    "products_count": 0,
+    "subcategories": [],
+    "products": [],
+    "category_url": "https://www.adafruit.com/categories/864"
+   }
+  ],
+  "products": [],
+  "category_url": "https://www.adafruit.com/categories/42"
+ },
+ {
+  "category_id": "54",
+  "category_name": "Components & Parts",
+  "category_description": "",
+  "products_count": 0,
+  "subcategories": [
+   {
+    "category_id": "153",
+    "category_name": "IC & Transistors",
+    "category_description": "",
+    "products_count": 0,
+    "subcategories": [],
+    "products": [],
+    "category_url": "https://www.adafruit.com/categories/153"
+   }
+  ],
+  "products": [],
+  "category_url": "https://www.adafruit.com/categories/54"
+ },
+ {
+  "category_id": "35",
+  "category_name": "Sensors",
+  "category_description": "",
+  "products_count": 0,
+  "subcategories": [
+   {
+    "category_id": "114",
+    "category_name": "Barometric Pressure",
+    "category_description": "",
+    "products_count": 0,
+    "subcategories": [],
+    "products": [],
+    "category_url": "https://www.adafruit.com/categories/114"
+   },
+   {
+    "category_id": "56",
+    "category_name": "Temperature",
+    "category_description": "",
+    "products_count": 0,
+    "subcategories": [
+     {
+      "category_id": "613",
+      "category_name": "I2C / SPI Digital",
+      "category_description": "",
+      "products_count": 0,
+      "subcategories": [],
+      "products": [],
+      "category_url": "https://www.adafruit.com/categories/613"
+     },
+     {
+      "category_id": "615",
+      "category_name": "Analog / Thermistor",
+      "category_description": "",
+      "products_count": 0,
+      "subcategories": [],
+      "products": [],
+      "category_url": "https://www.adafruit.com/categories/615"
+     }
+    ],
+    "products": [],
+    "category_url": "https://www.adafruit.com/categories/56"
+   },
+   {
+    "category_id": "60",
+    "category_name": "Touch",
+    "category_description": "",
+    "products_count": 0,
+    "subcategories": [],
+    "products": [],
+    "category_url": "https://www.adafruit.com/categories/60"
+   }
+  ],
+  "products": [],
+  "category_url": "https://www.adafruit.com/categories/35"
+ }
+]

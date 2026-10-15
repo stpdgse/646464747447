@@ -1,0 +1,200 @@
+{
+ "Product": {
+  "Description": {
+   "ProductDescription": "IC OPAMP GP 2 CIRCUIT 8SOIC",
+   "DetailedDescription": "General Purpose Amplifier 2 Circuit 8-SOIC"
+  },
+  "Manufacturer": {
+   "Id": 296,
+   "Name": "Texas Instruments"
+  },
+  "ManufacturerProductNumber": "LM358DR",
+  "UnitPrice": 0.42,
+  "ProductUrl": "https://www.digikey.com/en/products/detail/texas-instruments/LM358DR/404297",
+  "DatasheetUrl": "//www.ti.com/lit/ds/symlink/lm358.pdf",
+  "PhotoUrl": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/1/lm358.jpg",
+  "ProductVariations": [
+   {
+    "DigiKeyProductNumber": "296-1395-1-ND",
+    "PackageType": {
+     "Id": 2,
+     "Name": "Cut Tape (CT)"
+    },
+    "StandardPricing": [
+     {
+      "BreakQuantity": 1,
+      "UnitPrice": 0.42,
+      "TotalPrice": 0.42
+     },
+     {
+      "BreakQuantity": 10,
+      "UnitPrice": 0.3,
+      "TotalPrice": 3.0
+     },
+     {
+      "BreakQuantity": 100,
+      "UnitPrice": 0.2,
+      "TotalPrice": 20.0
+     }
+    ],
+    "MyPricing": [],
+    "MarketPlace": false,
+    "TariffActive": false,
+    "Supplier": {
+     "Id": 1,
+     "Name": "DigiKey"
+    },
+    "QuantityAvailableforPackageType": 120000,
+    "MaxQuantityForDistribution": 0,
+    "MinimumOrderQuantity": 1,
+    "StandardPackage": 1,
+    "DigiReelFee": 0
+   },
+   {
+    "DigiKeyProductNumber": "296-1395-2-ND",
+    "PackageType": {
+     "Id": 1,
+     "Name": "Tape & Reel (TR)"
+    },
+    "StandardPricing": [
+     {
+      "BreakQuantity": 2500,
+      "UnitPrice": 0.12,
+      "TotalPrice": 300.0
+     },
+     {
+      "BreakQuantity": 5000,
+      "UnitPrice": 0.11,
+      "TotalPrice": 550.0
+     }
+    ],
+    "MyPricing": [],
+    "MarketPlace": false,
+    "TariffActive": false,
+    "Supplier": {
+     "Id": 1,
+     "Name": "DigiKey"
+    },
+    "QuantityAvailableforPackageType": 100000,
+    "MaxQuantityForDistribution": 0,
+    "MinimumOrderQuantity": 2500,
+    "StandardPackage": 2500,
+    "DigiReelFee": 0
+   },
+   {
+    "DigiKeyProductNumber": "296-1395-6-ND",
+    "PackageType": {
+     "Id": 3,
+     "Name": "Digi-Reel®"
+    },
+    "StandardPricing": [
+     {
+      "BreakQuantity": 1,
+      "UnitPrice": 0.42,
+      "TotalPrice": 0.42
+     },
+     {
+      "BreakQuantity": 100,
+      "UnitPrice": 0.2,
+      "TotalPrice": 20.0
+     }
+    ],
+    "MyPricing": [],
+    "MarketPlace": false,
+    "TariffActive": false,
+    "Supplier": {
+     "Id": 1,
+     "Name": "DigiKey"
+    },
+    "QuantityAvailableforPackageType": 120000,
+    "MaxQuantityForDistribution": 0,
+    "MinimumOrderQuantity": 1,
+    "StandardPackage": 1,
+    "DigiReelFee": 0
+   }
+  ],
+  "QuantityAvailable": 120000,
+  "ProductStatus": {
+   "Id": 0,
+   "Status": "Active"
+  },
+  "BackOrderNotAllowed": false,
+  "NormallyStocking": true,
+  "Discontinued": false,
+  "EndOfLife": false,
+  "Ncnr": false,
+  "Parameters": [
+   {
+    "ParameterId": 16,
+    "ParameterText": "Package / Case",
+    "ParameterType": "String",
+    "ValueId": "1",
+    "ValueText": "8-SOIC (0.154\", 3.90mm Width)"
+   },
+   {
+    "ParameterId": 2,
+    "ParameterText": "Number of Circuits",
+    "ParameterType": "String",
+    "ValueId": "2",
+    "ValueText": "2"
+   },
+   {
+    "ParameterId": 3,
+    "ParameterText": "Voltage - Supply, Single/Dual (±)",
+    "ParameterType": "String",
+    "ValueId": "7",
+    "ValueText": "3V ~ 32V, ±1.5V ~ 16V"
+   },
+   {
+    "ParameterId": 4,
+    "ParameterText": "Current - Supply",
+    "ParameterType": "String",
+    "ValueId": "8",
+    "ValueText": "700µA"
+   }
+  ],
+  "BaseProductNumber": {
+   "Id": 1,
+   "Name": "LM358"
+  },
+  "Category": {
+   "CategoryId": 685,
+   "ParentId": 0,
+   "Name": "Integrated Circuits (ICs)",
+   "ProductCount": 1,
+   "NewProductCount": 0,
+   "ChildCategories": [
+    {
+     "CategoryId": 686,
+     "ParentId": 685,
+     "Name": "Linear - Amplifiers - Instrumentation, OP Amps, Buffer Amps",
+     "ProductCount": 1,
+     "ChildCategories": []
+    }
+   ]
+  },
+  "ManufacturerLeadWeeks": "6",
+  "ManufacturerPublicQuantity": 50000,
+  "Series": {
+   "Id": 10,
+   "Name": "LM358"
+  },
+  "Classifications": {
+   "ReachStatus": "REACH Unaffected",
+   "RohsStatus": "ROHS3 Compliant",
+   "MoistureSensitivityLevel": "1 (Unlimited)",
+   "ExportControlClassNumber": "EAR99",
+   "HtsusCode": "8542.33.0001"
+  },
+  "OtherNames": [
+   "LM358DRG4"
+  ]
+ },
+ "SearchLocaleUsed": {
+  "Site": "US",
+  "Language": "en",
+  "Currency": "USD"
+ },
+ "AccountIdUsed": 0,
+ "CustomerIdUsed": 0
+}

@@ -1,0 +1,205 @@
+{
+ "status": "OK",
+ "data": {
+  "products": {
+   "elements": []
+  },
+  "parameters": {
+   "elements": [
+    {
+     "id": 38,
+     "name": "Resistance",
+     "values": [
+      {
+       "id": 1436601,
+       "value": "10Ω",
+       "products_count": 1194,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1436664,
+       "value": "4.7kΩ",
+       "products_count": 1021,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1436672,
+       "value": "10kΩ",
+       "products_count": 1371,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1436688,
+       "value": "47kΩ",
+       "products_count": 863,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1436696,
+       "value": "100kΩ",
+       "products_count": 1152,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1436720,
+       "value": "1MΩ",
+       "products_count": 792,
+       "selected": false,
+       "is_active": true
+      }
+     ],
+     "products_count": 199271
+    },
+    {
+     "id": 39,
+     "name": "Tolerance",
+     "values": [
+      {
+       "id": 1819613,
+       "value": "±0.5%",
+       "products_count": 18546,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1819327,
+       "value": "±1%",
+       "products_count": 89239,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1819321,
+       "value": "±5%",
+       "products_count": 38481,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1819340,
+       "value": "±10%",
+       "products_count": 959,
+       "selected": false,
+       "is_active": true
+      }
+     ],
+     "products_count": 196605
+    },
+    {
+     "id": 2932,
+     "name": "Case - inch",
+     "values": [
+      {
+       "id": 1620225,
+       "value": "0402",
+       "products_count": 17692,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1620227,
+       "value": "0603",
+       "products_count": 52067,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1620229,
+       "value": "0805",
+       "products_count": 24213,
+       "selected": false,
+       "is_active": true
+      }
+     ],
+     "products_count": 164159
+    },
+    {
+     "id": 2931,
+     "name": "Case - mm",
+     "values": [
+      {
+       "id": 1620224,
+       "value": "0603",
+       "products_count": 5292,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1620228,
+       "value": "1608",
+       "products_count": 51867,
+       "selected": false,
+       "is_active": true
+      }
+     ],
+     "products_count": 163594
+    },
+    {
+     "id": 35,
+     "name": "Case",
+     "values": [
+      {
+       "id": 1439550,
+       "value": "MELF",
+       "products_count": 1551,
+       "selected": false,
+       "is_active": true
+      }
+     ],
+     "products_count": 5634
+    },
+    {
+     "id": 23,
+     "name": "Min. insulation resistance",
+     "values": [
+      {
+       "id": 1437023,
+       "value": "1GΩ",
+       "products_count": 343,
+       "selected": false,
+       "is_active": true
+      },
+      {
+       "id": 1436788,
+       "value": "10GΩ",
+       "products_count": 10,
+       "selected": false,
+       "is_active": true
+      }
+     ],
+     "products_count": 353
+    },
+    {
+     "id": 3082,
+     "name": "Dimensional tolerance",
+     "values": [],
+     "products_count": 143
+    },
+    {
+     "id": 594,
+     "name": "Coil resistance",
+     "values": [],
+     "products_count": 2
+    }
+   ]
+  },
+  "counters": {
+   "pages": 1,
+   "count": 100,
+   "page": 1,
+   "categories": {
+    "elements": [
+     {
+      "id": 100421,
+      "products_count": 100
+     }
+    ]
+   }
+  }
+ }
+}

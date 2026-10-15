@@ -1,0 +1,79 @@
+{
+ "status": "OK",
+ "data": {
+  "elements": [
+   {
+    "parent_id": 112309,
+    "id": 26,
+    "products_count": 129576,
+    "name": "Capacitors"
+   },
+   {
+    "parent_id": 26,
+    "id": 100003,
+    "products_count": 1387,
+    "name": "Ceramic capacitors"
+   },
+   {
+    "parent_id": 100421,
+    "id": 100216,
+    "products_count": 7082,
+    "name": "Operational amplifiers"
+   },
+   {
+    "parent_id": 112140,
+    "id": 100283,
+    "products_count": 104992,
+    "name": "Integrated circuits"
+   },
+   {
+    "parent_id": 100283,
+    "id": 100421,
+    "products_count": 26254,
+    "name": "Analog and mixed integrated circuits"
+   },
+   {
+    "parent_id": 26,
+    "id": 100556,
+    "products_count": 19788,
+    "name": "Electrolytic capacitors"
+   },
+   {
+    "parent_id": 26,
+    "id": 100560,
+    "products_count": 82225,
+    "name": "MLCC capacitors"
+   },
+   {
+    "parent_id": 111000,
+    "id": 111000,
+    "products_count": 1698825,
+    "name": ""
+   },
+   {
+    "parent_id": 111000,
+    "id": 112140,
+    "products_count": 264745,
+    "name": "Semiconductors"
+   },
+   {
+    "parent_id": 111000,
+    "id": 112309,
+    "products_count": 380426,
+    "name": "Passives"
+   },
+   {
+    "parent_id": 100216,
+    "id": 112843,
+    "products_count": 6638,
+    "name": "SMD operational amplifiers"
+   },
+   {
+    "parent_id": 100560,
+    "id": 113537,
+    "products_count": 78296,
+    "name": "MLCC SMD capacitors"
+   }
+  ]
+ }
+}

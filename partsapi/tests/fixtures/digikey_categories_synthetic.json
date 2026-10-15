@@ -1,0 +1,32 @@
+{
+ "ProductCount": 3,
+ "Categories": [
+  {
+   "CategoryId": 52,
+   "ParentId": 0,
+   "Name": "Resistors",
+   "ProductCount": 3,
+   "Children": [
+    {
+     "CategoryId": 53,
+     "ParentId": 52,
+     "Name": "Chip Resistor - Surface Mount",
+     "ProductCount": 3,
+     "Children": []
+    }
+   ]
+  },
+  {
+   "CategoryId": 685,
+   "ParentId": 0,
+   "Name": "Integrated Circuits (ICs)",
+   "ProductCount": 1,
+   "Children": []
+  }
+ ],
+ "SearchLocaleUsed": {
+  "Site": "US",
+  "Language": "en",
+  "Currency": "USD"
+ }
+}

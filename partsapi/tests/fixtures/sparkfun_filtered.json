@@ -1,0 +1,360 @@
+{
+ "data": {
+  "products": {
+   "total_count": 16,
+   "page_info": {
+    "total_pages": 6
+   },
+   "items": [
+    {
+     "sku": "SEN-13676",
+     "name": "SparkFun Atmospheric Sensor Breakout - BME280",
+     "uid": "MjgxNQ==",
+     "url_key": "sparkfun-atmospheric-sensor-breakout-bme280",
+     "url_suffix": ".html",
+     "stock_status": "IN_STOCK",
+     "only_x_left_in_stock": null,
+     "min_sale_qty": 1,
+     "max_sale_qty": 10000,
+     "country_of_manufacture": "CN",
+     "short_description": {
+      "html": ""
+     },
+     "image": {
+      "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/3/13676-01.jpg"
+     },
+     "media_gallery": [
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/3/13676-01.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/X/H/XHgftY9KrTY.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/3/13676-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/3/13676-03.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/3/13676-QuarterB.jpg",
+       "disabled": false
+      }
+     ],
+     "price_range": {
+      "minimum_price": {
+       "regular_price": {
+        "value": 25.5,
+        "currency": "USD"
+       },
+       "final_price": {
+        "value": 25.5,
+        "currency": "USD"
+       }
+      }
+     },
+     "price_tiers": [
+      {
+       "quantity": 10,
+       "final_price": {
+        "value": 24.23,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 25,
+       "final_price": {
+        "value": 22.95,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 100,
+       "final_price": {
+        "value": 21.68,
+        "currency": "USD"
+       }
+      }
+     ],
+     "categories": [
+      {
+       "uid": "OTUy",
+       "name": "Sensors",
+       "url_path": "sensors",
+       "level": 2
+      },
+      {
+       "uid": "MTEyNg==",
+       "name": "Environmental Sensors",
+       "url_path": "sensors/environmental-sensors",
+       "level": 3
+      },
+      {
+       "uid": "MTMxMg==",
+       "name": "Special Categories",
+       "url_path": "special-categories",
+       "level": 2
+      },
+      {
+       "uid": "MTMzMA==",
+       "name": "Weather",
+       "url_path": "sensors/environmental-sensors/weather",
+       "level": 4
+      },
+      {
+       "uid": "MTg0Mw==",
+       "name": "SparkFun Originals",
+       "url_path": "special-categories/sparkfun-originals",
+       "level": 3
+      },
+      {
+       "uid": "Mjk0Mw==",
+       "name": "Bosch",
+       "url_path": "special-categories/bosch",
+       "level": 3
+      },
+      {
+       "uid": "MzAyOQ==",
+       "name": "Items $20 - $30",
+       "url_path": "special-categories/items-20",
+       "level": 3
+      }
+     ]
+    },
+    {
+     "sku": "SEN-18364",
+     "name": "Humidity and Temperature Sensor - DHT20",
+     "uid": "MjIyNA==",
+     "url_key": "humidity-and-temperature-sensor-dht20",
+     "url_suffix": ".html",
+     "stock_status": "IN_STOCK",
+     "only_x_left_in_stock": null,
+     "min_sale_qty": 1,
+     "max_sale_qty": 10000,
+     "country_of_manufacture": "CN",
+     "short_description": {
+      "html": "<p>The DHT20 is a low cost humidity and temperature sensor with a I2C digital output protocol.</p>"
+     },
+     "image": {
+      "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18364-Humidity_and_Temperature_Sensor_-_DHT20-01.jpg"
+     },
+     "media_gallery": [
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18364-Humidity_and_Temperature_Sensor_-_DHT20-01.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18364-Humidity_and_Temperature_Sensor_-_DHT20-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/8/18364-Humidity_and_Temperature_Sensor_-_DHT20-03.jpg",
+       "disabled": false
+      }
+     ],
+     "price_range": {
+      "minimum_price": {
+       "regular_price": {
+        "value": 8.95,
+        "currency": "USD"
+       },
+       "final_price": {
+        "value": 8.95,
+        "currency": "USD"
+       }
+      }
+     },
+     "price_tiers": [
+      {
+       "quantity": 25,
+       "final_price": {
+        "value": 8.5,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 100,
+       "final_price": {
+        "value": 8.06,
+        "currency": "USD"
+       }
+      }
+     ],
+     "categories": [
+      {
+       "uid": "OTUy",
+       "name": "Sensors",
+       "url_path": "sensors",
+       "level": 2
+      },
+      {
+       "uid": "MTEyNg==",
+       "name": "Environmental Sensors",
+       "url_path": "sensors/environmental-sensors",
+       "level": 3
+      },
+      {
+       "uid": "MTEyOQ==",
+       "name": "Temperature",
+       "url_path": "sensors/environmental-sensors/temperature",
+       "level": 4
+      },
+      {
+       "uid": "MTMzMA==",
+       "name": "Weather",
+       "url_path": "sensors/environmental-sensors/weather",
+       "level": 4
+      }
+     ]
+    },
+    {
+     "sku": "SEN-19096",
+     "name": "SparkFun Environmental Sensor - BME688 (Qwiic)",
+     "uid": "Mjg0OA==",
+     "url_key": "sparkfun-environmental-sensor-bme688-qwiic",
+     "url_suffix": ".html",
+     "stock_status": "IN_STOCK",
+     "only_x_left_in_stock": null,
+     "min_sale_qty": 1,
+     "max_sale_qty": 10000,
+     "country_of_manufacture": "CN",
+     "short_description": {
+      "html": "<p>This compact SparkFun breakout board features the Bosch BME688, providing precise environmental data and intelligent VOC/VSC gas scanning.</p>"
+     },
+     "image": {
+      "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/9/19096-SparkFun_Environmental_Sensor_Breakout_-_BME688__Qwiic_-01.jpg"
+     },
+     "media_gallery": [
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/9/19096-SparkFun_Environmental_Sensor_Breakout_-_BME688__Qwiic_-01.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/8/C/8C2DNpUbOAo.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/9/19096-SparkFun_Environmental_Sensor_Breakout_-_BME688__Qwiic_-02.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/9/19096-SparkFun_Environmental_Sensor_Breakout_-_BME688__Qwiic_-03.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/9/19096-SparkFun_Environmental_Sensor_Breakout_-_BME688__Qwiic_-04.jpg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/x/0/x0RDEHqFIF8_1_17.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/4/v/4vdliMRtxBY.jpeg",
+       "disabled": false
+      },
+      {
+       "url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/C/n/Cn4LNui8eLo.jpeg",
+       "disabled": false
+      }
+     ],
+     "price_range": {
+      "minimum_price": {
+       "regular_price": {
+        "value": 24.95,
+        "currency": "USD"
+       },
+       "final_price": {
+        "value": 24.95,
+        "currency": "USD"
+       }
+      }
+     },
+     "price_tiers": [
+      {
+       "quantity": 10,
+       "final_price": {
+        "value": 23.7,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 25,
+       "final_price": {
+        "value": 22.46,
+        "currency": "USD"
+       }
+      },
+      {
+       "quantity": 100,
+       "final_price": {
+        "value": 21.21,
+        "currency": "USD"
+       }
+      }
+     ],
+     "categories": [
+      {
+       "uid": "OTUy",
+       "name": "Sensors",
+       "url_path": "sensors",
+       "level": 2
+      },
+      {
+       "uid": "MTAwMw==",
+       "name": "Development Boards",
+       "url_path": "development-boards",
+       "level": 2
+      },
+      {
+       "uid": "MTA1NA==",
+       "name": "Machine Learning and AI",
+       "url_path": "development-boards/machine-learning-and-ai",
+       "level": 3
+      },
+      {
+       "uid": "MTEyNg==",
+       "name": "Environmental Sensors",
+       "url_path": "sensors/environmental-sensors",
+       "level": 3
+      },
+      {
+       "uid": "MTMxMg==",
+       "name": "Special Categories",
+       "url_path": "special-categories",
+       "level": 2
+      },
+      {
+       "uid": "MTMzMA==",
+       "name": "Weather",
+       "url_path": "sensors/environmental-sensors/weather",
+       "level": 4
+      },
+      {
+       "uid": "MTg0Mw==",
+       "name": "SparkFun Originals",
+       "url_path": "special-categories/sparkfun-originals",
+       "level": 3
+      },
+      {
+       "uid": "Mjk0Mw==",
+       "name": "Bosch",
+       "url_path": "special-categories/bosch",
+       "level": 3
+      },
+      {
+       "uid": "Mjk2MA==",
+       "name": "Qwiic",
+       "url_path": "special-categories/qwiic",
+       "level": 3
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

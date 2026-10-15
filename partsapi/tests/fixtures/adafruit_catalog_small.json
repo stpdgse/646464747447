@@ -1,0 +1,647 @@
+[
+ {
+  "product_id": "385",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/385-00.jpg",
+  "product_image_alt": "DHT22 temperature-humidity sensor with 10K resistor",
+  "image_is_video": "0",
+  "product_name": "DHT22  temperature-humidity sensor + extras",
+  "product_model": "",
+  "product_mpn": "ADA385",
+  "product_master_category": "56",
+  "product_manufacturer": null,
+  "product_price": "9.95",
+  "product_shipping_weight": "4.5",
+  "product_url": "https://www.adafruit.com/product/385",
+  "product_stock": "-3",
+  "products_hts": "9025.80.10.00",
+  "products_coo": "CN",
+  "discontinue_status": "Discontinued",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2011-06-22 16:06:28",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "9.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "8.96",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "7.96",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "393",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/393-00.jpg",
+  "product_image_alt": "Sensor module with three wires",
+  "image_is_video": "0",
+  "product_name": "AM2302 (wired DHT22)  temperature-humidity sensor",
+  "product_model": "",
+  "product_mpn": "ADA393",
+  "product_master_category": "56",
+  "product_manufacturer": null,
+  "product_price": "15.00",
+  "product_shipping_weight": "22.7",
+  "product_url": "https://www.adafruit.com/product/393",
+  "product_stock": "-3",
+  "products_hts": "9025.80.1000",
+  "products_coo": "CN",
+  "discontinue_status": "Discontinued",
+  "products_coming_soon": "0",
+  "products_rohs": "2",
+  "products_virtual": "0",
+  "date_added": "2011-07-13 18:56:14",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "15.00",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "13.50",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "12.00",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "1071",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/1071-05.jpg",
+  "product_image_alt": "Angled Shot of the Extra-long force-sensitive resistor (FSR).",
+  "image_is_video": "0",
+  "product_name": "Extra-long force-sensitive resistor (FSR)",
+  "product_model": "Interlink 408",
+  "product_mpn": "ADA1071",
+  "product_master_category": "60",
+  "product_manufacturer": null,
+  "product_price": "19.95",
+  "product_shipping_weight": "32.7",
+  "product_url": "https://www.adafruit.com/product/1071",
+  "product_stock": "-7",
+  "products_hts": "8533.40.80.70",
+  "products_coo": "CN",
+  "discontinue_status": "Discontinued",
+  "products_coming_soon": "0",
+  "products_rohs": "0",
+  "products_virtual": "0",
+  "date_added": "2012-10-18 16:33:18",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "19.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "17.96",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "15.96",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "2652",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/2652-04.jpg",
+  "product_image_alt": "small, rectangle-shaped, BME280 temperature humidity pressure sensor breakout board.",
+  "image_is_video": "0",
+  "product_name": "Adafruit BME280 I2C or SPI Temperature Humidity Pressure Sensor",
+  "product_model": "STEMMA QT",
+  "product_mpn": "ADA2652",
+  "product_master_category": "114",
+  "product_manufacturer": "Adafruit",
+  "product_price": "14.95",
+  "product_shipping_weight": "4.5",
+  "product_url": "https://www.adafruit.com/product/2652",
+  "product_stock": "in stock",
+  "products_hts": "8542.39.00.00",
+  "products_coo": "US",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2020-11-11 12:28:51",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "14.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "13.46",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "11.96",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "593",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/593-01.jpg",
+  "product_image_alt": "MCP23008 i2c 8 input/output port expander",
+  "image_is_video": "0",
+  "product_name": "MCP23008 - i2c 8 input/output port expander",
+  "product_model": "",
+  "product_mpn": "ADA593",
+  "product_master_category": "153",
+  "product_manufacturer": null,
+  "product_price": "1.95",
+  "product_shipping_weight": "4.5",
+  "product_url": "https://www.adafruit.com/product/593",
+  "product_stock": "94",
+  "products_hts": "8542.39.00.00",
+  "products_coo": "TH",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2011-12-02 18:10:23",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "1.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "1.76",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "1.56",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "732",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/732-05.jpg",
+  "product_image_alt": "Angled shot of MCP23017 i2c 16 input/output port expander.",
+  "image_is_video": "0",
+  "product_name": "MCP23017 - i2c 16 input/output port expander",
+  "product_model": "",
+  "product_mpn": "ADA732",
+  "product_master_category": "153",
+  "product_manufacturer": null,
+  "product_price": "6.95",
+  "product_shipping_weight": "9.1",
+  "product_url": "https://www.adafruit.com/product/732",
+  "product_stock": "in stock",
+  "products_hts": "8542.39.00.00",
+  "products_coo": "TH",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2012-02-28 11:54:58",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "6.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "6.26",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "5.56",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "4884",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/4884-04.jpg",
+  "product_image_alt": "Angled shot of black rectangular microcontroller \"Feather RP2040\"",
+  "image_is_video": "0",
+  "product_name": "Adafruit Feather RP2040",
+  "product_model": "",
+  "product_mpn": "ADA4884",
+  "product_master_category": "436",
+  "product_manufacturer": "Adafruit",
+  "product_price": "11.95",
+  "product_shipping_weight": "3.6",
+  "product_url": "https://www.adafruit.com/product/4884",
+  "product_stock": "93",
+  "products_hts": "8535.90.80.20",
+  "products_coo": "HK",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2022-11-28 23:04:48",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "11.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "10.76",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "9.56",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "4375",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/4375-03.jpg",
+  "product_image_alt": " TC74A0 Breadboard Friendly I2C Temperature Sensor plugged into breadboard wired to Feather displaying the temperature",
+  "image_is_video": "0",
+  "product_name": "Breadboard Friendly I2C Temperature Sensor - TC74A0",
+  "product_model": "TC74A0-5.0VAT",
+  "product_mpn": "ADA4375",
+  "product_master_category": "613",
+  "product_manufacturer": null,
+  "product_price": "2.95",
+  "product_shipping_weight": "3.2",
+  "product_url": "https://www.adafruit.com/product/4375",
+  "product_stock": "in stock",
+  "products_hts": "8542.39.0001",
+  "products_coo": "TH",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2019-09-18 13:28:01",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "2.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "2.66",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "2.36",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "4890",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/4890-00.jpg",
+  "product_image_alt": "Angled shot of mini thermistor sensor.",
+  "image_is_video": "0",
+  "product_name": "Ultra Thin 10K Thermistor - B3950 NTC",
+  "product_model": "",
+  "product_mpn": "ADA4890",
+  "product_master_category": "615",
+  "product_manufacturer": null,
+  "product_price": "0.95",
+  "product_shipping_weight": "0.6",
+  "product_url": "https://www.adafruit.com/product/4890",
+  "product_stock": "in stock",
+  "products_hts": "8473.30.9100",
+  "products_coo": "CN",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "2",
+  "products_virtual": "0",
+  "date_added": "2021-03-15 20:54:30",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "0.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "0.86",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "0.76",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "4686",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/4686-05.jpg",
+  "product_image_alt": "Angled shot of temperature sensor breakout.",
+  "image_is_video": "0",
+  "product_name": "Adafruit TMP235 - Plug-and-Play STEMMA Analog Temperature Sensor",
+  "product_model": "TMP235",
+  "product_mpn": "ADA4686",
+  "product_master_category": "615",
+  "product_manufacturer": "Adafruit",
+  "product_price": "2.95",
+  "product_shipping_weight": "2.7",
+  "product_url": "https://www.adafruit.com/product/4686",
+  "product_stock": "16",
+  "products_hts": "8542.39.00.00",
+  "products_coo": "US",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2020-07-15 13:57:00",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "2.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "2.66",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "2.36",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "165",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/165-02.jpg",
+  "product_image_alt": "Small, black, analog temperature sensor next to US quarter for scale.",
+  "image_is_video": "0",
+  "product_name": "TMP36 - Analog Temperature sensor",
+  "product_model": "TMP36",
+  "product_mpn": "ADA165",
+  "product_master_category": "615",
+  "product_manufacturer": null,
+  "product_price": "2.75",
+  "product_shipping_weight": "4.5",
+  "product_url": "https://www.adafruit.com/product/165",
+  "product_stock": "in stock",
+  "products_hts": "8542.39.00.00",
+  "products_coo": "CN",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2009-05-16 20:21:06",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "2.75",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "2.48",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "2.20",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "5346",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/5346-05.jpg",
+  "product_image_alt": "Angled shot Adafruit MCP23017 I2C GPIO Expander Breakout",
+  "image_is_video": "0",
+  "product_name": "Adafruit MCP23017 I2C GPIO Expander Breakout",
+  "product_model": "STEMMA QT / Qwiic",
+  "product_mpn": "ADA5346",
+  "product_master_category": "864",
+  "product_manufacturer": "Adafruit",
+  "product_price": "5.95",
+  "product_shipping_weight": "5.9",
+  "product_url": "https://www.adafruit.com/product/5346",
+  "product_stock": "in stock",
+  "products_hts": "8542.31.0000",
+  "products_coo": "US",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2022-01-04 19:36:31",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "5.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "5.36",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "4.76",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "5712",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/5712-05.jpg",
+  "product_image_alt": "Angled shot of rectangular LoRa radio dev board.",
+  "image_is_video": "0",
+  "product_name": "Adafruit Feather RP2040 RFM69 Packet Radio - 868 or 915MHz",
+  "product_model": "RadioFruit and STEMMA QT",
+  "product_mpn": "ADA5712",
+  "product_master_category": "946",
+  "product_manufacturer": "Adafruit",
+  "product_price": "19.95",
+  "product_shipping_weight": "8.2",
+  "product_url": "https://www.adafruit.com/product/5712",
+  "product_stock": "46",
+  "products_hts": "8525.20.3025",
+  "products_coo": "HK",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2023-03-29 13:47:08",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "19.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "17.96",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "15.96",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "5980",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/5980-00.jpg",
+  "product_image_alt": "Angled shot of black, rectangular datalogging board.",
+  "image_is_video": "0",
+  "product_name": "Adafruit Feather RP2040 Adalogger - 8MB Flash with microSD Card",
+  "product_model": "STEMMA QT / Qwiic",
+  "product_mpn": "ADA5980",
+  "product_master_category": "946",
+  "product_manufacturer": "Adafruit",
+  "product_price": "14.95",
+  "product_shipping_weight": "8.6",
+  "product_url": "https://www.adafruit.com/product/5980",
+  "product_stock": "in stock",
+  "products_hts": "8542.39.00.00",
+  "products_coo": "HK",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2024-06-26 14:00:29",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "14.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "13.46",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "11.96",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ },
+ {
+  "product_id": "3333",
+  "product_image": "https://cdn-shop.adafruit.com/640x480/3333-05.jpg",
+  "product_image_alt": "A Black woman's manicured hand holds a round microcontroller with lit up LEDs.",
+  "image_is_video": "0",
+  "product_name": "Circuit Playground Express",
+  "product_model": "",
+  "product_mpn": "ADA3333",
+  "product_master_category": "966",
+  "product_manufacturer": "Adafruit",
+  "product_price": "24.95",
+  "product_shipping_weight": "15.4",
+  "product_url": "https://www.adafruit.com/product/3333",
+  "product_stock": "in stock",
+  "products_hts": "8542.90.0000",
+  "products_coo": "CN",
+  "discontinue_status": "None",
+  "products_coming_soon": "0",
+  "products_rohs": "1",
+  "products_virtual": "0",
+  "date_added": "2017-05-16 14:57:49",
+  "parent_pid": 0,
+  "discount_pricing": [
+   {
+    "discounted_price": "24.95",
+    "discounted_percent": 0,
+    "show_qty": "1-9",
+    "min_qty": 1
+   },
+   {
+    "discounted_price": "22.46",
+    "discounted_percent": "10",
+    "show_qty": "10-99",
+    "min_qty": 10
+   },
+   {
+    "discounted_price": "19.96",
+    "discounted_percent": "20",
+    "show_qty": "100+",
+    "min_qty": 100
+   }
+  ]
+ }
+]
