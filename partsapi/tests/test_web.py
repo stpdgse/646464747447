@@ -243,3 +243,25 @@ def test_model3d_errors(web):
     assert get(web, "/api/model3d?vendor=jlc&code=C1").headers["Content-Disposition"] == 'attachment; filename="we_ird_name.step"'
     web.fake.model = lambda code, fmt: (_ for _ in ()).throw(AuthError("creds"))
     assert get(web, "/api/model3d?vendor=jlc&code=C1").status_code == 502
+
+
+# ------------------------------------------------------------------ Vercel path restoration
+def test_rewritten_requests_get_their_original_path_back(web):
+    from werkzeug.test import Client
+
+    from partsapi.web.wsgi import RestoreOriginalPath
+    client = Client(RestoreOriginalPath(webapp.create_app().wsgi_app))
+    r = client.get("/api/index?__path=api/health&keep=1")
+    assert r.status_code == 200 and r.get_json() == {"ok": True, "password_required": True}
+    assert client.get("/api/index?__path=").status_code == 200 and b"Parts Search" in client.get("/api/index?__path=").data      # the page itself
+    assert client.get("/api/index?__path=static/app.js").status_code == 200
+    # query strings survive, the helper parameter does not leak into them, and the gate still applies to the restored path
+    seen = {}
+    web.fake.find = lambda q, **kw: seen.update(q=q) or []
+    app2 = webapp.create_app()
+    wrapped = Client(RestoreOriginalPath(app2.wsgi_app))
+    assert wrapped.get("/api/index?__path=api/vendors").status_code == 401
+    ok = wrapped.get("/api/index?__path=api/search&vendor=jlc&q=lm358", headers=web.h)
+    assert ok.status_code == 200 and seen["q"] == "lm358"
+    assert wrapped.get("/api/index?__path=api/../../etc/passwd", headers=web.h).status_code == 404
+    assert Client(RestoreOriginalPath(app2.wsgi_app)).get("/api/vendors", headers=web.h).status_code == 200      # un-rewritten paths are untouched
