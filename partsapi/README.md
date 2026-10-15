@@ -245,6 +245,27 @@ mkdir -p ~/.config/partsapi && cp .env.example ~/.config/partsapi/env && chmod 6
   variables instead. `PARTSAPI_NO_DOTENV=1` switches the automatic load off; `partsapi.load_env(path, override=False)` does it by hand.
 * **A secret that has been pasted into a chat, a ticket or a log should be regenerated** in the vendor's portal.
 
+## Web UI
+
+A small web app on top of the library: search every vendor at once with the filter syntax, open a part for its price ladder,
+attributes, datasheet and 3D-model download, browse a vendor's filter values, and compare one part number across vendors.
+
+```bash
+pip install -e ".[web]"
+python -m partsapi.web                 # http://127.0.0.1:8000  (credentials from your env file as usual)
+WEBUI_PASSWORD=choose-one python -m partsapi.web --host 0.0.0.0     # to reach it from another machine
+```
+
+* **Vendor credentials stay on the server.** The browser only ever talks to `/api/*` and never receives a key.
+* **Access control.** Every `/api/*` call needs the key from `WEBUI_PASSWORD` (sent as `X-Access-Key`; wrong keys are throttled).
+  With no password the API only answers on localhost, never behind a proxy and never on Vercel, so an unconfigured deployment is
+  inert rather than open. The page itself is static; a strict Content-Security-Policy (no inline script or style) applies.
+* **The browser never supplies URLs**, only a vendor from a fixed list and a part code, so the server cannot be steered to other hosts.
+* **Vercel.** `vercel.json` + `api/index.py` serve it as one Python function (set `WEBUI_PASSWORD`; add vendor keys as
+  *sensitive* environment variables: `DIGIKEY_CLIENT_ID`, `DIGIKEY_CLIENT_SECRET`, `MOUSER_API_KEY`, `TME_TOKEN`, `TME_SECRET`).
+  Function responses are capped at about 4.5 MB, so a large STEP file may need the OBJ download instead. Adafruit's catalogue is
+  re-downloaded on a cold start (about 3 s).
+
 ## How it works, and what to know
 
 * **Unofficial (JLCPCB, LCSC, Reichelt).** These sites publish no API. JLCPCB and LCSC are called at the JSON endpoints

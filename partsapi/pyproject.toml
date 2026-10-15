@@ -12,6 +12,7 @@ dependencies = ["requests>=2.31", "beautifulsoup4>=4.12", "lxml>=5.0"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+web = ["flask>=3"]
 
 [project.scripts]
 partsapi = "partsapi.cli:main"
@@ -22,3 +23,6 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["live: hits the real websites (set PARTSAPI_LIVE=1 to run)"]
+
+[tool.setuptools.package-data]
+partsapi = ["web/static/*"]
