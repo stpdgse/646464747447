@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Screenshot Chess Coach</title>
+  <meta name="theme-color" content="#262421" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Chess Coach" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+<main>
+  <header class="top">
+    <h1>Screenshot Chess Coach</h1>
+    <p>Drop in a Chess.com screenshot &rarr; Stockfish shows the best moves. Everything runs on your device.</p>
+  </header>
+
+  <section id="pick" class="card">
+    <label class="btn big" for="file">Choose screenshot</label>
+    <input id="file" type="file" accept="image/*" hidden />
+    <p class="muted">…or drag &amp; drop, or paste an image (Ctrl/⌘+V).</p>
+    <p class="muted small" id="engineStatus">Loading Stockfish…</p>
+  </section>
+
+  <div id="work" hidden>
+    <section class="card" id="settings">
+      <div class="row">
+        <div class="field"><span class="lbl">I play as</span>
+          <div class="seg" id="segPlay"><button data-v="w" class="on">White</button><button data-v="b">Black</button></div></div>
+        <div class="field"><span class="lbl">Whose move is it?</span>
+          <div class="seg" id="segMove"><button data-v="me" class="on">Mine</button><button data-v="opp">Opponent's</button></div></div>
+        <div class="field"><span class="lbl">Strength</span>
+          <div class="seg" id="segDepth"><button data-v="12">Quick</button><button data-v="18" class="on">Normal</button><button data-v="24">Deep</button></div></div>
+        <div class="field"><span class="lbl">Moves shown</span>
+          <div class="seg" id="segLines"><button data-v="1">1</button><button data-v="3" class="on">3</button><button data-v="5">5</button></div></div>
+      </div>
+    </section>
+
+    <div class="cols">
+      <section class="card" id="shotCard">
+        <h2>1 · Screenshot <button class="link" id="redetect">Re-detect board</button></h2>
+        <div id="shotWrap">
+          <canvas id="shot"></canvas>
+          <div id="box">
+            <svg viewBox="0 0 8 8" preserveAspectRatio="none"><path id="gridPath" /></svg>
+            <i class="h" data-h="tl"></i><i class="h" data-h="tr"></i><i class="h" data-h="bl"></i><i class="h" data-h="br"></i>
+          </div>
+        </div>
+        <p class="muted small" id="detectNote">Drag the green box so it sits exactly on the 8×8 board; corners resize it.</p>
+      </section>
+
+      <section class="card" id="boardCard">
+        <h2>2 · Position <span class="muted small" id="themeNote"></span></h2>
+        <div id="notice" class="notice" hidden></div>
+        <div id="bwrap">
+          <div id="board"></div>
+          <svg id="arrows" viewBox="0 0 8 8"></svg>
+        </div>
+        <p class="muted small">Wrong piece? Tap the square to fix it. <button class="link" id="resetEdits" hidden>Undo my fixes</button></p>
+        <div class="row tight">
+          <div class="field"><span class="lbl">Castling still allowed</span>
+            <div class="chips" id="castling">
+              <button data-k="K">White O-O</button><button data-k="Q">White O-O-O</button>
+              <button data-k="k">Black O-O</button><button data-k="q">Black O-O-O</button></div></div>
+          <div class="field"><label class="chk"><input type="checkbox" id="flipBox" /> White is at the <b>top</b> of my screenshot</label>
+            <label class="lbl" for="themeSel">Piece style</label>
+            <select id="themeSel"><option value="">Auto-detect</option></select></div>
+        </div>
+        <div class="fenrow"><code id="fen"></code><button class="btn small" id="copyFen">Copy FEN</button>
+          <a class="btn small" id="lichess" target="_blank" rel="noopener">Lichess</a></div>
+      </section>
+    </div>
+
+    <section class="card" id="results">
+      <h2>3 · Best moves <span class="muted small" id="depthNote"></span></h2>
+      <div id="evalBar" hidden><div id="evalFill"></div><span id="evalText"></span></div>
+      <div id="lines"></div>
+      <div class="row tight"><button class="btn small" id="stopBtn" hidden>Stop</button>
+        <button class="btn small" id="againBtn">Analyse again</button></div>
+      <p class="muted small" id="msg"></p>
+    </section>
+  </div>
+
+  <footer class="muted small">
+    Engine: Stockfish (GPL-3.0) via <a href="https://github.com/nmrugg/stockfish.js">Stockfish.js</a>. Piece images are read from your screenshot only to
+    recognise the position; nothing is uploaded. For analysing your own and finished games &mdash; engine help during live rated games is cheating.
+  </footer>
+</main>
+
+<dialog id="palette">
+  <form method="dialog">
+    <p id="palTitle">Set square</p>
+    <div id="palGrid"></div>
+    <div class="row tight"><button value="empty" class="btn small">Empty</button><button value="cancel" class="btn small ghost">Cancel</button></div>
+  </form>
+</dialog>
+</body>
+</html>
