@@ -15,7 +15,10 @@ const DEPTH_CAP_MS = { 12: 4000, 18: 10000, 24: 30000 };
 const ARROW_COLORS = ['#9be05a', '#ffb74d', '#64b5f6', '#ba68c8', '#e57373'];
 const $ = (id) => document.getElementById(id);
 const nextFrame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
-const pieceUrl = (theme, code) => `./pieces/${theme}/${code}.png`;
+// One sprite sheet per piece set (12 pieces side by side, 150px each).
+const pieceStyle = (theme, code) =>
+  `background-image:url(./pieces/${theme}.png);background-position:${(PIECE_CODES.indexOf(code) * 100) / 11}% 0`;
+const pieceHtml = (theme, code) => `<span class="pc" role="img" aria-label="${code}" style="${pieceStyle(theme, code)}"></span>`;
 const prettyTheme = (t) => t.replace(/_/g, ' ');
 
 const state = {
@@ -76,11 +79,11 @@ function loadTemplates() {
     const ctx = c.getContext('2d', { willReadFrequently: true });
     const out = {};
     for (const theme of THEMES) {
-      const imgs = await Promise.all(PIECE_CODES.map((code) => loadImage(pieceUrl(theme, code))));
+      const sheet = await loadImage(`./pieces/${theme}.png`);
       out[theme] = {};
       PIECE_CODES.forEach((code, i) => {
         ctx.clearRect(0, 0, 150, 150);
-        ctx.drawImage(imgs[i], 0, 0, 150, 150);
+        ctx.drawImage(sheet, i * 150, 0, 150, 150, 0, 0, 150, 150);
         out[theme][code] = prepareTemplate(ctx.getImageData(0, 0, 150, 150));
       });
     }
@@ -243,7 +246,7 @@ async function recognise({ full = false, firstRun = false } = {}) {
 
 const effectiveFlipped = () => (state.flipManual !== null ? state.flipManual : state.playingAs === 'b');
 
-const unsure = (cell) => cell.err > 600 || (cell.piece && cell.second < cell.err * 1.6 && cell.err > 150);
+const unsure = (cell) => cell.err > 600 || (cell.piece && cell.second < cell.err * 1.4 && cell.err > 300);
 
 /* ----------------------------------------------------------- position/UI */
 
@@ -335,10 +338,7 @@ function renderBoard(grid) {
       b.setAttribute('aria-label', `${FILES[c]}${8 - r}`);
       const p = grid[r][c];
       if (p) {
-        const img = document.createElement('img');
-        img.src = pieceUrl(state.theme, p);
-        img.alt = p;
-        b.appendChild(img);
+        b.insertAdjacentHTML('beforeend', pieceHtml(state.theme, p));
       }
       if (vc === 0) b.insertAdjacentHTML('beforeend', `<span class="co r">${8 - r}</span>`);
       if (vr === 7) b.insertAdjacentHTML('beforeend', `<span class="co f">${FILES[c]}</span>`);
@@ -360,7 +360,7 @@ function initBoardTaps() {
     for (const code of PIECE_CODES) {
       const pb = document.createElement('button');
       pb.value = code;
-      pb.innerHTML = `<img src="${pieceUrl(state.theme, code)}" alt="${code}">`;
+      pb.innerHTML = pieceHtml(state.theme, code);
       g.appendChild(pb);
     }
     dlg.showModal();

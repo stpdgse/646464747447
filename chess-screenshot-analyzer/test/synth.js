@@ -4,7 +4,7 @@ import path from 'node:path';
 import { PNG } from 'pngjs';
 import { PIECE_CODES, prepareTemplate } from '../src/recognize.js';
 
-const PIECES_DIR = path.resolve(import.meta.dirname, '../public/pieces');
+const PIECES_DIR = path.resolve(import.meta.dirname, '../assets/pieces-src');
 
 export function readPng(file) {
   const p = PNG.sync.read(fs.readFileSync(file));

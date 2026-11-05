@@ -39,6 +39,7 @@ NODE_PATH=$(npm root -g) node test/e2e-interact.cjs
 ## Notes
 
 - Serve over HTTPS (or localhost) for the service worker / offline mode and Home Screen install.
+- Piece sets live as 12 PNGs each in `assets/pieces-src/`; `node scripts/make-sprites.js` packs them into one sprite per set in `public/pieces/` (already committed).
 - `public/pieces/` holds Chess.com's piece artwork, used only to recognise pieces in your own
   screenshots. Keep deployments private/personal; do not redistribute them publicly.
 - En passant is not detectable from a single image; the engine assumes none.
