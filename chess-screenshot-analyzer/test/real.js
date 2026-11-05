@@ -1,0 +1,13 @@
+import { detectBoard } from '../src/detect.js';
+import { recognizeBoard, PIECE_CODES } from '../src/recognize.js';
+import { readPng, loadTemplates } from './synth.js';
+const img = readPng(process.argv[2]);
+let t = Date.now();
+const det = detectBoard(img);
+console.log('detect', JSON.stringify(det), `${Date.now() - t}ms`);
+t = Date.now();
+const rec = recognizeBoard(img, det, loadTemplates());
+console.log('recognize', `${Date.now() - t}ms`, 'theme', rec.theme, 'rmse', rec.rmse.toFixed(1), rec.themeScores.map((s) => s.theme + ':' + s.total.toFixed(0)).join(' '));
+const sym = { wp: 'P', wn: 'N', wb: 'B', wr: 'R', wq: 'Q', wk: 'K', bp: 'p', bn: 'n', bb: 'b', br: 'r', bq: 'q', bk: 'k' };
+for (let r = 0; r < 8; r++) console.log(rec.cells.slice(r * 8, r * 8 + 8).map((c) => (c.piece ? sym[c.piece] : '.')).join(' '));
+console.log('worst cells:', rec.cells.map((c, i) => [i, c.err]).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([i, e]) => `${i}:${e.toFixed(0)}`).join(' '));
