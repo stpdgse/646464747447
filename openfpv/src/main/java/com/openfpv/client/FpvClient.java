@@ -38,6 +38,8 @@ public final class FpvClient {
         new KeyBinding("key.openfpv.toggle", Keyboard.KEY_V, "key.categories.openfpv");
     public static final KeyBinding KEY_NEXT =
         new KeyBinding("key.openfpv.next", Keyboard.KEY_B, "key.categories.openfpv");
+    public static final KeyBinding KEY_RECORD =
+        new KeyBinding("key.openfpv.record", Keyboard.KEY_R, "key.categories.openfpv");
     public static final KeyBinding KEY_MODE =
         new KeyBinding("key.openfpv.mode", Keyboard.KEY_N, "key.categories.openfpv");
     public static final KeyBinding KEY_YAW_LEFT =
@@ -48,7 +50,7 @@ public final class FpvClient {
     /** Last known state of a camera drone, as reported by the server. */
     public static final class Cam {
         public int entityId;
-        public boolean active, night, thermal, returning;
+        public boolean active, night, thermal, returning, lights = true;
         public float fov = CameraMath.BASE_FOV, tilt, pan, energy;
         public float range = 64f;
         public int modules;
@@ -105,6 +107,7 @@ public final class FpvClient {
         c.night = p.night;
         c.thermal = p.thermal;
         c.returning = p.returning;
+        c.lights = p.lights;
         c.fov = p.fov;
         c.tilt = p.tilt;
         c.pan = p.pan;
@@ -137,7 +140,7 @@ public final class FpvClient {
     public static void onServerEnded(int reason) {
         String key;
         switch (reason) {
-            case PacketViewEnd.SIGNAL_LOST: key = "message.openfpv.signal_lost"; break;
+            case PacketViewEnd.SIGNAL_LOST: key = "message.openfpv.signal_lost"; DroneSounds.play(com.openfpv.ModSounds.LINK_LOST); break;
             case PacketViewEnd.DRONE_GONE: key = "message.openfpv.drone_gone"; break;
             case PacketViewEnd.CAMERA_OFF: key = "message.openfpv.camera_off"; break;
             default: key = "message.openfpv.refused"; break;
@@ -281,6 +284,7 @@ public final class FpvClient {
 
     private static void leaveView() {
         Minecraft mc = Minecraft.getMinecraft();
+        Recorder.stop();
         viewing = -1;
         pending = false;
         if (mc.player != null) mc.setRenderViewEntity(mc.player);
@@ -324,6 +328,9 @@ public final class FpvClient {
 
         while (KEY_TOGGLE.isPressed()) toggle();
         while (KEY_NEXT.isPressed()) cycle();
+        while (KEY_RECORD.isPressed()) {
+            if (isFlying()) Recorder.toggle();
+        }
         while (KEY_MODE.isPressed()) {
             if (isFlying()) setAcro(!acro);
         }
@@ -343,6 +350,7 @@ public final class FpvClient {
                 mc.gameSettings.thirdPersonView = 0;
                 haveLastYaw = false;
                 status("message.openfpv.entered");
+                DroneSounds.play(com.openfpv.ModSounds.LINK_UP);
             } else if (++pendingTicks > LINK_TIMEOUT_TICKS) {
                 exit(true, "message.openfpv.link_failed");
             }

@@ -1,0 +1,47 @@
+{
+  "drone_motor": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "openfpv:drone_motor",
+        "stream": false
+      }
+    ]
+  },
+  "beep_low_battery": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "openfpv:beep_low_battery",
+        "stream": false
+      }
+    ]
+  },
+  "link_up": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "openfpv:link_up",
+        "stream": false
+      }
+    ]
+  },
+  "link_lost": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "openfpv:link_lost",
+        "stream": false
+      }
+    ]
+  },
+  "rec_click": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "openfpv:rec_click",
+        "stream": false
+      }
+    ]
+  }
+}

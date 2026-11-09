@@ -59,6 +59,11 @@ public class OpenFPV {
     }
 
     @Mod.EventHandler
+    public void postInit(net.minecraftforge.fml.common.event.FMLPostInitializationEvent event) {
+        if (event.getSide().isClient()) com.openfpv.client.ClientBootstrap.postInit();
+    }
+
+    @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
         CameraRegistry.clear();
         ViewerManager.reset();

@@ -31,12 +31,16 @@ public class FpvEvents {
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) FpvClient.clientTick();
+        if (event.phase == TickEvent.Phase.END) {
+            FpvClient.clientTick();
+            DroneSounds.clientTick();
+        }
     }
 
     @SubscribeEvent
     public void onRenderTick(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) FpvClient.aimCamera(event.renderTickTime);
+        else Recorder.frame();
     }
 
     /** Esc leaves the FPV view instead of opening the pause menu. */

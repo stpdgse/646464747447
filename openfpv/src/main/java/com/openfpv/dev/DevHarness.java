@@ -6,6 +6,7 @@ import com.openfpv.OpenFPV;
 import com.openfpv.bay.ContainerModuleBay;
 import com.openfpv.bay.ModuleBay;
 import com.openfpv.client.FpvClient;
+import com.openfpv.client.Recorder;
 import com.openfpv.item.ModuleType;
 import com.openfpv.net.PacketViewEnd;
 import com.openfpv.oc.CameraEnvironment;
@@ -713,6 +714,35 @@ public final class DevHarness {
         }));
         add(waitTicks(20));
 
+        // ---- 8b. DVR: record the FPV feed + blackbox telemetry
+        add(once(() -> Recorder.start()));
+        add(waitTicks(60));
+        add(once(() -> Recorder.stop()));
+        add(() -> until(Recorder::isFinished, 800, "DVR to finish writing"));
+        add(waitTicks(10));
+        add(once(() -> {
+            java.io.File v = Recorder.video(), c = Recorder.blackbox();
+            long vsize = v != null && v.exists() ? v.length() : 0;
+            check("DVR wrote an mp4 video", vsize > 5000, v + " " + vsize + " bytes");
+            check("DVR captured about one frame per tick", Recorder.frameCount() >= 50 && Recorder.frameCount() <= 70, "frames=" + Recorder.frameCount());
+            int lines = 0;
+            String header = "";
+            try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(c))) {
+                header = r.readLine();
+                while (r.readLine() != null) lines++;
+            } catch (Exception ex) {
+                header = ex.toString();
+            }
+            check("blackbox CSV has a header and a row per frame", header != null && header.startsWith("tick,x,y,z,yaw,pitch,roll") && lines >= 50, lines + " rows");
+            try {
+                Process p = new ProcessBuilder("ffprobe", "-v", "error", "-show_entries", "stream=codec_name,nb_frames", "-of", "csv=p=0", v.getAbsolutePath()).start();
+                String out = new java.io.BufferedReader(new java.io.InputStreamReader(p.getInputStream())).readLine();
+                check("the video is valid H.264", out != null && out.startsWith("h264"), String.valueOf(out));
+            } catch (Exception ex) {
+                check("ffprobe", false, ex.toString());
+            }
+        }));
+
         // ---- 9. quadcopter flight (angle mode)
         double[] start = new double[3];
         float[] peak = new float[3];       // peak pitch / roll seen on the client
@@ -1001,6 +1031,119 @@ public final class DevHarness {
             double d = Math.sqrt(Math.pow(c.posX - wp[0], 2) + Math.pow(c.posY - wp[1], 2) + Math.pow(c.posZ - wp[2], 2));
             check("drone reached the waypoint and hovers there", d < 3.0, String.format("%.2f blocks from the waypoint", d));
         }));
+
+        // ---- 11e. the visible drone: Blockbench model, renderer, sounds
+        add(once(() -> {
+            try {
+                Entity bb = entity(droneB);
+                onServer(() -> {
+                    EntityPlayerMP p = server().getPlayerList().getPlayers().get(0);
+                    p.setPositionAndUpdate(bb.posX, 4, bb.posZ - 4.5);
+                    return null;
+                });
+                mc.player.rotationYaw = mc.player.prevRotationYaw = 0f;
+                mc.player.rotationPitch = mc.player.prevRotationPitch = 6f;
+            } catch (Exception ex) {
+                check("look at the drone", false, ex.toString());
+            }
+        }));
+        add(waitTicks(60));
+        add(once(() -> {
+            Entity be = mc.world.getEntityByID(droneB);
+            check("client has the drone entity", be != null, "");
+            if (be != null) {
+                check("OC's drone renderer was replaced by the OpenFPV quadcopter renderer",
+                    mc.getRenderManager().getEntityClassRenderObject(be.getClass()) instanceof com.openfpv.client.DroneRenderer, String.valueOf(mc.getRenderManager().getEntityClassRenderObject(be.getClass())));
+            }
+            com.openfpv.client.BbModel m = com.openfpv.client.DroneRenderer.model();
+            check("the .bbmodel loads (34 cubes, animated groups present)", m != null && m.cubeCount() == 34 && m.hasGroup("prop_fl")
+                && m.hasGroup("prop_br") && m.hasGroup("camera_pod") && m.hasGroup("lights"), m == null ? "null" : "cubes=" + m.cubeCount());
+            String[] snd = {"drone_motor", "beep_low_battery", "link_up", "link_lost", "rec_click"};
+            boolean allSounds = true;
+            for (String n : snd) {
+                allSounds &= mc.getSoundHandler().getAccessor(new net.minecraft.util.ResourceLocation(OpenFPV.MOD_ID, n)) != null;
+            }
+            check("all five sounds are registered and found in sounds.json", allSounds, "");
+            check("a motor hum is playing for the powered drones", com.openfpv.client.DroneSounds.active() >= 1, "hums=" + com.openfpv.client.DroneSounds.active());
+            shot("14_drone_model");
+        }));
+        add(once(() -> { // close-up
+            try {
+                Entity bb = entity(droneB);
+                onServer(() -> {
+                    EntityPlayerMP p = server().getPlayerList().getPlayers().get(0);
+                    p.setPositionAndUpdate(bb.posX, 4, bb.posZ - 1.7);
+                    return null;
+                });
+                mc.player.rotationPitch = mc.player.prevRotationPitch = 30f;
+            } catch (Exception ex) {
+                check("close-up", false, ex.toString());
+            }
+        }));
+        add(waitTicks(25));
+        add(once(() -> shot("14b_drone_closeup")));
+
+        // ---- 11f. lights and routes on drone C
+        add(once(() -> {
+            try {
+                invoke(droneC, "setLights", false);
+            } catch (Exception ex) {
+                check("lights off", false, ex.toString());
+            }
+        }));
+        add(waitTicks(30));
+        add(once(() -> {
+            FpvClient.Cam c = FpvClient.get(droneC);
+            check("Lua setLights(false) reaches the client", c != null && !c.lights, "");
+            try {
+                invoke(droneC, "setLights", true);
+            } catch (Exception ex) {
+                check("lights on", false, ex.toString());
+            }
+        }));
+        double[] c0 = new double[3];
+        add(once(() -> {
+            try {
+                Entity c = entity(droneC);
+                c0[0] = c.posX; c0[1] = c.posY; c0[2] = c.posZ;
+                invoke(droneC, "clearRoute");
+                invoke(droneC, "addWaypoint", c0[0] + 6, c0[1], c0[2]);
+                invoke(droneC, "addWaypoint", c0[0] + 6, c0[1] + 2, c0[2] + 6);
+                invoke(droneC, "addWaypoint", c0[0], c0[1], c0[2] + 6);
+                check("route holds three waypoints", cam(droneC).routeSize() == 3, "size=" + cam(droneC).routeSize());
+                check("startRoute accepts a route", Boolean.TRUE.equals(invoke(droneC, "startRoute", false)[0]), "");
+            } catch (Exception ex) {
+                check("route setup", false, ex.toString());
+            }
+        }));
+        int[] maxIdx = new int[1];
+        add(() -> {
+            if (cam(droneC) != null) maxIdx[0] = Math.max(maxIdx[0], cam(droneC).routeIndex());
+            return until(() -> cam(droneC) != null && !cam(droneC).isRouteActive(), 2400, "route to finish");
+        });
+        add(waitTicks(20));
+        add(once(() -> {
+            Entity c = entity(droneC);
+            double d = Math.sqrt(Math.pow(c.posX - c0[0], 2) + Math.pow(c.posY - c0[1], 2) + Math.pow(c.posZ - (c0[2] + 6), 2));
+            check("drone flew through all waypoints and stopped at the last one", maxIdx[0] == 2 && d < 3.0,
+                "visited up to index " + maxIdx[0] + ", " + String.format("%.2f", d) + " blocks from the last waypoint");
+            try {
+                check("a looping route keeps going", Boolean.TRUE.equals(invoke(droneC, "startRoute", true)[0]), "");
+            } catch (Exception ex) {
+                check("loop route", false, ex.toString());
+            }
+        }));
+        add(waitTicks(700));
+        add(once(() -> {
+            try {
+                check("looping route is still active after several laps", cam(droneC).isRouteActive() && cam(droneC).isAutopilot(), "");
+                invoke(droneC, "clearRoute");
+                check("clearRoute stops it", !cam(droneC).isRouteActive() && !cam(droneC).isAutopilot() && cam(droneC).routeSize() == 0, "");
+            } catch (Exception ex) {
+                check("route loop", false, ex.toString());
+            }
+        }));
+        add(waitTicks(60));
 
         // ---- 12. Esc leaves FPV; camera-off ends FPV; drone cycling
         add(once(() -> FpvClient.toggle()));

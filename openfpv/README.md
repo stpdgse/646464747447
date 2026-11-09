@@ -28,6 +28,8 @@ a link 300 blocks out, and a link at 700 of 800 blocks (control lag, static, los
 
 The module bay: ![module bay](docs/screenshots/module_bay.png)
 
+The drone model: ![close-up](docs/screenshots/drone_closeup.png)
+
 ## Items
 
 | Item | What it does |
@@ -92,6 +94,7 @@ quad), so it looks down as you lean forward and **rolls** in turns.
 | **W / S** | Pitch forward / back |
 | **A / D** | Bank left / right |
 | **N** | Toggle acro / angle mode |
+| **R** | Start / stop DVR recording |
 | **Space / Shift** | Throttle up / down |
 | **Mouse left/right** or **← / →** | Yaw (turn) |
 | **V** | Enter / leave the FPV view (picks the nearest camera drone) |
@@ -119,6 +122,34 @@ so you can flip, loop and fly inverted (and fall when you do). The camera stays 
 `camera.flyTo(x, y, z)` flies to a world position on autopilot (slowing on approach, hovering
 within 1.5 blocks); `isAutopilot()` tells you when it is done and `getPosition()` gives the
 drone's coordinates. Taking the controls cancels it.
+
+### The drone you can see
+
+Drones are drawn as an animated quadcopter built from a **Blockbench model**
+(`assets/openfpv/models/entity/quadcopter.bbmodel`). Open it in Blockbench, edit, save it back over the
+same file and the in-game drone changes (the game loads that exact file; the group names drive the
+animation: `prop_*` spin, `camera_pod` follows the gimbal, `light_*` elements are fullbright and blink).
+Props only spin while the drone is powered, the body leans into acceleration, and it turns to its
+heading. Navigation lights: red and green steady with a slow dim, a white strobe, and a status LED that
+shows the colour you set with `drone.setLightColor()`. `camera.setLights(false)` switches them off.
+Set `client.customDroneModel = false` to keep OpenComputers' own look.
+
+A **motor hum** follows every powered drone (pitch and volume rise with speed), and the pilot hears a
+link-up chirp, a link-lost tone and low-battery beeps.
+
+### DVR recording
+
+Press **R** while flying to record the FPV feed, OSD included, at 20 fps. It is encoded to H.264 with
+`ffmpeg` if installed (set `client.ffmpegPath` if it is not on your PATH); otherwise a PNG sequence is
+written. A **blackbox CSV** with position, attitude, speed, battery, signal, lag and mode for every frame
+is saved beside it. Files go to `<game dir>/openfpv/recordings/`; the HUD shows `● REC mm:ss`.
+
+### Routes
+
+Program a route from Lua and let the drone fly it: `addWaypoint(x,y,z)` (or `addWaypointHere()`),
+`startRoute([loop])`, `isRouteActive()`, `getRouteProgress()`, `getRoute()`, `clearRoute()`. It flies the
+waypoints in order and hovers at the last one (or loops). Routes and the home point are saved with the
+drone. Piloting takes over; the failsafe still applies.
 
 ### The control link
 
@@ -164,6 +195,9 @@ Methods marked *[module]* return `nil, "module not installed: …"` unless the m
 | `setHome()` / `getHome()` | Set / read the home point (`x, y, z`). The first `start()` sets it. |
 | `returnHome()` / `cancelReturn()` / `isReturning()` | Return-to-home autopilot. |
 | `flyTo(x, y, z)` / `isAutopilot()` / `getPosition()` | Waypoint autopilot. |
+| `addWaypoint(x,y,z)` / `addWaypointHere()` | Append to the route (max 64); returns its length. |
+| `startRoute([loop])` / `isRouteActive()` / `getRouteProgress()` / `getRoute()` / `clearRoute()` | Fly and manage the route. |
+| `setLights(on)` / `getLights()` | Navigation lights and strobe. |
 | `getEnergyUsage()` → `number` | Energy per second while active. |
 | `getModules()` → `table` | e.g. `{"nightvision","zoom"}` |
 | `getHeading()` → `number` | Compass heading of the camera (0 = N, 90 = E), including gimbal pan. |
@@ -216,6 +250,9 @@ end
 | `longrange.boostEntities` / `boostRadius` | true / 96 | Sync mobs near the drone to the pilot, and how far around it. |
 | `depth.*` | 32×16, 64 | Depth/colour scan limits and cost. |
 | `client.noise` | true | Static and scan lines on weak signal. |
+| `client.customDroneModel` | true | Draw drones with the animated quadcopter model (restart to apply). |
+| `client.droneSounds` | true | Motor hum and beeps. |
+| `client.ffmpegPath` | `ffmpeg` | Encoder for DVR videos. |
 
 ## In-game settings
 
@@ -242,8 +279,8 @@ The mod compiles only against OpenComputers' public API jar, so it is not tied t
   keyboard flight, night/thermal/zoom/gimbal, depth scans checked against a wall at a known distance,
   OC's driver registry (Assembler acceptance), the quadcopter model (tilt, speed, glide, levelling,
   banking, yaw), antenna ranges, a **pilot 300 blocks from the drone** (chunks and a mob streamed in),
-  control lag and packet loss at 700 blocks, signal loss, Esc, camera cycling, the return-home failsafe, acro mode, waypoint autopilot, goggles enforcement and the config screen. It writes
-  `run/autotest/summary.txt` and screenshots to `run/autotest/screenshots/` (122 checks).
+  control lag and packet loss at 700 blocks, signal loss, Esc, camera cycling, the return-home failsafe, acro mode, waypoint autopilot, goggles enforcement, the config screen, the Blockbench drone model and renderer swap, sounds, lights, routes (one-shot and looping) and a DVR recording verified with ffprobe. It writes
+  `run/autotest/summary.txt` and screenshots to `run/autotest/screenshots/` (138 checks).
 
   ```bash
   JAVA_HOME=/path/to/jdk8 ./scripts/run-selftest.sh
@@ -257,9 +294,10 @@ The mod compiles only against OpenComputers' public API jar, so it is not tied t
 
   Sample output is in `docs/screenshots/` and `docs/selftest-summary.txt`.
 
-### Regenerating textures
+### Regenerating assets
 
 `python3 scripts/gen_textures.py` redraws every icon and the GUI texture (no dependencies).
+`python3 scripts/gen_drone_assets.py` regenerates the drone `.bbmodel`, its texture and the Vorbis sounds (needs `ffmpeg` with libvorbis).
 
 ## License
 

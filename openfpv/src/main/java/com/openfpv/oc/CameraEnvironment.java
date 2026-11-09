@@ -5,7 +5,9 @@ import com.openfpv.bay.ModuleBay;
 import com.openfpv.item.ModuleType;
 import com.openfpv.net.Net;
 import com.openfpv.util.CameraMath;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import li.cil.oc.api.Network;
 import li.cil.oc.api.internal.Drone;
@@ -47,6 +49,11 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
     private double homeX, homeY, homeZ;
     private volatile boolean returning;
     private volatile boolean autopilot;
+    private volatile boolean lights = true;
+    private final List<double[]> route = new ArrayList<>();
+    private int routeIndex;
+    private boolean routeLoop;
+    private volatile boolean routeActive;
     private double tx, ty, tz;
     private boolean lowBatteryHandled;
 
@@ -102,6 +109,7 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
         tz = homeZ;
         autopilot = true;
         returning = true;
+        routeActive = false;
         dirty = true;
         return true;
     }
@@ -113,6 +121,60 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
         tz = z;
         autopilot = true;
         returning = false;
+        routeActive = false;
+        dirty = true;
+    }
+
+    public boolean lights() {
+        return lights;
+    }
+
+    public int routeSize() {
+        return route.size();
+    }
+
+    public boolean isRouteActive() {
+        return routeActive;
+    }
+
+    public int routeIndex() {
+        return routeIndex;
+    }
+
+    public boolean startRoute(boolean loop) {
+        if (route.isEmpty()) return false;
+        routeLoop = loop;
+        routeIndex = 0;
+        routeActive = true;
+        double[] w = route.get(0);
+        tx = w[0];
+        ty = w[1];
+        tz = w[2];
+        autopilot = true;
+        returning = false;
+        dirty = true;
+        return true;
+    }
+
+    private void advanceRoute() {
+        routeIndex++;
+        if (routeIndex >= route.size()) {
+            if (routeLoop && !route.isEmpty()) {
+                routeIndex = 0;
+            } else {
+                routeIndex = Math.max(0, route.size() - 1);   // finished: progress stays at the last waypoint
+                routeActive = false;
+                autopilot = false;
+                dirty = true;
+                Entity e = (Entity) drone;
+                DroneAccess.setTarget(e, e.posX, e.posY, e.posZ);
+                return;
+            }
+        }
+        double[] w = route.get(routeIndex);
+        tx = w[0];
+        ty = w[1];
+        tz = w[2];
         dirty = true;
     }
 
@@ -124,6 +186,7 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
         if (autopilot || returning) {
             autopilot = false;
             returning = false;
+            routeActive = false;
             dirty = true;
             Entity e = (Entity) drone;
             DroneAccess.setTarget(e, e.posX, e.posY, e.posZ);
@@ -222,6 +285,10 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
         double dx = tx - e.posX, dy = ty - e.posY, dz = tz - e.posZ;
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (dist < 1.5) {
+            if (routeActive) {
+                advanceRoute();
+                return;
+            }
             autopilot = false;
             returning = false;
             dirty = true;
@@ -261,6 +328,19 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
         if (nbt.hasKey("fov")) fov = CameraMath.clampFov(nbt.getFloat("fov"));
         tilt = CameraMath.clampTilt(nbt.getFloat("tilt"));
         pan = CameraMath.wrapPan(nbt.getFloat("pan"));
+        lights = !nbt.hasKey("lights") || nbt.getBoolean("lights");
+        route.clear();
+        net.minecraft.nbt.NBTTagList rl = nbt.getTagList("route", 10);
+        for (int i = 0; i < rl.tagCount(); i++) {
+            NBTTagCompound t = rl.getCompoundTagAt(i);
+            route.add(new double[]{t.getDouble("x"), t.getDouble("y"), t.getDouble("z")});
+        }
+        if (nbt.hasKey("hx")) {
+            homeX = nbt.getDouble("hx");
+            homeY = nbt.getDouble("hy");
+            homeZ = nbt.getDouble("hz");
+            hasHome = true;
+        }
         dirty = true;
     }
 
@@ -272,6 +352,21 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
         nbt.setFloat("fov", fov);
         nbt.setFloat("tilt", tilt);
         nbt.setFloat("pan", pan);
+        nbt.setBoolean("lights", lights);
+        net.minecraft.nbt.NBTTagList rl = new net.minecraft.nbt.NBTTagList();
+        for (double[] w : route) {
+            NBTTagCompound t = new NBTTagCompound();
+            t.setDouble("x", w[0]);
+            t.setDouble("y", w[1]);
+            t.setDouble("z", w[2]);
+            rl.appendTag(t);
+        }
+        nbt.setTag("route", rl);
+        if (hasHome) {
+            nbt.setDouble("hx", homeX);
+            nbt.setDouble("hy", homeY);
+            nbt.setDouble("hz", homeZ);
+        }
     }
 
     // ------------------------------------------------------------------ helpers
@@ -353,6 +448,72 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
     public Object[] cancelReturn(Context context, Arguments args) {
         cancelReturn();
         return ok(true);
+    }
+
+    @Callback(direct = true, doc = "function(on:boolean):boolean -- Switch the drone's navigation lights and strobe on or off.")
+    public Object[] setLights(Context context, Arguments args) {
+        boolean v = args.checkBoolean(0);
+        if (v != lights) {
+            lights = v;
+            dirty = true;
+        }
+        return ok(lights);
+    }
+
+    @Callback(direct = true, doc = "function():boolean -- Whether the navigation lights are on.")
+    public Object[] getLights(Context context, Arguments args) {
+        return ok(lights);
+    }
+
+    @Callback(direct = true, doc = "function(x:number, y:number, z:number):number -- Append a waypoint to the route (max 64). Returns the route length.")
+    public Object[] addWaypoint(Context context, Arguments args) {
+        if (route.size() >= 64) return fail("route is full (64 waypoints)");
+        route.add(new double[]{args.checkDouble(0), args.checkDouble(1), args.checkDouble(2)});
+        return ok(route.size());
+    }
+
+    @Callback(direct = true, doc = "function():number -- Append the drone's current position as a waypoint. Returns the route length.")
+    public Object[] addWaypointHere(Context context, Arguments args) {
+        if (route.size() >= 64) return fail("route is full (64 waypoints)");
+        Entity e = (Entity) drone;
+        route.add(new double[]{e.posX, e.posY, e.posZ});
+        return ok(route.size());
+    }
+
+    @Callback(direct = true, doc = "function():boolean -- Delete the route (and stop flying it).")
+    public Object[] clearRoute(Context context, Arguments args) {
+        route.clear();
+        if (routeActive) cancelReturn();
+        routeActive = false;
+        return ok(true);
+    }
+
+    @Callback(direct = true, doc = "function():table -- The route as a list of {x, y, z} tables.")
+    public Object[] getRoute(Context context, Arguments args) {
+        Map<Integer, Object> list = new HashMap<>();
+        for (int i = 0; i < route.size(); i++) {
+            Map<Integer, Object> p = new HashMap<>();
+            p.put(1, route.get(i)[0]);
+            p.put(2, route.get(i)[1]);
+            p.put(3, route.get(i)[2]);
+            list.put(i + 1, p);
+        }
+        return ok(list);
+    }
+
+    @Callback(direct = true, doc = "function([loop:boolean=false]):boolean -- Fly the route waypoint by waypoint on autopilot; with loop it starts over at the end. Piloting takes over again.")
+    public Object[] startRoute(Context context, Arguments args) {
+        return startRoute(args.optBoolean(0, false)) ? ok(true) : fail("the route is empty");
+    }
+
+    @Callback(direct = true, doc = "function():boolean -- Whether the drone is flying a route.")
+    public Object[] isRouteActive(Context context, Arguments args) {
+        return ok(routeActive);
+    }
+
+    @Callback(direct = true, doc = "function():number, number -- Index of the waypoint being flown to (1-based) and the route length.")
+    public Object[] getRouteProgress(Context context, Arguments args) {
+        return new Object[]{routeIndex + 1, route.size()};
     }
 
     @Callback(direct = true, doc = "function():boolean -- Whether the camera is currently on.")

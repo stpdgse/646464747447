@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /** Server -> client: the camera state of one drone. */
 public class PacketCameraState implements IMessage {
     public int entityId;
-    public boolean active, night, thermal, returning;
+    public boolean active, night, thermal, returning, lights = true;
     public float fov, tilt, pan, energy, range;
     public double x, y, z;
     public int modules;
@@ -25,6 +25,7 @@ public class PacketCameraState implements IMessage {
         p.night = e.isNight();
         p.thermal = e.isThermal();
         p.returning = e.isReturning();
+        p.lights = e.lights();
         p.fov = e.fov();
         p.tilt = e.tilt();
         p.pan = e.pan();
@@ -46,6 +47,7 @@ public class PacketCameraState implements IMessage {
         night = (flags & 2) != 0;
         thermal = (flags & 4) != 0;
         returning = (flags & 8) != 0;
+        lights = (flags & 16) != 0;
         fov = buf.readFloat();
         tilt = buf.readFloat();
         pan = buf.readFloat();
@@ -60,7 +62,7 @@ public class PacketCameraState implements IMessage {
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(entityId);
-        buf.writeByte((active ? 1 : 0) | (night ? 2 : 0) | (thermal ? 4 : 0) | (returning ? 8 : 0));
+        buf.writeByte((active ? 1 : 0) | (night ? 2 : 0) | (thermal ? 4 : 0) | (returning ? 8 : 0) | (lights ? 16 : 0));
         buf.writeFloat(fov);
         buf.writeFloat(tilt);
         buf.writeFloat(pan);

@@ -19,6 +19,11 @@ public final class Config {
     public static double depthMaxDistance = 64.0;
     /** Analog static / scanlines on weak signal. */
     public static boolean noiseEnabled = true;
+    /** Draw drones with the animated quadcopter model instead of OC's own. */
+    public static boolean customDroneModel = true;
+    public static boolean droneSounds = true;
+    /** Executable used for DVR video encoding. */
+    public static String ffmpegPath = "ffmpeg";
 
     // ---- quadcopter flight model (angle mode)
     /** Maximum bank/pitch angle in degrees at full stick. */
@@ -95,6 +100,11 @@ public final class Config {
         depthMaxHeight = c.get("depth", "maxHeight", depthMaxHeight, "Max grid height for depth scans.", 1, 64).getInt();
         depthMaxDistance = c.get("depth", "maxDistance", depthMaxDistance, "Max ray length for depth scans.", 4.0, 256.0).getDouble();
         noiseEnabled = c.get("client", "noise", noiseEnabled, "Show static/scanlines on weak signal.").getBoolean();
+        customDroneModel = c.get("client", "customDroneModel", customDroneModel,
+            "Draw drones with OpenFPV's animated quadcopter model (restart to apply).").getBoolean();
+        droneSounds = c.get("client", "droneSounds", droneSounds, "Motor hum and beeps.").getBoolean();
+        ffmpegPath = c.get("client", "ffmpegPath", ffmpegPath,
+            "ffmpeg executable for DVR recordings (without it, recordings are PNG sequences).").getString();
 
         maxTilt = c.get("flight", "maxTilt", maxTilt, "Maximum bank/pitch angle (degrees).", 10.0, 70.0).getDouble();
         attitudeResponse = c.get("flight", "attitudeResponse", attitudeResponse,
