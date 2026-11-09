@@ -550,7 +550,8 @@ public final class DevHarness {
 
         // ---- 6. recipes
         add(once(() -> {
-            String[] names = {"camera_upgrade", "night_vision_module", "zoom_module", "gimbal_module", "thermal_module", "depth_module"};
+            String[] names = {"camera_upgrade", "night_vision_module", "zoom_module", "gimbal_module", "thermal_module", "depth_module",
+                "antenna_mk1", "antenna_mk2", "antenna_mk3", "antenna_mk4", "fpv_goggles"};
             for (String n : names) {
                 net.minecraft.item.crafting.IRecipe r = net.minecraft.item.crafting.CraftingManager.REGISTRY
                     .getObject(new net.minecraft.util.ResourceLocation(OpenFPV.MOD_ID, n));
@@ -793,9 +794,44 @@ public final class DevHarness {
             // the view is interpolated between ticks and software rendering skips frames: allow ~2.5 ticks of turning
             check("camera heading follows the drone's yaw", Math.abs(MathHelperWrap(FpvClient.viewYaw() - expect)) < 2.5f * (float) Config.yawRate + 1f,
                 FpvClient.viewYaw() + " vs " + expect);
+            check("the drone model turns to its heading (visible to everyone)",
+                Math.abs(MathHelperWrap(entity(droneB).rotationYaw - FpvClient.attitude()[0])) < 10f,
+                entity(droneB).rotationYaw + " vs " + FpvClient.attitude()[0]);
             KeyBinding.setKeyBindState(FpvClient.KEY_YAW_RIGHT.getKeyCode(), false);
         }));
         add(waitTicks(40));
+        // ---- acro mode: rate control, no self-levelling
+        float[] acroPeak = new float[2];
+        add(once(() -> {
+            FpvClient.setAcro(true);
+            acroPeak[0] = acroPeak[1] = 0;
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), true);
+        }));
+        add(() -> {
+            float[] a = FpvClient.attitude();
+            acroPeak[0] = Math.max(acroPeak[0], Math.abs(MathHelperWrap(a[1])));
+            float vp = FpvClient.viewPitch(0f);
+            acroPeak[1] = Math.max(acroPeak[1], Math.abs(vp));
+            return tickInStep >= 15;
+        });
+        add(once(() -> {
+            check("acro pitches far beyond the angle-mode limit", acroPeak[0] > 90f, String.format("peak pitch %.1f deg", acroPeak[0]));
+            check("camera pitch stays renderable (flip-safe)", acroPeak[1] <= 90.01f, String.format("peak view pitch %.1f", acroPeak[1]));
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
+        }));
+        add(waitTicks(25));
+        add(once(() -> {
+            float p = Math.abs(MathHelperWrap(FpvClient.attitude()[1]));
+            check("acro does NOT self-level when the stick is released", p > 30f, String.format("pitch still %.1f deg", p));
+            FpvClient.setAcro(false);
+        }));
+        add(waitTicks(120));
+        add(once(() -> {
+            float[] a = FpvClient.attitude();
+            check("switching back to angle mode levels the drone again", Math.abs(MathHelperWrap(a[1])) < 2f && Math.abs(MathHelperWrap(a[2])) < 2f,
+                String.format("pitch %.2f roll %.2f", a[1], a[2]));
+        }));
+        add(waitTicks(60));
         add(once(() -> {
             Entity b = entity(droneB);
             start[1] = b.posY;
@@ -947,6 +983,25 @@ public final class DevHarness {
             }
         }));
 
+        // ---- 11d. waypoint autopilot on drone C
+        double[] wp = new double[3];
+        add(once(() -> {
+            try {
+                Entity c = entity(droneC);
+                wp[0] = c.posX + 8; wp[1] = c.posY + 1; wp[2] = c.posZ;
+                check("Lua flyTo accepts a waypoint", Boolean.TRUE.equals(invoke(droneC, "flyTo", wp[0], wp[1], wp[2])[0]), "");
+            } catch (Exception ex) {
+                check("flyTo", false, ex.toString());
+            }
+        }));
+        add(() -> until(() -> cam(droneC) != null && !cam(droneC).isAutopilot(), 900, "flyTo to finish"));
+        add(waitTicks(20));
+        add(once(() -> {
+            Entity c = entity(droneC);
+            double d = Math.sqrt(Math.pow(c.posX - wp[0], 2) + Math.pow(c.posY - wp[1], 2) + Math.pow(c.posZ - wp[2], 2));
+            check("drone reached the waypoint and hovers there", d < 3.0, String.format("%.2f blocks from the waypoint", d));
+        }));
+
         // ---- 12. Esc leaves FPV; camera-off ends FPV; drone cycling
         add(once(() -> FpvClient.toggle()));
         add(() -> until(FpvClient::isFlying, 100, "FPV restart"));
@@ -981,6 +1036,62 @@ public final class DevHarness {
         add(() -> until(() -> !FpvClient.isViewing(), 100, "camera-off exit"));
         add(once(() -> check("switching the camera off ends FPV", !FpvClient.isViewing()
             && mc.getRenderViewEntity() == mc.player, "")));
+
+        // ---- 12b. goggles requirement (client and server both enforce it)
+        add(once(() -> {
+            Config.requireGoggles = true;
+            FpvClient.toggle();
+        }));
+        add(waitTicks(20));
+        add(once(() -> {
+            check("client refuses to fly without goggles when they are required", !FpvClient.isViewing(), "");
+            // ask the server directly, bypassing the client check
+            com.openfpv.net.Net.CHANNEL.sendToServer(new com.openfpv.net.PacketView(droneB, true));
+        }));
+        add(waitTicks(20));
+        add(once(() -> {
+            try {
+                check("server refuses a link without goggles", !onServer(() -> ViewerManager.isViewing(mc.player.getUniqueID())), "");
+                onServer(() -> {
+                    server().getPlayerList().getPlayers().get(0).setItemStackToSlot(
+                        net.minecraft.inventory.EntityEquipmentSlot.HEAD, new ItemStack(ModItems.GOGGLES));
+                    return null;
+                });
+            } catch (Exception ex) {
+                check("goggles refusal", false, ex.toString());
+            }
+        }));
+        add(waitTicks(10));
+        add(once(() -> FpvClient.toggle()));
+        add(() -> until(FpvClient::isFlying, 300, "FPV with goggles"));
+        add(once(() -> {
+            check("with goggles on, the pilot can fly", FpvClient.isFlying(), "");
+            FpvClient.exit(true, null);
+            Config.requireGoggles = false;
+        }));
+        add(waitTicks(20));
+
+        // ---- 12c. in-game config screen + live reload
+        add(once(() -> {
+            try {
+                net.minecraft.client.gui.GuiScreen gui = new com.openfpv.client.OpenFPVGuiFactory().createConfigGui(null);
+                mc.displayGuiScreen(gui);
+                check("config screen opens", mc.currentScreen instanceof net.minecraftforge.fml.client.config.GuiConfig, "");
+            } catch (Throwable t) {
+                check("config screen opens", false, t.toString());
+            }
+        }));
+        add(waitTicks(15));
+        add(once(() -> {
+            shot("13_config_gui");
+            mc.displayGuiScreen(null);
+            double before = Config.maxTilt;
+            Config.cfg.getCategory("flight").get("maxTilt").set(41.0);
+            Config.read();
+            check("edited config values apply live", Config.maxTilt == 41.0, "maxTilt=" + Config.maxTilt);
+            Config.cfg.getCategory("flight").get("maxTilt").set(before);
+            Config.read();
+        }));
 
         // ---- 13. finish
         add(() -> {

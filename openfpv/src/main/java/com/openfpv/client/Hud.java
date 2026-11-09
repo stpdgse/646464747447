@@ -108,6 +108,7 @@ public final class Hud {
         if (cam.night) tags.append("[NV] ");
         if (cam.thermal) tags.append("[THERMAL] ");
         if (cam.returning) tags.append("[RTH] ");
+        tags.append(FpvClient.isAcro() ? "[ACRO] " : "[ANGLE] ");
         if (ModuleType.has(cam.modules, ModuleType.DEPTH)) tags.append("[DEPTH] ");
         if (ModuleType.has(cam.modules, ModuleType.GIMBAL) && (cam.pan != 0f || cam.tilt != 0f)) {
             tags.append(String.format("[GIM %+.0f/%+.0f]", cam.pan, cam.tilt));

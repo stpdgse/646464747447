@@ -38,6 +38,7 @@ The module bay: ![module bay](docs/screenshots/module_bay.png)
 | **Gimbal Module** | `setTilt()` / `setPan()` – aim the camera independently of the flight direction |
 | **Thermal Vision Module** | `setThermal()` – heat-map vision, living things glow white-hot |
 | **Depth Sensor Module** | `depth()` / `color()` – distance and colour grids for your Lua programs |
+| **FPV Goggles** | Helmet-slot item. With `flight.requireGoggles` on, pilots must wear them to fly. |
 | **Antenna Mk1 – Mk4** | Goes in the bay's antenna slot and sets the video range: **160 / 400 / 800 / 1500** blocks (64 without one). Each tier is crafted from the previous one. |
 
 A Tier 1 drone only has two upgrade slots and a Tier 2 drone three, so modules do not take drone
@@ -90,6 +91,7 @@ quad), so it looks down as you lean forward and **rolls** in turns.
 |---|---|
 | **W / S** | Pitch forward / back |
 | **A / D** | Bank left / right |
+| **N** | Toggle acro / angle mode |
 | **Space / Shift** | Throttle up / down |
 | **Mouse left/right** or **← / →** | Yaw (turn) |
 | **V** | Enter / leave the FPV view (picks the nearest camera drone) |
@@ -104,6 +106,19 @@ protected — pick a safe spot).
 
 The view ends automatically if the camera is switched off, the drone is destroyed or unloaded,
 or you get beyond the antenna's range.
+
+### Acro mode
+
+Press **N** while flying to switch to **acro** (rate) mode, as used for racing and freestyle: the
+sticks rotate the drone, it never levels itself, and thrust always points along the body's up axis,
+so you can flip, loop and fly inverted (and fall when you do). The camera stays flip-safe. Press
+**N** again to go back to angle mode; the drone levels out the short way.
+
+### Autopilot and waypoints
+
+`camera.flyTo(x, y, z)` flies to a world position on autopilot (slowing on approach, hovering
+within 1.5 blocks); `isAutopilot()` tells you when it is done and `getPosition()` gives the
+drone's coordinates. Taking the controls cancels it.
 
 ### The control link
 
@@ -148,6 +163,7 @@ Methods marked *[module]* return `nil, "module not installed: …"` unless the m
 | `getAntennaTier()` → `number` | 0 = none, 1–4 = Antenna Mk1–Mk4. |
 | `setHome()` / `getHome()` | Set / read the home point (`x, y, z`). The first `start()` sets it. |
 | `returnHome()` / `cancelReturn()` / `isReturning()` | Return-to-home autopilot. |
+| `flyTo(x, y, z)` / `isAutopilot()` / `getPosition()` | Waypoint autopilot. |
 | `getEnergyUsage()` → `number` | Energy per second while active. |
 | `getModules()` → `table` | e.g. `{"nightvision","zoom"}` |
 | `getHeading()` → `number` | Compass heading of the camera (0 = N, 90 = E), including gimbal pan. |
@@ -189,6 +205,8 @@ end
 | `flight.yawRate` | 4.5 | Turn rate (degrees/tick) at full input. |
 | `flight.drag` | 0.9 | Velocity kept per tick while piloting (0.8 = OC default, higher = longer glide). |
 | `flight.speedMultiplier` | 2.5 | Multiplier on OC's 8 m/s drone speed cap while piloting. |
+| `flight.acroRate` | 12 | Rotation speed (degrees/tick) in acro mode. |
+| `flight.requireGoggles` | false | Pilots must wear FPV Goggles. |
 | `flight.cameraUptilt` | 15 | Camera mounting angle (degrees up). |
 | `failsafe.returnOnSignalLoss` | true | Fly home when the signal is lost. |
 | `failsafe.lowBatteryReturn` | 0.15 | Battery fraction that triggers a return (0 = off). |
@@ -198,6 +216,10 @@ end
 | `longrange.boostEntities` / `boostRadius` | true / 96 | Sync mobs near the drone to the pilot, and how far around it. |
 | `depth.*` | 32×16, 64 | Depth/colour scan limits and cost. |
 | `client.noise` | true | Static and scan lines on weak signal. |
+
+## In-game settings
+
+*Mods → OpenFPV → Config* edits every option above; changes apply immediately.
 
 ## Building
 
@@ -212,7 +234,7 @@ The mod compiles only against OpenComputers' public API jar, so it is not tied t
 
 ### Tests
 
-* `./gradlew test` – 34 JUnit tests: camera maths (frames, grid rays, signal falloff, compass), the
+* `./gradlew test` – 38 JUnit tests: camera maths (frames, grid rays, signal falloff, compass), the
   quadcopter physics (tilt → acceleration, attitude lag, angle wrapping, terminal speed), the control-link
   model (lag, ordering, packet loss) and module bit-masks.
 * **End-to-end self test** – boots a real 1.12.2 client with OpenComputers 1.8.x, builds a flat world,
@@ -220,8 +242,8 @@ The mod compiles only against OpenComputers' public API jar, so it is not tied t
   keyboard flight, night/thermal/zoom/gimbal, depth scans checked against a wall at a known distance,
   OC's driver registry (Assembler acceptance), the quadcopter model (tilt, speed, glide, levelling,
   banking, yaw), antenna ranges, a **pilot 300 blocks from the drone** (chunks and a mob streamed in),
-  control lag and packet loss at 700 blocks, signal loss, Esc, camera cycling and the return-home failsafe. It writes
-  `run/autotest/summary.txt` and screenshots to `run/autotest/screenshots/` (105 checks).
+  control lag and packet loss at 700 blocks, signal loss, Esc, camera cycling, the return-home failsafe, acro mode, waypoint autopilot, goggles enforcement and the config screen. It writes
+  `run/autotest/summary.txt` and screenshots to `run/autotest/screenshots/` (122 checks).
 
   ```bash
   JAVA_HOME=/path/to/jdk8 ./scripts/run-selftest.sh

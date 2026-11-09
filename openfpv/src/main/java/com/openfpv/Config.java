@@ -38,6 +38,11 @@ public final class Config {
     /** FPV cameras are mounted tilted up by this many degrees, like on a real racing quad. */
     public static double cameraUptilt = 15.0;
 
+    /** Rate of rotation in acro mode, degrees per tick at full stick. */
+    public static double acroRate = 12.0;
+    /** If true the pilot must wear FPV Goggles in the helmet slot to fly. */
+    public static boolean requireGoggles = false;
+
     // ---- control link
     public static boolean controlLag = true;
     /** Control delay in ticks at the very edge of the range. */
@@ -67,9 +72,18 @@ public final class Config {
         return rangeTiers.length - 1;
     }
 
+    /** The live configuration (also edited by the in-game config screen). */
+    public static Configuration cfg;
+
     public static void load(File file) {
-        Configuration c = new Configuration(file);
-        c.load();
+        cfg = new Configuration(file);
+        cfg.load();
+        read();
+    }
+
+    /** Copies the values from the configuration file into the static fields. */
+    public static void read() {
+        Configuration c = cfg;
         double[] tiers = c.get("range", "tiers", rangeTiers,
             "Signal range (blocks) with no antenna, then Antenna Mk1..Mk4. Five values, ascending.", 16.0, 20000.0).getDoubleList();
         if (tiers.length == 5) rangeTiers = tiers;
@@ -94,6 +108,8 @@ public final class Config {
             "Multiplier on OC's 8 m/s drone speed cap while piloting.", 1.0, 6.0).getDouble();
         cameraUptilt = c.get("flight", "cameraUptilt", cameraUptilt, "Camera mounting angle (degrees up).", 0.0, 45.0).getDouble();
 
+        acroRate = c.get("flight", "acroRate", acroRate, "Rotation speed (degrees/tick) in acro mode.", 2.0, 30.0).getDouble();
+        requireGoggles = c.get("flight", "requireGoggles", requireGoggles, "Pilots must wear FPV Goggles to fly.").getBoolean();
         controlLag = c.get("link", "controlLag", controlLag, "Delay and drop control inputs as the signal weakens.").getBoolean();
         maxLagTicks = c.get("link", "maxLagTicks", maxLagTicks, "Control delay (ticks) at the edge of the range.", 0, 40).getInt();
         maxPacketLoss = c.get("link", "maxPacketLoss", maxPacketLoss, "Fraction of control packets lost at the edge of the range.", 0.0, 0.9).getDouble();
@@ -107,6 +123,16 @@ public final class Config {
         boostEntities = c.get("longrange", "boostEntities", boostEntities,
             "Sync entities near the drone to the pilot even when they are beyond normal tracking distance.").getBoolean();
         boostRadius = c.get("longrange", "boostRadius", boostRadius, "Radius (blocks) around the drone for boosted entities.", 16.0, 192.0).getDouble();
+        String[][] meta = {
+            {"range", "Video range per antenna tier."}, {"camera", "Camera power use."},
+            {"depth", "Depth sensor limits and cost."}, {"client", "Client-side visuals."},
+            {"flight", "Quadcopter handling: tilt, response, drag, speed, acro, goggles."},
+            {"link", "Control delay and packet loss as the signal weakens."},
+            {"failsafe", "Return-to-home triggers."}, {"longrange", "Chunk and mob streaming around a far drone."}};
+        for (String[] m : meta) {
+            c.setCategoryComment(m[0], m[1]);
+            c.setCategoryLanguageKey(m[0], "openfpv.configgui.ctgy." + m[0]);
+        }
         if (c.hasChanged()) c.save();
     }
 }

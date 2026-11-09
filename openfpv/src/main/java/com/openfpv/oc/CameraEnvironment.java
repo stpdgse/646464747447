@@ -46,6 +46,8 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
     private volatile boolean hasHome;
     private double homeX, homeY, homeZ;
     private volatile boolean returning;
+    private volatile boolean autopilot;
+    private double tx, ty, tz;
     private boolean lowBatteryHandled;
 
     private volatile boolean dirty = true;
@@ -95,13 +97,32 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
     /** Starts the autopilot back to the home point. Returns false if there is no home or the camera is off. */
     public boolean returnHome() {
         if (!hasHome) return false;
+        tx = homeX;
+        ty = homeY;
+        tz = homeZ;
+        autopilot = true;
         returning = true;
         dirty = true;
         return true;
     }
 
+    /** Flies to a world position on autopilot. */
+    public void flyTo(double x, double y, double z) {
+        tx = x;
+        ty = y;
+        tz = z;
+        autopilot = true;
+        returning = false;
+        dirty = true;
+    }
+
+    public boolean isAutopilot() {
+        return autopilot;
+    }
+
     public void cancelReturn() {
-        if (returning) {
+        if (autopilot || returning) {
+            autopilot = false;
             returning = false;
             dirty = true;
             Entity e = (Entity) drone;
@@ -187,7 +208,7 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
             returnHome();
         }
         if (energyFraction() > Config.lowBatteryReturn + 0.1) lowBatteryHandled = false;
-        if (returning) autopilot();
+        if (autopilot) autopilot();
         if (dirty || (active && ++sinceSync >= 20)) {
             sinceSync = 0;
             dirty = false;
@@ -195,12 +216,13 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
         }
     }
 
-    /** Straight-line flight home, slowing down on approach; stops and hovers within 1.5 blocks. */
+    /** Straight-line autopilot flight to (tx,ty,tz), slowing down on approach; stops and hovers within 1.5 blocks. */
     private void autopilot() {
         Entity e = (Entity) drone;
-        double dx = homeX - e.posX, dy = homeY - e.posY, dz = homeZ - e.posZ;
+        double dx = tx - e.posX, dy = ty - e.posY, dz = tz - e.posZ;
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (dist < 1.5) {
+            autopilot = false;
             returning = false;
             dirty = true;
             DroneAccess.setTarget(e, e.posX, e.posY, e.posZ);
@@ -303,6 +325,23 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
     @Callback(direct = true, doc = "function():boolean -- Fly back to the home point on autopilot. Piloting takes over again. Also happens automatically when the signal is lost or the battery is low.")
     public Object[] returnHome(Context context, Arguments args) {
         return returnHome() ? ok(true) : fail("no home point set");
+    }
+
+    @Callback(direct = true, doc = "function(x:number, y:number, z:number):boolean -- Fly to a world position on autopilot (slows down on approach, hovers within 1.5 blocks). Piloting takes over again.")
+    public Object[] flyTo(Context context, Arguments args) {
+        flyTo(args.checkDouble(0), args.checkDouble(1), args.checkDouble(2));
+        return ok(true);
+    }
+
+    @Callback(direct = true, doc = "function():boolean -- Whether an autopilot flight (flyTo or returnHome) is in progress.")
+    public Object[] isAutopilot(Context context, Arguments args) {
+        return ok(autopilot);
+    }
+
+    @Callback(direct = true, doc = "function():number, number, number -- The drone's current position (x, y, z), handy together with flyTo().")
+    public Object[] getPosition(Context context, Arguments args) {
+        Entity e = (Entity) drone;
+        return new Object[]{e.posX, e.posY, e.posZ};
     }
 
     @Callback(direct = true, doc = "function():boolean -- Whether the return-home autopilot is flying.")

@@ -102,4 +102,58 @@ public class QuadPhysicsTest {
         assertTrue(QuadPhysics.terminalSpeed(0.06, 0.8) < QuadPhysics.terminalSpeed(0.06, 0.9));
         assertTrue(Double.isInfinite(QuadPhysics.terminalSpeed(0.06, 1.0)));
     }
+
+    @Test
+    public void acroMatchesAngleModeAtSmallTilt() {
+        for (double pitch = -20; pitch <= 20; pitch += 10) {
+            double[] angle = QuadPhysics.acceleration(37, pitch, 0, 0, 0.12, 0.05);
+            double[] acro = QuadPhysics.acroAcceleration(37, pitch, 0, 0, 0.12, 0.05);
+            assertEquals(angle[0], acro[0], 1e-9);
+            assertEquals(angle[2], acro[2], 1e-9);
+            assertTrue("loses a little height when tilted", acro[1] <= 1e-12);
+        }
+        assertArrayEquals(new double[]{0, 0, 0}, QuadPhysics.acroAcceleration(5, 0, 0, 0, 0.12, 0.05), EPS);
+    }
+
+    @Test
+    public void acroInvertedPushesDownAndPastNinetyReversesForwardThrust() {
+        double[] inverted = QuadPhysics.acroAcceleration(0, 180, 0, 0, 0.12, 0.05);
+        assertEquals(-0.24, inverted[1], 1e-9);
+        assertEquals(0.0, inverted[2], 1e-9);
+        double[] knife = QuadPhysics.acroAcceleration(0, 90, 0, 0, 0.12, 0.05);
+        assertEquals(0.12, knife[2], 1e-9);
+        assertEquals(-0.12, knife[1], 1e-9);
+        double[] past = QuadPhysics.acroAcceleration(0, 135, 0, 0, 0.12, 0.05);
+        assertTrue(past[2] > 0 && past[1] < -0.12);
+        double[] rollRight = QuadPhysics.acroAcceleration(0, 0, 90, 0, 0.12, 0.05);
+        assertEquals(-0.12, rollRight[0], 1e-9);   // right of south is west
+    }
+
+    @Test
+    public void acroThrustVectorHasConstantMagnitude() {
+        for (double pitch = -170; pitch <= 170; pitch += 34) {
+            for (double roll = -170; roll <= 170; roll += 34) {
+                double[] a = QuadPhysics.acroAcceleration(20, pitch, roll, 0.5, 0.12, 0.05);
+                double[] withGravity = {a[0], a[1] + 0.12, a[2]};
+                double len = Math.sqrt(withGravity[0] * withGravity[0] + withGravity[1] * withGravity[1] + withGravity[2] * withGravity[2]);
+                assertEquals(0.145, len, 1e-9);
+            }
+        }
+    }
+
+    @Test
+    public void viewNormalisationKeepsPitchRenderableAndTheSameDirection() {
+        float[] v = QuadPhysics.normalizeView(10f, 100f, 5f);   // 10 past vertical: looking back over the top
+        assertEquals(80f, v[1], 1e-4f);
+        assertEquals(-170f, v[0], 1e-4f);
+        assertEquals(-175f, v[2], 1e-4f);
+        float[] same = QuadPhysics.normalizeView(30f, 45f, -10f);
+        assertEquals(30f, same[0], 1e-4f);
+        assertEquals(45f, same[1], 1e-4f);
+        for (float p = -720; p <= 720; p += 37) {
+            float[] n = QuadPhysics.normalizeView(0f, p, 0f);
+            assertTrue(n[1] >= -90f && n[1] <= 90f);
+        }
+        assertEquals(-80f, QuadPhysics.normalizeView(0f, -100f, 0f)[1], 1e-4f);
+    }
 }

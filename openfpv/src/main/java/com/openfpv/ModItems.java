@@ -2,6 +2,7 @@ package com.openfpv;
 
 import com.openfpv.item.ItemAntenna;
 import com.openfpv.item.ItemCamera;
+import com.openfpv.item.ItemGoggles;
 import com.openfpv.item.ItemModule;
 import com.openfpv.item.ModuleType;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -28,12 +29,14 @@ public final class ModItems {
     };
 
     public static final ItemCamera CAMERA = new ItemCamera();
+    public static final ItemGoggles GOGGLES = new ItemGoggles();
     public static final ItemModule[] MODULES = new ItemModule[ModuleType.VALUES.length];
     /** Antenna Mk1..Mk4 (index 0 = Mk1). */
     public static final ItemAntenna[] ANTENNAS = new ItemAntenna[4];
 
     static {
         name(CAMERA, "camera_upgrade");
+        name(GOGGLES, "fpv_goggles");
         for (ModuleType t : ModuleType.VALUES) {
             ItemModule m = new ItemModule(t);
             name(m, t.itemName);
@@ -54,6 +57,7 @@ public final class ModItems {
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(CAMERA);
+        event.getRegistry().register(GOGGLES);
         event.getRegistry().registerAll(MODULES);
         event.getRegistry().registerAll(ANTENNAS);
     }
@@ -62,6 +66,7 @@ public final class ModItems {
     @SideOnly(Side.CLIENT)
     public static void registerModels(ModelRegistryEvent event) {
         ModelLoader.setCustomModelResourceLocation(CAMERA, 0, new ModelResourceLocation(CAMERA.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(GOGGLES, 0, new ModelResourceLocation(GOGGLES.getRegistryName(), "inventory"));
         for (ItemModule m : MODULES) {
             ModelLoader.setCustomModelResourceLocation(m, 0, new ModelResourceLocation(m.getRegistryName(), "inventory"));
         }

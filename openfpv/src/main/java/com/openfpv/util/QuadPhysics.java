@@ -49,6 +49,45 @@ public final class QuadPhysics {
             f[2] * aForward + r[2] * aRight};
     }
 
+    /**
+     * Acro (rate) mode acceleration for ANY attitude, including inverted. Thrust always points along the
+     * body's up axis; level hover (throttle 0) cancels out exactly, so at small angles this equals
+     * the angle-mode result. Tilted past 90 degrees the drone loses height; inverted it is pushed down.
+     */
+    public static double[] acroAcceleration(double yawDeg, double pitchDeg, double rollDeg, double throttle,
+                                            double accelScale, double throttleAccel) {
+        double p = Math.toRadians(pitchDeg), r = Math.toRadians(rollDeg);
+        double uF = Math.sin(p) * Math.cos(r);
+        double uR = Math.sin(r);
+        double uY = Math.cos(p) * Math.cos(r);
+        double thrust = accelScale + CameraMath.clamp(throttle, -1.0, 1.0) * throttleAccel;
+        double[] f = CameraMath.forward(yawDeg, 0);
+        double[] rt = CameraMath.right(yawDeg);
+        return new double[]{
+            (f[0] * uF + rt[0] * uR) * thrust,
+            uY * thrust - accelScale,
+            (f[2] * uF + rt[2] * uR) * thrust};
+    }
+
+    /**
+     * Converts a body attitude (any pitch/roll) into camera angles Minecraft can render: pitch within
+     * [-90, 90], flipping yaw and roll by 180 degrees when the drone is over the top of a loop.
+     * Returns {yaw, pitch, roll}.
+     */
+    public static float[] normalizeView(float yaw, float pitch, float roll) {
+        float p = wrapDegrees(pitch);
+        if (p > 90f) {
+            p = 180f - p;
+            yaw += 180f;
+            roll += 180f;
+        } else if (p < -90f) {
+            p = -180f - p;
+            yaw += 180f;
+            roll += 180f;
+        }
+        return new float[]{wrapDegrees(yaw), p, wrapDegrees(roll)};
+    }
+
     /** Scales the vector down if it is longer than max (OC drones cap their acceleration). */
     public static double[] clampLength(double[] v, double max) {
         double len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);

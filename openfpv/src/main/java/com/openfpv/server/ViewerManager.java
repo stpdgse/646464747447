@@ -44,6 +44,7 @@ public final class ViewerManager {
         long lastControl;
         float sPitch, sRoll, sYaw, sThrottle;
         float yaw, pitch, roll;
+        boolean acro;
         float[] savedLimits;
         LongRangeLink link;
 
@@ -63,6 +64,10 @@ public final class ViewerManager {
     public static void begin(EntityPlayerMP player, int entityId) {
         Entity e = player.world.getEntityByID(entityId);
         CameraEnvironment cam = CameraRegistry.get(entityId);
+        if (Config.requireGoggles && !wearsGoggles(player)) {
+            Net.sendViewEnd(player, PacketViewEnd.REFUSED);
+            return;
+        }
         if (e == null || e.isDead || !(e instanceof Drone) || cam == null || !cam.isActive()
             || player.getDistance(e) > cam.range() || pilotedByOther(player.getUniqueID(), entityId)) {
             Net.sendViewEnd(player, PacketViewEnd.REFUSED);
@@ -79,6 +84,10 @@ public final class ViewerManager {
         s.link = new LongRangeLink(player, entityId);
         SESSIONS.put(player.getUniqueID(), s);
         Net.sendAttitude(player, new PacketAttitude(entityId, s.yaw, 0, 0));
+    }
+
+    public static boolean wearsGoggles(net.minecraft.entity.player.EntityPlayer p) {
+        return p.getItemStackFromSlot(net.minecraft.inventory.EntityEquipmentSlot.HEAD).getItem() == com.openfpv.ModItems.GOGGLES;
     }
 
     private static boolean pilotedByOther(UUID me, int entityId) {
@@ -132,6 +141,7 @@ public final class ViewerManager {
         s.sRoll = stick(msg.roll);
         s.sYaw = stick(msg.yaw);
         s.sThrottle = stick(msg.throttle);
+        s.acro = msg.acro;
         s.lastControl = ticks;
     }
 
@@ -185,15 +195,26 @@ public final class ViewerManager {
         if (ticks - s.lastControl > CONTROL_TIMEOUT_TICKS) {
             s.sPitch = s.sRoll = s.sYaw = s.sThrottle = 0f;   // link dead: level out and hover
         }
-        float tilt = (float) Config.maxTilt;
         float response = (float) Config.attitudeResponse;
-        s.pitch = QuadPhysics.approach(s.pitch, s.sPitch * tilt, response);
-        s.roll = QuadPhysics.approach(s.roll, s.sRoll * tilt, response);
-        s.yaw = QuadPhysics.wrapDegrees(s.yaw + s.sYaw * (float) Config.yawRate);
-
-        double[] a = QuadPhysics.acceleration(s.yaw, s.pitch, s.roll, s.sThrottle, Config.accelScale, Config.throttleAccel);
+        double[] a;
+        if (s.acro) {
+            // rate mode: the sticks turn the drone, it does not level itself
+            s.pitch = QuadPhysics.wrapDegrees(s.pitch + s.sPitch * (float) Config.acroRate);
+            s.roll = QuadPhysics.wrapDegrees(s.roll + s.sRoll * (float) Config.acroRate);
+            s.yaw = QuadPhysics.wrapDegrees(s.yaw + s.sYaw * (float) Config.yawRate);
+            a = QuadPhysics.acroAcceleration(s.yaw, s.pitch, s.roll, s.sThrottle, Config.accelScale, Config.throttleAccel);
+        } else {
+            float tilt = (float) Config.maxTilt;
+            s.pitch = QuadPhysics.wrapDegrees(s.pitch);   // coming back from acro: level out the short way
+            s.roll = QuadPhysics.wrapDegrees(s.roll);
+            s.pitch = QuadPhysics.approach(s.pitch, s.sPitch * tilt, response);
+            s.roll = QuadPhysics.approach(s.roll, s.sRoll * tilt, response);
+            s.yaw = QuadPhysics.wrapDegrees(s.yaw + s.sYaw * (float) Config.yawRate);
+            a = QuadPhysics.acceleration(s.yaw, s.pitch, s.roll, s.sThrottle, Config.accelScale, Config.throttleAccel);
+        }
         a = QuadPhysics.clampLength(a, 0.095);   // OC drones cap their acceleration at 0.1 blocks/tick^2
         DroneAccess.setTarget(e, e.posX + a[0], e.posY + a[1], e.posZ + a[2]);
+        e.rotationYaw = e.prevRotationYaw = s.yaw;   // the drone model turns to its heading for everybody to see
         Net.sendAttitude(player, new PacketAttitude(s.entityId, s.yaw, s.pitch, s.roll));
     }
 

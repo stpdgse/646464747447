@@ -59,6 +59,8 @@ public final class ModRecipes {
         add(event, ModuleType.DEPTH, "ERE", "LCL", "IPI",
             'E', net.minecraft.init.Items.ENDER_PEARL, 'R', "dustRedstone", 'L', "gemLapis", 'C', chip2,
             'I', "ingotIron", 'P', pcb);
+        add(event, "fpv_goggles", new ItemStack(ModItems.GOGGLES), "ISI", "GCG", "LPL",
+            'I', "ingotIron", 'S', "string", 'G', "paneGlass", 'C', chip2, 'L', "leather", 'P', pcb);
         registerAntennas(event, pcb, chip3, wlan1, wlan2, chipDiamond);
     }
 

@@ -38,6 +38,8 @@ public final class FpvClient {
         new KeyBinding("key.openfpv.toggle", Keyboard.KEY_V, "key.categories.openfpv");
     public static final KeyBinding KEY_NEXT =
         new KeyBinding("key.openfpv.next", Keyboard.KEY_B, "key.categories.openfpv");
+    public static final KeyBinding KEY_MODE =
+        new KeyBinding("key.openfpv.mode", Keyboard.KEY_N, "key.categories.openfpv");
     public static final KeyBinding KEY_YAW_LEFT =
         new KeyBinding("key.openfpv.yaw_left", Keyboard.KEY_LEFT, "key.categories.openfpv");
     public static final KeyBinding KEY_YAW_RIGHT =
@@ -76,6 +78,7 @@ public final class FpvClient {
     private static boolean haveLastYaw;
     private static long tick;
     public static int lagTicks;
+    private static boolean acro;
     public static float[] lastSticks = new float[4];
     public static int packetsSent, packetsDropped;
 
@@ -200,12 +203,25 @@ public final class FpvClient {
         return new float[]{curYaw, curPitch, curRoll};
     }
 
+    public static boolean isAcro() {
+        return acro;
+    }
+
+    public static void setAcro(boolean on) {
+        acro = on;
+        status(on ? "message.openfpv.mode_acro" : "message.openfpv.mode_angle");
+    }
+
     // ------------------------------------------------------------------ view control
 
     public static void toggle() {
         Minecraft mc = Minecraft.getMinecraft();
         if (isViewing()) {
             exit(true, null);
+            return;
+        }
+        if (Config.requireGoggles && !com.openfpv.server.ViewerManager.wearsGoggles(mc.player)) {
+            status("message.openfpv.need_goggles");
             return;
         }
         List<Cam> list = available();
@@ -257,6 +273,7 @@ public final class FpvClient {
         lagTicks = 0;
         packetsSent = packetsDropped = 0;
         LAG.clear();
+        acro = false;
         loadedShader = null;
         Net.CHANNEL.sendToServer(new PacketView(entityId, true));
         status("message.openfpv.linking");
@@ -307,6 +324,9 @@ public final class FpvClient {
 
         while (KEY_TOGGLE.isPressed()) toggle();
         while (KEY_NEXT.isPressed()) cycle();
+        while (KEY_MODE.isPressed()) {
+            if (isFlying()) setAcro(!acro);
+        }
 
         if (viewing < 0) return;
         Cam cam = CAMS.get(viewing);
@@ -390,7 +410,7 @@ public final class FpvClient {
             out = sticks;
         }
         if (out != null) {
-            Net.CHANNEL.sendToServer(new PacketControl(drone.getEntityId(), out));
+            Net.CHANNEL.sendToServer(new PacketControl(drone.getEntityId(), out, acro));
             packetsSent++;
         }
     }
@@ -443,23 +463,22 @@ public final class FpvClient {
 
     // ------------------------------------------------------------------ render-frame work
 
-    /** Pitch (nose-down, camera mounting and gimbal included) of the view, in Minecraft degrees. */
-    public static float viewPitch(float partialTicks) {
+    /** Camera angles {yaw, pitch, roll} for this frame: body attitude + camera mounting + gimbal, renderable by Minecraft. */
+    public static float[] viewAngles(float partialTicks) {
         Cam cam = current();
-        float p = prevPitch + (curPitch - prevPitch) * partialTicks;
-        float tilt = cam != null ? cam.tilt : 0f;
-        return CameraMath.clamp(p - (float) Config.cameraUptilt - tilt, -90f, 90f);
+        float yaw = QuadPhysics.lerpAngle(prevYaw, curYaw, partialTicks) + (cam != null ? cam.pan : 0f);
+        float pitch = QuadPhysics.lerpAngle(prevPitch, curPitch, partialTicks) - (float) Config.cameraUptilt - (cam != null ? cam.tilt : 0f);
+        float roll = QuadPhysics.lerpAngle(prevRoll, curRoll, partialTicks);
+        return QuadPhysics.normalizeView(yaw, pitch, roll);
     }
 
-    public static float viewYawAngle(float partialTicks) {
-        Cam cam = current();
-        return QuadPhysics.lerpAngle(prevYaw, curYaw, partialTicks) + (cam != null ? cam.pan : 0f);
+    public static float viewPitch(float partialTicks) {
+        return viewAngles(partialTicks)[1];
     }
 
     /** Camera roll in degrees for the render hook; zero unless flying. */
     public static float viewRoll(float partialTicks) {
-        if (!isFlying()) return 0f;
-        return prevRoll + (curRoll - prevRoll) * partialTicks;
+        return isFlying() ? viewAngles(partialTicks)[2] : 0f;
     }
 
     /** Aims the drone entity's camera before the world is drawn: the drone's own attitude plus gimbal offsets. */
@@ -468,10 +487,9 @@ public final class FpvClient {
         if (!isFlying() || mc.player == null) return;
         Entity e = mc.getRenderViewEntity();
         if (e == null || e == mc.player || current() == null) return;
-        float yaw = viewYawAngle(partialTicks);
-        float pitch = viewPitch(partialTicks);
-        e.rotationYaw = e.prevRotationYaw = yaw;
-        e.rotationPitch = e.prevRotationPitch = pitch;
+        float[] v = viewAngles(partialTicks);
+        e.rotationYaw = e.prevRotationYaw = v[0];
+        e.rotationPitch = e.prevRotationPitch = v[1];
     }
 
     /** Heading of the view in Minecraft yaw degrees (for the compass). */

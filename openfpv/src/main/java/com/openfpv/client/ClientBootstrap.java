@@ -17,6 +17,7 @@ public final class ClientBootstrap {
     public static void init() {
         ClientRegistry.registerKeyBinding(FpvClient.KEY_TOGGLE);
         ClientRegistry.registerKeyBinding(FpvClient.KEY_NEXT);
+        ClientRegistry.registerKeyBinding(FpvClient.KEY_MODE);
         ClientRegistry.registerKeyBinding(FpvClient.KEY_YAW_LEFT);
         ClientRegistry.registerKeyBinding(FpvClient.KEY_YAW_RIGHT);
         // Developer self test (never set in normal play); see build.gradle -Popenfpv.autotest

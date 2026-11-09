@@ -12,11 +12,13 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 public class PacketControl implements IMessage {
     public int entityId;
     public float pitch, roll, yaw, throttle;
+    public boolean acro;
 
     public PacketControl() {}
 
-    public PacketControl(int entityId, ControlLag.Sticks s) {
+    public PacketControl(int entityId, ControlLag.Sticks s, boolean acro) {
         this.entityId = entityId;
+        this.acro = acro;
         this.pitch = s.pitch;
         this.roll = s.roll;
         this.yaw = s.yaw;
@@ -30,6 +32,7 @@ public class PacketControl implements IMessage {
         roll = buf.readFloat();
         yaw = buf.readFloat();
         throttle = buf.readFloat();
+        acro = buf.readBoolean();
     }
 
     @Override
@@ -39,6 +42,7 @@ public class PacketControl implements IMessage {
         buf.writeFloat(roll);
         buf.writeFloat(yaw);
         buf.writeFloat(throttle);
+        buf.writeBoolean(acro);
     }
 
     public static class Handler implements IMessageHandler<PacketControl, IMessage> {

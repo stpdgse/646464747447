@@ -16,7 +16,8 @@ import org.apache.logging.log4j.Logger;
 
 @Mod(modid = OpenFPV.MOD_ID, name = OpenFPV.NAME, version = OpenFPV.VERSION,
      dependencies = "required-after:opencomputers@[1.7.5,)",
-     acceptedMinecraftVersions = "[1.12.2]")
+     acceptedMinecraftVersions = "[1.12.2]",
+     guiFactory = "com.openfpv.client.OpenFPVGuiFactory")
 public class OpenFPV {
     public static final String MOD_ID = "openfpv";
     public static final String NAME = "OpenFPV";
@@ -34,8 +35,17 @@ public class OpenFPV {
         Net.init();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         MinecraftForge.EVENT_BUS.register(new ViewerManager());
+        MinecraftForge.EVENT_BUS.register(this);
         if (event.getSide().isClient()) {
             com.openfpv.client.ClientBootstrap.preInit();
+        }
+    }
+
+    @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+    public void onConfigChanged(net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (MOD_ID.equals(event.getModID())) {
+            if (Config.cfg.hasChanged()) Config.cfg.save();
+            Config.read();
         }
     }
 

@@ -167,6 +167,22 @@ def depth():
     return im
 
 
+def goggles():
+    im = Img(16, 16)
+    im.rect(1, 5, 14, 5, rgb("#2b2b33"))
+    im.rect(1, 6, 14, 11, rgb("#1e1e26"))
+    im.rect(2, 7, 6, 10, rgb("#37474f"))
+    im.rect(9, 7, 13, 10, rgb("#37474f"))
+    im.rect(3, 8, 5, 9, rgb("#4dd0e1"))
+    im.rect(10, 8, 12, 9, rgb("#4dd0e1"))
+    im.set(3, 8, rgb("#e0f7fa"))
+    im.set(10, 8, rgb("#e0f7fa"))
+    im.rect(0, 7, 0, 9, rgb("#455a64"))
+    im.rect(15, 7, 15, 9, rgb("#455a64"))
+    im.rect(7, 12, 8, 13, rgb("#ff5252"))      # status LED
+    return im
+
+
 def antenna(tier):
     im = Img(16, 16)
     im.rect(3, 12, 12, 14, rgb("#23232b"))
@@ -228,6 +244,7 @@ if __name__ == "__main__":
     gimbal().save("items/gimbal_module.png")
     thermal().save("items/thermal_module.png")
     depth().save("items/depth_module.png")
+    goggles().save("items/fpv_goggles.png")
     for t in range(1, 5):
         antenna(t).save("items/antenna_mk%d.png" % t)
     gui().save("gui/module_bay.png")
