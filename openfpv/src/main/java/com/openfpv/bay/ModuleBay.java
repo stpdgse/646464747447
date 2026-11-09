@@ -1,5 +1,6 @@
 package com.openfpv.bay;
 
+import com.openfpv.item.ItemAntenna;
 import com.openfpv.item.ItemModule;
 import com.openfpv.item.ModuleType;
 import net.minecraft.inventory.InventoryBasic;
@@ -11,7 +12,10 @@ import net.minecraft.nbt.NBTTagList;
 public final class ModuleBay {
     public static final String TAG = "openfpv";
     public static final String LIST = "Modules";
-    public static final int SIZE = ModuleType.VALUES.length;
+    /** Slots 0..4 hold the modules (one slot per type); the last slot holds the antenna. */
+    public static final int MODULE_SLOTS = ModuleType.VALUES.length;
+    public static final int ANTENNA_SLOT = MODULE_SLOTS;
+    public static final int SIZE = MODULE_SLOTS + 1;
 
     private ModuleBay() {}
 
@@ -58,6 +62,12 @@ public final class ModuleBay {
         return mask;
     }
 
+    /** Tier (1..4) of the installed antenna, or 0 for none. */
+    public static int readAntennaTier(ItemStack camera) {
+        ItemStack a = read(camera)[ANTENNA_SLOT];
+        return !a.isEmpty() && a.getItem() instanceof ItemAntenna ? ((ItemAntenna) a.getItem()).tier : 0;
+    }
+
     /** Inventory view of the bay; every change is written straight back into the camera stack. */
     public static class Inv extends InventoryBasic {
         private final ItemStack camera;
@@ -79,6 +89,7 @@ public final class ModuleBay {
 
         @Override
         public boolean isItemValidForSlot(int index, ItemStack stack) {
+            if (index == ANTENNA_SLOT) return stack.getItem() instanceof ItemAntenna;
             return stack.getItem() instanceof ItemModule && ((ItemModule) stack.getItem()).type.ordinal() == index;
         }
 

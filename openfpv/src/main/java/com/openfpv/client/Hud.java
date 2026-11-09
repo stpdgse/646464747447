@@ -55,6 +55,7 @@ public final class Hud {
         rect(cx, cy + 3, cx + 1, cy + 9, main);
         rect(cx, cy, cx + 1, cy + 1, main);
 
+        horizon(cx, cy, main, dim, partialTicks);
         compass(w, main, dim, font);
 
         GlStateManager.enableTexture2D();
@@ -73,7 +74,7 @@ public final class Hud {
         int x = 10, y = h / 2 - 28;
         font.drawStringWithShadow(I18n.format("hud.openfpv.alt", fmt(alt)), x, y, main);
         font.drawStringWithShadow(I18n.format("hud.openfpv.spd", fmt(FpvClient.speed)), x, y + 11, main);
-        font.drawStringWithShadow(I18n.format("hud.openfpv.dst", fmt(FpvClient.distance)), x, y + 22, main);
+        font.drawStringWithShadow(I18n.format("hud.openfpv.rng", Math.round(FpvClient.distance), Math.round(cam.range)), x, y + 22, main);
 
         // battery
         int pct = Math.round(cam.energy * 100f);
@@ -99,6 +100,10 @@ public final class Hud {
         GlStateManager.enableTexture2D();
         String fov = I18n.format("hud.openfpv.zoom", fmt(CameraMath.fovToZoom(cam.fov)));
         font.drawStringWithShadow(fov, w - 10 - font.getStringWidth(fov), y + 22, main);
+        if (FpvClient.lagTicks > 0) {
+            String lag = I18n.format("hud.openfpv.lag", FpvClient.lagTicks * 50);
+            font.drawStringWithShadow(lag, w - 10 - font.getStringWidth(lag), y + 44, FpvClient.lagTicks >= 6 ? 0xFFFF6060 : main);
+        }
         StringBuilder tags = new StringBuilder();
         if (cam.night) tags.append("[NV] ");
         if (cam.thermal) tags.append("[THERMAL] ");
@@ -121,6 +126,28 @@ public final class Hud {
                 font.drawStringWithShadow(warn, w / 2 - font.getStringWidth(warn) / 2, h / 2 + 24, 0xFFFF4040);
             }
         }
+    }
+
+    /**
+     * Artificial horizon: a bar that stays parallel to the real horizon, drawn in the camera's frame, so
+     * it rolls and slides with the drone's attitude. The short ticks mark 10 degrees of pitch.
+     */
+    private static void horizon(int cx, int cy, int main, int dim, float partialTicks) {
+        float roll = FpvClient.viewRoll(partialTicks);
+        float pitch = FpvClient.viewPitch(partialTicks);
+        float ppd = 3.5f; // pixels per degree of pitch
+        float y = CameraMath.clamp(-pitch * ppd, -90f, 90f);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(cx, cy, 0);
+        GlStateManager.rotate(-roll, 0, 0, 1);
+        rect(-70, Math.round(y), -22, Math.round(y) + 1, dim);
+        rect(22, Math.round(y), 70, Math.round(y) + 1, dim);
+        for (int d = -30; d <= 30; d += 10) {
+            if (d == 0) continue;
+            int ly = Math.round(y - d * ppd);
+            rect(-14, ly, 14, ly + 1, (dim & 0x00FFFFFF) | 0x50000000);
+        }
+        GlStateManager.popMatrix();
     }
 
     private static void compass(int w, int main, int dim, FontRenderer font) {

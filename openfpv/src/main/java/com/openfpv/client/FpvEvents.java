@@ -70,20 +70,26 @@ public class FpvEvents {
         }
     }
 
+    /** Banking: the camera rolls with the drone, so the horizon tilts in turns like on a real FPV feed. */
+    @SubscribeEvent
+    public void onCameraSetup(EntityViewRenderEvent.CameraSetup event) {
+        if (FpvClient.isFlying()) event.setRoll(FpvClient.viewRoll((float) event.getRenderPartialTicks()));
+    }
+
     @SubscribeEvent
     public void onFov(EntityViewRenderEvent.FOVModifier event) {
         FpvClient.Cam cam = FpvClient.current();
-        if (cam != null) event.setFOV(cam.fov);
+        if (cam != null && FpvClient.isFlying()) event.setFOV(cam.fov);
     }
 
     @SubscribeEvent
     public void onRenderHand(RenderHandEvent event) {
-        if (FpvClient.isViewing()) event.setCanceled(true);
+        if (FpvClient.isFlying()) event.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onOverlayPre(RenderGameOverlayEvent.Pre event) {
-        if (!FpvClient.isViewing()) return;
+        if (!FpvClient.isFlying()) return;
         switch (event.getType()) {
             case ALL:
             case TEXT:
@@ -98,7 +104,7 @@ public class FpvEvents {
 
     @SubscribeEvent
     public void onOverlayPost(RenderGameOverlayEvent.Post event) {
-        if (FpvClient.isViewing() && event.getType() == RenderGameOverlayEvent.ElementType.ALL) {
+        if (FpvClient.isFlying() && event.getType() == RenderGameOverlayEvent.ElementType.ALL) {
             Hud.render(event.getResolution(), event.getPartialTicks());
         }
     }

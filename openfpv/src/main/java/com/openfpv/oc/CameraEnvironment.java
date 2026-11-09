@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 public class CameraEnvironment extends AbstractManagedEnvironment {
     private final Drone drone;
     private final int modules;
+    private final int antennaTier;
 
     private volatile boolean active;
     private volatile boolean night;
@@ -47,6 +48,7 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
     public CameraEnvironment(Drone drone, ItemStack stack) {
         this.drone = drone;
         this.modules = ModuleBay.readMask(stack);
+        this.antennaTier = ModuleBay.readAntennaTier(stack);
         setNode(Network.newNode(this, Visibility.Network).withComponent("camera").withConnector().create());
     }
 
@@ -86,6 +88,15 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
 
     public int modules() {
         return modules;
+    }
+
+    public int antennaTier() {
+        return antennaTier;
+    }
+
+    /** Maximum pilot-to-drone distance in blocks, set by the installed antenna. */
+    public double range() {
+        return Config.rangeForTier(antennaTier);
     }
 
     public boolean hasModule(ModuleType t) {
@@ -217,9 +228,14 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
         return ok(active);
     }
 
-    @Callback(direct = true, doc = "function():number -- Maximum distance in blocks between pilot and drone before the video signal is lost.")
+    @Callback(direct = true, doc = "function():number -- Maximum distance in blocks between pilot and drone before the video signal is lost. Set by the antenna in the camera's bay.")
     public Object[] getRange(Context context, Arguments args) {
-        return ok(Config.maxRange);
+        return ok(range());
+    }
+
+    @Callback(direct = true, doc = "function():number -- Tier of the installed antenna: 0 = none, 1..4 = Antenna Mk1..Mk4.")
+    public Object[] getAntennaTier(Context context, Arguments args) {
+        return ok(antennaTier);
     }
 
     @Callback(direct = true, doc = "function():number -- Energy the active camera consumes per second.")

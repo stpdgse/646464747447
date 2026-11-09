@@ -46,7 +46,7 @@ public class GuiModuleBay extends GuiContainer {
         for (int i = 0; i < ModuleBay.SIZE; i++) {
             Slot slot = inventorySlots.getSlot(i);
             if (!slot.getHasStack()) {
-                ItemStack ghost = new ItemStack(ModItems.MODULES[i]);
+                ItemStack ghost = new ItemStack(i == ModuleBay.ANTENNA_SLOT ? ModItems.ANTENNAS[0] : ModItems.MODULES[i]);
                 itemRender.renderItemIntoGUI(ghost, slot.xPos, slot.yPos);
                 GlStateManager.disableLighting();
                 GlStateManager.disableDepth();
@@ -60,8 +60,10 @@ public class GuiModuleBay extends GuiContainer {
     protected void renderHoveredToolTip(int x, int y) {
         Slot hovered = getSlotUnderMouse();
         if (hovered != null && hovered.slotNumber < ModuleBay.SIZE && !hovered.getHasStack()) {
-            ModuleType t = ModuleType.VALUES[hovered.slotNumber];
-            drawHoveringText(I18n.format("item.openfpv." + t.itemName + ".name"), x, y);
+            String label = hovered.slotNumber == ModuleBay.ANTENNA_SLOT
+                ? I18n.format("container.openfpv.antenna_slot")
+                : I18n.format("item.openfpv." + ModuleType.VALUES[hovered.slotNumber].itemName + ".name");
+            drawHoveringText(label, x, y);
         } else {
             super.renderHoveredToolTip(x, y);
         }

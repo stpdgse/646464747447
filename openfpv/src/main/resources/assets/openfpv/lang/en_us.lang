@@ -6,6 +6,10 @@ item.openfpv.zoom_module.name=Zoom Module
 item.openfpv.gimbal_module.name=Gimbal Module
 item.openfpv.thermal_module.name=Thermal Vision Module
 item.openfpv.depth_module.name=Depth Sensor Module
+item.openfpv.antenna_mk1.name=Antenna Mk1
+item.openfpv.antenna_mk2.name=Antenna Mk2
+item.openfpv.antenna_mk3.name=Antenna Mk3
+item.openfpv.antenna_mk4.name=Antenna Mk4
 
 tooltip.openfpv.camera_upgrade=Drone upgrade: adds the "camera" component for first-person flying.
 tooltip.openfpv.no_modules=No modules installed.
@@ -16,15 +20,22 @@ tooltip.openfpv.night_vision_module=Enables camera.setNightVision(), the green a
 tooltip.openfpv.zoom_module=Enables camera.setFov() / camera.setZoom().
 tooltip.openfpv.gimbal_module=Enables camera.setTilt() / camera.setPan().
 tooltip.openfpv.thermal_module=Enables camera.setThermal(), heat-map vision.
+tooltip.openfpv.antenna=Extends the video link to %s blocks.
+tooltip.openfpv.antenna_hint=Goes into the antenna slot of a Camera Upgrade's bay.
 tooltip.openfpv.depth_module=Enables camera.depth() / camera.color() grid scans.
 
 container.openfpv.module_bay=Camera Module Bay
+container.openfpv.antenna_slot=Antenna
 
 key.categories.openfpv=OpenFPV
 key.openfpv.toggle=Toggle FPV View
 key.openfpv.next=Next Camera Drone
+key.openfpv.yaw_left=Yaw Left
+key.openfpv.yaw_right=Yaw Right
 
 message.openfpv.entered=FPV link established. Esc to leave.
+message.openfpv.linking=Establishing video link...
+message.openfpv.link_failed=Could not establish the video link.
 message.openfpv.no_camera=No active camera drone in range.
 message.openfpv.only_camera=Only one camera drone in range.
 message.openfpv.signal_lost=Signal lost!
@@ -38,5 +49,7 @@ hud.openfpv.dst=DST %s m
 hud.openfpv.pwr=PWR %s%%
 hud.openfpv.sig=SIG
 hud.openfpv.zoom=ZOOM x%s
-hud.openfpv.hint=WASD/Space/Shift: fly   Mouse: look   B: next drone   Esc: exit
+hud.openfpv.hint=W/S pitch  A/D roll  Space/Shift throttle  Mouse or arrows: yaw  B: next  Esc: exit
+hud.openfpv.rng=RNG %s/%s m
+hud.openfpv.lag=LAG %s ms
 hud.openfpv.weak_signal=WEAK SIGNAL

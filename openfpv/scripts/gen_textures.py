@@ -167,6 +167,26 @@ def depth():
     return im
 
 
+def antenna(tier):
+    im = Img(16, 16)
+    im.rect(3, 12, 12, 14, rgb("#23232b"))
+    im.rect(4, 11, 11, 11, rgb("#3a3a46"))
+    for x in (4, 6, 8, 10):
+        im.set(x, 15, rgb("#d4af37"))
+    im.rect(7, 4, 8, 11, rgb("#cfd8dc"))      # mast
+    im.rect(6, 11, 9, 11, rgb("#90a4ae"))
+    im.disc(7.5, 3.5, 1.4, rgb("#ff5252"))     # tip
+    cols = ["#81d4fa", "#4fc3f7", "#29b6f6", "#0288d1"]
+    for i in range(tier):                      # more signal arcs per tier
+        r = 3 + i * 2
+        for a in range(-50, 51, 5):
+            import math
+            x = 7.5 + r * math.sin(math.radians(a))
+            y = 3.5 - r * math.cos(math.radians(a)) * 0.55
+            im.set(round(x), round(y), rgb(cols[i]))
+    return im
+
+
 def gui():
     W, H = 256, 256
     im = Img(W, H)
@@ -189,8 +209,8 @@ def gui():
         im.set(x - 1, y + 16, rgb("#8b8b8b"))
         im.set(x + 16, y - 1, rgb("#8b8b8b"))
 
-    for i in range(5):
-        slot(43 + i * 18, 20)
+    for i in range(6):
+        slot(34 + i * 18, 20)
     for row in range(3):
         for col in range(9):
             slot(8 + col * 18, 51 + row * 18)
@@ -208,5 +228,7 @@ if __name__ == "__main__":
     gimbal().save("items/gimbal_module.png")
     thermal().save("items/thermal_module.png")
     depth().save("items/depth_module.png")
+    for t in range(1, 5):
+        antenna(t).save("items/antenna_mk%d.png" % t)
     gui().save("gui/module_bay.png")
     print("textures written to", os.path.normpath(OUT))

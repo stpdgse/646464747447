@@ -1,6 +1,7 @@
 package com.openfpv.bay;
 
 import com.openfpv.ModItems;
+import com.openfpv.item.ItemAntenna;
 import com.openfpv.item.ItemModule;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -12,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 
 public class ContainerModuleBay extends Container {
-    public static final int BAY_X = 43;
+    public static final int BAY_X = 34;
     public static final int BAY_Y = 20;
 
     private final ItemStack camera;
@@ -84,8 +85,9 @@ public class ContainerModuleBay extends Container {
         ItemStack copy = stack.copy();
         if (index < ModuleBay.SIZE) {
             if (!mergeItemStack(stack, ModuleBay.SIZE, inventorySlots.size(), true)) return ItemStack.EMPTY;
-        } else if (stack.getItem() instanceof ItemModule) {
-            int target = ((ItemModule) stack.getItem()).type.ordinal();
+        } else if (stack.getItem() instanceof ItemModule || stack.getItem() instanceof ItemAntenna) {
+            int target = stack.getItem() instanceof ItemAntenna ? ModuleBay.ANTENNA_SLOT
+                : ((ItemModule) stack.getItem()).type.ordinal();
             if (inventorySlots.get(target).getHasStack()) return ItemStack.EMPTY;
             inventorySlots.get(target).putStack(stack.splitStack(1));
         } else {

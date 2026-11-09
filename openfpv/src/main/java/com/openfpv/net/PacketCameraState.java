@@ -12,7 +12,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 public class PacketCameraState implements IMessage {
     public int entityId;
     public boolean active, night, thermal;
-    public float fov, tilt, pan, energy;
+    public float fov, tilt, pan, energy, range;
+    public double x, y, z;
     public int modules;
 
     public PacketCameraState() {}
@@ -28,6 +29,11 @@ public class PacketCameraState implements IMessage {
         p.pan = e.pan();
         p.energy = e.energyFraction();
         p.modules = e.modules();
+        p.range = (float) e.range();
+        net.minecraft.entity.Entity ent = (net.minecraft.entity.Entity) e.drone();
+        p.x = ent.posX;
+        p.y = ent.posY;
+        p.z = ent.posZ;
         return p;
     }
 
@@ -43,6 +49,10 @@ public class PacketCameraState implements IMessage {
         pan = buf.readFloat();
         energy = buf.readFloat();
         modules = buf.readInt();
+        range = buf.readFloat();
+        x = buf.readDouble();
+        y = buf.readDouble();
+        z = buf.readDouble();
     }
 
     @Override
@@ -54,6 +64,10 @@ public class PacketCameraState implements IMessage {
         buf.writeFloat(pan);
         buf.writeFloat(energy);
         buf.writeInt(modules);
+        buf.writeFloat(range);
+        buf.writeDouble(x);
+        buf.writeDouble(y);
+        buf.writeDouble(z);
     }
 
     public static class Handler implements IMessageHandler<PacketCameraState, IMessage> {

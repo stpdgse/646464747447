@@ -38,6 +38,10 @@ public final class ModRecipes {
         Object chip2 = oc("chip2", "gemDiamond");
         Object pcb = oc("printedcircuitboard", "ingotIron");
         Object gpu = oc("graphicscard1", chip1);
+        Object chip3 = oc("chip3", "gemDiamond");
+        Object wlan1 = oc("wlancard1", chip1);
+        Object wlan2 = oc("wlancard2", chip2);
+        Object chipDiamond = oc("chipdiamond", "gemDiamond");
 
         add(event, "camera_upgrade", new ItemStack(ModItems.CAMERA),
             "IGI", "RVR", "IPI",
@@ -55,6 +59,23 @@ public final class ModRecipes {
         add(event, ModuleType.DEPTH, "ERE", "LCL", "IPI",
             'E', net.minecraft.init.Items.ENDER_PEARL, 'R', "dustRedstone", 'L', "gemLapis", 'C', chip2,
             'I', "ingotIron", 'P', pcb);
+        registerAntennas(event, pcb, chip3, wlan1, wlan2, chipDiamond);
+    }
+
+    private static ItemStack antenna(int tier) {
+        return new ItemStack(ModItems.ANTENNAS[tier - 1]);
+    }
+
+    private static void registerAntennas(RegistryEvent.Register<IRecipe> event, Object pcb, Object chip3,
+                                         Object wlan1, Object wlan2, Object chipDiamond) {
+        add(event, "antenna_mk1", antenna(1), "IRI", "RWR", "IPI",
+            'I', "ingotIron", 'R', "dustRedstone", 'W', wlan1, 'P', pcb);
+        add(event, "antenna_mk2", antenna(2), "GRG", "RAR", "GWG",
+            'G', "ingotGold", 'R', "dustRedstone", 'A', antenna(1), 'W', wlan2);
+        add(event, "antenna_mk3", antenna(3), "DCD", "RAR", "DWD",
+            'D', "gemDiamond", 'C', chip3, 'R', "dustRedstone", 'A', antenna(2), 'W', wlan2);
+        add(event, "antenna_mk4", antenna(4), "EQE", "CAC", "EWE",
+            'E', net.minecraft.init.Items.ENDER_PEARL, 'Q', chipDiamond, 'C', chip3, 'A', antenna(3), 'W', wlan2);
     }
 
     private static void add(RegistryEvent.Register<IRecipe> event, ModuleType type, Object... recipe) {

@@ -1,9 +1,10 @@
-PASS three drones spawned  -- 16562,16563,16564
-PASS drone A Lua ran to completion  -- RESULT|modules=nightvision,zoom,gimbal,thermal,depth;start=true;active=true;range=64.0;setFov=40.0;getFov=40.0;zoom=1.75;setZoom=2.0;fovAfterZoom=35.0;setTilt=15.0;tiltClamp=90.0;setPan=-160.0;getPan=-160.0;center=true;pan0=0.0;tilt0=0.0;nv=true;isNv=true;th=true;isTh=true;rows=3;cols=4;depthCells=12;colorRows=2;tooBig=grid must be 1..32 wide and 1..16 high;usage=2.0;wallDepth=13.500;wallColor=7368816;skyDepth=-1;groundDepth=0.70;stopped=false
+PASS four drones spawned  -- 15340,15341,15342,15343
+PASS drone A Lua ran to completion  -- RESULT|modules=nightvision,zoom,gimbal,thermal,depth;start=true;active=true;range=400.0;antenna=2;setFov=40.0;getFov=40.0;zoom=1.75;setZoom=2.0;fovAfterZoom=35.0;setTilt=15.0;tiltClamp=90.0;setPan=-160.0;getPan=-160.0;center=true;pan0=0.0;tilt0=0.0;nv=true;isNv=true;th=true;isTh=true;rows=3;cols=4;depthCells=12;colorRows=2;tooBig=grid must be 1..32 wide and 1..16 high;usage=2.0;wallDepth=13.500;wallColor=7368816;skyDepth=-1;groundDepth=0.70;stopped=false
 PASS Lua modules  -- expected nightvision,zoom,gimbal,thermal,depth got nightvision,zoom,gimbal,thermal,depth
 PASS Lua start  -- expected true got true
 PASS Lua active  -- expected true got true
-PASS Lua range  -- expected 64.0 got 64.0
+PASS Lua range  -- expected 400.0 got 400.0
+PASS Lua antenna  -- expected 2 got 2
 PASS Lua setFov  -- expected 40.0 got 40.0
 PASS Lua getFov  -- expected 40.0 got 40.0
 PASS Lua zoom  -- expected 1.75 got 1.75
@@ -32,22 +33,24 @@ PASS tilt 80 deg down hits the ground close by  -- 0.7
 PASS no-module camera refuses night vision  -- [null, module not installed: nightvision]
 PASS no-module camera refuses depth  -- [null, module not installed: depth]
 PASS no-module camera lists no modules  -- Map()
-PASS OC lets the camera be installed in a drone  -- com.openfpv.oc.DriverCamera@9f20d1e
+PASS OC lets the camera be installed in a drone  -- com.openfpv.oc.DriverCamera@1adbcd43
 PASS camera goes in an upgrade slot  -- upgrade
 PASS camera fits any upgrade tier (tier 0)
 PASS OC refuses the camera in a robot
 PASS OC refuses the camera in a micro-controller-less host (generic EnvironmentHost)
-PASS modules cannot be put into a drone directly (only into the camera's bay)
-PASS recipe registered: camera_upgrade  -- [net.minecraftforge.oredict.OreIngredient@24bab3d8, net.minecraftforge.oredict.OreIngredient@7fb44edb, net.minecraftforge.oredict.OreIngredient@24bab3d8, net.minecraftforge.oredict.OreIngredient@7a3bbea6, net.minecraft.item.crafting.Ingredient@104a6c23, net.minecraftforge.oredict.OreIngredient@7a3bbea6, net.minecraftforge.oredict.OreIngredient@24bab3d8, net.minecraft.item.crafting.Ingredient@619f2981, net.minecraftforge.oredict.OreIngredient@24bab3d8]
-PASS recipe registered: night_vision_module  -- [net.minecraftforge.oredict.OreIngredient@1b692647, net.minecraftforge.oredict.OreIngredient@58816a7d, net.minecraftforge.oredict.OreIngredient@1b692647, net.minecraftforge.oredict.OreIngredient@40ca93cd, net.minecraft.item.crafting.Ingredient@7f7a0da2, net.minecraftforge.oredict.OreIngredient@40ca93cd, net.minecraftforge.oredict.OreIngredient@2df34714, net.minecraft.item.crafting.Ingredient@7e720255, net.minecraftforge.oredict.OreIngredient@2df34714]
-PASS recipe registered: zoom_module  -- [net.minecraftforge.oredict.OreIngredient@450ab544, net.minecraftforge.oredict.OreIngredient@72f68116, net.minecraftforge.oredict.OreIngredient@450ab544, net.minecraftforge.oredict.OreIngredient@6320bb5f, net.minecraft.item.crafting.Ingredient@1cf855b7, net.minecraftforge.oredict.OreIngredient@6320bb5f, net.minecraftforge.oredict.OreIngredient@6320bb5f, net.minecraft.item.crafting.Ingredient@731082ea, net.minecraftforge.oredict.OreIngredient@6320bb5f]
-PASS recipe registered: gimbal_module  -- [net.minecraftforge.oredict.OreIngredient@d8d9c7a, net.minecraft.item.crafting.Ingredient@6ba3fd40, net.minecraftforge.oredict.OreIngredient@d8d9c7a, net.minecraftforge.oredict.OreIngredient@d3f5928, net.minecraft.item.crafting.Ingredient@7a4f9db7, net.minecraftforge.oredict.OreIngredient@d3f5928, net.minecraftforge.oredict.OreIngredient@d8d9c7a, net.minecraft.item.crafting.Ingredient@79302976, net.minecraftforge.oredict.OreIngredient@d8d9c7a]
-PASS recipe registered: thermal_module  -- [net.minecraft.item.crafting.Ingredient@8954f25, net.minecraftforge.oredict.OreIngredient@699a6c01, net.minecraft.item.crafting.Ingredient@8954f25, net.minecraftforge.oredict.OreIngredient@119983dd, net.minecraft.item.crafting.Ingredient@11e32a5e, net.minecraftforge.oredict.OreIngredient@119983dd, net.minecraftforge.oredict.OreIngredient@33ada320, net.minecraft.item.crafting.Ingredient@9ed2b30, net.minecraftforge.oredict.OreIngredient@33ada320]
-PASS recipe registered: depth_module  -- [net.minecraft.item.crafting.Ingredient@5c0eb7a9, net.minecraftforge.oredict.OreIngredient@264bbab, net.minecraft.item.crafting.Ingredient@5c0eb7a9, net.minecraftforge.oredict.OreIngredient@62b0a47c, net.minecraft.item.crafting.Ingredient@858348f, net.minecraftforge.oredict.OreIngredient@62b0a47c, net.minecraftforge.oredict.OreIngredient@214279d2, net.minecraft.item.crafting.Ingredient@6dc37b2, net.minecraftforge.oredict.OreIngredient@214279d2]
+PASS modules and antennas cannot be put into a drone directly (only into the camera's bay)
+PASS recipe registered: camera_upgrade  -- [net.minecraftforge.oredict.OreIngredient@7d471800, net.minecraftforge.oredict.OreIngredient@31cd0bc0, net.minecraftforge.oredict.OreIngredient@7d471800, net.minecraftforge.oredict.OreIngredient@77e9f270, net.minecraft.item.crafting.Ingredient@72f80f99, net.minecraftforge.oredict.OreIngredient@77e9f270, net.minecraftforge.oredict.OreIngredient@7d471800, net.minecraft.item.crafting.Ingredient@37ba8ede, net.minecraftforge.oredict.OreIngredient@7d471800]
+PASS recipe registered: night_vision_module  -- [net.minecraftforge.oredict.OreIngredient@5632152e, net.minecraftforge.oredict.OreIngredient@64845cb6, net.minecraftforge.oredict.OreIngredient@5632152e, net.minecraftforge.oredict.OreIngredient@7abe286, net.minecraft.item.crafting.Ingredient@69b20591, net.minecraftforge.oredict.OreIngredient@7abe286, net.minecraftforge.oredict.OreIngredient@2feff6ec, net.minecraft.item.crafting.Ingredient@69c86e4b, net.minecraftforge.oredict.OreIngredient@2feff6ec]
+PASS recipe registered: zoom_module  -- [net.minecraftforge.oredict.OreIngredient@48c80b0f, net.minecraftforge.oredict.OreIngredient@1840dc6c, net.minecraftforge.oredict.OreIngredient@48c80b0f, net.minecraftforge.oredict.OreIngredient@7b47355b, net.minecraft.item.crafting.Ingredient@32505319, net.minecraftforge.oredict.OreIngredient@7b47355b, net.minecraftforge.oredict.OreIngredient@7b47355b, net.minecraft.item.crafting.Ingredient@735fc94f, net.minecraftforge.oredict.OreIngredient@7b47355b]
+PASS recipe registered: gimbal_module  -- [net.minecraftforge.oredict.OreIngredient@69f3651e, net.minecraft.item.crafting.Ingredient@5d1a86ca, net.minecraftforge.oredict.OreIngredient@69f3651e, net.minecraftforge.oredict.OreIngredient@1f358ddf, net.minecraft.item.crafting.Ingredient@12ad3ac7, net.minecraftforge.oredict.OreIngredient@1f358ddf, net.minecraftforge.oredict.OreIngredient@69f3651e, net.minecraft.item.crafting.Ingredient@6056923c, net.minecraftforge.oredict.OreIngredient@69f3651e]
+PASS recipe registered: thermal_module  -- [net.minecraft.item.crafting.Ingredient@283ec33e, net.minecraftforge.oredict.OreIngredient@5a1798b2, net.minecraft.item.crafting.Ingredient@283ec33e, net.minecraftforge.oredict.OreIngredient@e8426be, net.minecraft.item.crafting.Ingredient@28985db2, net.minecraftforge.oredict.OreIngredient@e8426be, net.minecraftforge.oredict.OreIngredient@76e14cac, net.minecraft.item.crafting.Ingredient@10d598ca, net.minecraftforge.oredict.OreIngredient@76e14cac]
+PASS recipe registered: depth_module  -- [net.minecraft.item.crafting.Ingredient@55d4422e, net.minecraftforge.oredict.OreIngredient@292ce014, net.minecraft.item.crafting.Ingredient@55d4422e, net.minecraftforge.oredict.OreIngredient@15033e33, net.minecraft.item.crafting.Ingredient@75c53706, net.minecraftforge.oredict.OreIngredient@15033e33, net.minecraftforge.oredict.OreIngredient@2f7dea2, net.minecraft.item.crafting.Ingredient@4c95b2a8, net.minecraftforge.oredict.OreIngredient@2f7dea2]
+PASS antenna slot takes only antennas, module slots only modules
 PASS bay refuses wrong-slot module and junk
 PASS module bay persisted to the camera item NBT  -- mask=31
+PASS antenna persisted to the camera item NBT  -- tier=3
 PASS client knows B has an active camera
-PASS FPV started on drone B  -- viewing=16563
+PASS FPV started on drone B  -- viewing=15341
 PASS render view entity is the drone
 PASS server registered the FPV session
 PASS night vision post-effect is active
@@ -58,18 +61,43 @@ PASS post-effect cleared when modes are off
 PASS client received zoomed FOV  -- 25.0
 PASS client received gimbal state
 PASS view yaw includes the gimbal pan  -- 35.0 vs 35.0
-PASS W flies the drone forward  -- moved 13.13 blocks along heading
-PASS HUD speed telemetry is live  -- peak 8.00 m/s
-PASS pilot's own body stayed put
-PASS releasing the keys makes the drone hover  -- drift 0.000
-PASS Space climbs  -- +11.12
-PASS signal quality drops with distance  -- q=0.47940385
+PASS W leans the drone forward up to the max tilt  -- peak pitch 34.6 deg (max 35)
+PASS W flies the drone forward  -- moved 6.83 blocks along heading
+PASS HUD speed telemetry is live  -- peak 16.00 m/s
+PASS piloted drone beats OC's stock 8 m/s cap  -- peak 16.00 m/s
+PASS drone glides after release (inertia, not an instant stop)  -- coasted 5.72 blocks
+PASS drone levels itself when the sticks are released  -- pitch 0.00 roll 0.00
+PASS drone hovers once it has settled  -- drift 0.000
+PASS D banks the drone to the right  -- peak roll 34.5 deg
+PASS banking right moves the drone to its right  -- moved 5.72 blocks right
+PASS camera roll follows the bank  -- view roll 34.5
+PASS arrow key yaws the drone at the configured rate  -- turned 90.0 deg
+PASS camera heading follows the drone's yaw  -- 84.51 vs 90.0
+PASS Space climbs  -- +10.21
+PASS Shift descends  -- y 9.58, was 14.71 when Shift was pressed
+PASS signal quality drops with distance  -- q=0.4955864
 PASS still viewing at 75% range
-PASS signal nearly gone at 93% range  -- q=0.1233691
+PASS signal nearly gone at 93% range  -- q=0.13568437
 PASS server ended the session when the signal was lost
 PASS shader cleared on exit
+PASS drone E is ~300 blocks from the pilot  -- 300.0 blocks
+PASS without a link the client has never heard of drone E's entity
+PASS client knows E's camera and its range (state broadcast)  -- range 800.0
+PASS Lua getRange() on E reports the Mk3 antenna
+PASS FPV is up on the far drone  -- viewing=15343
+PASS pilot's camera is the far drone entity
+PASS full signal at 300 of 800 blocks  -- q=1.0 dist=300.0003967285156
+PASS a pig beside the far drone is streamed to the pilot
+PASS server streams chunks around the drone to the pilot  -- watched=121
+PASS server boosted tracking of the drone and nearby entities  -- boosted=2
+PASS still linked at 700 of 800 blocks  -- viewing=15343
+PASS signal is weak there  -- q=0.24999604
+PASS control lag appears with the weak signal  -- lag=8 ticks
+PASS some control packets are lost  -- dropped=30 sent=157
+PASS long-range link is released when FPV ends
+PASS far drone is no longer tracked once the link is gone
 PASS Esc leaves FPV instead of opening the pause menu  -- screen=null
-PASS cycling switches to the other camera drone  -- now 16564
+PASS cycling switches to the other camera drone  -- now 15343
 PASS switching the camera off ends FPV
 
-TOTAL 73  PASS 73  FAIL 0
+TOTAL 101  PASS 101  FAIL 0

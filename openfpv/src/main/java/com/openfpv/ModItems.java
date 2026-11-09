@@ -1,5 +1,6 @@
 package com.openfpv;
 
+import com.openfpv.item.ItemAntenna;
 import com.openfpv.item.ItemCamera;
 import com.openfpv.item.ItemModule;
 import com.openfpv.item.ModuleType;
@@ -28,6 +29,8 @@ public final class ModItems {
 
     public static final ItemCamera CAMERA = new ItemCamera();
     public static final ItemModule[] MODULES = new ItemModule[ModuleType.VALUES.length];
+    /** Antenna Mk1..Mk4 (index 0 = Mk1). */
+    public static final ItemAntenna[] ANTENNAS = new ItemAntenna[4];
 
     static {
         name(CAMERA, "camera_upgrade");
@@ -35,6 +38,10 @@ public final class ModItems {
             ItemModule m = new ItemModule(t);
             name(m, t.itemName);
             MODULES[t.ordinal()] = m;
+        }
+        for (int i = 0; i < ANTENNAS.length; i++) {
+            ANTENNAS[i] = new ItemAntenna(i + 1);
+            name(ANTENNAS[i], "antenna_mk" + (i + 1));
         }
     }
 
@@ -48,6 +55,7 @@ public final class ModItems {
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(CAMERA);
         event.getRegistry().registerAll(MODULES);
+        event.getRegistry().registerAll(ANTENNAS);
     }
 
     @SubscribeEvent
@@ -56,6 +64,9 @@ public final class ModItems {
         ModelLoader.setCustomModelResourceLocation(CAMERA, 0, new ModelResourceLocation(CAMERA.getRegistryName(), "inventory"));
         for (ItemModule m : MODULES) {
             ModelLoader.setCustomModelResourceLocation(m, 0, new ModelResourceLocation(m.getRegistryName(), "inventory"));
+        }
+        for (ItemAntenna a : ANTENNAS) {
+            ModelLoader.setCustomModelResourceLocation(a, 0, new ModelResourceLocation(a.getRegistryName(), "inventory"));
         }
     }
 }

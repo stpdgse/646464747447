@@ -18,10 +18,15 @@ public final class Net {
         CHANNEL.registerMessage(PacketViewEnd.Handler.class, PacketViewEnd.class, 1, Side.CLIENT);
         CHANNEL.registerMessage(PacketView.Handler.class, PacketView.class, 2, Side.SERVER);
         CHANNEL.registerMessage(PacketControl.Handler.class, PacketControl.class, 3, Side.SERVER);
+        CHANNEL.registerMessage(PacketAttitude.Handler.class, PacketAttitude.class, 4, Side.CLIENT);
     }
 
     public static void sendState(CameraEnvironment env, World world) {
         CHANNEL.sendToDimension(PacketCameraState.of(env), world.provider.getDimension());
+    }
+
+    public static void sendAttitude(EntityPlayerMP player, PacketAttitude p) {
+        CHANNEL.sendTo(p, player);
     }
 
     public static void sendViewEnd(EntityPlayerMP player, int reason) {

@@ -1,5 +1,6 @@
 package com.openfpv.dev;
 
+import com.openfpv.Config;
 import com.openfpv.ModItems;
 import com.openfpv.OpenFPV;
 import com.openfpv.bay.ContainerModuleBay;
@@ -78,7 +79,7 @@ public final class DevHarness {
     private int tickInStep;
 
     // scene
-    private int droneA = -1, droneB = -1, droneC = -1;
+    private int droneA = -1, droneB = -1, droneC = -1, droneE = -1;
     private double dirX, dirZ;     // unit axis vector B faces
     private double wallDistance;
     private double expectedA;
@@ -209,38 +210,47 @@ public final class DevHarness {
     }
 
     private ItemStack cameraStack(boolean withModules) {
+        return cameraStack(withModules, 0);
+    }
+
+    private ItemStack cameraStack(boolean withModules, int antennaTier) {
         ItemStack s = new ItemStack(ModItems.CAMERA);
-        if (withModules) {
-            ItemStack[] mods = new ItemStack[ModuleBay.SIZE];
-            for (int i = 0; i < mods.length; i++) mods[i] = new ItemStack(ModItems.MODULES[i]);
-            ModuleBay.write(s, mods);
+        if (withModules || antennaTier > 0) {
+            ItemStack[] bay = new ItemStack[ModuleBay.SIZE];
+            for (int i = 0; i < bay.length; i++) bay[i] = ItemStack.EMPTY;
+            if (withModules) {
+                for (int i = 0; i < ModuleBay.MODULE_SLOTS; i++) bay[i] = new ItemStack(ModItems.MODULES[i]);
+            }
+            if (antennaTier > 0) bay[ModuleBay.ANTENNA_SLOT] = new ItemStack(ModItems.ANTENNAS[antennaTier - 1]);
+            ModuleBay.write(s, bay);
         }
         return s;
     }
 
-    private ItemStack makeDroneItem(String lua, boolean modules) {
+    private ItemStack makeDroneItem(String lua, boolean modules, int antenna, boolean chunkloader) {
         ItemStack drone = Items.get("drone").createItemStack(1);
         NBTTagCompound tag = new NBTTagCompound();
         tag.setByte("oc:tier", (byte) 3);
         tag.setInteger("oc:storedEnergy", 50000);
         NBTTagList comps = new NBTTagList();
         ItemStack eeprom = Items.registerEEPROM("openfpv-test", lua.getBytes(StandardCharsets.UTF_8), new byte[0], false);
-        for (ItemStack s : new ItemStack[]{
+        List<ItemStack> parts = new ArrayList<>(java.util.Arrays.asList(
             Items.get("cpu3").createItemStack(1), Items.get("ram6").createItemStack(1),
-            Items.get("ram6").createItemStack(1), eeprom, cameraStack(modules)}) {
-            comps.appendTag(s.writeToNBT(new NBTTagCompound()));
-        }
+            Items.get("ram6").createItemStack(1), eeprom, cameraStack(modules, antenna)));
+        // A drone that is far from every player only keeps running with a chunk loader upgrade (as in normal OC play).
+        if (chunkloader) parts.add(Items.get("chunkloaderupgrade").createItemStack(1));
+        for (ItemStack s : parts) comps.appendTag(s.writeToNBT(new NBTTagCompound()));
         tag.setTag("oc:components", comps);
         drone.setTagCompound(tag);
         return drone;
     }
 
     /** Places a drone just above the block at (x, 3, z) using OC's own item-use path. */
-    private int spawnDrone(String lua, boolean modules, int x, int z) throws Exception {
+    private int spawnDrone(String lua, boolean modules, int antenna, boolean chunkloader, int x, int z) throws Exception {
         return onServer(() -> {
             WorldServer w = server().getWorld(0);
             EntityPlayerMP p = server().getPlayerList().getPlayers().get(0);
-            ItemStack item = makeDroneItem(lua, modules);
+            ItemStack item = makeDroneItem(lua, modules, antenna, chunkloader);
             // OC's item delegator reads the player's held stack, so the drone must be in hand.
             ItemStack before = p.getHeldItem(EnumHand.MAIN_HAND);
             p.setHeldItem(EnumHand.MAIN_HAND, item);
@@ -321,7 +331,7 @@ public final class DevHarness {
         + "local mods = cam.getModules(); local names = {}\n"
         + "for i = 1, #mods do names[#names+1] = mods[i] end\n"
         + "put('modules', table.concat(names, ','))\n"
-        + "put('start', cam.start()); put('active', cam.isActive()); put('range', cam.getRange())\n"
+        + "put('start', cam.start()); put('active', cam.isActive()); put('range', cam.getRange()); put('antenna', cam.getAntennaTier())\n"
         + "put('setFov', cam.setFov(40)); put('getFov', cam.getFov()); put('zoom', string.format('%.2f', cam.getZoom()))\n"
         + "put('setZoom', cam.setZoom(2)); put('fovAfterZoom', string.format('%.1f', cam.getFov()))\n"
         + "put('setTilt', cam.setTilt(15)); put('tiltClamp', cam.setTilt(200))\n"
@@ -349,6 +359,13 @@ public final class DevHarness {
         + "cam.start()\n"
         + "while true do computer.pullSignal(1) end\n";
 
+    private static final String LUA_FAR =
+        "local cl = component.list('chunkloader')()\n"
+        + "if cl then component.invoke(cl, 'setActive', true) end\n"
+        + "local cam = component.proxy(component.list('camera')())\n"
+        + "cam.start()\n"
+        + "while true do computer.pullSignal(1) end\n";
+
     private void buildSteps() {
         // ---- 0. wait for the world
         add(() -> until(() -> mc.world != null && mc.player != null && mc.getIntegratedServer() != null
@@ -371,11 +388,26 @@ public final class DevHarness {
                     }
                     return null;
                 });
-                droneA = spawnDrone(LUA_API, true, 20, 0);
-                droneB = spawnDrone(LUA_IDLE, true, 0, 0);
-                droneC = spawnDrone(LUA_IDLE, false, -20, 0);
-                log("drones A=" + droneA + " B=" + droneB + " C=" + droneC);
-                check("three drones spawned", droneA >= 0 && droneB >= 0 && droneC >= 0, droneA + "," + droneB + "," + droneC);
+                onServer(() -> {   // the far drone's area must be loaded before anything can spawn there
+                    WorldServer w = server().getWorld(0);
+                    for (int cx = 15; cx <= 22; cx++) {
+                        for (int cz = -3; cz <= 3; cz++) w.getChunkFromChunkCoords(cx, cz);
+                    }
+                    return null;
+                });
+                droneA = spawnDrone(LUA_API, true, 2, false, 20, 0);
+                droneB = spawnDrone(LUA_FAR, true, 0, true, 0, 0);
+                droneC = spawnDrone(LUA_FAR, false, 0, true, -20, 0);
+                droneE = spawnDrone(LUA_FAR, true, 3, true, 300, 0);
+                log("drones A=" + droneA + " B=" + droneB + " C=" + droneC + " E=" + droneE);
+                check("four drones spawned", droneA >= 0 && droneB >= 0 && droneC >= 0 && droneE >= 0,
+                    droneA + "," + droneB + "," + droneC + "," + droneE);
+                onServer(() -> {   // something alive next to the far drone, to prove entities get streamed too
+                    WorldServer w = server().getWorld(0);
+                    Entity far = entity(droneE);
+                    spawnMob(w, new EntityPig(w), far.posX + 6.5, 4, far.posZ + 3.5);
+                    return null;
+                });
 
                 wallDistance = 14;
                 Entity a = entity(droneA), b = entity(droneB);
@@ -402,7 +434,7 @@ public final class DevHarness {
                     spawnMob(w, new EntityZombie(w), bx + dirX * 5 + 0.5 + rx * 2, 4, bz + dirZ * 5 + 0.5 + rz * 2);
                     return null;
                 });
-                startMachines(droneA, droneB, droneC);
+                startMachines(droneA, droneB, droneC, droneE);
             } catch (Exception ex) {
                 check("scene setup", false, ex.toString());
                 OpenFPV.log.error("scene setup failed", ex);
@@ -415,7 +447,8 @@ public final class DevHarness {
             try {
                 Entity a = entity(droneA);
                 String err = a instanceof Drone ? ((Drone) a).machine().lastError() : null;
-                return err != null && cam(droneB) != null && cam(droneB).isActive() && cam(droneC) != null && cam(droneC).isActive();
+                return err != null && cam(droneB) != null && cam(droneB).isActive() && cam(droneC) != null && cam(droneC).isActive()
+                    && cam(droneE) != null && cam(droneE).isActive();
             } catch (Exception ex) {
                 return false;
             }
@@ -438,7 +471,8 @@ public final class DevHarness {
                 eq(m, "modules", "nightvision,zoom,gimbal,thermal,depth");
                 eq(m, "start", "true");
                 eq(m, "active", "true");
-                eq(m, "range", "64.0");
+                eq(m, "range", "400.0");
+                eq(m, "antenna", "2");
                 eq(m, "setFov", "40.0");
                 eq(m, "getFov", "40.0");
                 eq(m, "zoom", "1.75");
@@ -505,10 +539,13 @@ public final class DevHarness {
             check("OC refuses the camera in a micro-controller-less host (generic EnvironmentHost)",
                 li.cil.oc.api.Driver.driverFor(camera, li.cil.oc.api.network.EnvironmentHost.class) == null, "");
             boolean modulesLoose = true;
-            for (int i = 0; i < ModuleBay.SIZE; i++) {
+            for (int i = 0; i < ModuleBay.MODULE_SLOTS; i++) {
                 modulesLoose &= li.cil.oc.api.Driver.driverFor(new ItemStack(ModItems.MODULES[i]), Drone.class) == null;
             }
-            check("modules cannot be put into a drone directly (only into the camera's bay)", modulesLoose, "");
+            for (int i = 0; i < ModItems.ANTENNAS.length; i++) {
+                modulesLoose &= li.cil.oc.api.Driver.driverFor(new ItemStack(ModItems.ANTENNAS[i]), Drone.class) == null;
+            }
+            check("modules and antennas cannot be put into a drone directly (only into the camera's bay)", modulesLoose, "");
         }));
 
         // ---- 6. recipes
@@ -550,7 +587,12 @@ public final class DevHarness {
                     // wrong module in a slot must be refused
                     boolean refused = !c.getSlot(0).isItemValid(new ItemStack(ModItems.MODULES[ModuleType.ZOOM.ordinal()]));
                     boolean junk = !c.getSlot(0).isItemValid(new ItemStack(Blocks.DIRT));
-                    for (int i = 0; i < ModuleBay.SIZE; i++) c.getSlot(i).putStack(new ItemStack(ModItems.MODULES[i]));
+                    boolean antennaOnly = !c.getSlot(ModuleBay.ANTENNA_SLOT).isItemValid(new ItemStack(ModItems.MODULES[0]))
+                        && c.getSlot(ModuleBay.ANTENNA_SLOT).isItemValid(new ItemStack(ModItems.ANTENNAS[0]))
+                        && !c.getSlot(0).isItemValid(new ItemStack(ModItems.ANTENNAS[0]));
+                    for (int i = 0; i < ModuleBay.MODULE_SLOTS; i++) c.getSlot(i).putStack(new ItemStack(ModItems.MODULES[i]));
+                    c.getSlot(ModuleBay.ANTENNA_SLOT).putStack(new ItemStack(ModItems.ANTENNAS[2]));
+                    check("antenna slot takes only antennas, module slots only modules", antennaOnly, "");
                     return refused && junk;
                 });
                 check("bay refuses wrong-slot module and junk", ok, "");
@@ -563,13 +605,14 @@ public final class DevHarness {
         add(waitTicks(5));
         add(once(() -> {
             try {
-                int mask = onServer(() -> {
+                int[] bay = onServer(() -> {
                     EntityPlayerMP p = server().getPlayerList().getPlayers().get(0);
-                    int m = ModuleBay.readMask(p.inventory.getStackInSlot(0));
+                    int[] r = {ModuleBay.readMask(p.inventory.getStackInSlot(0)), ModuleBay.readAntennaTier(p.inventory.getStackInSlot(0))};
                     p.closeScreen();
-                    return m;
+                    return r;
                 });
-                check("module bay persisted to the camera item NBT", mask == 31, "mask=" + mask);
+                check("module bay persisted to the camera item NBT", bay[0] == 31, "mask=" + bay[0]);
+                check("antenna persisted to the camera item NBT", bay[1] == 3, "tier=" + bay[1]);
             } catch (Exception ex) {
                 check("bay persist", false, ex.toString());
             }
@@ -598,7 +641,7 @@ public final class DevHarness {
             check("client knows B has an active camera", FpvClient.get(droneB) != null && FpvClient.get(droneB).active, "");
             FpvClient.toggle();
         }));
-        add(() -> until(FpvClient::isViewing, 100, "FPV to start"));
+        add(() -> until(FpvClient::isFlying, 100, "FPV to start"));
         add(waitTicks(40));
         add(once(() -> {
             check("FPV started on drone B", FpvClient.viewingId() == droneB, "viewing=" + FpvClient.viewingId());
@@ -669,31 +712,46 @@ public final class DevHarness {
         }));
         add(waitTicks(20));
 
-        // ---- 9. keyboard flight
+        // ---- 9. quadcopter flight (angle mode)
         double[] start = new double[3];
+        float[] peak = new float[3];       // peak pitch / roll seen on the client
+        double[] glide = new double[3];
         add(once(() -> {
             Entity b = entity(droneB);
             start[0] = b.posX; start[1] = b.posY; start[2] = b.posZ;
             maxSpeed = 0;
+            peak[0] = peak[1] = 0;
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), true);
         }));
-        add(() -> { // sample the HUD speed every tick; by the end the drone may be against the wall
+        add(() -> { // sample the attitude and HUD speed every tick
             maxSpeed = Math.max(maxSpeed, FpvClient.speed);
-            return tickInStep >= 50;
+            peak[0] = Math.max(peak[0], FpvClient.attitude()[1]);
+            return tickInStep >= 22;
         });
         add(once(() -> {
             Entity b = entity(droneB);
             double along = (b.posX - start[0]) * dirX + (b.posZ - start[2]) * dirZ;
-            check("W flies the drone forward", along > 1.5, String.format("moved %.2f blocks along heading", along));
+            check("W leans the drone forward up to the max tilt", peak[0] > 25f && peak[0] <= Config.maxTilt + 0.5,
+                String.format("peak pitch %.1f deg (max %.0f)", peak[0], Config.maxTilt));
+            check("W flies the drone forward", along > 3, String.format("moved %.2f blocks along heading", along));
             check("HUD speed telemetry is live", maxSpeed > 1.0, String.format("peak %.2f m/s", maxSpeed));
-            check("pilot's own body stayed put", mc.player.getDistance(b.posX - dirX * 3, 4, b.posZ - dirZ * 3) < 1.0
-                || Math.abs((mc.player.posX - (start[0] - dirX * 3))) < 1.0, "");
+            check("piloted drone beats OC's stock 8 m/s cap", maxSpeed > 9.0, String.format("peak %.2f m/s", maxSpeed));
             shot("04_fpv_flying");
+            glide[0] = b.posX; glide[1] = b.posY; glide[2] = b.posZ;
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
         }));
-        add(waitTicks(60));
+        add(waitTicks(20));
+        add(once(() -> {
+            Entity b = entity(droneB);
+            double coasted = (b.posX - glide[0]) * dirX + (b.posZ - glide[2]) * dirZ;
+            check("drone glides after release (inertia, not an instant stop)", coasted > 1.5, String.format("coasted %.2f blocks", coasted));
+        }));
+        add(waitTicks(70));
         double[] rest = new double[3];
         add(once(() -> {
+            float[] att = FpvClient.attitude();
+            check("drone levels itself when the sticks are released", Math.abs(att[1]) < 1.5f && Math.abs(att[2]) < 1.5f,
+                String.format("pitch %.2f roll %.2f", att[1], att[2]));
             Entity b = entity(droneB);
             rest[0] = b.posX; rest[1] = b.posY; rest[2] = b.posZ;
         }));
@@ -701,7 +759,45 @@ public final class DevHarness {
         add(once(() -> {
             Entity b = entity(droneB);
             double drift = Math.sqrt(Math.pow(b.posX - rest[0], 2) + Math.pow(b.posY - rest[1], 2) + Math.pow(b.posZ - rest[2], 2));
-            check("releasing the keys makes the drone hover", drift < 0.15, String.format("drift %.3f", drift));
+            check("drone hovers once it has settled", drift < 0.15, String.format("drift %.3f", drift));
+            start[0] = b.posX; start[2] = b.posZ;
+            peak[1] = 0;
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindRight.getKeyCode(), true);
+        }));
+        add(() -> {
+            peak[1] = Math.max(peak[1], FpvClient.attitude()[2]);
+            return tickInStep >= 20;
+        });
+        add(once(() -> {
+            Entity b = entity(droneB);
+            double[] right = {-dirZ, dirX};
+            double sideways = (b.posX - start[0]) * right[0] + (b.posZ - start[2]) * right[1];
+            check("D banks the drone to the right", peak[1] > 25f, String.format("peak roll %.1f deg", peak[1]));
+            check("banking right moves the drone to its right", sideways > 1.0, String.format("moved %.2f blocks right", sideways));
+            check("camera roll follows the bank", FpvClient.viewRoll(0f) > 20f, String.format("view roll %.1f", FpvClient.viewRoll(0f)));
+            shot("05b_fpv_bank");
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindRight.getKeyCode(), false);
+        }));
+        add(waitTicks(80));
+        float[] yaw0 = new float[1];
+        add(once(() -> {
+            yaw0[0] = FpvClient.attitude()[0];
+            KeyBinding.setKeyBindState(FpvClient.KEY_YAW_RIGHT.getKeyCode(), true);
+        }));
+        add(waitTicks(20));
+        add(once(() -> {
+            float turned = MathHelperWrap(FpvClient.attitude()[0] - yaw0[0]);
+            check("arrow key yaws the drone at the configured rate", turned > 60f && turned < 110f, String.format("turned %.1f deg", turned));
+            FpvClient.Cam cam = FpvClient.current();
+            float expect = FpvClient.attitude()[0] + (cam == null ? 0f : cam.pan);
+            // the view is interpolated between ticks and software rendering skips frames: allow ~2.5 ticks of turning
+            check("camera heading follows the drone's yaw", Math.abs(MathHelperWrap(FpvClient.viewYaw() - expect)) < 2.5f * (float) Config.yawRate + 1f,
+                FpvClient.viewYaw() + " vs " + expect);
+            KeyBinding.setKeyBindState(FpvClient.KEY_YAW_RIGHT.getKeyCode(), false);
+        }));
+        add(waitTicks(40));
+        add(once(() -> {
+            Entity b = entity(droneB);
             start[1] = b.posY;
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), true);
         }));
@@ -709,11 +805,14 @@ public final class DevHarness {
         add(once(() -> {
             Entity b = entity(droneB);
             check("Space climbs", b.posY - start[1] > 1.0, String.format("+%.2f", b.posY - start[1]));
+            start[2] = b.posY;   // where the descent starts from
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), false);
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), true);
         }));
         add(waitTicks(30));
         add(once(() -> {
+            Entity b = entity(droneB);
+            check("Shift descends", b.posY < start[2] - 1.0, String.format("y %.2f, was %.2f when Shift was pressed", b.posY, start[2]));
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), false);
         }));
         add(waitTicks(40));
@@ -742,9 +841,96 @@ public final class DevHarness {
         }));
         add(waitTicks(60));
 
+        // ---- 11b. long range: pilot ~300 blocks from drone E (Antenna Mk3 = 800 blocks)
+        add(once(() -> {
+            try {
+                onServer(() -> {
+                    EntityPlayerMP p = server().getPlayerList().getPlayers().get(0);
+                    p.setPositionAndUpdate(0.5, 4, 0.5);
+                    return null;
+                });
+            } catch (Exception ex) {
+                check("go home", false, ex.toString());
+            }
+        }));
+        add(waitTicks(60));
+        add(once(() -> {
+            try {
+                Entity e = entity(droneE);
+                double d = mc.player.getDistance(e.posX, e.posY, e.posZ);
+                check("drone E is ~300 blocks from the pilot", d > 250 && d < 350, String.format("%.1f blocks", d));
+                check("without a link the client has never heard of drone E's entity", mc.world.getEntityByID(droneE) == null, "");
+                FpvClient.Cam c = FpvClient.get(droneE);
+                check("client knows E's camera and its range (state broadcast)", c != null && Math.abs(c.range - 800f) < 0.1,
+                    c == null ? "no state" : "range " + c.range);
+                check("Lua getRange() on E reports the Mk3 antenna", ((Number) invoke(droneE, "getRange")[0]).doubleValue() == 800.0, "");
+                FpvClient.enter(droneE);
+            } catch (Exception ex) {
+                check("long-range setup", false, ex.toString());
+            }
+        }));
+        add(() -> until(FpvClient::isFlying, 400, "long-range link to come up"));
+        add(waitTicks(50));
+        add(once(() -> {
+            try {
+                Entity e = mc.world.getEntityByID(droneE);
+                check("FPV is up on the far drone", FpvClient.isFlying() && FpvClient.viewingId() == droneE, "viewing=" + FpvClient.viewingId());
+                check("pilot's camera is the far drone entity", mc.getRenderViewEntity() != null && mc.getRenderViewEntity().getEntityId() == droneE, "");
+                check("full signal at 300 of 800 blocks", FpvClient.quality > 0.99f, "q=" + FpvClient.quality + " dist=" + FpvClient.distance);
+                boolean pigSeen = false;
+                if (e != null) {
+                    for (Entity x : mc.world.loadedEntityList) {
+                        if (x instanceof EntityPig && x.getDistance(e) < 30) pigSeen = true;
+                    }
+                }
+                check("a pig beside the far drone is streamed to the pilot", pigSeen, "");
+                int[] st = onServer(() -> ViewerManager.linkStats(mc.player.getUniqueID()));
+                check("server streams chunks around the drone to the pilot", st != null && st[0] > 20, st == null ? "no session" : "watched=" + st[0]);
+                check("server boosted tracking of the drone and nearby entities", st != null && st[1] >= 2, st == null ? "no session" : "boosted=" + st[1]);
+                shot("11_fpv_longrange");
+            } catch (Exception ex) {
+                check("long-range checks", false, ex.toString());
+            }
+        }));
+        add(once(() -> { // 700 of 800 blocks: weak signal, control lag, lost packets
+            try {
+                Entity e = entity(droneE);
+                onServer(() -> {
+                    EntityPlayerMP p = server().getPlayerList().getPlayers().get(0);
+                    p.setPositionAndUpdate(e.posX - 700, 4, e.posZ);
+                    return null;
+                });
+            } catch (Exception ex) {
+                check("teleport to 700 blocks", false, ex.toString());
+            }
+        }));
+        add(waitTicks(140));
+        add(once(() -> {
+            check("still linked at 700 of 800 blocks", FpvClient.isFlying() && FpvClient.viewingId() == droneE, "viewing=" + FpvClient.viewingId());
+            check("signal is weak there", FpvClient.quality > 0.05f && FpvClient.quality < 0.45f, "q=" + FpvClient.quality);
+            check("control lag appears with the weak signal", FpvClient.lagTicks >= 5, "lag=" + FpvClient.lagTicks + " ticks");
+            check("some control packets are lost", FpvClient.packetsDropped > 0, "dropped=" + FpvClient.packetsDropped + " sent=" + FpvClient.packetsSent);
+            shot("12_fpv_longrange_weak");
+            FpvClient.exit(true, null);
+        }));
+        add(waitTicks(30));
+        add(once(() -> {
+            try {
+                boolean released = onServer(() -> ViewerManager.linkStats(mc.player.getUniqueID()) == null);
+                check("long-range link is released when FPV ends", released, "");
+                boolean notTracked = onServer(() -> !server().getWorld(0).getEntityTracker().getTrackingPlayers(entity(droneE))
+                    .contains(server().getPlayerList().getPlayers().get(0)));
+                check("far drone is no longer tracked once the link is gone", notTracked, "");
+            } catch (Exception ex) {
+                check("link release", false, ex.toString());
+            }
+            teleportPilot(0.2);
+        }));
+        add(waitTicks(80));
+
         // ---- 12. Esc leaves FPV; camera-off ends FPV; drone cycling
         add(once(() -> FpvClient.toggle()));
-        add(() -> until(FpvClient::isViewing, 100, "FPV restart"));
+        add(() -> until(FpvClient::isFlying, 100, "FPV restart"));
         add(waitTicks(10));
         add(once(() -> mc.displayGuiScreen(new GuiIngameMenu())));
         add(waitTicks(5));
@@ -753,7 +939,7 @@ public final class DevHarness {
                 !FpvClient.isViewing() && !(mc.currentScreen instanceof GuiIngameMenu), "screen=" + mc.currentScreen);
             FpvClient.toggle();
         }));
-        add(() -> until(FpvClient::isViewing, 100, "FPV restart 2"));
+        add(() -> until(FpvClient::isFlying, 100, "FPV restart 2"));
         add(waitTicks(10));
         add(once(() -> {
             int first = FpvClient.viewingId();
@@ -761,7 +947,8 @@ public final class DevHarness {
             log("cycled from " + first + " to " + FpvClient.viewingId());
             check("cycling switches to the other camera drone",
                 FpvClient.viewingId() >= 0 && FpvClient.viewingId() != first
-                    && (FpvClient.viewingId() == droneB || FpvClient.viewingId() == droneC), "now " + FpvClient.viewingId());
+                    && (FpvClient.viewingId() == droneB || FpvClient.viewingId() == droneC || FpvClient.viewingId() == droneE),
+                    "now " + FpvClient.viewingId());
         }));
         add(waitTicks(30));
         add(once(() -> {
