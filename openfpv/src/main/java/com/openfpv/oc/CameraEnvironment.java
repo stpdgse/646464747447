@@ -42,6 +42,12 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
     private volatile float tilt;
     private volatile float pan;
 
+    // home point + return-to-home autopilot
+    private volatile boolean hasHome;
+    private double homeX, homeY, homeZ;
+    private volatile boolean returning;
+    private boolean lowBatteryHandled;
+
     private volatile boolean dirty = true;
     private int sinceSync;
 
@@ -64,6 +70,43 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
 
     public boolean isActive() {
         return active;
+    }
+
+    public boolean isReturning() {
+        return returning;
+    }
+
+    public boolean hasHome() {
+        return hasHome;
+    }
+
+    public double[] home() {
+        return new double[]{homeX, homeY, homeZ};
+    }
+
+    public void setHomeHere() {
+        Entity e = (Entity) drone;
+        homeX = e.posX;
+        homeY = e.posY;
+        homeZ = e.posZ;
+        hasHome = true;
+    }
+
+    /** Starts the autopilot back to the home point. Returns false if there is no home or the camera is off. */
+    public boolean returnHome() {
+        if (!hasHome) return false;
+        returning = true;
+        dirty = true;
+        return true;
+    }
+
+    public void cancelReturn() {
+        if (returning) {
+            returning = false;
+            dirty = true;
+            Entity e = (Entity) drone;
+            DroneAccess.setTarget(e, e.posX, e.posY, e.posZ);
+        }
     }
 
     public boolean isNight() {
@@ -138,11 +181,33 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
                 dirty = true;
             }
         }
+        if (active && Config.lowBatteryReturn > 0 && !lowBatteryHandled && hasHome
+            && energyFraction() < Config.lowBatteryReturn) {
+            lowBatteryHandled = true;
+            returnHome();
+        }
+        if (energyFraction() > Config.lowBatteryReturn + 0.1) lowBatteryHandled = false;
+        if (returning) autopilot();
         if (dirty || (active && ++sinceSync >= 20)) {
             sinceSync = 0;
             dirty = false;
             Net.sendState(this, world);
         }
+    }
+
+    /** Straight-line flight home, slowing down on approach; stops and hovers within 1.5 blocks. */
+    private void autopilot() {
+        Entity e = (Entity) drone;
+        double dx = homeX - e.posX, dy = homeY - e.posY, dz = homeZ - e.posZ;
+        double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist < 1.5) {
+            returning = false;
+            dirty = true;
+            DroneAccess.setTarget(e, e.posX, e.posY, e.posZ);
+            return;
+        }
+        double step = CameraMath.clamp(dist * 0.02, 0.03, 0.09);
+        DroneAccess.setTarget(e, e.posX + dx / dist * step, e.posY + dy / dist * step, e.posZ + dz / dist * step);
     }
 
     @Override
@@ -211,6 +276,7 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
             active = true;
             dirty = true;
         }
+        if (!hasHome) setHomeHere();   // the first start() marks the home point
         return ok(true);
     }
 
@@ -220,6 +286,33 @@ public class CameraEnvironment extends AbstractManagedEnvironment {
             active = false;
             dirty = true;
         }
+        return ok(true);
+    }
+
+    @Callback(direct = true, doc = "function():boolean -- Remember the drone's current position as the home point (set automatically by the first start()).")
+    public Object[] setHome(Context context, Arguments args) {
+        setHomeHere();
+        return ok(true);
+    }
+
+    @Callback(direct = true, doc = "function():number, number, number -- The home point (x, y, z), or nil if none is set.")
+    public Object[] getHome(Context context, Arguments args) {
+        return hasHome ? new Object[]{homeX, homeY, homeZ} : new Object[]{null};
+    }
+
+    @Callback(direct = true, doc = "function():boolean -- Fly back to the home point on autopilot. Piloting takes over again. Also happens automatically when the signal is lost or the battery is low.")
+    public Object[] returnHome(Context context, Arguments args) {
+        return returnHome() ? ok(true) : fail("no home point set");
+    }
+
+    @Callback(direct = true, doc = "function():boolean -- Whether the return-home autopilot is flying.")
+    public Object[] isReturning(Context context, Arguments args) {
+        return ok(returning);
+    }
+
+    @Callback(direct = true, doc = "function():boolean -- Stop the return-home autopilot and hover.")
+    public Object[] cancelReturn(Context context, Arguments args) {
+        cancelReturn();
         return ok(true);
     }
 

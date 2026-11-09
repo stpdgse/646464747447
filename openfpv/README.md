@@ -111,6 +111,14 @@ Static, scan lines and tearing start at half the range. With **control lag** on 
 inputs also arrive late and some are lost as the signal weakens, up to 500 ms of delay and 30 %
 packet loss at the very edge, like real long-range flying. The HUD shows the current lag.
 
+### Failsafe: return to home
+
+The first `camera.start()` records the drone's position as its **home point**. If the signal is
+lost, or the battery drops below 15 %, the drone flies back there on its own and hovers (the HUD
+shows `[RTH]`). Taking the controls again cancels it. From Lua: `setHome()`, `getHome()`,
+`returnHome()`, `isReturning()`, `cancelReturn()`. Both triggers are configurable
+(`failsafe.returnOnSignalLoss`, `failsafe.lowBatteryReturn`).
+
 ### Long range
 
 With an antenna the drone can be hundreds of blocks away. Minecraft normally only sends you the
@@ -138,6 +146,8 @@ Methods marked *[module]* return `nil, "module not installed: …"` unless the m
 | `isActive()` → `boolean` | |
 | `getRange()` → `number` | Max pilot-to-drone distance in blocks (set by the antenna). |
 | `getAntennaTier()` → `number` | 0 = none, 1–4 = Antenna Mk1–Mk4. |
+| `setHome()` / `getHome()` | Set / read the home point (`x, y, z`). The first `start()` sets it. |
+| `returnHome()` / `cancelReturn()` / `isReturning()` | Return-to-home autopilot. |
 | `getEnergyUsage()` → `number` | Energy per second while active. |
 | `getModules()` → `table` | e.g. `{"nightvision","zoom"}` |
 | `getHeading()` → `number` | Compass heading of the camera (0 = N, 90 = E), including gimbal pan. |
@@ -180,6 +190,8 @@ end
 | `flight.drag` | 0.9 | Velocity kept per tick while piloting (0.8 = OC default, higher = longer glide). |
 | `flight.speedMultiplier` | 2.5 | Multiplier on OC's 8 m/s drone speed cap while piloting. |
 | `flight.cameraUptilt` | 15 | Camera mounting angle (degrees up). |
+| `failsafe.returnOnSignalLoss` | true | Fly home when the signal is lost. |
+| `failsafe.lowBatteryReturn` | 0.15 | Battery fraction that triggers a return (0 = off). |
 | `link.controlLag` | true | Delay and drop control inputs as the signal weakens. |
 | `link.maxLagTicks` / `link.maxPacketLoss` | 10 / 0.3 | Delay (ticks) and lost fraction at the edge of the range. |
 | `longrange.streamRadius` | 5 | Chunk radius streamed around the drone (also capped by the server view distance). |
@@ -208,8 +220,8 @@ The mod compiles only against OpenComputers' public API jar, so it is not tied t
   keyboard flight, night/thermal/zoom/gimbal, depth scans checked against a wall at a known distance,
   OC's driver registry (Assembler acceptance), the quadcopter model (tilt, speed, glide, levelling,
   banking, yaw), antenna ranges, a **pilot 300 blocks from the drone** (chunks and a mob streamed in),
-  control lag and packet loss at 700 blocks, signal loss, Esc, camera cycling. It writes
-  `run/autotest/summary.txt` and screenshots to `run/autotest/screenshots/` (101 checks).
+  control lag and packet loss at 700 blocks, signal loss, Esc, camera cycling and the return-home failsafe. It writes
+  `run/autotest/summary.txt` and screenshots to `run/autotest/screenshots/` (105 checks).
 
   ```bash
   JAVA_HOME=/path/to/jdk8 ./scripts/run-selftest.sh

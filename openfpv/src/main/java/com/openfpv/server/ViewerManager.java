@@ -68,6 +68,7 @@ public final class ViewerManager {
             Net.sendViewEnd(player, PacketViewEnd.REFUSED);
             return;
         }
+        cam.cancelReturn();
         Session s = new Session(entityId, ticks);
         EnumFacing f = ((Drone) e).facing();
         s.yaw = f != null && f.getAxis().isHorizontal() ? f.getHorizontalAngle() : 0f;
@@ -171,6 +172,7 @@ public final class ViewerManager {
             if (reason >= 0) {
                 it.remove();
                 finish(player, s);
+                if (reason == PacketViewEnd.SIGNAL_LOST && Config.returnOnSignalLoss && cam != null) cam.returnHome();
                 Net.sendViewEnd(player, reason);
                 continue;
             }

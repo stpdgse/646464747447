@@ -46,7 +46,7 @@ public final class FpvClient {
     /** Last known state of a camera drone, as reported by the server. */
     public static final class Cam {
         public int entityId;
-        public boolean active, night, thermal;
+        public boolean active, night, thermal, returning;
         public float fov = CameraMath.BASE_FOV, tilt, pan, energy;
         public float range = 64f;
         public int modules;
@@ -101,6 +101,7 @@ public final class FpvClient {
         c.active = true;
         c.night = p.night;
         c.thermal = p.thermal;
+        c.returning = p.returning;
         c.fov = p.fov;
         c.tilt = p.tilt;
         c.pan = p.pan;

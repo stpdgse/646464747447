@@ -837,6 +837,7 @@ public final class DevHarness {
             check("server ended the session when the signal was lost", !FpvClient.isViewing()
                 && mc.getRenderViewEntity() == mc.player, "");
             check("shader cleared on exit", !mc.entityRenderer.isShaderActive(), "");
+            check("signal loss triggers the return-home failsafe", cam(droneB) != null && cam(droneB).isReturning(), "");
             teleportPilot(0.2);
         }));
         add(waitTicks(60));
@@ -927,6 +928,24 @@ public final class DevHarness {
             teleportPilot(0.2);
         }));
         add(waitTicks(80));
+
+        // ---- 11c. the failsafe must have flown drone B back to the home point it recorded at start()
+        add(() -> until(() -> cam(droneB) != null && !cam(droneB).isReturning(), 1500, "return-home to finish"));
+        add(waitTicks(20));
+        add(once(() -> {
+            try {
+                CameraEnvironment env = cam(droneB);
+                Entity b = entity(droneB);
+                double[] h = env.home();
+                double d = Math.sqrt(Math.pow(b.posX - h[0], 2) + Math.pow(b.posY - h[1], 2) + Math.pow(b.posZ - h[2], 2));
+                check("drone flew back to its home point and stopped", env.hasHome() && d < 3.0, String.format("%.2f blocks from home", d));
+                check("camera stays on after returning home", env.isActive(), "");
+                Object[] r = invoke(droneB, "isReturning");
+                check("Lua isReturning() is false once home", r != null && Boolean.FALSE.equals(r[0]), java.util.Arrays.toString(r));
+            } catch (Exception ex) {
+                check("return home", false, ex.toString());
+            }
+        }));
 
         // ---- 12. Esc leaves FPV; camera-off ends FPV; drone cycling
         add(once(() -> FpvClient.toggle()));

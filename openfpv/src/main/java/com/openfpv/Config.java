@@ -45,6 +45,12 @@ public final class Config {
     /** Fraction of control packets lost at the very edge of the range. */
     public static double maxPacketLoss = 0.3;
 
+    // ---- failsafe
+    /** On signal loss the drone flies back to its home point instead of just hovering. */
+    public static boolean returnOnSignalLoss = true;
+    /** Battery fraction below which an active camera drone automatically returns home (0 = off). */
+    public static double lowBatteryReturn = 0.15;
+
     // ---- long range streaming
     /** Chunks (radius) around the drone that are streamed to the pilot, capped by the server view distance. */
     public static int streamRadius = 5;
@@ -92,6 +98,10 @@ public final class Config {
         maxLagTicks = c.get("link", "maxLagTicks", maxLagTicks, "Control delay (ticks) at the edge of the range.", 0, 40).getInt();
         maxPacketLoss = c.get("link", "maxPacketLoss", maxPacketLoss, "Fraction of control packets lost at the edge of the range.", 0.0, 0.9).getDouble();
 
+        returnOnSignalLoss = c.get("failsafe", "returnOnSignalLoss", returnOnSignalLoss,
+            "Fly back to the home point when the signal is lost.").getBoolean();
+        lowBatteryReturn = c.get("failsafe", "lowBatteryReturn", lowBatteryReturn,
+            "Battery fraction that triggers an automatic return home (0 disables).", 0.0, 0.9).getDouble();
         streamRadius = c.get("longrange", "streamRadius", streamRadius,
             "Chunk radius streamed around the drone to the pilot (also capped by the server view distance).", 2, 12).getInt();
         boostEntities = c.get("longrange", "boostEntities", boostEntities,
