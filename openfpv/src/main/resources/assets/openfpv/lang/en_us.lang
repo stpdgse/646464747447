@@ -1,0 +1,42 @@
+itemGroup.openfpv=OpenFPV
+
+item.openfpv.camera_upgrade.name=Camera Upgrade
+item.openfpv.night_vision_module.name=Night Vision Module
+item.openfpv.zoom_module.name=Zoom Module
+item.openfpv.gimbal_module.name=Gimbal Module
+item.openfpv.thermal_module.name=Thermal Vision Module
+item.openfpv.depth_module.name=Depth Sensor Module
+
+tooltip.openfpv.camera_upgrade=Drone upgrade: adds the "camera" component for first-person flying.
+tooltip.openfpv.no_modules=No modules installed.
+tooltip.openfpv.modules=Modules:
+tooltip.openfpv.open_bay=Right-click to open the module bay.
+tooltip.openfpv.module_hint=Insert into a Camera Upgrade's module bay.
+tooltip.openfpv.night_vision_module=Enables camera.setNightVision(), the green amplified view.
+tooltip.openfpv.zoom_module=Enables camera.setFov() / camera.setZoom().
+tooltip.openfpv.gimbal_module=Enables camera.setTilt() / camera.setPan().
+tooltip.openfpv.thermal_module=Enables camera.setThermal(), heat-map vision.
+tooltip.openfpv.depth_module=Enables camera.depth() / camera.color() grid scans.
+
+container.openfpv.module_bay=Camera Module Bay
+
+key.categories.openfpv=OpenFPV
+key.openfpv.toggle=Toggle FPV View
+key.openfpv.next=Next Camera Drone
+
+message.openfpv.entered=FPV link established. Esc to leave.
+message.openfpv.no_camera=No active camera drone in range.
+message.openfpv.only_camera=Only one camera drone in range.
+message.openfpv.signal_lost=Signal lost!
+message.openfpv.drone_gone=Drone lost.
+message.openfpv.camera_off=Camera switched off.
+message.openfpv.refused=The drone's camera is not available.
+
+hud.openfpv.alt=ALT %s
+hud.openfpv.spd=SPD %s m/s
+hud.openfpv.dst=DST %s m
+hud.openfpv.pwr=PWR %s%%
+hud.openfpv.sig=SIG
+hud.openfpv.zoom=ZOOM x%s
+hud.openfpv.hint=WASD/Space/Shift: fly   Mouse: look   B: next drone   Esc: exit
+hud.openfpv.weak_signal=WEAK SIGNAL
