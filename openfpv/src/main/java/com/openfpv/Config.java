@@ -7,8 +7,12 @@ import net.minecraftforge.common.config.Configuration;
 public final class Config {
     private Config() {}
 
-    /** Maximum distance in blocks between pilot and drone before the video signal is lost. */
-    public static double maxRange = 96.0;
+    /**
+     * Maximum distance in blocks between pilot and drone before the video signal is lost.
+     * OpenComputers registers drones with an entity tracking range of 80 blocks, so the client
+     * cannot see a drone any further away than that; the config is capped accordingly.
+     */
+    public static double maxRange = 64.0;
     /** Energy (OC units) the camera draws from the drone every tick while active. */
     public static double energyPerTick = 0.1;
     /** Extra energy per ray for depth/color scans. */
@@ -25,7 +29,8 @@ public final class Config {
         Configuration c = new Configuration(file);
         c.load();
         maxRange = c.get("camera", "maxRange", maxRange,
-            "Max pilot-to-drone distance (blocks). Also limited by your render distance on the client.", 16.0, 512.0).getDouble();
+            "Max pilot-to-drone distance (blocks). Capped at 80 because OpenComputers drones are only tracked by "
+                + "clients within 80 blocks; also limited by your render distance on the client.", 16.0, 80.0).getDouble();
         energyPerTick = c.get("camera", "energyPerTick", energyPerTick,
             "Energy the active camera draws from the drone each tick.", 0.0, 100.0).getDouble();
         depthEnergyPerRay = c.get("depth", "energyPerRay", depthEnergyPerRay,

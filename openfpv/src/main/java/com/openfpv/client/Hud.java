@@ -41,6 +41,8 @@ public final class Hud {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         GlStateManager.disableTexture2D();
+        // Vanilla leaves GL_FLAT shading on, which would turn the vignette gradients into flat bands.
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
         vignette(w, h);
         if (Config.noiseEnabled) Noise.render(w, h, FpvClient.quality, FpvClient.viewTicks + partialTicks);
@@ -57,6 +59,7 @@ public final class Hud {
 
         GlStateManager.enableTexture2D();
         telemetry(mc, cam, w, h, font, main, partialTicks);
+        GlStateManager.shadeModel(GL11.GL_FLAT); // what vanilla expects
         GlStateManager.disableBlend();
         GlStateManager.enableDepth();
         GlStateManager.popMatrix();

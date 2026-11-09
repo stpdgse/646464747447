@@ -61,6 +61,8 @@ public final class FpvClient {
     public static double distance;    // pilot <-> drone
     public static float quality = 1f; // signal quality 0..1
     public static int viewTicks;
+    private static double lastX, lastY, lastZ;
+    private static boolean haveLast;
 
     // ------------------------------------------------------------------ network callbacks
 
@@ -184,6 +186,8 @@ public final class FpvClient {
         if (e == null) return;
         viewing = entityId;
         viewTicks = 0;
+        haveLast = false;
+        speed = 0;
         lastDx = lastDy = lastDz = 0;
         sinceControl = 0;
         loadedShader = null;
@@ -251,9 +255,18 @@ public final class FpvClient {
         viewTicks++;
         if (mc.getRenderViewEntity() != e) mc.setRenderViewEntity(e);
 
-        // telemetry
-        double dx = e.posX - e.prevPosX, dy = e.posY - e.prevPosY, dz = e.posZ - e.prevPosZ;
-        speed = Math.sqrt(dx * dx + dy * dy + dz * dz) * 20.0;
+        // telemetry: OC's drone resets prevPos itself, so track the position between our own ticks
+        if (haveLast) {
+            double dx = e.posX - lastX, dy = e.posY - lastY, dz = e.posZ - lastZ;
+            double instant = Math.sqrt(dx * dx + dy * dy + dz * dz) * 20.0;
+            speed = speed * 0.6 + instant * 0.4;
+        } else {
+            speed = 0;
+        }
+        lastX = e.posX;
+        lastY = e.posY;
+        lastZ = e.posZ;
+        haveLast = true;
         distance = mc.player.getDistance(e);
         quality = CameraMath.signalQuality(distance, range());
 

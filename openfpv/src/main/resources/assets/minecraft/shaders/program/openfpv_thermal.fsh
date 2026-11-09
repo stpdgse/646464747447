@@ -1,8 +1,9 @@
 #version 120
 
 // OpenFPV thermal vision: maps scene brightness onto an "iron" heat palette.
-// Entities are drawn flat white (hot) by the mod, so they come out white-yellow;
-// cold dark scenery ends up purple/blue, sunlit and lava surfaces glow orange.
+//  * Living things are drawn flat white by the mod, so they come out white-yellow (hot).
+//  * Blue-dominant pixels (sky, water) are treated as cold, so they go deep purple/blue.
+//  * Lit ground, lava and glowing blocks land in the orange/yellow part of the palette.
 
 uniform sampler2D DiffuseSampler;
 varying vec2 texCoord;
@@ -25,6 +26,7 @@ vec3 heat(float t) {
 void main() {
     vec3 c = texture2D(DiffuseSampler, texCoord).rgb;
     float l = dot(c, vec3(0.3, 0.59, 0.11));
-    l = pow(l, 0.75);
-    gl_FragColor = vec4(heat(l), 1.0);
+    float cold = clamp((c.b - c.r) * 3.0, 0.0, 1.0);   // sky and water
+    float t = pow(l, 0.8) * (1.0 - 0.85 * cold);
+    gl_FragColor = vec4(heat(t), 1.0);
 }

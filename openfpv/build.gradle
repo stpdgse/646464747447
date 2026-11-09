@@ -25,6 +25,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'info'
+            if (project.hasProperty('autotest')) property 'openfpv.autotest', project.property('autotest')
         }
         server {
             workingDirectory project.file('run-server')
@@ -33,6 +34,10 @@ minecraft {
         }
     }
 }
+
+// ForgeGradle 3 dev runs load a mod's assets from its *classes* directory; without this the
+// resources land in build/resources/main and the dev client cannot find models, lang or textures.
+sourceSets.main.output.resourcesDir = sourceSets.main.java.outputDir
 
 repositories {
     flatDir { dirs 'libs' }
@@ -60,6 +65,7 @@ processResources {
 }
 
 jar {
+    exclude 'com/openfpv/dev/**'   // developer self-test harness, not shipped
     manifest {
         attributes([
             "Specification-Title"     : project.mod_name,

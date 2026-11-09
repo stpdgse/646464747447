@@ -17,5 +17,9 @@ public final class ClientBootstrap {
     public static void init() {
         ClientRegistry.registerKeyBinding(FpvClient.KEY_TOGGLE);
         ClientRegistry.registerKeyBinding(FpvClient.KEY_NEXT);
+        // Developer self test (never set in normal play); see build.gradle -Popenfpv.autotest
+        if (System.getProperty("openfpv.autotest") != null) {
+            com.openfpv.dev.DevHarness.install();
+        }
     }
 }
