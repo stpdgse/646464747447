@@ -39,6 +39,7 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | `ferrite-remote` | Query (UDP) and RCON (TCP) servers plus clients, verified against vanilla |
 | `ferrite-ecs` | Archetype ECS: `#![forbid(unsafe_code)]`, generational entities, typed queries, bundles, deferred commands, resources. Deterministic by construction |
 | `ferrite-world` | Chunk model (paletted, bit-packed sections), versioned codec with zstd, and the crash-safe log-structured chunk store |
+| `ferrite-blocks` | Block behaviour: vanilla's neighbour/shape update propagation, scheduled ticks, water and lava, pane/fence connections, support rules. Checked against recordings of the official server |
 | `ferrite-sim` | Region scheduler (rayon) with deterministic exchange, plus the particle workload and single-threaded reference used to prove determinism |
 | `ferrite-server` | The executable (mimalloc, clap flags, both backends, online mode, Query, RCON) |
 
@@ -327,9 +328,40 @@ they can be added), world metadata, and a smarter index for worlds with many mil
 (the index is a `HashMap`, and opening reads every record header). `fsync` cost depends on the
 disk, so the 180 us figure is only indicative.
 
+## Block physics
+
+`ferrite-blocks` is the first gameplay logic. Behaviour is implemented from *observation* of the
+official server (clean-room), and every rule is held to recordings of it:
+
+* **Geometry comes from the game itself.** The vanilla data reports have no shapes, so
+  `ferrite-datagen` also compiles and runs `java/ShapeDump.java`, which asks the vanilla registries
+  for collision, outline and face-occlusion boxes, face sturdiness, light, fluid state and flags
+  for all 35,723 states (1,007 distinct shapes). The table is generated, validated and
+  byte-reproducible like the others.
+* **Recordings.** `scripts/record-physics.py` drives a frozen vanilla server over RCON, steps it
+  tick by tick, and reads the resulting blocks and *pending fluid ticks (with delays and order)*
+  back from its save. `tests/vanilla.rs` replays each recording against Ferrite and requires an
+  identical world and identical pending ticks at every snapshot. The committed fixtures cover
+  hand-written scenarios plus seeded random scenery (slabs, stairs, fences, panes, doors,
+  trapdoors, carpets, snow, torches, lanterns, ...). Larger sweeps can be replayed with
+  `FERRITE_FIXTURE_DIR`; 300 + 300 unseen random scenarios matched after the rules below were fixed.
+* **Negative controls.** Deliberately breaking a rule (spread order, slope distance, update order,
+  source conversion, lava reach, ...) makes the recordings fail; this found real coverage gaps,
+  which the scenarios now close.
+* **Found by comparison, not memory:** snow layers' tags were renamed in 26.x; a redstone block is
+  *not* a redstone conductor; vanilla saves pending ticks in scheduling order, not execution
+  order; `/setblock` lets the new state adapt to its neighbours before placing it.
+
+Done so far: neighbour- and shape-update propagation (depth-first, vanilla's two direction orders),
+the scheduled-tick queue, water and lava (flow, slope search, falling, source formation, lava
+hardening), waterlogging, and the support/connection rules the scenery needed. Not yet: redstone,
+pistons, falling blocks, fire, random ticks, block entities, most block-specific behaviour. Lava
+that is *rising* uses vanilla's shared world random; Ferrite cannot match that stream, so recordings
+avoid it.
+
 ## Quality gates
 
-* 254 tests (plus 6 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
+* 283 tests (plus 6 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
   `cfb8` crate and checked directly against the NIST SP 800-38A vector, and compression cross-checked against `flate2`.
 * Ten `cargo-fuzz` targets: frame decoder, codec readers, frame round-trip, whole-session driving
   (structure-aware, reaches login and configuration), the NBT reader, the Query handler, the Query

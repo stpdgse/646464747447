@@ -124,6 +124,10 @@ impl StateFacts {
     pub fn collision_shape(&self) -> &'static [Box6] {
         SHAPES[usize::from(self.collision)]
     }
+    /// Id of the collision shape; equal ids mean equal shapes, so this is a cheap cache key.
+    pub const fn collision_id(&self) -> u16 {
+        self.collision
+    }
     pub fn outline_shape(&self) -> &'static [Box6] {
         SHAPES[usize::from(self.shape)]
     }

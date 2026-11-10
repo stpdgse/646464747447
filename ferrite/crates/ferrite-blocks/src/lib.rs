@@ -1,0 +1,21 @@
+//! Block behaviour.
+//!
+//! [`World`] owns loaded blocks and what makes them change: vanilla's neighbour- and shape-update
+//! propagation, scheduled ticks, and (so far) water and lava. The rules are implemented from
+//! observation of the official server and are compared against recordings of it in the tests;
+//! geometry comes from [`ferrite_data::shapes`].
+
+#![forbid(unsafe_code)]
+
+pub mod fluid;
+mod kinds;
+mod level;
+mod pos;
+pub mod shape;
+pub mod ticks;
+mod world;
+
+pub use kinds::{Behaviour, Kinds};
+pub use level::{BlockAccess, Chunks};
+pub use pos::{BlockPos, Direction};
+pub use world::{NEIGHBOR_UPDATE_ORDER, Rules, SHAPE_UPDATE_ORDER, World, update};
