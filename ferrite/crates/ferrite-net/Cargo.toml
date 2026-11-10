@@ -1,0 +1,33 @@
+[package]
+name = "ferrite-net"
+description = "Connection handling: backend-independent policy plus tokio and io_uring I/O loops"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[features]
+default = ["uring"]
+# Thread-per-core io_uring backend (Linux only; ignored on other platforms).
+uring = ["dep:monoio"]
+
+[dependencies]
+bytes.workspace = true
+ferrite-data.workspace = true
+ferrite-protocol = { path = "../ferrite-protocol" }
+socket2 = { version = "0.5", features = ["all"] }
+thiserror.workspace = true
+tokio = { version = "1", features = ["rt-multi-thread", "net", "io-util", "time", "macros", "sync"] }
+tracing = "0.1"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+monoio = { version = "0.2", optional = true, features = ["bytes"] }
+
+[dev-dependencies]
+ferrite-swarm = { path = "../ferrite-swarm" }
+tokio = { version = "1", features = ["full"] }
+uuid.workspace = true
+
+[lints]
+workspace = true

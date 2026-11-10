@@ -428,3 +428,35 @@ fn login_plugin_answers_and_cookies_are_forwarded_to_the_application() {
     ));
     assert_eq!(s.phase(), Phase::LoginPending);
 }
+
+#[test]
+fn play_packets_can_be_sent_only_in_play() {
+    use ferrite_protocol::packets::play::Disconnect;
+    use ferrite_protocol::types::Text;
+    let kick = Disconnect { reason: Text::plain("bye") };
+
+    let mut s = ServerSession::new(SessionConfig { compression: None, ..SessionConfig::default() });
+    assert!(matches!(s.send_play(&kick), Err(SessionError::WrongPhase { .. })));
+
+    let mut c = Client::new();
+    handshake(&mut c, &mut s, 2);
+    c.send(&mut s, &ServerboundHello { name: Str::new("P"), uuid: Uuid::nil() });
+    s.poll_all().unwrap();
+    s.accept_login(profile("P")).unwrap();
+    c.frames(&mut s);
+    c.send(&mut s, &LoginAcknowledged {});
+    s.poll_all().unwrap();
+    c.frames(&mut s);
+    c.send(&mut s, &ServerboundSelectKnownPacks { packs: LenVec(vec![core_pack()]) });
+    s.poll_all().unwrap();
+    c.frames(&mut s);
+    c.send(&mut s, &AcknowledgeFinishConfiguration {});
+    assert_eq!(s.poll_all().unwrap(), [Event::EnteredPlay]);
+
+    s.send_play(&kick).unwrap();
+    let frames = c.frames(&mut s);
+    assert_eq!(frames.len(), 1);
+    assert_eq!(packet_name(State::Play, Direction::Clientbound, frames[0].id), Some("disconnect"));
+    // A configuration packet is not a play packet.
+    assert!(matches!(s.send_play(&FinishConfiguration {}), Err(SessionError::WrongPhase { .. })));
+}

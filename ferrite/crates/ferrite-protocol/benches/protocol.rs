@@ -125,5 +125,17 @@ fn bench_frames(c: &mut Criterion) {
     }
 }
 
-criterion_group!(benches, bench_varint, bench_cipher, bench_frames);
+fn bench_construction(c: &mut Criterion) {
+    use ferrite_protocol::session::{ServerSession, SessionConfig};
+    let mut g = c.benchmark_group("construction");
+    g.bench_function("FrameEncoder::new", |b| b.iter(|| black_box(FrameEncoder::new())));
+    g.bench_function("FrameDecoder::new", |b| b.iter(|| black_box(FrameDecoder::new())));
+    g.bench_function("ServerSession::new", |b| {
+        let cfg = SessionConfig::default();
+        b.iter(|| black_box(ServerSession::new(cfg.clone())))
+    });
+    g.finish();
+}
+
+criterion_group!(benches, bench_varint, bench_cipher, bench_frames, bench_construction);
 criterion_main!(benches);

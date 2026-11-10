@@ -43,7 +43,8 @@ pub struct FrameDecoder {
     compression: Option<Compression>,
     max_frame: usize,
     max_uncompressed: usize,
-    inflater: Decompressor,
+    /// Created on first use: most connections (status pings) never see compressed data.
+    inflater: Option<Decompressor>,
 }
 
 impl std::fmt::Debug for FrameDecoder {
@@ -71,7 +72,7 @@ impl FrameDecoder {
             compression: None,
             max_frame: MAX_SERVERBOUND_FRAME,
             max_uncompressed: MAX_UNCOMPRESSED,
-            inflater: Decompressor::new(),
+            inflater: None,
         }
     }
 
@@ -188,6 +189,7 @@ impl FrameDecoder {
                     let mut out = vec![0u8; declared];
                     let written = self
                         .inflater
+                        .get_or_insert_with(Decompressor::new)
                         .zlib_decompress(&rest, &mut out)
                         .map_err(|_| ProtocolError::Decompress)?;
                     if written != declared {
@@ -211,7 +213,9 @@ impl FrameDecoder {
 /// Turns packets into bytes ready for the socket (before encryption).
 pub struct FrameEncoder {
     compression: Option<Compression>,
-    deflater: Compressor,
+    /// Created when compression is first enabled; libdeflate's compressor is a large allocation
+    /// that a connection which never compresses should not pay for.
+    deflater: Option<Compressor>,
     level: i32,
     joined: Vec<u8>,
     packed: Vec<u8>,
@@ -231,20 +235,14 @@ impl Default for FrameEncoder {
 
 impl FrameEncoder {
     pub fn new() -> Self {
-        Self {
-            compression: None,
-            deflater: Compressor::new(CompressionLvl::default()),
-            level: 6,
-            joined: Vec::new(),
-            packed: Vec::new(),
-        }
+        Self { compression: None, deflater: None, level: 6, joined: Vec::new(), packed: Vec::new() }
     }
 
     /// Enables compression with the given threshold and zlib level (1 fastest .. 12 smallest).
     pub fn set_compression(&mut self, compression: Option<Compression>, level: i32) -> Result<()> {
-        if level != self.level {
+        if compression.is_some() && (self.deflater.is_none() || level != self.level) {
             let lvl = CompressionLvl::new(level).map_err(|_| ProtocolError::Compress)?;
-            self.deflater = Compressor::new(lvl);
+            self.deflater = Some(Compressor::new(lvl));
             self.level = level;
         }
         self.compression = compression;
@@ -274,10 +272,11 @@ impl FrameEncoder {
         self.joined.clear();
         self.joined.extend_from_slice(&id_bytes[..id_len]);
         self.joined.extend_from_slice(body);
-        let bound = self.deflater.zlib_compress_bound(payload_len);
+        // `compression` is only ever `Some` after `set_compression` created the compressor.
+        let deflater = self.deflater.as_mut().ok_or(ProtocolError::Compress)?;
+        let bound = deflater.zlib_compress_bound(payload_len);
         self.packed.resize(bound, 0);
-        let packed_len = self
-            .deflater
+        let packed_len = deflater
             .zlib_compress(&self.joined, &mut self.packed)
             .map_err(|_| ProtocolError::Compress)?;
 

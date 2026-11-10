@@ -238,6 +238,15 @@ impl ServerSession {
         Ok(())
     }
 
+    /// Sends a play-state packet. Only valid once the session has reached [`Phase::Play`] (it keeps
+    /// the encoder, compression and encryption state until [`into_parts`](Self::into_parts)).
+    pub fn send_play<P: Packet>(&mut self, packet: &P) -> Result<()> {
+        if self.phase != Phase::Play || P::STATE != ferrite_data::State::Play {
+            return Err(SessionError::WrongPhase { phase: self.phase.name() });
+        }
+        self.send(packet)
+    }
+
     /// Kicks the client with a message appropriate to the current phase and closes the session.
     /// Only the login and configuration phases have a disconnect packet; in any other phase the
     /// session just closes.

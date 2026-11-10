@@ -3,10 +3,14 @@
 A from-scratch Minecraft: Java Edition server in Rust, built for multicore throughput and
 bit-exact vanilla behaviour. Target release: **26.3** (protocol 777, world data version 5023).
 
-> **Status: handshake to play.** The data pipeline, wire protocol, NBT and the server-side
-> connection state machine (handshake, status, login, configuration) are done and verified
-> against a real vanilla server. There is no networking or game logic yet. See the
-> [roadmap](#roadmap).
+> **Status: a server that accepts real connections.** Clients can ping it, log in (offline mode)
+> and complete configuration; it then ends the connection politely because gameplay does not
+> exist yet. Everything is verified against a real vanilla server. See the [roadmap](#roadmap).
+
+```sh
+cargo run --release -p ferrite-server -- --addr 127.0.0.1:25565 --max-players 100
+cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --connections 32
+```
 
 ## Decisions
 
@@ -14,7 +18,7 @@ bit-exact vanilla behaviour. Target release: **26.3** (protocol 777, world data 
 |---|---|
 | Scope | Full vanilla parity, bit-exact wherever it is observable (redstone order, mob AI, RNG) |
 | Parallelism | World split into regions ticked in parallel, ECS systems parallel inside a region, deterministic merge of cross-region effects at fixed sync points |
-| Networking | `tokio` and `io_uring` implementations behind one trait; benchmarks pick the default |
+| Networking | `tokio` and `io_uring` backends over one shared policy layer. **`tokio` is the default**: on loopback the benchmarks do not justify `io_uring` (see [Networking](#networking)) |
 | Storage | Custom on-disk format (no Anvil), with seed-exact vanilla world generation |
 | Game data | Generated from the official server's data reports, never hand-typed |
 | Auth | Online mode (RSA + AES-CFB8 + session server) and offline mode; signed chat |
@@ -30,6 +34,9 @@ bit-exact vanilla behaviour. Target release: **26.3** (protocol 777, world data 
 | `ferrite-datagen` | Runs the vanilla data generator and emits `ferrite-data`'s tables. Validates every layout assumption the runtime relies on |
 | `ferrite-nbt` | NBT with both root encodings (network and named), modified UTF-8, vanilla quota and depth accounting enforced before allocation |
 | `ferrite-protocol` | VarInt/VarLong, zero-copy codec, framing, zlib (libdeflate), AES-128-CFB8, packet definitions for handshake/status/login/configuration, and the sans-IO `ServerSession` state machine |
+| `ferrite-net` | `Lobby` (every connection decision, backend-independent) plus a multi-thread `tokio` backend and a thread-per-core `io_uring` backend (`monoio`, `SO_REUSEPORT`, Linux) |
+| `ferrite-swarm` | Bot load tester: status, join and steady-state ping modes with latency percentiles. Its bots are checked against the vanilla server |
+| `ferrite-server` | The executable (mimalloc, clap flags, both backends) |
 
 ### Regenerating the tables
 
@@ -104,9 +111,50 @@ Two things in the data are deliberately *not* compared by position, because vani
 not stable: the order of tag registries and the order of tags inside a registry (hash iteration,
 different on every server start).
 
+## Networking
+
+`ferrite_net::Lobby` makes every decision about a connection (server list text, name rules,
+capacity, version rejection, kicking) by driving a `ServerSession`. The backends only move bytes,
+so behaviour cannot drift between them, and the end-to-end tests run **every scenario against
+both**: garbage input, slow-loris timeouts, byte-at-a-time delivery, mid-login disconnects, a full
+server, and 600 concurrent joins with zero failures.
+
+```sh
+scripts/bench-net.sh                                    # tokio vs io_uring
+FERRITE_ACCEPT_MOJANG_EULA=true scripts/bench-net.sh server.jar /path/to/jdk25/bin/java  # + vanilla
+```
+
+Measured on a 4-core, 2.1 GHz cloud VM over loopback, server and load generator pinned to separate
+cores (one run each; expect roughly +/-10% noise):
+
+| Scenario | ferrite / tokio | ferrite / io_uring | vanilla 26.3 |
+|---|---|---|---|
+| Status ping, new connection each, 2 server cores, 64 bots | **~47,000/s** | ~31,000/s | ~34,000/s |
+| Same, 256 bots | **~45,000/s** | ~32,000/s | ~38,000/s |
+| Full login + configuration to play, 64 bots | ~2,200/s | ~1,900/s | not compared (vanilla also spawns the player) |
+| Steady ping/pong on persistent connections, **1 server core** | ~212,000/s | ~192,000/s | not applicable |
+
+What this does and does not show:
+
+* **The socket layer is not where the speed will come from.** On loopback about 80% of the
+  server's CPU is the kernel's TCP stack and only about 15% is Ferrite's own code. Against vanilla
+  the status-ping advantage is a modest 1.2 to 1.4x, not an order of magnitude. The multiplier has
+  to come from the tick loop, the ECS and the world, which is what the next subsystems are for.
+* **`io_uring` did not win here.** It makes far fewer syscalls (2.3 per status operation against
+  10.7 for tokio) and uses a third less user CPU, but spends more in the kernel on this VM, so
+  throughput is roughly even and sometimes lower. Its tail latency is much better at 1,024
+  persistent connections (p99 9 ms against 140 ms). A real NIC and many long-lived connections may
+  change the balance, so the backend stays available and this will be re-measured on your hardware.
+* Vanilla ran with a 3 second warm-up, on two cores that also host its JIT and GC threads.
+
+The benchmarks also found two cheap wins, both fixed: constructing a session allocated a
+libdeflate compressor for every connection even though status pings never compress (3.6 us down to
+50 ns), and the load tester itself ran out of ephemeral ports until its sockets were closed with a
+reset instead of lingering in TIME_WAIT.
+
 ## Quality gates
 
-* 89 tests (plus 2 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
+* 116 tests (plus 2 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
   `cfb8` crate and checked directly against the NIST SP 800-38A vector, and compression cross-checked against `flate2`.
 * Five `cargo-fuzz` targets: frame decoder, codec readers, frame round-trip, whole-session driving
   (structure-aware, reaches login and configuration), and the NBT reader.
@@ -126,7 +174,7 @@ One pull request per subsystem.
 1. **Foundation**: data pipeline, protocol primitives, framing, cipher.
 2. **Packets and sessions**: NBT, packet definitions, handshake / status / login / configuration
    state machine, vanilla oracle tests.
-3. Networking: `tokio` and `io_uring` backends, connection tasks, bot-swarm load tester crate.
+3. **Networking**: `tokio` and `io_uring` backends, connection policy, bot-swarm load tester, benchmarks.
 4. Online-mode authentication, signed chat, Query and RCON.
 5. Custom ECS and region scheduler (deterministic parallel ticking).
 6. World storage format and chunk pipeline.
