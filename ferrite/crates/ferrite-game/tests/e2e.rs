@@ -20,7 +20,11 @@ struct TestServer {
 }
 
 async fn server(view_distance: u8) -> TestServer {
-    let (host, game) = ferrite_game::start(GameConfig { view_distance, ..GameConfig::default() });
+    server_with(GameConfig { view_distance, ..GameConfig::default() }).await
+}
+
+async fn server_with(cfg: GameConfig) -> TestServer {
+    let (host, game) = ferrite_game::start(cfg);
     let lobby = Arc::new(Lobby::new(LobbyConfig { play: Some(host), ..LobbyConfig::default() }));
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let addr = listener.local_addr().unwrap();
@@ -190,4 +194,125 @@ async fn impossible_movement_is_undone() {
     .await;
     let back: PlayerPosition = decode(&back);
     assert_eq!((back.x, back.y, back.z), (0.5, -60.0, 0.5), "the server puts the player back");
+}
+
+fn state(name: &str) -> i32 {
+    i32::from(ferrite_data::blocks::block_by_name(name).unwrap().default_state)
+}
+
+fn item(name: &str) -> i32 {
+    ferrite_data::registries::item::by_name.get(name).copied().unwrap() as i32
+}
+
+/// The block update for `pos` that arrives next, skipping unrelated ones.
+async fn block_update_at(bot: &mut PlayBot, x: i32, y: i32, z: i32) -> BlockUpdate {
+    let p = until(bot, 600, |p| {
+        p.name == "block_update" && {
+            let u: BlockUpdate = decode(p);
+            (u.pos.x(), u.pos.y(), u.pos.z()) == (x, y, z)
+        }
+    })
+    .await;
+    decode(&p)
+}
+
+#[tokio::test]
+async fn creative_players_break_and_place_blocks_and_everyone_sees_it() {
+    use ferrite_protocol::codec::VarInt;
+    let s = server(4).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    let mut b = PlayBot::join(s.addr, "Bob").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    until(&mut b, 600, |p| p.name == "chunk_batch_finished").await;
+
+    // Alice breaks the grass under her feet.
+    a.send(&PlayerAction {
+        action: VarInt(0),
+        pos: PackedPos::new(0, -61, 0),
+        face: 1,
+        sequence: VarInt(1),
+    })
+    .await
+    .unwrap();
+    let u = block_update_at(&mut a, 0, -61, 0).await;
+    assert_eq!(u.state.0, state("air"));
+    let ack = until(&mut a, 100, |p| p.name == "block_changed_ack").await;
+    assert_eq!(decode::<BlockChangedAck>(&ack).sequence.0, 1);
+    // Bob, who has the chunk loaded, is told too.
+    assert_eq!(block_update_at(&mut b, 0, -61, 0).await.state.0, state("air"));
+
+    // Alice puts stone in her hotbar and places it next to the hole.
+    a.send(&SetCreativeModeSlot {
+        slot: 36,
+        item: ItemStack { count: 64, item: item("minecraft:stone") },
+    })
+    .await
+    .unwrap();
+    a.send(&UseItemOn {
+        hand: VarInt(0),
+        pos: PackedPos::new(2, -61, 0),
+        face: VarInt(1),
+        cursor_x: 0.5,
+        cursor_y: 1.0,
+        cursor_z: 0.5,
+        inside: false,
+        world_border_hit: false,
+        sequence: VarInt(2),
+    })
+    .await
+    .unwrap();
+    assert_eq!(block_update_at(&mut a, 2, -60, 0).await.state.0, state("stone"));
+    assert_eq!(block_update_at(&mut b, 2, -60, 0).await.state.0, state("stone"));
+}
+
+#[tokio::test]
+async fn a_block_cannot_be_placed_inside_a_player() {
+    use ferrite_protocol::codec::VarInt;
+    let s = server(4).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    a.send(&SetCreativeModeSlot {
+        slot: 36,
+        item: ItemStack { count: 1, item: item("minecraft:stone") },
+    })
+    .await
+    .unwrap();
+    // Alice stands at (0.5, -60, 0.5); placing on the ground block below her would fill her space.
+    a.send(&UseItemOn {
+        hand: VarInt(0),
+        pos: PackedPos::new(0, -61, 0),
+        face: VarInt(1),
+        cursor_x: 0.5,
+        cursor_y: 1.0,
+        cursor_z: 0.5,
+        inside: false,
+        world_border_hit: false,
+        sequence: VarInt(7),
+    })
+    .await
+    .unwrap();
+    // The server answers with the truth (air) for the position, never stone.
+    let u = block_update_at(&mut a, 0, -60, 0).await;
+    assert_eq!(u.state.0, state("air"));
+    let ack = until(&mut a, 100, |p| p.name == "block_changed_ack").await;
+    assert_eq!(decode::<BlockChangedAck>(&ack).sequence.0, 7);
+}
+
+#[tokio::test]
+async fn survival_players_cannot_break_blocks_yet() {
+    use ferrite_protocol::codec::VarInt;
+    let s =
+        server_with(GameConfig { game_mode: 0, view_distance: 4, ..GameConfig::default() }).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    a.send(&PlayerAction {
+        action: VarInt(0),
+        pos: PackedPos::new(0, -61, 0),
+        face: 1,
+        sequence: VarInt(3),
+    })
+    .await
+    .unwrap();
+    // The client is told the block is still there.
+    assert_eq!(block_update_at(&mut a, 0, -61, 0).await.state.0, state("grass_block"));
 }

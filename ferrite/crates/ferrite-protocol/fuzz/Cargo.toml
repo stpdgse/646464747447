@@ -42,3 +42,10 @@ doc = false
 bench = false
 
 [workspace]
+
+[[bin]]
+name = "play_packets"
+path = "fuzz_targets/play_packets.rs"
+test = false
+doc = false
+bench = false

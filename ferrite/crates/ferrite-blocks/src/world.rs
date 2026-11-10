@@ -197,6 +197,24 @@ impl<A: BlockAccess> World<A> {
         out
     }
 
+    /// Removes the block at `pos` the way a player breaking it does: whatever fluid the block
+    /// held stays behind, otherwise air. Returns whether anything changed.
+    pub fn destroy_block(&mut self, pos: BlockPos) -> bool {
+        let Some(state) = self.blocks.block(pos) else { return false };
+        let left = FluidState::of(state).block();
+        self.set_block(pos, left, update::ALL)
+    }
+
+    /// A player used (right-clicked) the block at `pos`. Returns whether the block did something
+    /// with the click, in which case an item in hand is not also used.
+    pub fn use_block(&mut self, pos: BlockPos) -> bool {
+        let Some(state) = self.blocks.block(pos) else { return false };
+        if Kinds::get().of_state(state).redstone.is_some() {
+            return crate::redstone::use_block(self, pos, state);
+        }
+        false
+    }
+
     /// Queues a block event (vanilla's `Level.blockEvent`); duplicates of a queued event are
     /// ignored. Events run after the tick queues, in the order they were queued.
     pub fn block_event(&mut self, pos: BlockPos, block: u16, id: i32, param: i32) {

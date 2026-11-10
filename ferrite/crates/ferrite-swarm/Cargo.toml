@@ -16,7 +16,7 @@ getrandom = { version = "0.4", features = ["sys_rng"] }
 ferrite-protocol = { path = "../ferrite-protocol" }
 socket2 = { version = "0.5", features = ["all"] }
 thiserror.workspace = true
-tokio = { version = "1", features = ["rt-multi-thread", "net", "io-util", "time", "macros", "sync"] }
+tokio = { version = "1", features = ["rt-multi-thread", "net", "io-util", "time", "macros", "sync", "io-std"] }
 uuid.workspace = true
 
 [lints]

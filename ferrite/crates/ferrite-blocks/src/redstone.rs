@@ -305,6 +305,13 @@ pub(crate) fn tick<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, state: u
             }
         }
         Some(Redstone::Repeater) => repeater_tick(world, pos, state),
+        Some(Redstone::Button) => {
+            if is_true(state, "powered") {
+                let released = set_prop(state, "powered", "false");
+                world.set_block(pos, released, update::ALL);
+                update_attached_neighbours(world, pos, released);
+            }
+        }
         Some(Redstone::Observer) => {
             if is_true(state, "powered") {
                 world.set_block(pos, set_prop(state, "powered", "false"), update::CLIENTS);
@@ -330,6 +337,48 @@ pub(crate) fn observer_shape<A: BlockAccess>(
         && !world.has_scheduled_block_tick(pos, block_of(state))
     {
         world.schedule_block_tick(pos, block_of(state), 2, 0);
+    }
+}
+
+// ---- levers and buttons ------------------------------------------------------------------
+
+/// Ticks a button stays pressed: stone buttons 20, wooden ones 30.
+fn button_duration(state: u16) -> i64 {
+    let name = ferrite_data::blocks::block_of_state(state).map_or("", |b| b.name);
+    if name == "minecraft:stone_button" || name == "minecraft:polished_blackstone_button" {
+        20
+    } else {
+        30
+    }
+}
+
+/// Tells the block the lever or button is stuck to, and the lever or button itself, that it
+/// changed.
+fn update_attached_neighbours<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, state: u16) {
+    let block = block_of(state);
+    world.update_neighbors_at(pos, block);
+    world.update_neighbors_at(pos.offset(attached_direction(state).opposite()), block);
+}
+
+/// A player used the block at `pos` (right click). Returns whether the block consumed the click.
+pub(crate) fn use_block<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, state: u16) -> bool {
+    match redstone_of(state) {
+        Some(Redstone::Lever) => {
+            let flipped = set_prop(state, "powered", bool_str(!is_true(state, "powered")));
+            world.set_block(pos, flipped, update::ALL);
+            update_attached_neighbours(world, pos, flipped);
+            true
+        }
+        Some(Redstone::Button) => {
+            if !is_true(state, "powered") {
+                let pressed = set_prop(state, "powered", "true");
+                world.set_block(pos, pressed, update::ALL);
+                update_attached_neighbours(world, pos, pressed);
+                world.schedule_block_tick(pos, block_of(state), button_duration(state), 0);
+            }
+            true
+        }
+        _ => false,
     }
 }
 

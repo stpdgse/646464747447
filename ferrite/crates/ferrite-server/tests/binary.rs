@@ -85,13 +85,15 @@ fn start(extra: &[&str]) -> Option<Server> {
     }
 }
 
-async fn exercise(extra: &[&str]) {
+/// `first_play_packet`: what a joining client receives first: `login` where the game runs (the
+/// tokio backend), `disconnect` where it does not yet (io_uring).
+async fn exercise(extra: &[&str], first_play_packet: &str) {
     let Some(server) = start(extra) else { return };
 
     // Status and a full offline join.
     status_once(server.addr).await.unwrap();
     let joined = join_once(server.addr, "BinaryBot").await.unwrap();
-    assert_eq!(joined.first_play_packet, Some("disconnect"));
+    assert_eq!(joined.first_play_packet, Some(first_play_packet));
 
     // RCON.
     let mut c = rcon::Client::connect(&server.rcon.to_string()).await.unwrap();
@@ -128,13 +130,14 @@ async fn exercise(extra: &[&str]) {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn tokio_backend_serves_game_query_and_rcon() {
-    exercise(&["--online-mode", "false", "--backend", "tokio"]).await;
+    exercise(&["--online-mode", "false", "--backend", "tokio"], "login").await;
 }
 
 #[cfg(target_os = "linux")]
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn uring_backend_serves_game_query_and_rcon() {
-    exercise(&["--online-mode", "false", "--backend", "uring", "--threads", "2"]).await;
+    exercise(&["--online-mode", "false", "--backend", "uring", "--threads", "2"], "disconnect")
+        .await;
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]

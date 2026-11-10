@@ -126,6 +126,10 @@ fn replay(text: &str) -> Result<(), String> {
                     .unwrap_or_default();
                 world.command_set_block_with(BlockPos::new(x, y, z), parse_state(text), &defined);
             }
+            "use" => {
+                let [x, y, z] = nums(&parts[1..4]);
+                world.use_block(BlockPos::new(x, y, z));
+            }
             "step" => {
                 for _ in 0..nums::<1>(&parts[1..2])[0] {
                     world.tick();

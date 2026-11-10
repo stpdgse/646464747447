@@ -152,9 +152,43 @@ def rows(blocks):
     return out
 
 
+class Bot:
+    """The scriptable client (`ferrite-interact`), joined to the recording server so scenarios can
+    right-click blocks, which no server command can do."""
+
+    NAME = "InteractBot"
+
+    def __init__(self, binary, addr):
+        import subprocess
+        self.p = subprocess.Popen([binary, addr, "--name", self.NAME], stdin=subprocess.PIPE,
+                                  stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, bufsize=1)
+        if self.p.stdout.readline().strip() != "ready":
+            sys.exit("the interaction bot did not join")
+        self.seq = 0
+
+    def use(self, x, y, z):
+        self.seq += 1
+        self.p.stdin.write(f"use {x} {y} {z} 1 {self.seq}\n")
+        self.p.stdin.flush()
+        while True:
+            line = self.p.stdout.readline()
+            if not line:
+                sys.exit("the interaction bot disconnected")
+            if line.strip() == f"ack {self.seq}":
+                return
+
+    def close(self):
+        try:
+            self.p.stdin.write("quit\n")
+            self.p.stdin.flush()
+            self.p.wait(timeout=5)
+        except Exception:
+            self.p.kill()
+
+
 class Recorder:
-    def __init__(self, rcon, world):
-        self.r, self.world = rcon, world
+    def __init__(self, rcon, world, bot=None):
+        self.r, self.world, self.bot = rcon, world, bot
 
     def step(self, n):
         before = self.gametime()
@@ -208,7 +242,15 @@ class Recorder:
         lines.append("end")
         initial = blocks
         for a in actions:
-            if a[0] == "set":
+            if a[0] == "use":
+                _, x, y, z = a
+                if self.bot is None:
+                    sys.exit(f"{name}: a 'use' action needs --interact-bin and --game")
+                # Stand next to the block (the server only checks reach), then click it.
+                self.r.cmd(f"tp {Bot.NAME} {x + 0.5} {y + 1.0} {z + 0.5}")
+                self.bot.use(x, y, z)
+                lines.append(f"use {x} {y} {z}")
+            elif a[0] == "set":
                 _, x, y, z, state = a
                 reply = self.r.cmd(f"setblock {x} {y} {z} {state}")
                 # "Could not set the block" means it already was that state: a no-op to replay.
@@ -451,6 +493,48 @@ def redstone_scenarios():
     s["rs_torch_pulse_into_wire"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 redstone_torch[lit=true]",
                                               "setblock 9 101 8 redstone_wire", "setblock 10 101 8 redstone_lamp", "setblock 9 100 8 stone"],
         [("set", 8, 100, 8, "redstone_block")] + steps(1, 1, 1, 1, 1) + [("set", 8, 100, 8, "stone")] + steps(1, 1, 1, 1, 1))
+    return s
+
+
+def use_scenarios():
+    """Levers and buttons, clicked by a real client."""
+    s = {}
+    n = lambda k: steps(*[1] * k)
+    use = lambda x, y, z: [("use", x, y, z)]
+    L = "lever[face=floor,facing=north,powered=false]"
+    s["us_lever_toggles_a_lamp"] = (ARENA + ["setblock 8 100 8 " + L, "setblock 9 100 8 redstone_lamp"],
+        use(8, 100, 8) + n(3) + use(8, 100, 8) + n(6))
+    s["us_lever_on_a_wall"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 100 7 lever[face=wall,facing=north,powered=false]",
+                                        "setblock 8 101 8 redstone_lamp", "setblock 9 100 8 redstone_lamp"],
+        use(8, 100, 7) + n(3) + use(8, 100, 7) + n(6))
+    s["us_lever_on_a_ceiling"] = (ARENA + ["setblock 8 103 8 stone", "setblock 8 102 8 lever[face=ceiling,facing=east,powered=false]",
+                                           "setblock 8 101 8 redstone_lamp", "setblock 8 103 9 redstone_lamp"],
+        use(8, 102, 8) + n(3) + use(8, 102, 8) + n(6))
+    s["us_lever_powers_a_wire_line"] = (ARENA + ["setblock 8 100 8 " + L] + [f"setblock {x} 100 8 redstone_wire" for x in range(9, 14)] + ["setblock 14 100 8 redstone_lamp"],
+        use(8, 100, 8) + n(3) + use(8, 100, 8) + n(3))
+    s["us_lever_powers_the_block_it_is_stuck_to"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 lever[face=floor,facing=north,powered=false]",
+                                                              "setblock 9 100 8 redstone_lamp", "setblock 8 100 9 redstone_lamp", "setblock 7 100 8 redstone_lamp"],
+        use(8, 101, 8) + n(3) + use(8, 101, 8) + n(5))
+    s["us_lever_drives_a_piston"] = (ARENA + ["setblock 8 100 8 piston[facing=east]", "setblock 9 100 8 stone", "setblock 7 100 8 lever[face=floor,facing=north,powered=false]"],
+        use(7, 100, 8) + n(6) + use(7, 100, 8) + n(6))
+    s["us_lever_through_a_repeater"] = (ARENA + ["setblock 8 100 8 " + L, "setblock 9 100 8 repeater[facing=west,delay=2]", "setblock 10 100 8 redstone_lamp"],
+        use(8, 100, 8) + n(8) + use(8, 100, 8) + n(8))
+    s["us_stone_button_pulses"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 stone_button[face=floor,facing=north,powered=false]",
+                                            "setblock 9 100 8 redstone_lamp", "setblock 8 100 9 redstone_lamp"],
+        use(8, 101, 8) + n(30))
+    s["us_oak_button_pulses_longer"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 oak_button[face=floor,facing=north,powered=false]",
+                                                 "setblock 9 100 8 redstone_lamp", "setblock 8 100 9 redstone_lamp"],
+        use(8, 101, 8) + n(40))
+    s["us_button_pressed_again_while_powered"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 stone_button[face=floor,facing=north,powered=false]",
+                                                           "setblock 9 100 8 redstone_lamp"],
+        use(8, 101, 8) + n(5) + use(8, 101, 8) + n(25))
+    s["us_button_on_a_wall_drives_wire"] = (ARENA + ["setblock 8 100 8 stone", "setblock 9 100 8 stone_button[face=wall,facing=east,powered=false]",
+                                                     "setblock 9 101 8 redstone_wire", "setblock 10 101 8 redstone_wire", "setblock 11 101 8 redstone_lamp",
+                                                     "setblock 9 100 9 stone", "setblock 9 101 9 redstone_lamp"],
+        use(9, 100, 8) + n(30))
+    s["us_button_drives_an_observer_and_torch"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 stone_button[face=floor,facing=north,powered=false]",
+                                                            "setblock 7 100 8 redstone_wall_torch[facing=west,lit=true]", "setblock 6 100 8 redstone_lamp"],
+        use(8, 101, 8) + n(30))
     return s
 
 
@@ -742,6 +826,8 @@ def main():
     ap.add_argument("--rcon", default="127.0.0.1:25622")
     ap.add_argument("--password", default=os.environ.get("FERRITE_ORACLE_RCON_PASSWORD", "ferrite-oracle"))
     ap.add_argument("--only", default="")
+    ap.add_argument("--interact-bin", default=None, help="path of ferrite-interact (for 'use' scenarios)")
+    ap.add_argument("--game", default="127.0.0.1:25620", help="game address of the recording server")
     ap.add_argument("--random", type=int, default=40)
     ap.add_argument("--random-redstone", type=int, default=30)
     ap.add_argument("--random-pistons", type=int, default=40)
@@ -758,9 +844,13 @@ def main():
     r.cmd("gamerule random_tick_speed 0")
     if "set to 0" not in r.cmd("gamerule random_tick_speed"):
         sys.exit("could not disable random ticks")
-    rec = Recorder(r, args.world)
+    bot = Bot(args.interact_bin, args.game) if args.interact_bin else None
+    if bot:
+        r.cmd(f"gamemode creative {Bot.NAME}")
+    rec = Recorder(r, args.world, bot)
     todo = scenarios()
     todo.update(redstone_scenarios())
+    todo.update(use_scenarios())
     todo.update(piston_scenarios())
     todo.update(random_pistons(args.random_pistons, args.seed))
     todo.update(random_redstone(args.random_redstone, args.seed))
@@ -769,6 +859,8 @@ def main():
     for name, (setup, actions) in todo.items():
         if name.startswith(args.only):
             rec.record(name, setup, actions, args.out)
+    if bot:
+        bot.close()
 
 
 if __name__ == "__main__":

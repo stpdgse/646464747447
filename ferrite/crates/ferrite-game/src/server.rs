@@ -1,6 +1,6 @@
 //! The game thread: it owns the world and every player, and advances at 20 ticks per second.
 //!
-//! Connection tasks never touch game state. They send [`Event`]s over a channel and receive
+//! Connection tasks never touch game state. They send events over a channel and receive
 //! packets through each player's [`PlayerSink`], so the game is single-writer and deterministic.
 
 use std::collections::{HashMap, HashSet};
@@ -185,6 +185,9 @@ struct Player {
     moved: bool,
     held_slot: u8,
     inventory: [ItemStack; 46],
+    sneaking: bool,
+    /// The latest block-change sequence number to acknowledge at the end of the tick.
+    ack: Option<i32>,
     game_mode: u8,
     joined: u64,
 }
@@ -314,6 +317,8 @@ impl Game {
             moved: false,
             held_slot: 0,
             inventory: [ItemStack::default(); 46],
+            sneaking: false,
+            ack: None,
             game_mode: self.cfg.game_mode,
             joined: self.tick,
         };
@@ -667,16 +672,168 @@ impl Game {
                     pl.held_slot = p.slot as u8;
                 }
             }
+            PlayerAction::ID => {
+                let p = decode!(PlayerAction);
+                self.on_player_action(id, &p);
+            }
+            UseItemOn::ID => {
+                let p = decode!(UseItemOn);
+                self.on_use_item_on(id, &p);
+            }
+            SetCreativeModeSlot::ID => {
+                let p = decode!(SetCreativeModeSlot);
+                if let Some(pl) = self.players.get_mut(&id)
+                    && pl.game_mode == 1
+                    && (0..46).contains(&p.slot)
+                {
+                    let mut item = p.item;
+                    item.count = item.count.clamp(0, 99);
+                    pl.inventory[p.slot as usize] = item;
+                }
+            }
+            PlayerInput::ID => {
+                let p = decode!(PlayerInput);
+                if let Some(pl) = self.players.get_mut(&id) {
+                    pl.sneaking = p.flags & 32 != 0;
+                }
+            }
             // Accepted and ignored for now.
             ChunkBatchReceived::ID
             | PlayerLoaded::ID
             | ClientTickEnd::ID
             | ServerboundCustomPayload::ID
-            | PlayerInput::ID
             | PlayerCommand::ID
             | Punch::ID => {}
             _ => {}
         }
+    }
+
+    /// Whether the player may touch the block at `pos`: loaded, and within reach.
+    fn in_reach(&self, id: PlayerId, pos: BlockPos) -> bool {
+        let Some(p) = self.players.get(&id) else { return false };
+        if !p.loaded.contains(&(pos.x >> 4, pos.z >> 4)) {
+            return false;
+        }
+        let (dx, dy, dz) = (
+            f64::from(pos.x) + 0.5 - p.x,
+            f64::from(pos.y) + 0.5 - (p.y + 1.62),
+            f64::from(pos.z) + 0.5 - p.z,
+        );
+        dx * dx + dy * dy + dz * dz <= 6.0 * 6.0
+    }
+
+    /// Tells one player what is really at `pos` (used to undo a change the server refused).
+    fn resend_block(&self, id: PlayerId, pos: BlockPos) {
+        if let (Some(p), Some(state)) = (self.players.get(&id), self.world.block(pos)) {
+            send(
+                &p.sink,
+                &BlockUpdate {
+                    pos: PackedPos::new(pos.x, pos.y, pos.z),
+                    state: VarInt(i32::from(state)),
+                },
+            );
+        }
+    }
+
+    /// Acknowledges a block-change sequence number. Like vanilla, the acknowledgement goes out at
+    /// the end of the tick, after the block updates it refers to.
+    fn ack(&mut self, id: PlayerId, sequence: VarInt) {
+        if let Some(p) = self.players.get_mut(&id) {
+            p.ack = Some(sequence.0);
+        }
+    }
+
+    fn on_player_action(&mut self, id: PlayerId, a: &PlayerAction) {
+        let pos = BlockPos::new(a.pos.x(), a.pos.y(), a.pos.z());
+        // Action 0 starts digging; in creative that breaks the block at once. Survival digging
+        // (hardness, tools, drops) is not implemented, so those requests are refused.
+        if a.action.0 == 0 {
+            let creative = self.players.get(&id).is_some_and(|p| p.game_mode == 1);
+            if creative && self.in_reach(id, pos) {
+                self.world.destroy_block(pos);
+            } else {
+                self.resend_block(id, pos);
+            }
+        }
+        if matches!(a.action.0, 0..=2) {
+            self.ack(id, a.sequence);
+        }
+    }
+
+    /// The block a held item places: items and blocks share names.
+    fn block_for_item(item: i32) -> Option<u16> {
+        let name = ferrite_data::registries::item::names.get(usize::try_from(item).ok()?)?;
+        ferrite_data::blocks::block_by_name(name).map(|b| b.default_state)
+    }
+
+    fn on_use_item_on(&mut self, id: PlayerId, u: &UseItemOn) {
+        let target = BlockPos::new(u.pos.x(), u.pos.y(), u.pos.z());
+        let Some(face) = ferrite_blocks::Direction::ALL.get(u.face.0 as usize).copied() else {
+            return self.kick(id, "Invalid packet");
+        };
+        let (sneaking, held) = match self.players.get(&id) {
+            Some(p) => (p.sneaking, p.inventory[36 + usize::from(p.held_slot)]),
+            None => return,
+        };
+        let mut place_pos = target.offset(face);
+        if self.in_reach(id, target) {
+            // A block that reacts to a click (levers, buttons) takes it unless the player sneaks
+            // with something in hand.
+            let uses_block = !(sneaking && held.count > 0);
+            if uses_block && self.world.use_block(target) {
+                self.ack(id, u.sequence);
+                return;
+            }
+            // Clicking something replaceable (snow, grass, water) places into it.
+            if self.world.block(target).is_some_and(|s| {
+                ferrite_data::shapes::facts(s).has(ferrite_data::shapes::flag::REPLACEABLE)
+            }) {
+                place_pos = target;
+            }
+            if held.count > 0
+                && let Some(state) = Self::block_for_item(held.item)
+                && self.in_reach(id, place_pos)
+                && self.world.block(place_pos).is_some_and(|s| {
+                    ferrite_data::shapes::facts(s).has(ferrite_data::shapes::flag::REPLACEABLE)
+                })
+                && !self.blocked_by_player(state, place_pos)
+            {
+                let adapted = self.world.update_from_neighbor_shapes(state, place_pos);
+                let placed =
+                    if ferrite_data::shapes::facts(adapted).has(ferrite_data::shapes::flag::AIR) {
+                        state
+                    } else {
+                        adapted
+                    };
+                self.world.set_block(place_pos, placed, ferrite_blocks::update::ALL);
+            } else {
+                self.resend_block(id, place_pos);
+            }
+        } else {
+            self.resend_block(id, target);
+            self.resend_block(id, place_pos);
+        }
+        self.ack(id, u.sequence);
+    }
+
+    /// Whether a block in `state` at `pos` would overlap a player (which vanilla does not allow).
+    fn blocked_by_player(&self, state: u16, pos: BlockPos) -> bool {
+        let boxes = ferrite_data::shapes::facts(state).collision_shape();
+        if boxes.is_empty() {
+            return false;
+        }
+        self.players.values().any(|p| {
+            let (px0, px1) = (p.x - 0.3, p.x + 0.3);
+            let (py0, py1) = (p.y, p.y + 1.8);
+            let (pz0, pz1) = (p.z - 0.3, p.z + 0.3);
+            boxes.iter().any(|b| {
+                let (x0, y0, z0) =
+                    (f64::from(pos.x) + b[0], f64::from(pos.y) + b[1], f64::from(pos.z) + b[2]);
+                let (x1, y1, z1) =
+                    (f64::from(pos.x) + b[3], f64::from(pos.y) + b[4], f64::from(pos.z) + b[5]);
+                px0 < x1 && px1 > x0 && py0 < y1 && py1 > y0 && pz0 < z1 && pz1 > z0
+            })
+        })
     }
 
     fn kick(&mut self, id: PlayerId, reason: &str) {
@@ -770,6 +927,11 @@ impl Game {
         }
         self.update_tracking();
         self.broadcast_movement();
+        for p in self.players.values_mut() {
+            if let Some(sequence) = p.ack.take() {
+                send(&p.sink, &BlockChangedAck { sequence: VarInt(sequence) });
+            }
+        }
         if self.tick.is_multiple_of(20) {
             let t = self.time_packet();
             for p in self.players.values() {
@@ -934,13 +1096,7 @@ impl Game {
                 }
                 // The base only advances by what was actually sent as a delta, so rounding never
                 // accumulates; a teleport resets it.
-                let base = if moved && !small {
-                    now
-                } else if moved {
-                    now
-                } else {
-                    p.sent.base
-                };
+                let base = if moved { now } else { p.sent.base };
                 (out, SentState { base, y_rot: yr, x_rot: xr, head: hr })
             };
             let p = self.players.get_mut(&id).expect("exists");

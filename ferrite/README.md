@@ -40,6 +40,7 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | `ferrite-ecs` | Archetype ECS: `#![forbid(unsafe_code)]`, generational entities, typed queries, bundles, deferred commands, resources. Deterministic by construction |
 | `ferrite-world` | Chunk model (paletted, bit-packed sections), versioned codec with zstd, and the crash-safe log-structured chunk store |
 | `ferrite-blocks` | Block behaviour: vanilla's neighbour/shape update propagation, scheduled ticks, water and lava, redstone (wire, repeaters, torches, lamps, observers), pistons, connections and support rules. Checked against recordings of the official server |
+| `ferrite-game` | The game: a 20 TPS single-writer thread owning the world and players; join sequence, chunk streaming, entity tracking, movement, chat, block interaction |
 | `ferrite-sim` | Region scheduler (rayon) with deterministic exchange, plus the particle workload and single-threaded reference used to prove determinism |
 | `ferrite-server` | The executable (mimalloc, clap flags, both backends, online mode, Query, RCON) |
 
@@ -390,9 +391,60 @@ block`; a recording server must clear the area around its arena (pistons push bl
 
 Not yet: comparators, dispensers/droppers/hoppers, rails, pressure plates and tripwire (they need
 entities), falling blocks, fire, random ticks, container block entities. Lava that is *rising* uses
-vanilla's shared world random, which Ferrite cannot match, so recordings avoid it. Levers and
-buttons (and their timed release) are driven by `/setblock`-style state changes in the tests, since
-no server command can press them; the real "use" path arrives with the player work.
+vanilla's shared world random, which Ferrite cannot match, so recordings avoid it. Levers
+and buttons (with their timed release) are clicked by a real client in the recordings: see
+[Players and the play state](#players-and-the-play-state).
+
+## Players and the play state
+
+`ferrite-server` now runs a game. A player joins a flat world, sees chunks stream in, walks around,
+sees other players, chats, breaks and places blocks (creative mode), and uses levers and buttons.
+
+* **`ferrite-net`** hands a connection to a `PlayHost` once configuration ends. The connection task
+  forwards raw play frames to the game's handle and writes whatever the game queues through a
+  bounded `PlayerSink` (a client that falls 32 MiB behind is dropped). The network layer never
+  interprets a play packet. The tokio backend runs the play state; the io_uring backend does not yet.
+* **`ferrite-game`** is a single-writer game thread at 20 TPS that owns the world and every player:
+  the join sequence, keep-alive, chunk streaming in vanilla's rounded-square view shape (nearest
+  first, batched), player list and entity spawning by distance, relative movement quantised to
+  1/4096 block so rounding never drifts, teleport confirmation, rejection of impossible moves
+  (the client is put back), chat, block breaking and placing, and block-change broadcasts.
+  The world is the real `ferrite-blocks` simulation, so pistons, redstone and fluids run under
+  players. A flat-world generator stands in for the real world generator (milestone 9).
+* **Chunks** encode straight from `ferrite-world`'s paletted containers: non-air and fluid
+  counts, heightmaps, and full-bright light (there is no lighting engine yet, so caves and shade
+  look lit).
+
+### How the packets were verified
+
+Play packet layouts are the most error-prone part of the protocol, and there is no client here to
+try them on, so three independent checks stand in for one:
+
+1. **Captured vanilla traffic.** `ferrite-capture` joins a server as a minimal client and records
+   every clientbound play packet. A committed sample of vanilla's join sequence (`tests/captures`)
+   is decoded with Ferrite's types, must consume every byte, and must re-encode byte-identically.
+2. **Vanilla's own codecs.** `scripts/vanilla-codec.sh` has the official `StreamCodec`s decode what
+   Ferrite *sends*: every serverbound packet Ferrite understands, and 80 packets of 30 kinds from a
+   live multi-player Ferrite session. A packet that fails or leaves bytes unread is reported.
+   This found, among other things, that relative movement packets lead with a properties VarInt
+   (on-ground bit plus a step count): a capture round trip had missed it because the captured
+   sample happened to be all zeros.
+3. **Fuzzing.** `play_packets` decodes arbitrary bytes as every play packet a client can send.
+
+Version details the captures taught: `accept_teleportation` echoes position and rotation,
+chunk sections carry a fluid count, paletted-container data has no length prefix, `login` ends
+with `online_mode` and `enforces_secure_chat`, `set_time` carries world-clock updates, and the
+serverbound `punch` packet is empty.
+
+Levers and buttons are verified against the real server too: `ferrite-interact` is a scriptable
+client that joins vanilla and right-clicks blocks, and the physics recorder replays those clicks
+(12 recorded scenarios match: levers on floors, walls and ceilings, button timing, wire, repeaters,
+pistons, torches and observers).
+
+**Not yet:** survival mode (digging time, tools, drops, damage, hunger), item components, the
+inventory beyond creative hotbar slots, block-placement orientation (a placed block takes its
+default state, adapted to neighbours), signed chat, commands, persistence of changes, lighting,
+and the io_uring backend's play state.
 
 ## Quality gates
 
@@ -425,7 +477,8 @@ One pull request per subsystem.
    [Simulation core](#simulation-core).
 6. **World storage format and chunk pipeline**, see [World storage](#world-storage).
 7. Block updates, physics, redstone (bit-exact).
-8. Entities, mobs, villagers, trading, raids, breeding, farming.
+8. Entities, mobs, villagers, trading, raids, breeding, farming. *Started: players, movement,
+   chat and block interaction are in (see [Players and the play state](#players-and-the-play-state)).*
 9. Exact vanilla world generation.
 10. Commands (Brigadier, selectors, NBT), datapacks, functions, advancements, loot tables.
 11. Dimensions and portals.
