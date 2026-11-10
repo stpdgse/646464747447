@@ -47,6 +47,11 @@ jobs:
           # where the io_uring backend is not compiled.)
           FERRITE_REQUIRE_URING: "1"
       - run: cargo bench --workspace --no-run
+      - name: Hammer the ECS and scheduler property tests
+        # The determinism guarantee is only as good as the number of worlds it was tried on.
+        run: cargo test -p ferrite-ecs -p ferrite-sim
+        env:
+          PROPTEST_CASES: "2000"
 
   datagen-is-reproducible:
     # The committed tables must be exactly what the generator produces from the official jar.

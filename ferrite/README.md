@@ -17,7 +17,7 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | Area | Decision |
 |---|---|
 | Scope | Full vanilla parity, bit-exact wherever it is observable (redstone order, mob AI, RNG) |
-| Parallelism | World split into regions ticked in parallel, ECS systems parallel inside a region, deterministic merge of cross-region effects at fixed sync points |
+| Parallelism | World split into regions that tick in parallel, each owning its own ECS world; cross-region effects are messages delivered at barriers in an order that never depends on thread timing (see [Simulation core](#simulation-core)). Parallel *systems inside* a region are deliberately not built yet |
 | Networking | `tokio` and `io_uring` backends over one shared policy layer. **`tokio` is the default**: on loopback the benchmarks do not justify `io_uring` (see [Networking](#networking)) |
 | Storage | Custom on-disk format (no Anvil), with seed-exact vanilla world generation |
 | Game data | Generated from the official server's data reports, never hand-typed |
@@ -37,6 +37,8 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | `ferrite-net` | `Lobby` (every connection decision, backend-independent) plus a multi-thread `tokio` backend and a thread-per-core `io_uring` backend (`monoio`, `SO_REUSEPORT`, Linux) |
 | `ferrite-swarm` | Bot load tester: status, join and steady-state ping modes with latency percentiles. Its bots are checked against the vanilla server |
 | `ferrite-remote` | Query (UDP) and RCON (TCP) servers plus clients, verified against vanilla |
+| `ferrite-ecs` | Archetype ECS: `#![forbid(unsafe_code)]`, generational entities, typed queries, bundles, deferred commands, resources. Deterministic by construction |
+| `ferrite-sim` | Region scheduler (rayon) with deterministic exchange, plus the particle workload and single-threaded reference used to prove determinism |
 | `ferrite-server` | The executable (mimalloc, clap flags, both backends, online mode, Query, RCON) |
 
 ### Regenerating the tables
@@ -218,9 +220,61 @@ amplifier (the handshake is at most 16 bytes in reply to 7). RCON additionally c
 password in constant time, slows down and limits wrong guesses, and rejects oversized or
 malformed packets from the header alone.
 
+## Simulation core
+
+The aim is the one guarantee the whole project depends on: **a tick produces the same state for any
+number of threads and any scheduling.**
+
+**How it works.** The world is a grid of regions. Each region owns an ECS `World` outright, so
+there is no sharing and no locking. A tick is a list of phases. In a phase every region runs the
+same function in parallel, touching only its own world and pushing messages to its outbox. Between
+phases an *exchange* gathers outboxes in region order and delivers them, so an inbox is ordered by
+(source region, emission order): a function of the messages, not of who finished first. Border
+state travels as read-only "ghost" messages, and entities that cross a border as migration
+messages.
+
+**How it is proven.** `ferrite_sim::particles` is a neighbour-interaction workload whose
+floating-point sums depend on addition order. A plain single-threaded `Reference` runs the same
+physics with no regions, no ECS and no threads. The tests require every tick, bit for bit, to
+match it for 7 region layouts x 5 thread counts, for a heavily unbalanced world, for rectangular
+worlds, for 12 repeated 4-thread runs, and for random worlds (the tests are run with thousands of
+cases in CI). A negative control keeps the check honest: with halo exchange disabled the result
+*must* differ, and more than 200 particles cross region borders in the scenario.
+
+**What it does not give.** Vanilla's exact *global* update order for rules that depend on it
+(redstone, entity push collisions). The particle rules are Jacobi-style (everything reads the
+start-of-tick state), which is order-independent. Order-dependent systems need an ordered mode,
+and are designed system by system when they are built. Within one region, systems run
+sequentially.
+
+**ECS speed** (one run, 1M `pos += vel` entities; the VM is noisy, treat as +/-15%):
+
+| | ferrite | hecs 0.11 | bevy_ecs 0.20 | plain `Vec` |
+|---|---|---|---|---|
+| Iterate 1M entities | 1.52 ms | 1.38 ms | 3.17 ms | 1.36 ms |
+| Spawn 100k entities | 4.9 ms | 2.4 ms | 7.2 ms | n/a |
+| Insert then remove a component, 100k | 6.5 ms | 8.6 ms | 14.1 ms | n/a |
+
+Iteration is at memory-bandwidth speed. Spawn is about 2x slower than hecs. The first version was
+slower still (spawn 9.0 ms, insert/remove 17.6 ms) because every spawn sorted and hashed a `Vec`
+of component ids and every insert boxed its value; a per-bundle-type cache, cached archetype
+transitions and typed moves fixed that.
+
+**Scaling** (200,000 interacting particles, 16x16 regions, 4-core VM):
+
+| Threads | ms per tick | Speedup |
+|---|---|---|
+| 1 | 103.7 | 1.00x |
+| 2 | 57.8 | 1.79x |
+| 3 | 37.3 | 2.78x |
+| 4 | 28.7 | 3.62x (90% efficient) |
+
+The region count barely matters (2x2 to 32x32 within about 10%). The honest caveat: the workload
+is a toy, so this shows the *scheduler* scales, not that vanilla's real mob workload will.
+
 ## Quality gates
 
-* 186 tests (plus 6 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
+* 211 tests (plus 6 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
   `cfb8` crate and checked directly against the NIST SP 800-38A vector, and compression cross-checked against `flate2`.
 * Eight `cargo-fuzz` targets: frame decoder, codec readers, frame round-trip, whole-session driving
   (structure-aware, reaches login and configuration), the NBT reader, the Query handler, the Query
@@ -245,7 +299,8 @@ One pull request per subsystem.
 3. **Networking**: `tokio` and `io_uring` backends, connection policy, bot-swarm load tester, benchmarks.
 4. **Online-mode authentication, Query and RCON** (signed chat moves to the play-state work, see
    [Authentication](#authentication)).
-5. Custom ECS and region scheduler (deterministic parallel ticking).
+5. **Custom ECS and region scheduler** (deterministic parallel ticking), see
+   [Simulation core](#simulation-core).
 6. World storage format and chunk pipeline.
 7. Block updates, physics, redstone (bit-exact).
 8. Entities, mobs, villagers, trading, raids, breeding, farming.
