@@ -31,8 +31,27 @@ pub enum Support {
     SnowLayer,
     /// A rigid or centre-supporting top face below (pressure plates).
     RigidOrCenterBelow,
+    /// A rigid top face below (repeaters, comparators).
+    RigidBelow,
+    /// Face-attached (levers, buttons): the full face of the block it is stuck to.
+    Attached,
     /// A two-block door: each half needs the other, the lower one a full face below.
     Door,
+}
+
+/// Redstone-relevant blocks.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Redstone {
+    /// A block that always emits 15.
+    PowerBlock,
+    Lever,
+    Button,
+    Lamp,
+    /// A redstone torch standing on a block.
+    Torch,
+    /// A redstone torch on a wall.
+    WallTorch,
+    Repeater,
 }
 
 /// How a block's side arms follow its horizontal neighbours.
@@ -46,6 +65,7 @@ pub enum Connects {
 
 #[derive(Clone, Copy, Debug)]
 pub struct BlockKind {
+    pub redstone: Option<Redstone>,
     pub connects: Option<Connects>,
     /// Never connected to, even with a sturdy face (leaves, pumpkins, shulker boxes, ...).
     pub connection_exception: bool,
@@ -115,6 +135,7 @@ impl Kinds {
                     stride *= p.values.len() as u16;
                 }
                 BlockKind {
+                    redstone: None,
                     connects: None,
                     connection_exception: false,
                     is_wall: false,
@@ -226,6 +247,24 @@ impl Kinds {
         }
         for &b in block_tag("minecraft:doors") {
             by_block[usize::from(b)].support = Some(Support::Door);
+        }
+        for (name, kind) in [
+            ("redstone_block", Redstone::PowerBlock),
+            ("lever", Redstone::Lever),
+            ("redstone_lamp", Redstone::Lamp),
+            ("redstone_torch", Redstone::Torch),
+            ("redstone_wall_torch", Redstone::WallTorch),
+            ("repeater", Redstone::Repeater),
+        ] {
+            by_block[id(name)].redstone = Some(kind);
+        }
+        for &b in block_tag("minecraft:buttons") {
+            by_block[usize::from(b)].redstone = Some(Redstone::Button);
+        }
+        by_block[id("repeater")].support = Some(Support::RigidBelow);
+        by_block[id("lever")].support = Some(Support::Attached);
+        for &b in block_tag("minecraft:buttons") {
+            by_block[usize::from(b)].support = Some(Support::Attached);
         }
         for &b in block_tag("minecraft:wool_carpets") {
             by_block[usize::from(b)].support = Some(Support::NotAirBelow);

@@ -11,11 +11,12 @@ pub mod fluid;
 mod kinds;
 mod level;
 mod pos;
+mod redstone;
 pub mod shape;
 pub mod ticks;
 mod world;
 
-pub use kinds::{Behaviour, Kinds};
+pub use kinds::{Behaviour, Kinds, Redstone};
 pub use level::{BlockAccess, Chunks};
 pub use pos::{BlockPos, Direction};
 pub use world::{NEIGHBOR_UPDATE_ORDER, Rules, SHAPE_UPDATE_ORDER, World, update};

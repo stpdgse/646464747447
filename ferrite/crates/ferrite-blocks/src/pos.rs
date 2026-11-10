@@ -72,6 +72,27 @@ impl Direction {
         self as usize
     }
 
+    /// The next horizontal direction clockwise seen from above (north -> east -> south -> west).
+    pub const fn clockwise(self) -> Direction {
+        match self {
+            Direction::North => Direction::East,
+            Direction::East => Direction::South,
+            Direction::South => Direction::West,
+            Direction::West => Direction::North,
+            other => other,
+        }
+    }
+
+    pub const fn counter_clockwise(self) -> Direction {
+        match self {
+            Direction::North => Direction::West,
+            Direction::West => Direction::South,
+            Direction::South => Direction::East,
+            Direction::East => Direction::North,
+            other => other,
+        }
+    }
+
     /// Vanilla's lowercase name, which is also the name of the matching arm property.
     pub const fn name(self) -> &'static str {
         match self {

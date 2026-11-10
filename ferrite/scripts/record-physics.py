@@ -178,15 +178,17 @@ class Recorder:
         blocks = chunk_blocks(chunk)
         ticks = [(t["x"], t["y"], t["z"], t["i"].replace("minecraft:", ""), t["t"], t["p"])
                  for t in chunk["fluid_ticks"] if Y0 <= t["y"] <= Y1]
-        return blocks, ticks
+        block_ticks = [(t["x"], t["y"], t["z"], t["i"].replace("minecraft:", ""), t["t"], t["p"])
+                       for t in chunk["block_ticks"] if Y0 <= t["y"] <= Y1]
+        return blocks, ticks, block_ticks
 
     def clear(self):
         for y in range(Y0, Y1 + 1, 4):
             self.r.cmd(f"fill 0 {y} 0 15 {min(y + 3, Y1)} 15 air")
         self.step(130)  # let every stale scheduled tick run out
-        blocks, ticks = self.snapshot()
-        if blocks or ticks:
-            sys.exit(f"arena did not clear: {len(blocks)} blocks, {len(ticks)} ticks")
+        blocks, ticks, btk = self.snapshot()
+        if blocks or ticks or btk:
+            sys.exit(f"arena did not clear: {len(blocks)} blocks, {len(ticks) + len(btk)} ticks")
 
     def record(self, name, setup, actions, out_dir):
         """setup: commands building inert scenery. actions: ("set", x, y, z, state) | ("step", n)."""
@@ -196,9 +198,9 @@ class Recorder:
             if "Incorrect" in reply or "Unknown" in reply or "Invalid" in reply:
                 sys.exit(f"{name}: command {c!r} failed: {reply}")
         self.step(130)
-        blocks, ticks = self.snapshot()
-        if ticks:
-            sys.exit(f"{name}: scenery left scheduled ticks behind: {ticks[:3]}")
+        blocks, ticks, btk = self.snapshot()
+        if ticks or btk:
+            sys.exit(f"{name}: scenery left scheduled ticks behind: {(ticks + btk)[:3]}")
         lines = [f"# recorded from the official server by scripts/record-physics.py", "init"]
         lines += rows(blocks)
         lines.append("end")
@@ -213,13 +215,14 @@ class Recorder:
             else:
                 self.step(a[1])
                 lines.append(f"step {a[1]}")
-                blocks, ticks = self.snapshot()
+                blocks, ticks, btk = self.snapshot()
                 # Only what differs from the initial scenery is written down.
                 lines.append("expect")
                 changed = {p: s for p, s in blocks.items() if initial.get(p) != s}
                 changed.update({p: "air" for p in initial if p not in blocks})
                 lines += [f"b {x} {y} {z} {s}" for (x, y, z), s in sorted(changed.items())]
                 lines += [f"f {x} {y} {z} {i} {t} {p}" for (x, y, z, i, t, p) in ticks]
+                lines += [f"k {x} {y} {z} {i} {t} {p}" for (x, y, z, i, t, p) in btk]
                 lines.append("end")
         with open(os.path.join(out_dir, name + ".txt"), "w") as f:
             f.write("\n".join(lines) + "\n")
@@ -303,6 +306,69 @@ def scenarios():
     return s
 
 
+def redstone_scenarios():
+    """Redstone components driven one tick at a time. Levers and buttons are placed with
+    /setblock, which notifies only the six neighbours, so power sources that matter are
+    redstone blocks and torches."""
+    s = {}
+    one = steps(1)
+    s["rs_block_powers_a_lamp"] = (ARENA + ["setblock 8 100 8 redstone_lamp"],
+        [("set", 9, 100, 8, "redstone_block")] + steps(1, 1, 1)
+        + [("set", 9, 100, 8, "air")] + steps(1, 1, 1, 1, 1, 1, 1))
+    s["rs_block_powers_a_lamp_through_stone"] = (ARENA + ["setblock 8 100 8 redstone_lamp", "setblock 9 100 8 stone"],
+        [("set", 10, 100, 8, "redstone_block")] + steps(1, 1, 1))
+    s["rs_lever_beside_a_lamp"] = (ARENA + ["setblock 8 100 8 redstone_lamp"],
+        [("set", 9, 100, 8, "lever[face=wall,facing=east,powered=true]")] + steps(1, 1)
+        + [("set", 9, 100, 8, "lever[face=wall,facing=east,powered=false]")] + steps(1, 1, 1, 1, 1, 1))
+    s["rs_lever_powers_the_block_it_is_on"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 redstone_lamp",
+                                                       "setblock 9 100 8 redstone_lamp", "setblock 8 99 8 stone"],
+        [("set", 8, 100, 7, "lever[face=wall,facing=north,powered=true]")] + steps(1, 1, 5))
+    # A torch is switched off by a *powered block it is attached to*: here a redstone block
+    # under it (a redstone block is a weak source, so every direction counts for a torch).
+    s["rs_torch_off_when_its_block_is_powered"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 redstone_torch[lit=true]"],
+        [("set", 8, 100, 8, "redstone_block")] + steps(1, 1, 1, 1, 1)
+        + [("set", 8, 100, 8, "stone")] + steps(1, 1, 1, 1, 1))
+    s["rs_wall_torch_off_when_its_block_is_powered"] = (ARENA + ["setblock 8 100 8 stone", "setblock 9 100 8 redstone_wall_torch[facing=east,lit=true]",
+                                                                 "setblock 10 100 8 redstone_lamp", "setblock 9 101 8 redstone_lamp"],
+        [("set", 8, 100, 8, "redstone_block")] + steps(1, 1, 1, 1, 1, 1)
+        + [("set", 8, 100, 8, "stone")] + steps(1, 1, 1, 1, 1, 1))
+    s["rs_floor_torch_powers_the_block_above"] = (ARENA + ["setblock 8 101 8 stone", "setblock 8 102 8 redstone_lamp",
+                                                           "setblock 7 101 8 redstone_lamp", "setblock 8 100 8 stone"],
+        [("set", 8, 100, 8, "redstone_torch[lit=true]")] + steps(1, 1, 1, 1)
+        + [("set", 8, 100, 8, "air")] + steps(1, 1, 1, 1, 1, 1, 1))
+    s["rs_torch_does_not_power_what_it_stands_on"] = (ARENA + ["setblock 8 100 8 redstone_lamp", "setblock 9 101 8 redstone_lamp",
+                                                               "setblock 9 100 8 stone", "setblock 7 100 8 stone", "setblock 7 101 8 redstone_lamp"],
+        [("set", 8, 101, 8, "redstone_torch[lit=true]")] + steps(1, 1, 1, 1, 1))
+    s["rs_wall_torch_does_not_power_its_wall"] = (ARENA + ["setblock 8 100 8 redstone_lamp", "setblock 8 101 8 redstone_lamp",
+                                                           "setblock 7 100 8 redstone_lamp"],
+        [("set", 9, 100, 8, "redstone_wall_torch[facing=east,lit=true]")] + steps(1, 1, 1, 1, 1))
+    s["rs_torch_is_lit_when_placed_unpowered"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 102 8 redstone_lamp"],
+        [("set", 8, 101, 8, "redstone_torch[lit=false]")] + steps(1, 1, 1, 1, 1))
+    s["rs_torch_burns_out"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 redstone_torch[lit=true]"],
+        sum([[("set", 8, 100, 8, "redstone_block")] + steps(1, 1, 1) + [("set", 8, 100, 8, "stone")] + steps(1, 1, 1)
+             for _ in range(10)], []) + steps(100, 100))
+    s["rs_repeater_delay"] = {}
+    for d in (1, 2, 3, 4):
+        s[f"rs_repeater_delay_{d}"] = (ARENA + [f"setblock 9 100 8 repeater[facing=west,delay={d}]", "setblock 10 100 8 redstone_lamp"],
+            [("set", 8, 100, 8, "redstone_block")] + steps(*[1] * (2 * d + 3))
+            + [("set", 8, 100, 8, "air")] + steps(*[1] * (2 * d + 3)))
+    del s["rs_repeater_delay"]
+    s["rs_repeater_short_pulse_is_extended"] = (ARENA + ["setblock 9 100 8 repeater[facing=west,delay=2]", "setblock 10 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "redstone_block")] + steps(1) + [("set", 8, 100, 8, "air")] + steps(*[1] * 12))
+    s["rs_repeater_chain"] = (ARENA + ["setblock 9 100 8 repeater[facing=west,delay=1]", "setblock 10 100 8 repeater[facing=west,delay=1]",
+                                       "setblock 11 100 8 repeater[facing=west,delay=1]", "setblock 12 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "redstone_block")] + steps(*[1] * 10) + [("set", 8, 100, 8, "air")] + steps(*[1] * 10))
+    s["rs_repeater_locked_by_a_side_repeater"] = (ARENA + ["setblock 9 100 8 repeater[facing=west,delay=1]", "setblock 8 100 8 redstone_lamp"],
+        [("set", 9, 100, 9, "repeater[facing=south,delay=1,powered=true]"), ("set", 10, 100, 8, "redstone_block"),
+         ("set", 10, 100, 8, "air")] + steps(*[1] * 3) + [("set", 11, 100, 8, "redstone_block")] + steps(*[1] * 3)
+        + [("set", 9, 100, 9, "air")] + steps(*[1] * 6))
+    s["rs_repeater_lock_holds_the_output"] = (ARENA + ["setblock 9 100 8 repeater[facing=west,delay=1,powered=true]", "setblock 8 100 8 redstone_lamp[lit=true]",
+                                                       "setblock 10 100 8 redstone_block"],
+        [("set", 9, 100, 7, "repeater[facing=north,delay=1,powered=true]"), ("set", 10, 100, 8, "air")] + steps(*[1] * 4)
+        + [("set", 9, 100, 7, "air")] + steps(*[1] * 6))
+    return s
+
+
 def random_scenarios(count, seed):
     scenery = ["stone", "stone", "stone", "stone_slab", "stone_slab[type=top]", "oak_stairs[facing=east]",
                "oak_stairs[facing=north,half=top]", "glass_pane", "oak_fence", "cobblestone_wall", "torch",
@@ -356,6 +422,7 @@ def main():
         sys.exit("could not disable random ticks")
     rec = Recorder(r, args.world)
     todo = scenarios()
+    todo.update(redstone_scenarios())
     todo.update(random_scenarios(args.random, args.seed))
     for name, (setup, actions) in todo.items():
         if name.startswith(args.only):

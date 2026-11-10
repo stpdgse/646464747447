@@ -73,6 +73,8 @@ enum Update {
         flags: u32,
         limit: i32,
     },
+    /// Tell exactly one block that `block` changed next to it.
+    Single { pos: BlockPos, block: u16 },
     /// Tell the neighbours of `source` (except `skip`) that it changed; `next` is the progress.
     Multi { source: BlockPos, block: u16, skip: Option<Direction>, next: usize },
 }
@@ -84,6 +86,10 @@ pub struct World<A: BlockAccess> {
     pub rules: Rules,
     time: i64,
     pub(crate) fluid_ticks: TickQueue<u8>,
+    block_ticks: TickQueue<u16>,
+    running_ticks: Vec<(BlockPos, u16)>,
+    running_next: usize,
+    pub(crate) toggles: Vec<(BlockPos, i64)>,
     occlusion: OcclusionCache,
     stack: Vec<Update>,
     added: Vec<Update>,
@@ -101,6 +107,10 @@ impl<A: BlockAccess> World<A> {
             rules,
             time: 0,
             fluid_ticks: TickQueue::new(),
+            block_ticks: TickQueue::new(),
+            running_ticks: Vec::new(),
+            running_next: 0,
+            toggles: Vec::new(),
             occlusion: OcclusionCache::default(),
             stack: Vec::new(),
             added: Vec::new(),
@@ -141,6 +151,21 @@ impl<A: BlockAccess> World<A> {
         self.fluid_ticks.pending(self.time)
     }
 
+    /// Pending block ticks in saved order.
+    pub fn pending_block_ticks(&self) -> Vec<crate::ticks::Pending<u16>> {
+        self.block_ticks.pending(self.time)
+    }
+
+    /// Schedules a block tick (`block` is the block id) unless one is already pending.
+    pub fn schedule_block_tick(&mut self, pos: BlockPos, block: u16, delay: i64, priority: i8) {
+        self.block_ticks.schedule(pos, block, self.time + delay, priority);
+    }
+
+    /// Whether a tick of `block` at `pos` is waiting to run later in the current game tick.
+    pub fn will_tick_this_tick(&self, pos: BlockPos, block: u16) -> bool {
+        self.running_ticks.iter().skip(self.running_next).any(|t| *t == (pos, block))
+    }
+
     pub(crate) fn schedule_fluid_tick(&mut self, pos: BlockPos, fluid_type: u8, delay: i64) {
         self.fluid_ticks.schedule(pos, fluid_type, self.time + delay, 0);
     }
@@ -166,6 +191,11 @@ impl<A: BlockAccess> World<A> {
             return false;
         }
         self.blocks.set_block_raw(pos, state);
+        if STATE_TO_BLOCK[usize::from(old)] != STATE_TO_BLOCK[usize::from(state)]
+            && Kinds::get().of_state(old).redstone.is_some()
+        {
+            crate::redstone::on_remove(self, pos, old);
+        }
         self.on_place(pos, state, old);
         // A non-liquid block that now holds a different fluid (waterlogging) gets that fluid's
         // tick; liquid blocks schedule their own in `on_place`.
@@ -216,6 +246,18 @@ impl<A: BlockAccess> World<A> {
         self.add_and_run(Update::Multi { source: pos, block, skip: None, next: 0 });
     }
 
+    /// Like [`update_neighbors_at`](Self::update_neighbors_at), leaving out the neighbour in
+    /// direction `skip`.
+    pub fn update_neighbors_at_except(&mut self, pos: BlockPos, block: u16, skip: Direction) {
+        let first = if NEIGHBOR_UPDATE_ORDER[0] == skip { 1 } else { 0 };
+        self.add_and_run(Update::Multi { source: pos, block, skip: Some(skip), next: first });
+    }
+
+    /// Tells the block at `pos` that a neighbour of type `block` changed.
+    pub fn neighbor_changed_at(&mut self, pos: BlockPos, block: u16) {
+        self.add_and_run(Update::Single { pos, block });
+    }
+
     fn add_and_run(&mut self, update: Update) {
         let running = self.chained > 0;
         let too_deep = self.chained >= MAX_CHAINED_UPDATES;
@@ -245,6 +287,12 @@ impl<A: BlockAccess> World<A> {
                 let more = match top {
                     Update::Shape { dir, neighbor_state, pos, neighbor_pos, flags, limit } => {
                         self.run_shape_update(dir, neighbor_state, pos, neighbor_pos, flags, limit);
+                        false
+                    }
+                    Update::Single { pos, block } => {
+                        if let Some(state) = self.blocks.block(pos) {
+                            self.neighbor_changed(pos, state, block);
+                        }
                         false
                     }
                     Update::Multi { source, block, skip, mut next } => {
@@ -295,15 +343,23 @@ impl<A: BlockAccess> World<A> {
 
     // ---- per-block hooks ------------------------------------------------------------------
 
-    fn on_place(&mut self, pos: BlockPos, state: u16, _old: u16) {
-        if Kinds::get().of_state(state).behaviour == Behaviour::Liquid {
+    fn on_place(&mut self, pos: BlockPos, state: u16, old: u16) {
+        let kind = Kinds::get().of_state(state);
+        if kind.behaviour == Behaviour::Liquid {
             fluid::liquid_block_changed(self, pos, state);
+        }
+        if kind.redstone.is_some() {
+            crate::redstone::on_place(self, pos, state, old);
         }
     }
 
-    fn neighbor_changed(&mut self, pos: BlockPos, state: u16, _source_block: u16) {
-        if Kinds::get().of_state(state).behaviour == Behaviour::Liquid {
+    fn neighbor_changed(&mut self, pos: BlockPos, state: u16, source_block: u16) {
+        let kind = Kinds::get().of_state(state);
+        if kind.behaviour == Behaviour::Liquid {
             fluid::liquid_block_changed(self, pos, state);
+        }
+        if kind.redstone.is_some() {
+            crate::redstone::neighbor_changed(self, pos, state, source_block);
         }
     }
 
@@ -358,6 +414,14 @@ impl<A: BlockAccess> World<A> {
                     || sturdy(pos.below(), Direction::Up, DataSupport::Rigid)
                     || sturdy(pos.below(), Direction::Up, DataSupport::Center)
             }
+            Support::RigidBelow => {
+                dir != Direction::Down || sturdy(pos.below(), Direction::Up, DataSupport::Rigid)
+            }
+            Support::Attached => {
+                let toward = crate::redstone::attached_direction(state);
+                dir != toward.opposite()
+                    || sturdy(pos.offset(toward.opposite()), toward, DataSupport::Full)
+            }
             Support::Door => {
                 // The other-half rule is handled in `update_shape`; this is the floor.
                 let lower = kinds.property(state, "half") == Some("lower");
@@ -376,7 +440,18 @@ impl<A: BlockAccess> World<A> {
         _neighbor_pos: BlockPos,
     ) -> u16 {
         let kinds = Kinds::get();
-        let state = self.update_shape_inner(state, neighbor_state, pos);
+        let mut state = self.update_shape_inner(state, neighbor_state, pos);
+        if kinds.of_state(state).redstone == Some(crate::kinds::Redstone::Repeater)
+            && dir != Direction::Down
+            && dir != Direction::Up
+            && dir.is_x_axis()
+                != kinds
+                    .property(state, "facing")
+                    .and_then(Direction::from_name)
+                    .is_some_and(|f| f.is_x_axis())
+        {
+            state = crate::redstone::repeater_lock_state(self, pos, state);
+        }
         if kinds.of_state(state).support == Some(Support::Door) {
             let half = kinds.property(state, "half").expect("doors have halves");
             let toward_other = if half == "lower" { Direction::Up } else { Direction::Down };
@@ -451,6 +526,22 @@ impl<A: BlockAccess> World<A> {
     /// Advances the world by one game tick.
     pub fn tick(&mut self) {
         self.time += 1;
+        // Block ticks run before fluid ticks.
+        let mut due = Vec::new();
+        self.block_ticks.take_due(self.time, &mut due);
+        self.running_ticks = due;
+        self.running_next = 0;
+        while self.running_next < self.running_ticks.len() {
+            let (pos, block) = self.running_ticks[self.running_next];
+            self.running_next += 1;
+            let Some(state) = self.blocks.block(pos) else { continue };
+            if STATE_TO_BLOCK[usize::from(state)] == block
+                && Kinds::get().of_state(state).redstone.is_some()
+            {
+                crate::redstone::tick(self, pos, state);
+            }
+        }
+        self.running_ticks.clear();
         let mut due = Vec::new();
         self.fluid_ticks.take_due(self.time, &mut due);
         for (pos, kind) in due {

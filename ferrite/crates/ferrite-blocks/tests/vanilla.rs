@@ -124,6 +124,7 @@ fn replay(text: &str) -> Result<(), String> {
             "expect" => {
                 let mut want = initial.clone();
                 let mut want_ticks = Vec::new();
+                let mut want_block_ticks = Vec::new();
                 for (_, l) in lines.by_ref() {
                     if l == "end" {
                         break;
@@ -140,6 +141,7 @@ fn replay(text: &str) -> Result<(), String> {
                             }
                         }
                         "f" => want_ticks.push(format!("{x} {y} {z} {}", p[4])),
+                        "k" => want_block_ticks.push(format!("{x} {y} {z} {}", p[4])),
                         other => panic!("bad expect line kind {other}"),
                     }
                 }
@@ -203,6 +205,39 @@ fn replay(text: &str) -> Result<(), String> {
                         want_ticks.len(),
                         got_ticks.get(first),
                         want_ticks.get(first)
+                    ));
+                }
+                let got_block_ticks: Vec<String> = world
+                    .pending_block_ticks()
+                    .iter()
+                    .filter(|t| {
+                        (Y0..=Y1).contains(&t.pos.y)
+                            && (0..16).contains(&t.pos.x)
+                            && (0..16).contains(&t.pos.z)
+                    })
+                    .map(|t| {
+                        let name = ferrite_data::blocks::BLOCKS[usize::from(t.kind)]
+                            .name
+                            .trim_start_matches("minecraft:");
+                        format!(
+                            "{} {} {} {name} {} {}",
+                            t.pos.x, t.pos.y, t.pos.z, t.delay, t.priority
+                        )
+                    })
+                    .collect();
+                if got_block_ticks != want_block_ticks {
+                    let first = got_block_ticks
+                        .iter()
+                        .zip(&want_block_ticks)
+                        .position(|(a, b)| a != b)
+                        .unwrap_or(got_block_ticks.len().min(want_block_ticks.len()));
+                    return Err(format!(
+                        "block ticks differ at snapshot {step_no} (line {}): {} vs vanilla {} entries; first difference at #{first}: ferrite {:?} / vanilla {:?}\n",
+                        line_no + 1,
+                        got_block_ticks.len(),
+                        want_block_ticks.len(),
+                        got_block_ticks.get(first),
+                        want_block_ticks.get(first)
                     ));
                 }
             }
