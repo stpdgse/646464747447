@@ -116,7 +116,7 @@ jobs:
         working-directory: ferrite/crates
         run: |
           fuzz() { (cd "$1" && cargo fuzz run "$2" -- -max_total_time=30 -max_len=4096); }
-          for target in frame_decoder codec_readers frame_roundtrip session; do fuzz ferrite-protocol/fuzz "$target"; done
+          for target in frame_decoder codec_readers frame_roundtrip session play_packets; do fuzz ferrite-protocol/fuzz "$target"; done
           fuzz ferrite-nbt/fuzz read
           for target in query_handler query_parsers; do fuzz ferrite-remote/fuzz "$target"; done
           fuzz ferrite-net/fuzz parse_profile
