@@ -1,0 +1,18 @@
+[package]
+name = "ferrite-nbt"
+description = "Named Binary Tag: network and disk encodings with vanilla-compatible size accounting"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+indexmap = "2"
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

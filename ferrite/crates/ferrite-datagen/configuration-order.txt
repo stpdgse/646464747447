@@ -1,0 +1,59 @@
+# Which registries the vanilla server synchronizes and sends tags for, as observed from the 26.3
+# server with tests/oracle.rs. That is decided in vanilla code, not in the data reports.
+#
+# [registry_data] is a deterministic order and is reproduced exactly.
+# [update_tags] order is NOT meaningful: vanilla iterates a hash map, so the order differs on
+# every server start. The oracle test therefore compares tag registries by name.
+#
+# The oracle test fails if the generated tables ever disagree with what vanilla actually sends.
+
+[registry_data]
+minecraft:worldgen/biome
+minecraft:chat_type
+minecraft:trim_pattern
+minecraft:trim_material
+minecraft:wolf_variant
+minecraft:wolf_sound_variant
+minecraft:pig_variant
+minecraft:pig_sound_variant
+minecraft:frog_variant
+minecraft:cat_variant
+minecraft:cat_sound_variant
+minecraft:cow_sound_variant
+minecraft:cow_variant
+minecraft:chicken_sound_variant
+minecraft:chicken_variant
+minecraft:zombie_nautilus_variant
+minecraft:painting_variant
+minecraft:sulfur_cube_archetype
+minecraft:dimension_type
+minecraft:damage_type
+minecraft:banner_pattern
+minecraft:enchantment
+minecraft:jukebox_song
+minecraft:instrument
+minecraft:test_environment
+minecraft:test_instance
+minecraft:dialog
+minecraft:world_clock
+minecraft:timeline
+minecraft:decorated_pot_pattern
+minecraft:block_transformer
+minecraft:worldgen/block_state_provider
+
+[update_tags]
+minecraft:fluid
+minecraft:painting_variant
+minecraft:worldgen/biome
+minecraft:entity_type
+minecraft:potion
+minecraft:game_event
+minecraft:damage_type
+minecraft:dialog
+minecraft:item
+minecraft:banner_pattern
+minecraft:timeline
+minecraft:point_of_interest_type
+minecraft:block
+minecraft:instrument
+minecraft:enchantment

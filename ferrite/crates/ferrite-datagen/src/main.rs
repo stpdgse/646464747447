@@ -10,6 +10,7 @@
 //! and block-state layouts.
 
 mod blocks;
+mod configuration;
 mod meta;
 mod packets;
 mod registries;
@@ -85,6 +86,7 @@ fn main() -> Result<()> {
         ("packets.rs", packets::generate(&cx)?),
         ("registries.rs", registries::generate(&cx, &regs)?),
         ("blocks.rs", blocks::generate(&cx, &regs)?),
+        ("configuration.rs", configuration::generate(&cx, &regs)?),
         ("mod.rs", mod_rs(&cx)),
     ];
     for (name, content) in &files {
@@ -108,7 +110,7 @@ fn main() -> Result<()> {
 
 fn mod_rs(cx: &GenContext) -> String {
     format!(
-        "{}\npub mod blocks;\npub mod meta;\npub mod packets;\npub mod registries;\n",
+        "{}\npub mod blocks;\npub mod configuration;\npub mod meta;\npub mod packets;\npub mod registries;\n",
         cx.header
     )
 }

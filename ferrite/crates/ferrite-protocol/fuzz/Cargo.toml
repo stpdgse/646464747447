@@ -10,6 +10,7 @@ cargo-fuzz = true
 [dependencies]
 libfuzzer-sys = "0.4"
 bytes = "1"
+uuid = { version = "1", default-features = false }
 ferrite-protocol = { path = ".." }
 
 [[bin]]
@@ -29,6 +30,13 @@ bench = false
 [[bin]]
 name = "frame_roundtrip"
 path = "fuzz_targets/frame_roundtrip.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "session"
+path = "fuzz_targets/session.rs"
 test = false
 doc = false
 bench = false

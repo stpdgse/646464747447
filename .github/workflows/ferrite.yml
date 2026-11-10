@@ -84,11 +84,17 @@ jobs:
       - name: Install pinned toolchain
         run: rustup show active-toolchain || rustup toolchain install
       - uses: Swatinem/rust-cache@v2
-        with: { workspaces: "ferrite/crates/ferrite-protocol/fuzz" }
+        with:
+          workspaces: |
+            ferrite/crates/ferrite-protocol/fuzz
+            ferrite/crates/ferrite-nbt/fuzz
       - run: cargo install --locked cargo-fuzz
-      - name: Fuzz each target for 30 seconds
+      - name: Fuzz each protocol target for 30 seconds
         working-directory: ferrite/crates/ferrite-protocol/fuzz
         run: |
-          for target in frame_decoder codec_readers frame_roundtrip; do
+          for target in frame_decoder codec_readers frame_roundtrip session; do
             cargo fuzz run "$target" -- -max_total_time=30 -max_len=4096
           done
+      - name: Fuzz the NBT reader for 30 seconds
+        working-directory: ferrite/crates/ferrite-nbt/fuzz
+        run: cargo fuzz run read -- -max_total_time=30 -max_len=2048

@@ -32,6 +32,31 @@ pub enum ProtocolError {
     Decompress,
     #[error("compression failed")]
     Compress,
+    #[error("unknown packet id {id} in state {state:?} ({direction:?})")]
+    UnknownPacket { state: ferrite_data::State, direction: ferrite_data::Direction, id: i32 },
+    #[error("invalid identifier {0:?}")]
+    InvalidIdentifier(String),
+    #[error("invalid NBT: {0}")]
+    Nbt(#[from] ferrite_nbt::NbtError),
+    #[error("{0}")]
+    Invalid(&'static str),
 }
 
 pub type Result<T, E = ProtocolError> = core::result::Result<T, E>;
+
+/// Why a connection session must be closed.
+#[derive(Debug, Error, PartialEq, Clone)]
+pub enum SessionError {
+    #[error(transparent)]
+    Protocol(#[from] ProtocolError),
+    #[error("packet {packet:?} is not valid in phase {phase}")]
+    Unexpected { packet: &'static str, phase: &'static str },
+    #[error("the client does not have the data pack `minecraft:core` {version}")]
+    MissingCorePack { version: &'static str },
+    #[error("this action is not valid in phase {phase}")]
+    WrongPhase { phase: &'static str },
+    #[error("the session is closed")]
+    Closed,
+    #[error("random number generation failed")]
+    Random,
+}

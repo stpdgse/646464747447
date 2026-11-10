@@ -10,7 +10,10 @@ publish.workspace = true
 [dependencies]
 aes.workspace = true
 bytes.workspace = true
+getrandom = "0.3"
+md-5 = "0.10"
 ferrite-data.workspace = true
+ferrite-nbt = { path = "../ferrite-nbt" }
 libdeflater.workspace = true
 thiserror.workspace = true
 uuid.workspace = true
