@@ -102,6 +102,8 @@ public final class ShapeDump {
             if (s.isCollisionShapeFullBlock(g, p)) flags |= 1 << 11;
             if (s.useShapeForLightOcclusion()) flags |= 1 << 12;
             if (s.isRandomlyTicking()) flags |= 1 << 13;
+            if (s.hasBlockEntity()) flags |= 1 << 14;
+            if (s.getDestroySpeed(g, p) == -1.0f) flags |= 1 << 15;
             sb.append(' ').append(flags);
             sb.append(' ').append(s.getLightEmission());
             sb.append(' ').append(s.getLightDampening());

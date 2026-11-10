@@ -142,3 +142,17 @@ fn every_state_is_internally_consistent() {
     }
     assert!(fluid_states > 100, "waterlogged blocks and fluids carry fluid ({fluid_states})");
 }
+
+#[test]
+fn block_entity_and_unbreakable_flags() {
+    assert!(facts(default_state("chest")).has(flag::HAS_BLOCK_ENTITY));
+    assert!(facts(default_state("furnace")).has(flag::HAS_BLOCK_ENTITY));
+    assert!(!facts(default_state("stone")).has(flag::HAS_BLOCK_ENTITY));
+    assert!(facts(default_state("bedrock")).has(flag::UNBREAKABLE));
+    assert!(facts(default_state("barrier")).has(flag::UNBREAKABLE));
+    assert!(
+        !facts(default_state("obsidian")).has(flag::UNBREAKABLE),
+        "obsidian is hard, not unbreakable"
+    );
+    assert!(!facts(default_state("stone")).has(flag::UNBREAKABLE));
+}

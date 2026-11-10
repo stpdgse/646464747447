@@ -391,6 +391,13 @@ def redstone_scenarios():
         [("set", 8, 100, 8, "stone")] + steps(1, 1) + [("set", 9, 100, 8, "air")] + steps(*[1] * 6))
     s["rs_observer_removed_while_pulsing_through_stone"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 stone", "setblock 11 100 8 redstone_lamp"],
         [("set", 8, 100, 8, "stone")] + steps(1, 1, 1) + [("set", 9, 100, 8, "air")] + steps(*[1] * 7))
+    # A wall torch attached to a directional emitter (observer or repeater output).
+    s["rs_wall_torch_on_an_observer_output"] = (ARENA + ["setblock 8 100 8 observer[facing=south]", "setblock 8 100 7 redstone_wall_torch[facing=north,lit=true]",
+                                                        "setblock 8 101 7 redstone_lamp"],
+        [("set", 8, 100, 9, "stone")] + steps(*[1] * 8))
+    s["rs_wall_torch_on_a_repeater_output"] = (ARENA + ["setblock 8 100 8 repeater[facing=south,delay=1]", "setblock 8 100 7 redstone_wall_torch[facing=north,lit=true]",
+                                                       "setblock 8 101 7 redstone_lamp"],
+        [("set", 8, 100, 9, "redstone_block")] + steps(*[1] * 8) + [("set", 8, 100, 9, "air")] + steps(*[1] * 8))
     s["rs_observer_sees_water_flow"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 redstone_lamp"],
         [("set", 6, 100, 8, "water")] + steps(*[1] * 20))
     s["rs_observer_up_down_facing"] = (ARENA + ["setblock 8 100 8 observer[facing=up]", "setblock 8 99 8 redstone_lamp", "setblock 9 101 8 redstone_lamp"],

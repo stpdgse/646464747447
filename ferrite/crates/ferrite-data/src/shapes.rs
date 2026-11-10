@@ -27,6 +27,9 @@ pub mod flag {
     pub const FULL_COLLISION_BLOCK: u16 = 1 << 11;
     pub const SHAPE_FOR_LIGHT_OCCLUSION: u16 = 1 << 12;
     pub const RANDOMLY_TICKING: u16 = 1 << 13;
+    pub const HAS_BLOCK_ENTITY: u16 = 1 << 14;
+    /// Destroy speed -1 (bedrock, barriers, portals, ...): immovable and unbreakable.
+    pub const UNBREAKABLE: u16 = 1 << 15;
 }
 
 /// How a face can support another block.

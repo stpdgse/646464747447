@@ -334,8 +334,9 @@ pub(crate) fn observer_shape<A: BlockAccess>(
 fn torch_input<A: BlockAccess>(world: &World<A>, pos: BlockPos, state: u16) -> bool {
     match redstone_of(state) {
         Some(Redstone::WallTorch) => {
-            let f = facing(state);
-            signal(world, pos.offset(f.opposite()), f) > 0
+            // Ask the block it is attached to, looking toward it.
+            let toward = facing(state).opposite();
+            signal(world, pos.offset(toward), toward) > 0
         }
         _ => signal(world, pos.below(), Direction::Down) > 0,
     }
