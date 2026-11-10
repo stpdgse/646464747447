@@ -330,8 +330,12 @@ impl Store {
                 let mut tail = vec![0u8; (total - valid_end) as usize];
                 read_exact_at(&segment.file, &mut tail, valid_end)?;
                 fs::write(segment.path.with_extension("log.discarded"), &tail)?;
-                segment.file.set_len(valid_end)?;
-                segment.file.sync_all()?;
+                // Truncate through a separate write handle: the segment handle is append-only,
+                // and on Windows an append-only handle may not change a file's length.
+                let truncator = OpenOptions::new().write(true).open(&segment.path)?;
+                truncator.set_len(valid_end)?;
+                truncator.sync_all()?;
+                drop(truncator);
                 recovery.truncated_bytes = total - valid_end;
             }
             for r in records {
