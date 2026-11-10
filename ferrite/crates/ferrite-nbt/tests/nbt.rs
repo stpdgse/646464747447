@@ -301,15 +301,23 @@ fn arb_tag(depth: u32) -> BoxedStrategy<Tag> {
 proptest! {
     #[test]
     fn arbitrary_tags_round_trip(tag in arb_tag(3), name in "\\PC{0,10}") {
+        // Compared as bytes: `Tag`'s `PartialEq` follows IEEE 754, under which a NaN is not equal
+        // to itself, although it round-trips bit for bit.
         let bytes = net(&tag);
         let mut s = &bytes[..];
-        prop_assert_eq!(read_network(&mut s, Limits::default()), Ok(Some(tag.clone())));
+        let back = read_network(&mut s, Limits::default()).unwrap().expect("a tag");
         prop_assert!(s.is_empty());
+        prop_assert_eq!(net(&back), bytes);
 
         let mut named = Vec::new();
         write_named(&name, &tag, &mut named).unwrap();
         let mut s = &named[..];
-        prop_assert_eq!(read_named(&mut s, Limits::default()), Ok((name, tag)));
+        let (back_name, back_tag) = read_named(&mut s, Limits::default()).unwrap();
+        prop_assert!(s.is_empty());
+        prop_assert_eq!(back_name, name.clone());
+        let mut again = Vec::new();
+        write_named(&name, &back_tag, &mut again).unwrap();
+        prop_assert_eq!(again, named);
     }
 
     #[test]
