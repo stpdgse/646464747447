@@ -40,6 +40,16 @@ struct Args {
     /// Compress packets of at least this many bytes; -1 disables compression.
     #[arg(long, default_value_t = 256, allow_hyphen_values = true)]
     compression_threshold: i32,
+    /// Run the game: players join a flat world and can move, chat and see each other. With this
+    /// off, players are disconnected as soon as configuration ends.
+    #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
+    game: bool,
+    /// View distance in chunks.
+    #[arg(long, default_value_t = 10)]
+    view_distance: u8,
+    /// Game mode for new players: 0 survival, 1 creative, 2 adventure, 3 spectator.
+    #[arg(long, default_value_t = 1)]
+    game_mode: u8,
     /// Seconds of silence after which a connection is dropped.
     #[arg(long, default_value_t = 15)]
     read_timeout: u64,
@@ -109,6 +119,31 @@ fn main() -> std::io::Result<()> {
         None
     };
 
+    // The game owns the world; the lobby only hands it connections. The io_uring backend does not
+    // run the play state yet, so the game is only attached for the tokio backend.
+    let mut _game_thread = None;
+    let play: Option<Arc<dyn ferrite_net::PlayHost>> = if args.game
+        && matches!(args.backend, Backend::Tokio)
+    {
+        let (host, thread) = ferrite_game::start(ferrite_game::GameConfig {
+            motd: args.motd.clone(),
+            max_players: args.max_players,
+            view_distance: args.view_distance.clamp(2, 32),
+            simulation_distance: args.view_distance.clamp(2, 32),
+            game_mode: args.game_mode.min(3),
+            online_mode: args.online_mode,
+            ..ferrite_game::GameConfig::default()
+        });
+        _game_thread = Some(thread);
+        Some(host)
+    } else {
+        if args.game {
+            tracing::warn!(
+                "the io_uring backend does not run the game yet; players are disconnected after joining"
+            );
+        }
+        None
+    };
     let lobby = Arc::new(Lobby::new(LobbyConfig {
         motd: args.motd.clone(),
         max_players: args.max_players,
@@ -120,6 +155,7 @@ fn main() -> std::io::Result<()> {
             ..SessionConfig::default()
         },
         online,
+        play,
     }));
     tracing::info!(
         "Ferrite for Minecraft {} (protocol {}) listening on {} with {:?} backend, {threads} threads",

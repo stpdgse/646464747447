@@ -954,9 +954,13 @@ dependencies = [
  "bytes",
  "ferrite-blocks",
  "ferrite-data",
+ "ferrite-nbt",
+ "ferrite-net",
  "ferrite-protocol",
+ "ferrite-swarm",
  "ferrite-world",
  "thiserror",
+ "tokio",
  "tracing",
  "uuid",
 ]
@@ -1026,6 +1030,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "ferrite-data",
+ "ferrite-game",
  "ferrite-net",
  "ferrite-protocol",
  "ferrite-remote",

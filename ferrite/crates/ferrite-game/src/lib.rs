@@ -9,6 +9,9 @@
 
 pub mod chunkenc;
 pub mod flat;
+pub mod server;
+
+pub use server::{GameConfig, GameHost, GameThread, start};
 
 use ferrite_data::configuration::SYNCHRONIZED_REGISTRIES;
 

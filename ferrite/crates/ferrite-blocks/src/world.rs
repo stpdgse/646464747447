@@ -92,6 +92,8 @@ pub struct World<A: BlockAccess> {
     running_ticks: Vec<(BlockPos, u16)>,
     running_next: usize,
     pub(crate) wires_give_power: bool,
+    track_changes: bool,
+    changed: Vec<BlockPos>,
     pub(crate) block_events: std::collections::VecDeque<(BlockPos, u16, i32, i32)>,
     pub(crate) bes: Vec<crate::piston::MovingBe>,
     pub(crate) be_at: std::collections::HashMap<BlockPos, usize>,
@@ -119,6 +121,8 @@ impl<A: BlockAccess> World<A> {
             running_ticks: Vec::new(),
             running_next: 0,
             wires_give_power: true,
+            track_changes: false,
+            changed: Vec::new(),
             block_events: std::collections::VecDeque::new(),
             bes: Vec::new(),
             be_at: std::collections::HashMap::new(),
@@ -175,6 +179,24 @@ impl<A: BlockAccess> World<A> {
         self.block_ticks.schedule(pos, block, self.time + delay, priority);
     }
 
+    /// Starts (or stops) remembering which positions change, so a server can tell its players.
+    pub fn track_changes(&mut self, on: bool) {
+        self.track_changes = on;
+        if !on {
+            self.changed.clear();
+        }
+    }
+
+    /// Positions that changed since the last call, each once, in the order they first changed.
+    /// Read the current state with [`block`](Self::block): a position may have changed several
+    /// times, or back to what it was.
+    pub fn take_changes(&mut self) -> Vec<BlockPos> {
+        let mut seen = std::collections::HashSet::new();
+        let mut out = std::mem::take(&mut self.changed);
+        out.retain(|p| seen.insert(*p));
+        out
+    }
+
     /// Queues a block event (vanilla's `Level.blockEvent`); duplicates of a queued event are
     /// ignored. Events run after the tick queues, in the order they were queued.
     pub fn block_event(&mut self, pos: BlockPos, block: u16, id: i32, param: i32) {
@@ -219,6 +241,9 @@ impl<A: BlockAccess> World<A> {
             return false;
         }
         self.blocks.set_block_raw(pos, state);
+        if self.track_changes {
+            self.changed.push(pos);
+        }
         if STATE_TO_BLOCK[usize::from(old)] != STATE_TO_BLOCK[usize::from(state)] {
             let ok = Kinds::get().of_state(old);
             let moved = flags & update::MOVING != 0;

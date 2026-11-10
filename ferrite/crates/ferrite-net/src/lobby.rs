@@ -23,6 +23,8 @@ pub struct LobbyConfig {
     pub read_timeout: Duration,
     /// `Some` turns on online mode: encryption and Mojang authentication.
     pub online: Option<OnlineConfig>,
+    /// The game. Without one, players who finish configuration are politely disconnected.
+    pub play: Option<Arc<dyn crate::play::PlayHost>>,
 }
 
 /// Online-mode settings.
@@ -45,6 +47,7 @@ impl Default for LobbyConfig {
             session: SessionConfig { brand: "ferrite".into(), ..SessionConfig::default() },
             read_timeout: Duration::from_secs(15),
             online: None,
+            play: None,
         }
     }
 }
@@ -93,12 +96,15 @@ impl Stats {
 }
 
 /// What the I/O loop should do after [`Lobby::drive`].
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Flow {
     /// Keep reading.
     Continue,
     /// Flush the pending output, then close the connection.
     Close,
+    /// The player finished configuration: flush, then switch the connection to the play loop
+    /// (see [`Lobby::enter_play`]).
+    Play(Box<crate::play::PlayStart>),
     /// Flush, then wait for [`Lobby::start_authentication`] and hand the outcome to
     /// [`Lobby::finish_authentication`]. Input that arrived behind the packet that triggered this
     /// is kept and processed afterwards.
@@ -113,6 +119,8 @@ pub struct ConnState {
     counted_online: bool,
     peer: Option<IpAddr>,
     login_name: Option<String>,
+    profile: Option<GameProfile>,
+    client: Option<ferrite_protocol::packets::configuration::ClientInformation>,
     /// Events that arrived in the same read as one that paused processing (see [`Flow`]).
     backlog: VecDeque<Event>,
 }
@@ -147,6 +155,8 @@ impl Lobby {
             counted_online: false,
             peer,
             login_name: None,
+            profile: None,
+            client: None,
             backlog: VecDeque::new(),
         }
     }
@@ -201,8 +211,31 @@ impl Lobby {
         }
         conn.counted_online = true;
         self.stats.logins.fetch_add(1, Ordering::Relaxed);
+        conn.profile = Some(profile.clone());
         conn.session.accept_login(profile)?;
         Ok(Flow::Continue)
+    }
+
+    /// Hands a connection that reached [`Flow::Play`] to the game. Returns the codec to drive and
+    /// the game's handle, plus the queue the game writes to; `None` if the game refused the player.
+    pub fn enter_play(
+        &self,
+        conn: &mut ConnState,
+        start: crate::play::PlayStart,
+    ) -> Option<crate::play::PlayEntry> {
+        let host = self.cfg.play.as_ref()?;
+        let (sink, outbox, queued) = crate::play::PlayerSink::new();
+        let handle = host.join(start, sink)?;
+        // The session is finished; keep its codec state and leave a blank one behind.
+        let session =
+            std::mem::replace(&mut conn.session, ServerSession::new(self.cfg.session.clone()));
+        let (dec, enc, cipher, out) = session.into_parts().ok()?;
+        Some(crate::play::PlayEntry {
+            conn: crate::play::PlayConn::from_parts(dec, enc, cipher, out),
+            handle,
+            outbox,
+            queued,
+        })
     }
 
     /// Call exactly once when a connection ends, however it ended.
@@ -304,10 +337,22 @@ impl Lobby {
                 conn.session.disconnect("Unexpected login packet")?;
                 return Ok(Flow::Close);
             }
-            Event::Configuring | Event::Configuration(_) => {}
+            Event::Configuring => {}
+            Event::Configuration(ferrite_protocol::packets::configuration::ServerboundConfiguration::ClientInformation(info)) => {
+                conn.client = Some(info);
+            }
+            Event::Configuration(_) => {}
             Event::EnteredPlay => {
                 self.stats.entered_play.fetch_add(1, Ordering::Relaxed);
-                // Gameplay does not exist yet; end the connection politely.
+                if self.cfg.play.is_some()
+                    && let Some(profile) = conn.profile.clone()
+                {
+                    return Ok(Flow::Play(Box::new(crate::play::PlayStart {
+                        profile,
+                        client: conn.client.clone(),
+                    })));
+                }
+                // No game is attached; end the connection politely.
                 conn.session.send_play(&Disconnect {
                     reason: Text::plain("Ferrite does not implement gameplay yet"),
                 })?;

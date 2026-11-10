@@ -13,6 +13,7 @@
 
 pub mod auth;
 mod lobby;
+pub mod play;
 pub mod tokio_backend;
 #[cfg(all(feature = "uring", target_os = "linux"))]
 pub mod uring_backend;
@@ -20,3 +21,4 @@ pub mod uring_backend;
 pub use lobby::{
     ConnState, Flow, Lobby, LobbyConfig, OnlineConfig, Stats, StatsSnapshot, is_valid_player_name,
 };
+pub use play::{PlayConn, PlayEntry, PlayHost, PlayStart, PlayerHandle, PlayerSink};

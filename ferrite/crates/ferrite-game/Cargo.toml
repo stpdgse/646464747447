@@ -11,11 +11,17 @@ publish.workspace = true
 bytes.workspace = true
 ferrite-blocks = { path = "../ferrite-blocks" }
 ferrite-data.workspace = true
+ferrite-net = { path = "../ferrite-net" }
 ferrite-protocol = { path = "../ferrite-protocol" }
 ferrite-world = { path = "../ferrite-world" }
 thiserror.workspace = true
 tracing = "0.1"
 uuid.workspace = true
+
+[dev-dependencies]
+ferrite-nbt = { path = "../ferrite-nbt" }
+ferrite-swarm = { path = "../ferrite-swarm" }
+tokio = { version = "1", features = ["full"] }
 
 [lints]
 workspace = true

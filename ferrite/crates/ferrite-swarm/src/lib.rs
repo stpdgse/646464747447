@@ -8,7 +8,7 @@ mod report;
 mod runner;
 
 pub use client::{
-    Captured, Conn, JoinOutcome, SwarmError, capture_play, join_once, join_online_once,
+    Captured, Conn, JoinOutcome, PlayBot, SwarmError, capture_play, join_once, join_online_once,
     ping_session, status_once,
 };
 pub use report::Report;

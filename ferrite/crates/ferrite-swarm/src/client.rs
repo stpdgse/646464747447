@@ -299,72 +299,87 @@ pub struct Captured {
     pub body: Vec<u8>,
 }
 
-/// Joins `addr` as `name`, stays in the play state for `listen`, and returns every clientbound
-/// play packet exactly as received. The bot behaves like a minimal client: it answers
-/// keep-alives and pings, confirms teleports, acknowledges chunk batches and reports that it has
-/// loaded, so the server keeps streaming the world to it.
-pub async fn capture_play(addr: SocketAddr, name: &str, listen: Duration) -> Result<Vec<Captured>> {
-    let mut conn = Conn::connect(addr).await?;
-    conn.login(name).await?;
-    configure(&mut conn).await?;
-    let mut out = Vec::new();
-    let deadline = Instant::now() + listen;
-    let mut loaded_sent = false;
-    while Instant::now() < deadline {
-        let frame = match conn.recv().await {
-            Ok(f) => f,
-            Err(SwarmError::Timeout) => break,
-            Err(e) => return Err(e),
-        };
+/// A minimal client in the play state. It answers keep-alives, pings, teleports and chunk
+/// batches by itself so a test only has to look at what the server sends.
+#[derive(Debug)]
+pub struct PlayBot {
+    conn: Conn,
+    loaded_sent: bool,
+    /// The last position the server put this bot at (from `player_position`).
+    pub position: Option<[f64; 3]>,
+}
+
+impl PlayBot {
+    /// Logs in (offline mode) and completes configuration. The next packet is the first of the
+    /// play state.
+    pub async fn join(addr: SocketAddr, name: &str) -> Result<Self> {
+        let mut conn = Conn::connect(addr).await?;
+        conn.login(name).await?;
+        configure(&mut conn).await?;
+        Ok(PlayBot { conn, loaded_sent: false, position: None })
+    }
+
+    /// Waits for the next clientbound play packet, answering whatever needs an answer.
+    pub async fn next(&mut self) -> Result<Captured> {
+        use ferrite_data::generated::packets::play::serverbound as sb;
+        let frame = self.conn.recv().await?;
         let packet_name = packet_name(State::Play, Direction::Clientbound, frame.id).unwrap_or("?");
         match packet_name {
-            "keep_alive" => {
-                conn.send_raw(
-                    ferrite_data::generated::packets::play::serverbound::KEEP_ALIVE,
-                    &frame.body,
-                )
-                .await?
-            }
-            "ping" => {
-                conn.send_raw(
-                    ferrite_data::generated::packets::play::serverbound::PONG,
-                    &frame.body,
-                )
-                .await?
-            }
+            "keep_alive" => self.conn.send_raw(sb::KEEP_ALIVE, &frame.body).await?,
+            "ping" => self.conn.send_raw(sb::PONG, &frame.body).await?,
             "player_position" => {
-                // player_position: id, x, y, z, dx, dy, dz, yRot, xRot, flags. The confirmation
-                // echoes the id, the position and the rotation.
+                // id, x, y, z, dx, dy, dz, yRot, xRot, flags. Confirm with id, position, rotation.
                 let mut rest = &frame.body[..];
                 let teleport = <VarInt as ferrite_protocol::codec::Decode>::decode(&mut rest)?;
-                let mut id_only = Vec::new();
-                ferrite_protocol::codec::Encode::encode(&teleport, &mut id_only)?;
-                id_only.extend_from_slice(&rest[..24]); // x, y, z
-                id_only.extend_from_slice(&rest[48..56]); // yRot, xRot
-                conn.send_raw(
-                    ferrite_data::generated::packets::play::serverbound::ACCEPT_TELEPORTATION,
-                    &id_only,
-                )
-                .await?;
-                if !loaded_sent {
-                    conn.send_raw(
-                        ferrite_data::generated::packets::play::serverbound::PLAYER_LOADED,
-                        &[],
-                    )
-                    .await?;
-                    loaded_sent = true;
+                let mut reply = Vec::new();
+                ferrite_protocol::codec::Encode::encode(&teleport, &mut reply)?;
+                reply.extend_from_slice(&rest[..24]);
+                reply.extend_from_slice(&rest[48..56]);
+                let f = |i: usize| f64::from_be_bytes(rest[i..i + 8].try_into().expect("8 bytes"));
+                self.position = Some([f(0), f(8), f(16)]);
+                self.conn.send_raw(sb::ACCEPT_TELEPORTATION, &reply).await?;
+                if !self.loaded_sent {
+                    self.conn.send_raw(sb::PLAYER_LOADED, &[]).await?;
+                    self.loaded_sent = true;
                 }
             }
             "chunk_batch_finished" => {
-                conn.send_raw(
-                    ferrite_data::generated::packets::play::serverbound::CHUNK_BATCH_RECEIVED,
-                    &25.0f32.to_be_bytes(),
-                )
-                .await?
+                self.conn.send_raw(sb::CHUNK_BATCH_RECEIVED, &25.0f32.to_be_bytes()).await?
             }
             _ => {}
         }
-        out.push(Captured { id: frame.id, name: packet_name, body: frame.body.to_vec() });
+        Ok(Captured { id: frame.id, name: packet_name, body: frame.body.to_vec() })
+    }
+
+    /// Reads packets until one named `name` arrives (or `limit` pass).
+    pub async fn wait_for(&mut self, name: &str, limit: usize) -> Result<Captured> {
+        for _ in 0..limit {
+            let p = self.next().await?;
+            if p.name == name {
+                return Ok(p);
+            }
+        }
+        Err(SwarmError::Unexpected(format!("no {name} packet within {limit} packets")))
+    }
+
+    /// Sends a packet.
+    pub async fn send<P: Packet>(&mut self, packet: &P) -> Result<()> {
+        self.conn.send(packet).await
+    }
+}
+
+/// Joins `addr` as `name`, stays in the play state for `listen`, and returns every clientbound
+/// play packet exactly as received.
+pub async fn capture_play(addr: SocketAddr, name: &str, listen: Duration) -> Result<Vec<Captured>> {
+    let mut bot = PlayBot::join(addr, name).await?;
+    let mut out = Vec::new();
+    let deadline = Instant::now() + listen;
+    while Instant::now() < deadline {
+        match bot.next().await {
+            Ok(p) => out.push(p),
+            Err(SwarmError::Timeout) => break,
+            Err(e) => return Err(e),
+        }
     }
     Ok(out)
 }

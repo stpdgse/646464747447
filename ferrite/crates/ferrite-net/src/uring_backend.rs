@@ -183,7 +183,8 @@ async fn run(stream: &mut TcpStream, lobby: &Lobby, conn: &mut ConnState) -> io:
             flush(stream, conn).await?;
             match flow {
                 Ok(Flow::Continue) => break,
-                Ok(Flow::Close) | Err(_) => return linger(stream).await,
+                // The io_uring backend does not run the play state yet; end the connection.
+                Ok(Flow::Close) | Ok(Flow::Play(_)) | Err(_) => return linger(stream).await,
                 Ok(Flow::Authenticate(request)) => {
                     // tokio's oneshot channel is runtime-agnostic: it only needs a waker.
                     let answer = timeout(lobby.auth_timeout(), lobby.start_authentication(request))

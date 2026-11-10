@@ -579,6 +579,27 @@ packet! {
     }
 }
 
+/// A fixed-size byte array (no length prefix).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Fixed<const N: usize>(pub [u8; N]);
+
+impl<const N: usize> Encode for Fixed<N> {
+    fn encode<B: bytes::BufMut>(&self, buf: &mut B) -> Result<()> {
+        buf.put_slice(&self.0);
+        Ok(())
+    }
+}
+impl<'a, const N: usize> Decode<'a> for Fixed<N> {
+    fn decode(buf: &mut &'a [u8]) -> Result<Self> {
+        if buf.len() < N {
+            return Err(crate::error::ProtocolError::Eof);
+        }
+        let (a, rest) = buf.split_at(N);
+        *buf = rest;
+        Ok(Fixed(a.try_into().expect("length checked")))
+    }
+}
+
 packet! {
     PlayerInfoRemove in Play Clientbound = play::clientbound::PLAYER_INFO_REMOVE "player_info_remove" {
         uuids: LenVec<Uuid, 4096>,
@@ -881,6 +902,39 @@ packet! {
 
     PlayerInput in Play Serverbound = play::serverbound::PLAYER_INPUT "player_input" {
         flags: u8,
+    }
+
+    /// A chat message. Ferrite does not verify signatures; `signature` is kept only so the
+    /// packet round-trips.
+    Chat in Play Serverbound = play::serverbound::CHAT "chat" {
+        message: crate::types::Str<256>,
+        timestamp: i64,
+        salt: i64,
+        signature: Option<Fixed<256>>,
+        /// Last-seen-messages update: how many messages were acknowledged, which of the last 20
+        /// (a 20-bit set), and a checksum.
+        offset: VarInt,
+        acknowledged: Fixed<3>,
+        checksum: i8,
+    }
+
+    /// Settings the client sends after joining and whenever they change.
+    PlayClientInformation in Play Serverbound = play::serverbound::CLIENT_INFORMATION "client_information" {
+        locale: crate::types::Str<16>,
+        view_distance: i8,
+        chat_mode: VarInt,
+        chat_colors: bool,
+        displayed_skin_parts: u8,
+        main_hand: VarInt,
+        enable_text_filtering: bool,
+        allow_server_listings: bool,
+        particle_status: VarInt,
+    }
+
+    /// A plugin message (`minecraft:brand` is sent right after joining).
+    ServerboundCustomPayload in Play Serverbound = play::serverbound::CUSTOM_PAYLOAD "custom_payload" {
+        channel: Identifier,
+        data: crate::types::Remaining<32767>,
     }
 
     ChatCommand in Play Serverbound = play::serverbound::CHAT_COMMAND "chat_command" {
