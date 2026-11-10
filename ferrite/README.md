@@ -19,7 +19,7 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | Scope | Full vanilla parity, bit-exact wherever it is observable (redstone order, mob AI, RNG) |
 | Parallelism | World split into regions that tick in parallel, each owning its own ECS world; cross-region effects are messages delivered at barriers in an order that never depends on thread timing (see [Simulation core](#simulation-core)). Parallel *systems inside* a region are deliberately not built yet |
 | Networking | `tokio` and `io_uring` backends over one shared policy layer. **`tokio` is the default**: on loopback the benchmarks do not justify `io_uring` (see [Networking](#networking)) |
-| Storage | Custom on-disk format (no Anvil), with seed-exact vanilla world generation |
+| Storage | Custom format: palette + bit-packed chunks, zstd, in a CRC-checked log-structured store with an in-memory index (see [World storage](#world-storage)); seed-exact vanilla world generation comes later |
 | Game data | Generated from the official server's data reports, never hand-typed |
 | Auth | Online mode (RSA + AES-CFB8 + Mojang session server, **on by default**) and offline mode; Query and RCON. Signed chat arrives with the play state (see [Authentication](#authentication)) |
 | Platforms | Linux x86_64 and Windows |
@@ -38,6 +38,7 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | `ferrite-swarm` | Bot load tester: status, join and steady-state ping modes with latency percentiles. Its bots are checked against the vanilla server |
 | `ferrite-remote` | Query (UDP) and RCON (TCP) servers plus clients, verified against vanilla |
 | `ferrite-ecs` | Archetype ECS: `#![forbid(unsafe_code)]`, generational entities, typed queries, bundles, deferred commands, resources. Deterministic by construction |
+| `ferrite-world` | Chunk model (paletted, bit-packed sections), versioned codec with zstd, and the crash-safe log-structured chunk store |
 | `ferrite-sim` | Region scheduler (rayon) with deterministic exchange, plus the particle workload and single-threaded reference used to prove determinism |
 | `ferrite-server` | The executable (mimalloc, clap flags, both backends, online mode, Query, RCON) |
 
@@ -272,13 +273,67 @@ transitions and typed moves fixed that.
 The region count barely matters (2x2 to 32x32 within about 10%). The honest caveat: the workload
 is a toy, so this shows the *scheduler* scales, not that vanilla's real mob workload will.
 
+## World storage
+
+**Format.** A chunk is a column of 16x16x16 sections, each holding a block container (4096 states)
+and a biome container (64 cells). A container is a single value, a palette plus bit-packed indices,
+or packed raw ids, whichever its contents need, and it grows on demand. Packing is vanilla's rule
+(an entry never straddles a 64-bit word), so the same buffers can later go straight to the network;
+for example a 4096-entry section is 256, 342, 410, 456 and 512 longs at 4 to 8 bits. On disk a chunk
+is written in *canonical form* (sorted minimal palette, narrowest width), so equal chunks always
+encode to equal bytes, then zstd-compressed. The codec is versioned and treats its input as
+hostile: the decompressed size is read from the frame header and refused if oversized before
+anything is allocated, and every length, index and id is validated.
+
+**Store.** An append-only log of CRC-checked records in segment files, plus an in-memory index from
+chunk position to record. Overwritten and deleted chunks become dead space that `compact()`
+reclaims while readers and writers keep running.
+
+* **Torn writes.** Opening scans the newest segment in full; an incomplete or corrupt tail is
+  truncated, and the discarded bytes are saved next to it as `*.discarded` instead of destroyed.
+  Tested by cutting the log at **every byte offset** of a multi-record log.
+* **Silent corruption.** Every `get` re-verifies the record's checksum, so a damaged chunk fails
+  alone with an error and is repaired by simply writing it again. Structural damage in an older
+  segment is reported, not guessed at.
+* **Crash-safe compaction.** The output takes an id *between* the sealed sources and the new
+  active segment (so replay order is always right), is fsynced before the rename, and the sources
+  are then removed **oldest first**. A put always precedes the tombstone that cancels it, so no
+  prefix of removals can bring a deleted chunk back. This is tested for every crash state, and a
+  negative control proves it matters: removing segments newest-first *does* resurrect a deleted
+  chunk. (I originally relied on `Drop` to delete old files, and a concurrent reader would have
+  broken that ordering; working through the crash cases is what made me look.) Compaction also
+  refuses to drop a corrupt live record rather than lose it silently.
+* One process per directory (an exclusive lock file), and concurrent readers never block on writers
+  beyond an index lookup.
+
+**Measured** (one run on a 4-core cloud VM; a realistic generated terrain chunk with real block
+state ids, caves, ores, sea level and varied biomes):
+
+| | |
+|---|---|
+| Terrain chunk, raw to zstd 3 | 21,028 B to 1,612 B (13x); flat world 63 B; empty chunk 29 B |
+| Encode / decode a terrain chunk | 158 us / 55 us (about 18,000 loads per second per core) |
+| zstd level | 3 is the default: level 1 is 4% *larger* for the same time, level 6 only 5% smaller for 18% more time, level 9 7% smaller for twice the time |
+| Store `put` / `get` (checksummed) | 1.2 us / 0.5 us, plus 180 us per write if fsynced every time |
+| Rebuild the index on open | 6 ms for 20,000 chunks |
+| Compact 20,000 records, half dead | 50 ms |
+
+The first version spent 600 us serialising and 390 us decoding a terrain chunk, almost all of it in
+my own canonicalisation and per-entry validation, not in zstd. Working on the palette instead of
+every entry, and unpacking whole words, made them 5.4x and 7x faster with byte-identical output.
+
+**Not here yet.** Block entities, entities, heightmaps and lighting (the format is versioned so
+they can be added), world metadata, and a smarter index for worlds with many millions of chunks
+(the index is a `HashMap`, and opening reads every record header). `fsync` cost depends on the
+disk, so the 180 us figure is only indicative.
+
 ## Quality gates
 
-* 211 tests (plus 6 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
+* 254 tests (plus 6 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
   `cfb8` crate and checked directly against the NIST SP 800-38A vector, and compression cross-checked against `flate2`.
-* Eight `cargo-fuzz` targets: frame decoder, codec readers, frame round-trip, whole-session driving
+* Ten `cargo-fuzz` targets: frame decoder, codec readers, frame round-trip, whole-session driving
   (structure-aware, reaches login and configuration), the NBT reader, the Query handler, the Query
-  reply parsers, and the Mojang profile parser.
+  reply parsers, the Mojang profile parser, the chunk decoder, and the store's recovery scan.
 * `cargo audit` in CI: no known vulnerabilities (two transitive "unmaintained" notices remain).
 * Miri (strict provenance, symbolic alignment) on the `unsafe` code.
 * `clippy -D warnings`, rustfmt, CI on Linux and Windows.
@@ -301,7 +356,7 @@ One pull request per subsystem.
    [Authentication](#authentication)).
 5. **Custom ECS and region scheduler** (deterministic parallel ticking), see
    [Simulation core](#simulation-core).
-6. World storage format and chunk pipeline.
+6. **World storage format and chunk pipeline**, see [World storage](#world-storage).
 7. Block updates, physics, redstone (bit-exact).
 8. Entities, mobs, villagers, trading, raids, breeding, farming.
 9. Exact vanilla world generation.

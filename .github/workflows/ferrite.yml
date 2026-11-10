@@ -110,6 +110,7 @@ jobs:
             ferrite/crates/ferrite-nbt/fuzz
             ferrite/crates/ferrite-remote/fuzz
             ferrite/crates/ferrite-net/fuzz
+            ferrite/crates/ferrite-world/fuzz
       - run: cargo install --locked cargo-fuzz
       - name: Fuzz each target for 30 seconds
         working-directory: ferrite/crates
@@ -119,3 +120,4 @@ jobs:
           fuzz ferrite-nbt/fuzz read
           for target in query_handler query_parsers; do fuzz ferrite-remote/fuzz "$target"; done
           fuzz ferrite-net/fuzz parse_profile
+          for target in decode_chunk store_open; do fuzz ferrite-world/fuzz "$target"; done
