@@ -81,6 +81,17 @@ jobs:
           PROPTEST_DISABLE_FAILURE_PERSISTENCE: "true"
           PROPTEST_CASES: "24"
 
+  audit:
+    # Known-vulnerable dependencies fail the build. This matters here: online mode decrypts
+    # attacker-supplied RSA ciphertext, which is why `rsa` must stay at 0.10 or newer
+    # (RUSTSEC-2023-0071). "Unmaintained" notices for transitive crates only warn.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo install --locked cargo-audit
+      - run: cargo audit
+        working-directory: ferrite
+
   fuzz-smoke:
     runs-on: ubuntu-latest
     steps:
@@ -92,13 +103,14 @@ jobs:
           workspaces: |
             ferrite/crates/ferrite-protocol/fuzz
             ferrite/crates/ferrite-nbt/fuzz
+            ferrite/crates/ferrite-remote/fuzz
+            ferrite/crates/ferrite-net/fuzz
       - run: cargo install --locked cargo-fuzz
-      - name: Fuzz each protocol target for 30 seconds
-        working-directory: ferrite/crates/ferrite-protocol/fuzz
+      - name: Fuzz each target for 30 seconds
+        working-directory: ferrite/crates
         run: |
-          for target in frame_decoder codec_readers frame_roundtrip session; do
-            cargo fuzz run "$target" -- -max_total_time=30 -max_len=4096
-          done
-      - name: Fuzz the NBT reader for 30 seconds
-        working-directory: ferrite/crates/ferrite-nbt/fuzz
-        run: cargo fuzz run read -- -max_total_time=30 -max_len=2048
+          fuzz() { (cd "$1" && cargo fuzz run "$2" -- -max_total_time=30 -max_len=4096); }
+          for target in frame_decoder codec_readers frame_roundtrip session; do fuzz ferrite-protocol/fuzz "$target"; done
+          fuzz ferrite-nbt/fuzz read
+          for target in query_handler query_parsers; do fuzz ferrite-remote/fuzz "$target"; done
+          fuzz ferrite-net/fuzz parse_profile

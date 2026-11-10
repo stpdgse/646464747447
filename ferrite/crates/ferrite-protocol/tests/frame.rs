@@ -338,3 +338,26 @@ proptest! {
         }
     }
 }
+
+#[test]
+fn encrypted_bytes_pipelined_behind_the_last_plaintext_frame_decode_correctly() {
+    // A client may send its plaintext `key` packet and, in the same TCP segment, the first packets
+    // it encrypts. The decoder must treat everything after the frame it just handed out as
+    // ciphertext once encryption is enabled, even though those bytes were already buffered.
+    let key = [0x77u8; 16];
+    let mut enc = FrameEncoder::new();
+    let plain = encode_all(&mut enc, &[(1, vec![1, 2, 3])]);
+    let mut secret = encode_all(&mut enc, &[(2, vec![4, 5, 6]), (3, vec![7; 40])]);
+    Encryptor::new(&key).apply(&mut secret);
+
+    let mut one_read = plain.to_vec();
+    one_read.extend_from_slice(&secret);
+
+    let mut dec = FrameDecoder::new();
+    dec.queue(&one_read);
+    assert_eq!(dec.next_frame().unwrap().unwrap().id, 1);
+    dec.enable_encryption(&key);
+    assert_eq!(dec.next_frame().unwrap().unwrap(), Frame { id: 2, body: vec![4, 5, 6].into() });
+    assert_eq!(dec.next_frame().unwrap().unwrap(), Frame { id: 3, body: vec![7; 40].into() });
+    assert_eq!(dec.buffered(), 0);
+}

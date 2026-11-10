@@ -1,10 +1,17 @@
+use std::collections::VecDeque;
+use std::net::IpAddr;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::time::Duration;
 
 use ferrite_protocol::SessionError;
+use ferrite_protocol::crypto::ServerKey;
 use ferrite_protocol::packets::play::Disconnect;
 use ferrite_protocol::session::{Event, ServerSession, SessionConfig, offline_uuid};
 use ferrite_protocol::types::{GameProfile, LenVec, Str, Text};
+use tokio::sync::oneshot;
+
+use crate::auth::{AuthRequest, AuthResult, Authenticator};
 
 /// Settings for the lobby.
 #[derive(Clone, Debug)]
@@ -14,6 +21,20 @@ pub struct LobbyConfig {
     pub session: SessionConfig,
     /// A connection that sends nothing for this long is dropped (slow-loris protection).
     pub read_timeout: Duration,
+    /// `Some` turns on online mode: encryption and Mojang authentication.
+    pub online: Option<OnlineConfig>,
+}
+
+/// Online-mode settings.
+#[derive(Clone, Debug)]
+pub struct OnlineConfig {
+    pub key: Arc<ServerKey>,
+    pub authenticator: Arc<dyn Authenticator>,
+    /// Send the client's IP to Mojang so it can reject proxied connections (vanilla's
+    /// `prevent-proxy-connections`).
+    pub prevent_proxy_connections: bool,
+    /// Upper bound on waiting for the authenticator, whatever it does.
+    pub auth_timeout: Duration,
 }
 
 impl Default for LobbyConfig {
@@ -23,6 +44,7 @@ impl Default for LobbyConfig {
             max_players: 20,
             session: SessionConfig { brand: "ferrite".into(), ..SessionConfig::default() },
             read_timeout: Duration::from_secs(15),
+            online: None,
         }
     }
 }
@@ -36,6 +58,10 @@ pub struct Stats {
     pub entered_play: AtomicU64,
     pub protocol_errors: AtomicU64,
     pub timeouts: AtomicU64,
+    /// Logins refused because Mojang did not vouch for the player.
+    pub auth_rejected: AtomicU64,
+    /// Logins that failed because verification itself was unavailable.
+    pub auth_unavailable: AtomicU64,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -46,6 +72,8 @@ pub struct StatsSnapshot {
     pub entered_play: u64,
     pub protocol_errors: u64,
     pub timeouts: u64,
+    pub auth_rejected: u64,
+    pub auth_unavailable: u64,
 }
 
 impl Stats {
@@ -58,17 +86,23 @@ impl Stats {
             entered_play: self.entered_play.load(r),
             protocol_errors: self.protocol_errors.load(r),
             timeouts: self.timeouts.load(r),
+            auth_rejected: self.auth_rejected.load(r),
+            auth_unavailable: self.auth_unavailable.load(r),
         }
     }
 }
 
 /// What the I/O loop should do after [`Lobby::drive`].
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Flow {
     /// Keep reading.
     Continue,
     /// Flush the pending output, then close the connection.
     Close,
+    /// Flush, then wait for [`Lobby::start_authentication`] and hand the outcome to
+    /// [`Lobby::finish_authentication`]. Input that arrived behind the packet that triggered this
+    /// is kept and processed afterwards.
+    Authenticate(AuthRequest),
 }
 
 /// Per-connection state.
@@ -77,6 +111,10 @@ pub struct ConnState {
     pub session: ServerSession,
     protocol_version: i32,
     counted_online: bool,
+    peer: Option<IpAddr>,
+    login_name: Option<String>,
+    /// Events that arrived in the same read as one that paused processing (see [`Flow`]).
+    backlog: VecDeque<Event>,
 }
 
 /// Shared by every connection and every backend thread.
@@ -100,14 +138,71 @@ impl Lobby {
         self.online.load(Ordering::Relaxed)
     }
 
-    /// Call when a connection is accepted.
-    pub fn connect(&self) -> ConnState {
+    /// Call when a connection is accepted. `peer` is the client's address, if known.
+    pub fn connect(&self, peer: Option<IpAddr>) -> ConnState {
         self.stats.connections.fetch_add(1, Ordering::Relaxed);
         ConnState {
             session: ServerSession::new(self.cfg.session.clone()),
             protocol_version: 0,
             counted_online: false,
+            peer,
+            login_name: None,
+            backlog: VecDeque::new(),
         }
+    }
+
+    /// How long a backend should wait for authentication before giving up.
+    pub fn auth_timeout(&self) -> Duration {
+        self.cfg.online.as_ref().map_or(Duration::from_secs(10), |o| o.auth_timeout)
+    }
+
+    /// Starts verifying a login. Only meaningful in online mode.
+    pub fn start_authentication(&self, request: AuthRequest) -> oneshot::Receiver<AuthResult> {
+        match &self.cfg.online {
+            Some(online) => online.authenticator.authenticate(request),
+            None => {
+                let (tx, rx) = oneshot::channel();
+                let _ = tx.send(Ok(None));
+                rx
+            }
+        }
+    }
+
+    /// Completes a login after [`Flow::Authenticate`]. `result` is `None` if the authenticator
+    /// did not answer in time.
+    pub fn finish_authentication(
+        &self,
+        conn: &mut ConnState,
+        result: Option<AuthResult>,
+    ) -> Result<Flow, SessionError> {
+        match result {
+            Some(Ok(Some(profile))) => {
+                self.admit(conn, profile)?;
+                self.drive(conn)
+            }
+            Some(Ok(None)) => {
+                self.stats.auth_rejected.fetch_add(1, Ordering::Relaxed);
+                conn.session.disconnect_translate("multiplayer.disconnect.unverified_username")?;
+                Ok(Flow::Close)
+            }
+            Some(Err(_)) | None => {
+                self.stats.auth_unavailable.fetch_add(1, Ordering::Relaxed);
+                conn.session.disconnect_translate("multiplayer.disconnect.authservers_down")?;
+                Ok(Flow::Close)
+            }
+        }
+    }
+
+    /// Reserves a player slot and sends `login_finished`.
+    fn admit(&self, conn: &mut ConnState, profile: GameProfile) -> Result<Flow, SessionError> {
+        if !self.try_reserve_slot() {
+            conn.session.disconnect("The server is full")?;
+            return Ok(Flow::Close);
+        }
+        conn.counted_online = true;
+        self.stats.logins.fetch_add(1, Ordering::Relaxed);
+        conn.session.accept_login(profile)?;
+        Ok(Flow::Continue)
     }
 
     /// Call exactly once when a connection ends, however it ended.
@@ -134,16 +229,20 @@ impl Lobby {
     /// On `Err` the connection is finished; flush `conn.session.pending_output()` (it may carry a
     /// disconnect message) and close.
     pub fn drive(&self, conn: &mut ConnState) -> Result<Flow, SessionError> {
-        let events = match conn.session.poll_all() {
-            Ok(e) => e,
-            Err(e) => {
-                self.stats.protocol_errors.fetch_add(1, Ordering::Relaxed);
-                return Err(e);
+        // Events left over from before the last pause come first, to keep packet order.
+        if conn.backlog.is_empty() {
+            match conn.session.poll_all() {
+                Ok(events) => conn.backlog.extend(events),
+                Err(e) => {
+                    self.stats.protocol_errors.fetch_add(1, Ordering::Relaxed);
+                    return Err(e);
+                }
             }
-        };
-        for event in events {
-            if self.handle(conn, event)? == Flow::Close {
-                return Ok(Flow::Close);
+        }
+        while let Some(event) = conn.backlog.pop_front() {
+            match self.handle(conn, event)? {
+                Flow::Continue => {}
+                other => return Ok(other),
             }
         }
         Ok(Flow::Continue)
@@ -165,18 +264,39 @@ impl Lobby {
                     conn.session.disconnect("Invalid username")?;
                     return Ok(Flow::Close);
                 }
-                if !self.try_reserve_slot() {
-                    conn.session.disconnect("The server is full")?;
-                    return Ok(Flow::Close);
+                match &self.cfg.online {
+                    // Online mode: encrypt first, authenticate once the client has answered. The
+                    // slot is only taken after authentication, so unauthenticated connections
+                    // cannot hold the server full.
+                    Some(online) => {
+                        conn.login_name = Some(name);
+                        conn.session.begin_encryption(online.key.clone(), true)?;
+                    }
+                    None => {
+                        let profile = GameProfile {
+                            uuid: offline_uuid(&name),
+                            name: Str::new(name),
+                            properties: LenVec(Vec::new()),
+                        };
+                        return self.admit(conn, profile);
+                    }
                 }
-                conn.counted_online = true;
-                self.stats.logins.fetch_add(1, Ordering::Relaxed);
+            }
+            Event::EncryptionEstablished { server_hash, authenticate } => {
+                let name = conn.login_name.clone().unwrap_or_default();
+                if authenticate {
+                    let ip = match &self.cfg.online {
+                        Some(o) if o.prevent_proxy_connections => conn.peer,
+                        _ => None,
+                    };
+                    return Ok(Flow::Authenticate(AuthRequest { name, server_hash, ip }));
+                }
                 let profile = GameProfile {
                     uuid: offline_uuid(&name),
                     name: Str::new(name),
                     properties: LenVec(Vec::new()),
                 };
-                conn.session.accept_login(profile)?;
+                return self.admit(conn, profile);
             }
             // Offline mode never asks for encryption or plugin answers, so any such packet is
             // unsolicited.
@@ -280,7 +400,7 @@ mod tests {
     #[test]
     fn disconnect_releases_exactly_once() {
         let lobby = Lobby::new(LobbyConfig::default());
-        let mut conn = lobby.connect();
+        let mut conn = lobby.connect(None);
         assert!(lobby.try_reserve_slot());
         conn.counted_online = true;
         lobby.disconnect(&mut conn);

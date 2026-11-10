@@ -11,6 +11,7 @@
 
 pub mod cipher;
 pub mod codec;
+pub mod crypto;
 pub mod error;
 pub mod frame;
 pub mod packet;

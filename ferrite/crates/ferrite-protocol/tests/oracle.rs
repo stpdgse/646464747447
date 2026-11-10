@@ -31,12 +31,17 @@ struct Client {
     stream: TcpStream,
     dec: FrameDecoder,
     enc: FrameEncoder,
+    cipher: Option<ferrite_protocol::cipher::Encryptor>,
     trace: Vec<String>,
 }
 
 impl Client {
     fn connect() -> Self {
-        let stream = TcpStream::connect(addr()).expect("connect to the oracle server");
+        Self::connect_to(&addr())
+    }
+
+    fn connect_to(addr: &str) -> Self {
+        let stream = TcpStream::connect(addr).expect("connect to the oracle server");
         stream.set_read_timeout(Some(Duration::from_secs(15))).unwrap();
         stream.set_nodelay(true).unwrap();
         Client {
@@ -44,8 +49,15 @@ impl Client {
             // The server may send much larger frames than a client ever may.
             dec: FrameDecoder::new().with_limits(1 << 26, 1 << 26),
             enc: FrameEncoder::new(),
+            cipher: None,
             trace: Vec::new(),
         }
+    }
+
+    /// Both directions switch to AES-CFB8 with `secret` as key and IV.
+    fn enable_encryption(&mut self, secret: &[u8; 16]) {
+        self.dec.enable_encryption(secret);
+        self.cipher = Some(ferrite_protocol::cipher::Encryptor::new(secret));
     }
 
     fn send<P: Packet>(&mut self, p: &P) {
@@ -53,6 +65,9 @@ impl Client {
         p.encode(&mut body).unwrap();
         let mut out = BytesMut::new();
         self.enc.encode(P::ID, &body, &mut out).unwrap();
+        if let Some(cipher) = &mut self.cipher {
+            cipher.apply(&mut out);
+        }
         self.stream.write_all(&out).unwrap();
         self.trace.push(format!("C->S {}", P::NAME));
     }
@@ -349,4 +364,103 @@ fn dump_json(dir: &str, regs: &[(String, Vec<String>)], tags: &[(String, TagList
     out.push_str("]}");
     std::fs::create_dir_all(dir).unwrap();
     std::fs::write(format!("{dir}/vanilla-configuration.json"), out).unwrap();
+}
+
+/// Vanilla in online mode: its encryption request must parse, and it must accept our answer.
+///
+/// We cannot authenticate against Mojang here, so vanilla ends the login with a disconnect after
+/// it has decrypted our response. That disconnect arrives encrypted with the shared secret *we
+/// chose*, so decoding it proves that our RSA/DER handling, the verify-token logic and the
+/// AES-CFB8 key and IV all agree with the vanilla implementation.
+#[test]
+#[ignore = "needs an online-mode vanilla server: scripts/oracle.sh"]
+fn online_mode_key_exchange_is_accepted_by_vanilla() {
+    use ferrite_protocol::crypto::{encrypt_with_public_key, server_hash};
+    use ferrite_protocol::packets::login::Key;
+    use ferrite_protocol::types::ByteVec;
+
+    let online = std::env::var("FERRITE_ORACLE_ONLINE")
+        .expect("set FERRITE_ORACLE_ONLINE=host:port (see scripts/oracle.sh)");
+    let mut c = Client::connect_to(&online);
+    c.handshake(2);
+    c.send(&ServerboundHello { name: Str::new("FerriteBot"), uuid: Uuid::nil() });
+
+    let f = c.recv();
+    let ClientboundLogin::Hello(hello) = ClientboundLogin::decode(f.id, &f.body)
+        .unwrap_or_else(|e| panic!("vanilla's encryption request did not decode: {e}"))
+    else {
+        panic!("expected an encryption request, got packet id {}", f.id)
+    };
+    eprintln!(
+        "vanilla key: {} DER bytes, token {} bytes, authenticate={}, server_id={:?}",
+        hello.public_key.0.len(),
+        hello.verify_token.0.len(),
+        hello.should_authenticate,
+        hello.server_id.0
+    );
+    assert_eq!(hello.server_id.0, "", "vanilla sends an empty server id");
+    assert!(hello.should_authenticate, "an online-mode server asks clients to authenticate");
+    assert_eq!(hello.verify_token.0.len(), 4);
+
+    let secret = [0x5au8; 16];
+    let hash = server_hash("", &secret, &hello.public_key.0);
+    eprintln!("our server hash for this exchange: {hash}");
+    c.send(&Key {
+        shared_secret: ByteVec(encrypt_with_public_key(&hello.public_key.0, &secret).unwrap()),
+        verify_token: ByteVec(
+            encrypt_with_public_key(&hello.public_key.0, &hello.verify_token.0).unwrap(),
+        ),
+    });
+    c.enable_encryption(&secret);
+
+    // Vanilla now asks Mojang to verify us. We have no session, so it kicks us, in the clear or
+    // encrypted depending on how far it got. Reading it through our cipher is the proof.
+    let f = c.recv();
+    let ClientboundLogin::LoginDisconnect(d) = ClientboundLogin::decode(f.id, &f.body)
+        .unwrap_or_else(|e| {
+            panic!("vanilla's reply did not decode after we enabled encryption: {e}")
+        })
+    else {
+        panic!("expected a disconnect, got packet id {}", f.id)
+    };
+    eprintln!("vanilla's verdict: {}", d.reason.0);
+    assert!(
+        d.reason.0.contains("multiplayer.disconnect.unverified_username")
+            || d.reason.0.contains("multiplayer.disconnect.authservers_down"),
+        "unexpected disconnect: {}",
+        d.reason.0
+    );
+}
+
+/// What vanilla does with a wrong verify token, for reference. Not asserted strictly: it only has
+/// to refuse, and we record its message.
+#[test]
+#[ignore = "needs an online-mode vanilla server: scripts/oracle.sh"]
+fn vanilla_refuses_a_wrong_verify_token() {
+    use ferrite_protocol::crypto::encrypt_with_public_key;
+    use ferrite_protocol::packets::login::Key;
+    use ferrite_protocol::types::ByteVec;
+
+    let online = std::env::var("FERRITE_ORACLE_ONLINE").expect("FERRITE_ORACLE_ONLINE");
+    let mut c = Client::connect_to(&online);
+    c.handshake(2);
+    c.send(&ServerboundHello { name: Str::new("FerriteBot"), uuid: Uuid::nil() });
+    let f = c.recv();
+    let ClientboundLogin::Hello(hello) = ClientboundLogin::decode(f.id, &f.body).unwrap() else {
+        panic!()
+    };
+    let secret = [0x11u8; 16];
+    c.send(&Key {
+        shared_secret: ByteVec(encrypt_with_public_key(&hello.public_key.0, &secret).unwrap()),
+        verify_token: ByteVec(encrypt_with_public_key(&hello.public_key.0, &[0, 0, 0, 0]).unwrap()),
+    });
+    c.enable_encryption(&secret);
+    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| c.recv())) {
+        Ok(f) => eprintln!(
+            "vanilla answered a wrong token with packet id {} ({} bytes)",
+            f.id,
+            f.body.len()
+        ),
+        Err(_) => eprintln!("vanilla closed the connection on a wrong token"),
+    }
 }

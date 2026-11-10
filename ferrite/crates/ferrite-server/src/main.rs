@@ -2,9 +2,13 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 
+mod remote;
+
 use clap::{Parser, ValueEnum};
-use ferrite_net::{Lobby, LobbyConfig};
+use ferrite_net::auth::{MojangAuthenticator, MojangConfig};
+use ferrite_net::{Lobby, LobbyConfig, OnlineConfig};
 use ferrite_protocol::Compression;
+use ferrite_protocol::crypto::ServerKey;
 use ferrite_protocol::session::SessionConfig;
 
 #[global_allocator]
@@ -39,6 +43,35 @@ struct Args {
     /// Seconds of silence after which a connection is dropped.
     #[arg(long, default_value_t = 15)]
     read_timeout: u64,
+    /// Authenticate players with Mojang (and encrypt the connection). Turn off only for development
+    /// or behind a trusted proxy: without it anyone can log in as any name.
+    #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
+    online_mode: bool,
+    /// Base URL of the session server used in online mode.
+    #[arg(long, default_value = "https://sessionserver.mojang.com")]
+    session_server: String,
+    /// Send each player's IP to Mojang so it can reject proxied connections.
+    #[arg(long)]
+    prevent_proxy_connections: bool,
+    /// Concurrent Mojang verifications.
+    #[arg(long, default_value_t = 8)]
+    auth_workers: usize,
+    /// Seconds to wait for Mojang before telling the player the services are down.
+    #[arg(long, default_value_t = 6)]
+    auth_timeout: u64,
+    /// Serve the Query protocol (UDP) on this port, on the same address as the game.
+    #[arg(long)]
+    query_port: Option<u16>,
+    /// Serve RCON (TCP) on this port. Requires a password.
+    #[arg(long)]
+    rcon_port: Option<u16>,
+    /// Address RCON listens on. Defaults to localhost because RCON is unencrypted.
+    #[arg(long, default_value = "127.0.0.1")]
+    rcon_bind: std::net::IpAddr,
+    /// RCON password (prefer the FERRITE_RCON_PASSWORD environment variable: arguments are
+    /// visible to every user of the machine).
+    #[arg(long, env = "FERRITE_RCON_PASSWORD", hide_env_values = true)]
+    rcon_password: Option<String>,
     /// Print counters every N seconds (0 disables).
     #[arg(long, default_value_t = 0)]
     stats_interval: u64,
@@ -56,6 +89,26 @@ fn main() -> std::io::Result<()> {
         .or_else(|| std::thread::available_parallelism().ok().map(|n| n.get()))
         .unwrap_or(1);
 
+    let online = if args.online_mode {
+        let started = std::time::Instant::now();
+        let key = Arc::new(ServerKey::generate().expect("generating the server key"));
+        tracing::info!("generated a {}-bit server key in {:?}", ServerKey::BITS, started.elapsed());
+        Some(OnlineConfig {
+            key,
+            authenticator: Arc::new(MojangAuthenticator::new(MojangConfig {
+                base_url: args.session_server.clone(),
+                workers: args.auth_workers,
+                timeout: Duration::from_secs(args.auth_timeout.saturating_sub(1).max(1)),
+                ..MojangConfig::default()
+            })),
+            prevent_proxy_connections: args.prevent_proxy_connections,
+            auth_timeout: Duration::from_secs(args.auth_timeout),
+        })
+    } else {
+        tracing::warn!("online mode is OFF: players are not authenticated and can use any name");
+        None
+    };
+
     let lobby = Arc::new(Lobby::new(LobbyConfig {
         motd: args.motd.clone(),
         max_players: args.max_players,
@@ -66,6 +119,7 @@ fn main() -> std::io::Result<()> {
             brand: "ferrite".into(),
             ..SessionConfig::default()
         },
+        online,
     }));
     tracing::info!(
         "Ferrite for Minecraft {} (protocol {}) listening on {} with {:?} backend, {threads} threads",
@@ -74,6 +128,21 @@ fn main() -> std::io::Result<()> {
         args.addr,
         args.backend,
     );
+
+    let rcon = match args.rcon_port {
+        Some(port) => {
+            let password = args.rcon_password.clone().unwrap_or_default();
+            let cfg = ferrite_remote::rcon::RconConfig::new(password)
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))?;
+            Some((SocketAddr::new(args.rcon_bind, port), cfg))
+        }
+        None => None,
+    };
+    remote::spawn(
+        remote::RemoteConfig { query_port: args.query_port, rcon },
+        lobby.clone(),
+        args.addr,
+    )?;
 
     if args.stats_interval > 0 {
         let lobby = lobby.clone();

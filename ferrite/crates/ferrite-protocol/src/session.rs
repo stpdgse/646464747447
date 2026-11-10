@@ -14,6 +14,8 @@
 //! negotiation, registry and tag data, finishing configuration). Everything that is a *decision*
 //! (the status text, whether a player may join, who they are) is surfaced as an [`Event`].
 
+use std::sync::Arc;
+
 use bytes::{Buf, BytesMut};
 use ferrite_data::PROTOCOL_VERSION;
 use md5::{Digest, Md5};
@@ -21,6 +23,7 @@ use uuid::Uuid;
 
 use crate::cipher::Encryptor;
 use crate::codec::VarInt;
+use crate::crypto::{ServerKey, server_hash};
 use crate::error::SessionError;
 use crate::frame::{Compression, FrameDecoder, FrameEncoder};
 use crate::packet::Packet;
@@ -104,8 +107,14 @@ pub enum Event {
         uuid: Uuid,
         transfer: bool,
     },
-    /// A login packet the session does not handle itself (encryption response, plugin answers,
-    /// cookies).
+    /// The client answered [`ServerSession::begin_encryption`] correctly and the connection is now
+    /// encrypted in both directions. If `authenticate` was set, verify `server_hash` with the
+    /// session server, then call [`ServerSession::accept_login`] or disconnect.
+    EncryptionEstablished {
+        server_hash: String,
+        authenticate: bool,
+    },
+    /// A login packet the session does not handle itself (plugin answers, cookies).
     Login(ServerboundLogin),
     /// The client acknowledged login; the session has started the configuration sequence.
     Configuring,
@@ -129,6 +138,15 @@ pub struct ServerSession {
     sent_known_packs: bool,
     finish_sent: bool,
     transfer: bool,
+    /// Set between sending the encryption request and receiving the response.
+    encryption: Option<PendingEncryption>,
+}
+
+#[derive(Debug)]
+struct PendingEncryption {
+    key: Arc<ServerKey>,
+    verify_token: [u8; 4],
+    authenticate: bool,
 }
 
 impl ServerSession {
@@ -144,6 +162,7 @@ impl ServerSession {
             sent_known_packs: false,
             finish_sent: false,
             transfer: false,
+            encryption: None,
         }
     }
 
@@ -220,6 +239,26 @@ impl ServerSession {
         self.send(&status::StatusResponse { json: Str::new(json) })
     }
 
+    /// Starts the online-mode key exchange by sending the encryption request. Only valid once the
+    /// client has said hello ([`Event::LoginStarted`]) and before login is accepted. The answer
+    /// arrives as [`Event::EncryptionEstablished`].
+    pub fn begin_encryption(&mut self, key: Arc<ServerKey>, authenticate: bool) -> Result<()> {
+        if self.phase != Phase::LoginPending || self.encryption.is_some() || self.cipher.is_some() {
+            return Err(SessionError::WrongPhase { phase: self.phase.name() });
+        }
+        let mut verify_token = [0u8; 4];
+        getrandom::fill(&mut verify_token).map_err(|_| SessionError::Random)?;
+        self.send(&login::Hello {
+            // Always empty from the vanilla server; the public key is part of the hash anyway.
+            server_id: Str::new(""),
+            public_key: crate::types::ByteVec(key.public_key_der().to_vec()),
+            verify_token: crate::types::ByteVec(verify_token.to_vec()),
+            should_authenticate: authenticate,
+        })?;
+        self.encryption = Some(PendingEncryption { key, verify_token, authenticate });
+        Ok(())
+    }
+
     /// Lets the player in: negotiates compression, then sends `login_finished`.
     pub fn accept_login(&mut self, profile: GameProfile) -> Result<()> {
         if self.phase != Phase::LoginPending {
@@ -257,6 +296,33 @@ impl ServerSession {
             }
             Phase::Configuration => {
                 self.send(&cfg::Disconnect { reason: Text::plain(message) })?;
+            }
+            _ => {}
+        }
+        self.phase = Phase::Closed;
+        Ok(())
+    }
+
+    /// Kicks the client with a *translatable* message, which the client renders in its own
+    /// language (for example `multiplayer.disconnect.unverified_username`).
+    pub fn disconnect_translate(&mut self, key: &str) -> Result<()> {
+        if !key.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'.' || b == b'_') {
+            return Err(SessionError::Unexpected {
+                packet: "translation key",
+                phase: self.phase.name(),
+            });
+        }
+        match self.phase {
+            Phase::Login | Phase::LoginPending | Phase::AwaitLoginAck => {
+                let json = JsonText(format!("{{\"translate\":\"{key}\"}}"));
+                self.send(&login::LoginDisconnect { reason: json })?;
+            }
+            Phase::Configuration => {
+                // Configuration disconnects carry an NBT text component, not JSON.
+                let component = ferrite_nbt::Compound::new().with("translate", key.into());
+                self.send(&cfg::Disconnect {
+                    reason: Text(ferrite_nbt::Tag::Compound(component)),
+                })?;
             }
             _ => {}
         }
@@ -399,8 +465,34 @@ impl ServerSession {
                 packet: "login_acknowledged",
                 phase: self.phase.name(),
             }),
+            ServerboundLogin::Key(response) => self.on_encryption_response(response),
             other => Ok(Some(Event::Login(other))),
         }
+    }
+
+    fn on_encryption_response(&mut self, response: login::Key) -> Result<Option<Event>> {
+        let Some(pending) = self.encryption.take() else {
+            return Err(SessionError::Unexpected { packet: "key", phase: self.phase.name() });
+        };
+        // Any failure from here on looks the same to the client: a generic protocol error.
+        let secret = (|| {
+            let secret: [u8; 16] =
+                pending.key.decrypt(&response.shared_secret.0).ok()?.try_into().ok()?;
+            let token = pending.key.decrypt(&response.verify_token.0).ok()?;
+            constant_time_eq(&token, &pending.verify_token).then_some(secret)
+        })();
+        let Some(secret) = secret else {
+            let _ =
+                self.send(&login::LoginDisconnect { reason: JsonText::plain("Protocol error") });
+            return Err(SessionError::BadEncryptionResponse("bad shared secret or verify token"));
+        };
+        let hash = server_hash("", &secret, pending.key.public_key_der());
+        // Everything we send or receive from here on is encrypted.
+        self.enable_encryption(&secret);
+        Ok(Some(Event::EncryptionEstablished {
+            server_hash: hash,
+            authenticate: pending.authenticate,
+        }))
     }
 
     /// The fixed opening of the configuration phase, in vanilla's order.
@@ -492,6 +584,11 @@ impl ServerSession {
         self.finish_sent = true;
         Ok(())
     }
+}
+
+/// Compares without an early exit, so timing does not reveal how many bytes matched.
+fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
+    a.len() == b.len() && a.iter().zip(b).fold(0u8, |acc, (x, y)| acc | (x ^ y)) == 0
 }
 
 fn other_name_login(p: &ServerboundLogin) -> &'static str {

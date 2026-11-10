@@ -10,7 +10,9 @@ publish.workspace = true
 [dependencies]
 aes.workspace = true
 bytes.workspace = true
-getrandom = "0.3"
+getrandom = { version = "0.4", features = ["sys_rng"] }
+rsa = { version = "0.10", features = ["std", "pkcs1v15"] }
+sha1.workspace = true
 md-5 = "0.10"
 ferrite-data.workspace = true
 ferrite-nbt = { path = "../ferrite-nbt" }

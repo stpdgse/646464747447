@@ -414,17 +414,18 @@ fn login_plugin_answers_and_cookies_are_forwarded_to_the_application() {
     let mut c = Client::new();
     handshake(&mut c, &mut s, 2);
     c.send(&mut s, &ServerboundHello { name: Str::new("Fwd"), uuid: Uuid::nil() });
+    c.send(&mut s, &login::CustomQueryAnswer { message_id: VarInt(1), data: None });
     c.send(
         &mut s,
-        &login::Key {
-            shared_secret: ferrite_protocol::types::ByteVec(vec![1]),
-            verify_token: ferrite_protocol::types::ByteVec(vec![2]),
+        &login::CookieResponse {
+            key: ferrite_protocol::types::Identifier::new("a:b").unwrap(),
+            payload: None,
         },
     );
     let events = s.poll_all().unwrap();
     assert!(matches!(
         &events[..],
-        [Event::Handshake { .. }, Event::LoginStarted { .. }, Event::Login(_)]
+        [Event::Handshake { .. }, Event::LoginStarted { .. }, Event::Login(_), Event::Login(_)]
     ));
     assert_eq!(s.phase(), Phase::LoginPending);
 }
@@ -459,4 +460,270 @@ fn play_packets_can_be_sent_only_in_play() {
     assert_eq!(packet_name(State::Play, Direction::Clientbound, frames[0].id), Some("disconnect"));
     // A configuration packet is not a play packet.
     assert!(matches!(s.send_play(&FinishConfiguration {}), Err(SessionError::WrongPhase { .. })));
+}
+
+// ---------------------------------------------------------------------------------------------
+// Online mode: RSA key exchange, AES-CFB8, and the server hash.
+// ---------------------------------------------------------------------------------------------
+
+use std::sync::Arc;
+
+use ferrite_protocol::crypto::{ServerKey, encrypt_with_public_key, server_hash};
+use ferrite_protocol::types::ByteVec;
+
+fn server_key() -> Arc<ServerKey> {
+    use std::sync::OnceLock;
+    static KEY: OnceLock<Arc<ServerKey>> = OnceLock::new();
+    KEY.get_or_init(|| Arc::new(ServerKey::generate().unwrap())).clone()
+}
+
+struct Exchange {
+    secret: [u8; 16],
+    token: Vec<u8>,
+    public_key: Vec<u8>,
+}
+
+/// Handshake and hello, then the server's encryption request, decoded as a client would.
+fn start_online(
+    c: &mut Client,
+    s: &mut ServerSession,
+    key: &Arc<ServerKey>,
+    name: &str,
+) -> Exchange {
+    handshake(c, s, 2);
+    c.send(s, &ServerboundHello { name: Str::new(name), uuid: Uuid::nil() });
+    let events = s.poll_all().unwrap();
+    assert!(matches!(&events[..], [Event::Handshake { .. }, Event::LoginStarted { .. }]));
+    s.begin_encryption(key.clone(), true).unwrap();
+
+    let frames = c.frames(s);
+    assert_eq!(names(State::Login, &frames), ["hello"]);
+    let ClientboundLogin::Hello(h) =
+        ClientboundLogin::decode(frames[0].id, &frames[0].body).unwrap()
+    else {
+        panic!()
+    };
+    assert_eq!(h.server_id.0, "", "vanilla always sends an empty server id");
+    assert_eq!(h.public_key.0, key.public_key_der());
+    assert_eq!(h.verify_token.0.len(), 4);
+    assert!(h.should_authenticate);
+    Exchange { secret: [0x42; 16], token: h.verify_token.0, public_key: h.public_key.0 }
+}
+
+/// The client's reply, plaintext, after which both directions are encrypted.
+fn answer(c: &mut Client, s: &mut ServerSession, x: &Exchange) {
+    let key_packet = login::Key {
+        shared_secret: ByteVec(encrypt_with_public_key(&x.public_key, &x.secret).unwrap()),
+        verify_token: ByteVec(encrypt_with_public_key(&x.public_key, &x.token).unwrap()),
+    };
+    c.send(s, &key_packet);
+    c.cipher = Some(Encryptor::new(&x.secret));
+    c.dec.enable_encryption(&x.secret);
+}
+
+#[test]
+fn online_login_encrypts_everything_and_reports_the_server_hash() {
+    let key = server_key();
+    let mut s = ServerSession::new(SessionConfig::default());
+    let mut c = Client::new();
+    let x = start_online(&mut c, &mut s, &key, "Online");
+    answer(&mut c, &mut s, &x);
+
+    let events = s.poll_all().unwrap();
+    let expected_hash = server_hash("", &x.secret, key.public_key_der());
+    assert_eq!(
+        events,
+        [Event::EncryptionEstablished { server_hash: expected_hash, authenticate: true }]
+    );
+
+    // After authentication succeeds the application accepts the login. The output is encrypted:
+    // reading it as plaintext must fail, reading it through the client's cipher must work.
+    s.accept_login(profile("Online")).unwrap();
+    let raw = s.pending_output().to_vec();
+    let mut plain_reader = FrameDecoder::new();
+    plain_reader.queue(&raw);
+    assert!(
+        plain_reader.next_frame().is_err()
+            || plain_reader.next_frame().map(|f| f.is_none()).unwrap_or(true)
+            || ClientboundLogin::decode(
+                plain_reader.next_frame().ok().flatten().map_or(0, |f| f.id),
+                &[]
+            )
+            .is_err(),
+        "encrypted output must not parse as plaintext framing"
+    );
+    let out = s.take_output();
+    c.dec.queue(&out);
+    let first = c.dec.next_frame().unwrap().unwrap();
+    assert_eq!(
+        packet_name(State::Login, Direction::Clientbound, first.id),
+        Some("login_compression")
+    );
+    c.compression(256);
+    let second = c.dec.next_frame().unwrap().unwrap();
+    assert_eq!(
+        packet_name(State::Login, Direction::Clientbound, second.id),
+        Some("login_finished")
+    );
+
+    // The rest of the join works over the encrypted stream, including compression.
+    c.send(&mut s, &LoginAcknowledged {});
+    assert_eq!(s.poll_all().unwrap(), [Event::Configuring]);
+    c.frames(&mut s);
+    c.send(&mut s, &ServerboundSelectKnownPacks { packs: LenVec(vec![core_pack()]) });
+    s.poll_all().unwrap();
+    let rest = c.frames(&mut s);
+    assert_eq!(names(State::Configuration, &rest).last(), Some(&"finish_configuration"));
+    c.send(&mut s, &AcknowledgeFinishConfiguration {});
+    assert_eq!(s.poll_all().unwrap(), [Event::EnteredPlay]);
+}
+
+#[test]
+fn encrypted_packets_pipelined_with_the_key_packet_are_not_lost() {
+    // The client sends `key` and immediately more (encrypted) data in the same TCP segment.
+    let key = server_key();
+    let mut s = ServerSession::new(SessionConfig::default());
+    let mut c = Client::new();
+    let x = start_online(&mut c, &mut s, &key, "Eager");
+
+    let mut burst = c.wire(&login::Key {
+        shared_secret: ByteVec(encrypt_with_public_key(&x.public_key, &x.secret).unwrap()),
+        verify_token: ByteVec(encrypt_with_public_key(&x.public_key, &x.token).unwrap()),
+    });
+    c.cipher = Some(Encryptor::new(&x.secret));
+    c.dec.enable_encryption(&x.secret);
+    // A custom_query_answer is the kind of packet a client may legitimately send next.
+    burst.extend_from_slice(
+        &c.wire(&login::CustomQueryAnswer { message_id: VarInt(9), data: None }),
+    );
+    s.feed(&burst);
+
+    let events = s.poll_all().unwrap();
+    assert!(
+        matches!(&events[..], [Event::EncryptionEstablished { .. }, Event::Login(_)]),
+        "{events:?}"
+    );
+}
+
+#[test]
+fn a_wrong_verify_token_or_secret_is_refused_with_a_generic_error() {
+    let key = server_key();
+    for case in ["wrong token", "short secret", "long secret", "other key"] {
+        let mut s = ServerSession::new(SessionConfig::default());
+        let mut c = Client::new();
+        let x = start_online(&mut c, &mut s, &key, "Bad");
+        let (secret, token): (Vec<u8>, Vec<u8>) = match case {
+            "wrong token" => (x.secret.to_vec(), vec![0, 0, 0, 0]),
+            "short secret" => (vec![1; 15], x.token.clone()),
+            "long secret" => (vec![1; 17], x.token.clone()),
+            _ => (x.secret.to_vec(), x.token.clone()),
+        };
+        let target = if case == "other key" {
+            ServerKey::generate().unwrap().public_key_der().to_vec()
+        } else {
+            x.public_key.clone()
+        };
+        c.send(
+            &mut s,
+            &login::Key {
+                shared_secret: ByteVec(encrypt_with_public_key(&target, &secret).unwrap()),
+                verify_token: ByteVec(encrypt_with_public_key(&target, &token).unwrap()),
+            },
+        );
+        assert!(matches!(s.poll_all(), Err(SessionError::BadEncryptionResponse(_))), "{case}");
+        assert_eq!(s.phase(), Phase::Closed, "{case}");
+        // The client is told why, in the clear (encryption never started).
+        let frames = c.frames(&mut s);
+        assert_eq!(names(State::Login, &frames), ["login_disconnect"], "{case}");
+    }
+    // A garbage-length ciphertext also fails.
+    let mut s = ServerSession::new(SessionConfig::default());
+    let mut c = Client::new();
+    let _ = start_online(&mut c, &mut s, &key, "Bad");
+    c.send(
+        &mut s,
+        &login::Key { shared_secret: ByteVec(vec![1; 10]), verify_token: ByteVec(vec![]) },
+    );
+    assert!(s.poll_all().is_err());
+}
+
+#[test]
+fn the_encryption_exchange_cannot_be_misused() {
+    let key = server_key();
+
+    // A key packet nobody asked for.
+    let mut s = ServerSession::new(SessionConfig::default());
+    let mut c = Client::new();
+    handshake(&mut c, &mut s, 2);
+    c.send(&mut s, &ServerboundHello { name: Str::new("X"), uuid: Uuid::nil() });
+    s.poll_all().unwrap();
+    c.send(&mut s, &login::Key { shared_secret: ByteVec(vec![1]), verify_token: ByteVec(vec![2]) });
+    assert!(matches!(s.poll_all(), Err(SessionError::Unexpected { packet: "key", .. })));
+
+    // Requesting encryption before hello, or twice, or after login was accepted.
+    let mut s = ServerSession::new(SessionConfig::default());
+    assert!(matches!(s.begin_encryption(key.clone(), true), Err(SessionError::WrongPhase { .. })));
+    let mut c = Client::new();
+    let x = start_online(&mut c, &mut s, &key, "Twice");
+    assert!(matches!(s.begin_encryption(key.clone(), true), Err(SessionError::WrongPhase { .. })));
+
+    // Replaying the key packet after the exchange completed.
+    answer(&mut c, &mut s, &x);
+    s.poll_all().unwrap();
+    c.send(
+        &mut s,
+        &login::Key {
+            shared_secret: ByteVec(encrypt_with_public_key(&x.public_key, &x.secret).unwrap()),
+            verify_token: ByteVec(encrypt_with_public_key(&x.public_key, &x.token).unwrap()),
+        },
+    );
+    assert!(matches!(s.poll_all(), Err(SessionError::Unexpected { packet: "key", .. })));
+}
+
+#[test]
+fn authentication_can_be_declined_by_the_application_with_a_translated_message() {
+    let key = server_key();
+    let mut s = ServerSession::new(SessionConfig::default());
+    let mut c = Client::new();
+    let x = start_online(&mut c, &mut s, &key, "Impostor");
+    answer(&mut c, &mut s, &x);
+    s.poll_all().unwrap();
+
+    s.disconnect_translate("multiplayer.disconnect.unverified_username").unwrap();
+    let frames = c.frames(&mut s);
+    let ClientboundLogin::LoginDisconnect(d) =
+        ClientboundLogin::decode(frames[0].id, &frames[0].body).unwrap()
+    else {
+        panic!()
+    };
+    assert_eq!(d.reason.0, "{\"translate\":\"multiplayer.disconnect.unverified_username\"}");
+    assert_eq!(s.phase(), Phase::Closed);
+
+    // Keys are restricted so they cannot break out of the JSON string.
+    let mut s = ServerSession::new(SessionConfig::default());
+    assert!(s.disconnect_translate("a\"b").is_err());
+    assert!(s.disconnect_translate("a b").is_err());
+}
+
+#[test]
+fn offline_encryption_flag_is_reported_when_authentication_is_off() {
+    // Since 1.20.5 a server may encrypt without authenticating (should_authenticate = false).
+    let key = server_key();
+    let mut s = ServerSession::new(SessionConfig::default());
+    let mut c = Client::new();
+    handshake(&mut c, &mut s, 2);
+    c.send(&mut s, &ServerboundHello { name: Str::new("Quiet"), uuid: Uuid::nil() });
+    s.poll_all().unwrap();
+    s.begin_encryption(key.clone(), false).unwrap();
+    let frames = c.frames(&mut s);
+    let ClientboundLogin::Hello(h) =
+        ClientboundLogin::decode(frames[0].id, &frames[0].body).unwrap()
+    else {
+        panic!()
+    };
+    assert!(!h.should_authenticate);
+    let x = Exchange { secret: [3; 16], token: h.verify_token.0, public_key: h.public_key.0 };
+    answer(&mut c, &mut s, &x);
+    let events = s.poll_all().unwrap();
+    assert!(matches!(&events[..], [Event::EncryptionEstablished { authenticate: false, .. }]));
 }

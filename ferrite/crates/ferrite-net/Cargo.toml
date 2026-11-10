@@ -17,17 +17,21 @@ bytes.workspace = true
 ferrite-data.workspace = true
 ferrite-protocol = { path = "../ferrite-protocol" }
 socket2 = { version = "0.5", features = ["all"] }
+serde_json.workspace = true
 thiserror.workspace = true
 tokio = { version = "1", features = ["rt-multi-thread", "net", "io-util", "time", "macros", "sync"] }
 tracing = "0.1"
+ureq = "3"
+uuid.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
-monoio = { version = "0.2", optional = true, features = ["bytes"] }
+# `sync` is required: authenticator threads complete logins by waking monoio tasks that belong to
+# another thread, which monoio refuses (it panics) unless this feature is on.
+monoio = { version = "0.2", optional = true, features = ["bytes", "sync"] }
 
 [dev-dependencies]
 ferrite-swarm = { path = "../ferrite-swarm" }
 tokio = { version = "1", features = ["full"] }
-uuid.workspace = true
 
 [lints]
 workspace = true

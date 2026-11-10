@@ -59,4 +59,6 @@ pub enum SessionError {
     Closed,
     #[error("random number generation failed")]
     Random,
+    #[error("invalid encryption response: {0}")]
+    BadEncryptionResponse(&'static str),
 }

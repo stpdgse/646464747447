@@ -83,10 +83,15 @@ impl FrameDecoder {
         self
     }
 
-    /// Starts decrypting. Bytes already buffered and not yet decrypted are decrypted now, so this
-    /// may be called at any point after the last unencrypted byte has been consumed.
+    /// Starts decrypting. Call it right after taking the last plaintext frame out of the decoder.
+    ///
+    /// Everything still buffered at that point sits *behind* that frame and is therefore
+    /// ciphertext, even though it was received (and marked decrypted) before encryption was
+    /// enabled. A client may well pipeline its first encrypted packets in the same TCP segment as
+    /// the plaintext `key` packet, so those bytes are decrypted now.
     pub fn enable_encryption(&mut self, shared_secret: &[u8; 16]) {
         self.cipher = Some(Decryptor::new(shared_secret));
+        self.decrypted = 0;
         self.commit();
     }
 

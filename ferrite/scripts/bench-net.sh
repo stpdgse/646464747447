@@ -67,13 +67,13 @@ run_suite() { # label modes...
 
 for backend in tokio uring; do
   swarm_pin=("${pin_swarm[@]}")
-  "${pin_srv[@]}" "$server" --addr "127.0.0.1:$port" --backend "$backend" --threads 2 --max-players 1000000 >/dev/null 2>&1 &
+  "${pin_srv[@]}" "$server" --addr "127.0.0.1:$port" --backend "$backend" --threads 2 --max-players 1000000 --online-mode false >/dev/null 2>&1 &
   pid=$!; wait_ready
   run_suite "ferrite/$backend, churn (2 server threads on 2 cores)" status:64 status:256 join:64
 done
 for backend in tokio uring; do
   swarm_pin=("${pin_swarm3[@]}")
-  "${pin_srv1[@]}" "$server" --addr "127.0.0.1:$port" --backend "$backend" --threads 1 --max-players 1000000 >/dev/null 2>&1 &
+  "${pin_srv1[@]}" "$server" --addr "127.0.0.1:$port" --backend "$backend" --threads 1 --max-players 1000000 --online-mode false >/dev/null 2>&1 &
   pid=$!; wait_ready
   run_suite "ferrite/$backend, steady (1 server thread on 1 core)" ping:64 ping:256 ping:1024
 done

@@ -11,9 +11,12 @@
 //! Because the policy is shared, a behavioural difference between backends is a bug, and the
 //! end-to-end tests run the same scenarios against both.
 
+pub mod auth;
 mod lobby;
 pub mod tokio_backend;
 #[cfg(all(feature = "uring", target_os = "linux"))]
 pub mod uring_backend;
 
-pub use lobby::{ConnState, Flow, Lobby, LobbyConfig, Stats, StatsSnapshot, is_valid_player_name};
+pub use lobby::{
+    ConnState, Flow, Lobby, LobbyConfig, OnlineConfig, Stats, StatsSnapshot, is_valid_player_name,
+};

@@ -46,7 +46,7 @@ pub async fn serve(
 /// Runs one connection to completion.
 pub async fn handle_connection(mut stream: TcpStream, lobby: Arc<Lobby>) {
     let _ = stream.set_nodelay(true);
-    let mut conn = lobby.connect();
+    let mut conn = lobby.connect(stream.peer_addr().ok().map(|a| a.ip()));
     match run(&mut stream, &lobby, &mut conn).await {
         Ok(()) => {}
         Err(e) if is_peer_gone(&e) => {}
@@ -72,11 +72,21 @@ async fn run(stream: &mut TcpStream, lobby: &Lobby, conn: &mut ConnState) -> io:
         }
         conn.session.commit();
 
-        let flow = lobby.drive(conn);
-        flush(stream, conn).await?;
-        match flow {
-            Ok(Flow::Continue) => {}
-            Ok(Flow::Close) | Err(_) => return linger(stream).await,
+        let mut flow = lobby.drive(conn);
+        loop {
+            flush(stream, conn).await?;
+            match flow {
+                Ok(Flow::Continue) => break,
+                Ok(Flow::Close) | Err(_) => return linger(stream).await,
+                Ok(Flow::Authenticate(request)) => {
+                    // The authenticator answers on a channel, so the runtime it uses is irrelevant.
+                    let answer = timeout(lobby.auth_timeout(), lobby.start_authentication(request))
+                        .await
+                        .ok()
+                        .and_then(Result::ok);
+                    flow = lobby.finish_authentication(conn, answer);
+                }
+            }
         }
     }
 }

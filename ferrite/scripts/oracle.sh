@@ -6,7 +6,7 @@
 #
 # Running the vanilla server requires accepting the Minecraft EULA (https://aka.ms/MinecraftEULA).
 # This script never does that for you: it writes `eula=true` only if you set the variable above.
-# The server runs in a temporary directory, bound to 127.0.0.1, in offline mode, and is stopped
+# Two servers run in a temporary directory, bound to 127.0.0.1 (one offline, one online-mode), and are stopped
 # when the script exits. Nothing from the jar is stored in the repository.
 set -euo pipefail
 
@@ -21,19 +21,24 @@ if [[ "${FERRITE_ACCEPT_MOJANG_EULA:-}" != "true" ]]; then
 fi
 
 work="$(mktemp -d)"
-server_pid=""
+pids=()
 cleanup() {
-  [[ -n "$server_pid" ]] && kill "$server_pid" 2>/dev/null || true
+  for p in "${pids[@]:-}"; do [[ -n "$p" ]] && kill "$p" 2>/dev/null || true; done
   rm -rf "$work"
 }
 trap cleanup EXIT
 
-cp "$jar" "$work/server.jar"
-printf 'eula=true\n' > "$work/eula.txt"
-cat > "$work/server.properties" <<PROPS
-online-mode=false
+# start_server <name> <port> <online-mode> [extra properties...]
+start_server() {
+  local name="$1" sport="$2" online="$3"; shift 3
+  local dir="$work/$name"
+  mkdir -p "$dir"
+  cp "$jar" "$dir/server.jar"
+  printf 'eula=true\n' > "$dir/eula.txt"
+  cat > "$dir/server.properties" <<PROPS
+online-mode=$online
 server-ip=127.0.0.1
-server-port=$port
+server-port=$sport
 network-compression-threshold=256
 level-type=minecraft\:flat
 generate-structures=false
@@ -44,21 +49,32 @@ max-players=4
 motd=ferrite oracle
 white-list=false
 enforce-whitelist=false
-enable-rcon=false
-enable-query=false
 sync-chunk-writes=false
 PROPS
+  for extra in "$@"; do echo "$extra" >> "$dir/server.properties"; done
+  (cd "$dir" && exec "$java" -Xmx1G -jar server.jar --nogui) > "$dir/server.log" 2>&1 &
+  pids+=("$!")
+}
 
-(cd "$work" && exec "$java" -Xmx1G -jar server.jar --nogui) > "$work/server.log" 2>&1 &
-server_pid=$!
+wait_ready() { # name
+  for _ in $(seq 1 120); do
+    grep -q 'Done (' "$work/$1/server.log" 2>/dev/null && return 0
+    sleep 1
+  done
+  cat "$work/$1/server.log" >&2; echo "server $1 did not start in time" >&2; exit 1
+}
 
-for _ in $(seq 1 90); do
-  grep -q 'Done (' "$work/server.log" 2>/dev/null && break
-  kill -0 "$server_pid" 2>/dev/null || { cat "$work/server.log" >&2; echo "server exited early" >&2; exit 1; }
-  sleep 1
-done
-grep -q 'Done (' "$work/server.log" || { echo "server did not start in time" >&2; exit 1; }
+# Offline server for the protocol tests; online server for the key-exchange test.
+start_server offline "$port" false enable-rcon=true rcon.port=$((port + 2)) rcon.password=ferrite-oracle \
+  enable-query=true query.port=$((port + 3))
+start_server online $((port + 1)) true
+wait_ready offline
+wait_ready online
 
 cd "$(dirname "$0")/.."
-FERRITE_ORACLE="127.0.0.1:$port" \
-  cargo test -p ferrite-protocol --test oracle -- --ignored --test-threads=1 "${@:3}"
+export FERRITE_ORACLE="127.0.0.1:$port"
+export FERRITE_ORACLE_ONLINE="127.0.0.1:$((port + 1))"
+export FERRITE_ORACLE_RCON="127.0.0.1:$((port + 2))"
+export FERRITE_ORACLE_QUERY="127.0.0.1:$((port + 3))"
+cargo test -p ferrite-protocol --test oracle -- --ignored --test-threads=1 "${@:3}"
+cargo test -p ferrite-remote --test vanilla -- --ignored --test-threads=1 "${@:3}"

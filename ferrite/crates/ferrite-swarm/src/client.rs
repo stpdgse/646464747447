@@ -4,16 +4,20 @@ use std::time::{Duration, Instant};
 
 use bytes::BytesMut;
 use ferrite_data::{Direction, PROTOCOL_VERSION, State, packet_name};
+use ferrite_protocol::cipher::Encryptor;
 use ferrite_protocol::codec::VarInt;
+use ferrite_protocol::crypto::{encrypt_with_public_key, server_hash};
 use ferrite_protocol::packets::configuration::{
     AcknowledgeFinishConfiguration, ClientInformation, ClientboundConfiguration, Pong,
     ServerboundKeepAlive, ServerboundSelectKnownPacks,
 };
 use ferrite_protocol::packets::handshake::Intention;
-use ferrite_protocol::packets::login::{ClientboundLogin, LoginAcknowledged, ServerboundHello};
+use ferrite_protocol::packets::login::{
+    ClientboundLogin, Key, LoginAcknowledged, ServerboundHello,
+};
 use ferrite_protocol::packets::status::{ClientboundStatus, PingRequest, StatusRequest};
 use ferrite_protocol::session::core_pack;
-use ferrite_protocol::types::{LenVec, Str};
+use ferrite_protocol::types::{ByteVec, LenVec, Str};
 use ferrite_protocol::{Compression, Frame, FrameDecoder, FrameEncoder, Packet, ProtocolError};
 use thiserror::Error;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -46,6 +50,7 @@ pub struct Conn {
     stream: TcpStream,
     dec: FrameDecoder,
     enc: FrameEncoder,
+    cipher: Option<Encryptor>,
     scratch: Vec<u8>,
 }
 
@@ -64,6 +69,7 @@ impl Conn {
             // A client must accept anything a server may legitimately send.
             dec: FrameDecoder::new().with_limits(1 << 26, 1 << 26),
             enc: FrameEncoder::new(),
+            cipher: None,
             scratch: vec![0; 16 * 1024],
         })
     }
@@ -73,6 +79,9 @@ impl Conn {
         packet.encode(&mut body)?;
         let mut out = BytesMut::with_capacity(body.len() + 8);
         self.enc.encode(P::ID, &body, &mut out)?;
+        if let Some(cipher) = &mut self.cipher {
+            cipher.apply(&mut out);
+        }
         self.stream.write_all(&out).await?;
         Ok(())
     }
@@ -117,6 +126,11 @@ impl Conn {
     pub async fn login(&mut self, name: &str) -> Result<()> {
         self.handshake(2).await?;
         self.send(&ServerboundHello { name: Str::new(name), uuid: Uuid::nil() }).await?;
+        self.finish_login().await
+    }
+
+    /// Reads login packets up to `login_finished`, enabling compression when asked to.
+    async fn finish_login(&mut self) -> Result<()> {
         loop {
             let frame = self.recv().await?;
             match ClientboundLogin::decode(frame.id, &frame.body)? {
@@ -130,6 +144,55 @@ impl Conn {
                 other => return Err(SwarmError::Unexpected(format!("login: {other:?}"))),
             }
         }
+    }
+}
+
+impl Conn {
+    /// Like [`login`](Self::login) for an online-mode server: answers the encryption request and
+    /// switches to AES-CFB8.
+    ///
+    /// `register_hash` receives the server hash, which a real client would send to Mojang's
+    /// `join` endpoint before the server asks `hasJoined`. It runs *before* the key packet is
+    /// sent, because the server verifies as soon as it has it.
+    pub async fn login_online(
+        &mut self,
+        name: &str,
+        register_hash: impl FnOnce(&str),
+    ) -> Result<()> {
+        self.handshake(2).await?;
+        self.send(&ServerboundHello { name: Str::new(name), uuid: Uuid::nil() }).await?;
+
+        let frame = self.recv().await?;
+        let hello = match ClientboundLogin::decode(frame.id, &frame.body)? {
+            ClientboundLogin::Hello(h) => h,
+            ClientboundLogin::LoginDisconnect(d) => {
+                return Err(SwarmError::Unexpected(format!("login refused: {}", d.reason.0)));
+            }
+            other => return Err(SwarmError::Unexpected(format!("expected hello: {other:?}"))),
+        };
+
+        let mut secret = [0u8; 16];
+        getrandom::fill(&mut secret).map_err(|e| SwarmError::Unexpected(e.to_string()))?;
+        let hash = server_hash(&hello.server_id.0, &secret, &hello.public_key.0);
+        register_hash(&hash);
+
+        let crypto =
+            |e: ferrite_protocol::crypto::CryptoError| SwarmError::Unexpected(e.to_string());
+        self.send(&Key {
+            shared_secret: ByteVec(
+                encrypt_with_public_key(&hello.public_key.0, &secret).map_err(crypto)?,
+            ),
+            verify_token: ByteVec(
+                encrypt_with_public_key(&hello.public_key.0, &hello.verify_token.0)
+                    .map_err(crypto)?,
+            ),
+        })
+        .await?;
+        // From here on both directions are encrypted.
+        self.dec.enable_encryption(&secret);
+        self.cipher = Some(Encryptor::new(&secret));
+
+        self.finish_login().await
     }
 }
 
@@ -202,6 +265,23 @@ pub async fn join_once(addr: SocketAddr, name: &str) -> Result<JoinOutcome> {
     let start = Instant::now();
     let mut conn = Conn::connect(addr).await?;
     conn.login(name).await?;
+    configure_and_enter(conn, start).await
+}
+
+/// [`join_once`] for an online-mode server. See [`Conn::login_online`] for `register_hash`.
+pub async fn join_online_once(
+    addr: SocketAddr,
+    name: &str,
+    register_hash: impl FnOnce(&str),
+) -> Result<JoinOutcome> {
+    let start = Instant::now();
+    let mut conn = Conn::connect(addr).await?;
+    conn.login_online(name, register_hash).await?;
+    configure_and_enter(conn, start).await
+}
+
+/// Everything after `login_finished`: acknowledge, configure, and read the first play packet.
+async fn configure_and_enter(mut conn: Conn, start: Instant) -> Result<JoinOutcome> {
     conn.send(&LoginAcknowledged {}).await?;
     conn.send(&ClientInformation {
         locale: Str::new("en_US"),

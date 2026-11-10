@@ -21,7 +21,7 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | Networking | `tokio` and `io_uring` backends over one shared policy layer. **`tokio` is the default**: on loopback the benchmarks do not justify `io_uring` (see [Networking](#networking)) |
 | Storage | Custom on-disk format (no Anvil), with seed-exact vanilla world generation |
 | Game data | Generated from the official server's data reports, never hand-typed |
-| Auth | Online mode (RSA + AES-CFB8 + session server) and offline mode; signed chat |
+| Auth | Online mode (RSA + AES-CFB8 + Mojang session server, **on by default**) and offline mode; Query and RCON. Signed chat arrives with the play state (see [Authentication](#authentication)) |
 | Platforms | Linux x86_64 and Windows |
 | Toolchain | Pinned nightly, `unsafe` allowed where measured, mimalloc, per-tick arenas, LTO + PGO |
 | Legal | MIT OR Apache-2.0, clean-room. No Mojang code or jar is committed; only ids, names and state layouts derived from the data reports. |
@@ -36,7 +36,8 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | `ferrite-protocol` | VarInt/VarLong, zero-copy codec, framing, zlib (libdeflate), AES-128-CFB8, packet definitions for handshake/status/login/configuration, and the sans-IO `ServerSession` state machine |
 | `ferrite-net` | `Lobby` (every connection decision, backend-independent) plus a multi-thread `tokio` backend and a thread-per-core `io_uring` backend (`monoio`, `SO_REUSEPORT`, Linux) |
 | `ferrite-swarm` | Bot load tester: status, join and steady-state ping modes with latency percentiles. Its bots are checked against the vanilla server |
-| `ferrite-server` | The executable (mimalloc, clap flags, both backends) |
+| `ferrite-remote` | Query (UDP) and RCON (TCP) servers plus clients, verified against vanilla |
+| `ferrite-server` | The executable (mimalloc, clap flags, both backends, online mode, Query, RCON) |
 
 ### Regenerating the tables
 
@@ -152,12 +153,79 @@ libdeflate compressor for every connection even though status pings never compre
 50 ns), and the load tester itself ran out of ephemeral ports until its sockets were closed with a
 reset instead of lingering in TIME_WAIT.
 
+## Authentication
+
+Online mode is **on by default** (`--online-mode false` disables it, with a warning). The flow is
+vanilla's: the server sends a 1024-bit RSA public key (X.509 DER) and a 4-byte verify token; the
+client answers with a random 16-byte secret and the token, both PKCS#1 v1.5 encrypted; both sides
+switch to AES-128-CFB8 keyed (and IV'd) by the secret and compute Minecraft's non-standard signed
+SHA-1 digest of `server id + secret + public key`; the server asks Mojang's session server whether
+that hash was registered by the player.
+
+What is worth knowing:
+
+* **RSA is constant-time.** The server decrypts attacker-supplied ciphertext, which is exactly
+  the "Marvin" timing attack (RUSTSEC-2023-0071). `rsa` is pinned to 0.10, which fixes it with
+  *implicit rejection*: invalid padding yields a pseudo-random plaintext rather than an error.
+  Our session therefore fails closed on length and a constant-time token comparison. CI runs
+  `cargo audit` so a vulnerable version cannot come back.
+* **Slots are taken after authentication**, not before, so connections stuck mid-login cannot
+  keep a server full.
+* **Mojang being down is not the player's fault.** An unreachable or erroring session server
+  answers `authservers_down`; only an explicit "not verified" answers `unverified_username`. The
+  response is parsed as untrusted JSON with protocol-sized limits (fuzzed).
+* **Backpressure.** Verification runs on a worker pool behind a bounded queue; a login storm
+  during an outage is refused immediately instead of consuming memory and sockets.
+* **A pipelining bug in PR 1 was found and fixed here:** a client may send its first encrypted
+  packets in the same TCP segment as the plaintext key packet, and the decoder used to treat
+  those already-buffered bytes as plaintext.
+* **`monoio` needs its `sync` feature** because authenticator threads complete logins by waking
+  tasks that belong to another thread; without it monoio panics. The tests caught this.
+
+Verified against vanilla in online mode: vanilla's encryption request parses, vanilla accepts our
+RSA-encrypted secret and token, and its reply arrives encrypted with the secret *we* chose, which
+proves the DER, RSA and CFB8 handling agree with the vanilla implementation. OpenSSL is used as a
+second independent oracle for the key format and PKCS#1 v1.5 in both directions. The Mojang HTTP
+calls themselves are tested against an in-process mock of the session server, because no real
+Mojang account is available in CI.
+
+**Signed chat is not implemented yet, on purpose.** It lives in the play state (chat session
+packets, message chains) and cannot be verified without play-state chat packets and a real client
+that signs messages. It will land with those, rather than as code nothing can test.
+
+## Query and RCON
+
+`ferrite-remote` implements both, enabled with `--query-port` and `--rcon-port`
+(`FERRITE_RCON_PASSWORD`, an empty password is refused, and RCON binds to `127.0.0.1` unless told
+otherwise because it is unencrypted).
+
+Testing them against the real vanilla server found that the documentation is wrong or incomplete
+in several places, so the code follows vanilla's measured behaviour:
+
+| Observed in vanilla 26.3 | Documentation said |
+|---|---|
+| Query echoes the session id **verbatim** (and corrupts ids with high bits set) | only the low nibbles are used |
+| A stat request of exactly 8 payload bytes is a full stat; **any other length of 4 or more is a basic stat** | 4 bytes is basic, 8 is full |
+| RCON **drops the connection if two packets arrive in one read**, so a client must send its end-of-output marker only after the first reply | the marker can be pipelined |
+| A failed RCON login leaves the connection open for a retry | not stated |
+| An unknown command answers `Unknown or incomplete command. See below for error<cmd><--[HERE]` with no newline | not stated |
+
+One deliberate difference: a repeated Query handshake returns the same token for the rest of the
+30 second period, where vanilla issues a new one and invalidates the old. That stops anyone who
+can spoof a source address from knocking out its legitimate token; clients cannot tell. Query
+only ever answers requests carrying a valid token, plus a rate limit, so it cannot be used as an
+amplifier (the handshake is at most 16 bytes in reply to 7). RCON additionally compares the
+password in constant time, slows down and limits wrong guesses, and rejects oversized or
+malformed packets from the header alone.
+
 ## Quality gates
 
-* 116 tests (plus 2 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
+* 186 tests (plus 6 oracle tests that need a server) including property tests, with the cipher cross-checked against the RustCrypto
   `cfb8` crate and checked directly against the NIST SP 800-38A vector, and compression cross-checked against `flate2`.
-* Five `cargo-fuzz` targets: frame decoder, codec readers, frame round-trip, whole-session driving
-  (structure-aware, reaches login and configuration), and the NBT reader.
+* Eight `cargo-fuzz` targets: frame decoder, codec readers, frame round-trip, whole-session driving
+  (structure-aware, reaches login and configuration), the NBT reader, the Query handler, the Query
+  reply parsers, and the Mojang profile parser.
+* `cargo audit` in CI: no known vulnerabilities (two transitive "unmaintained" notices remain).
 * Miri (strict provenance, symbolic alignment) on the `unsafe` code.
 * `clippy -D warnings`, rustfmt, CI on Linux and Windows.
 
@@ -175,7 +243,8 @@ One pull request per subsystem.
 2. **Packets and sessions**: NBT, packet definitions, handshake / status / login / configuration
    state machine, vanilla oracle tests.
 3. **Networking**: `tokio` and `io_uring` backends, connection policy, bot-swarm load tester, benchmarks.
-4. Online-mode authentication, signed chat, Query and RCON.
+4. **Online-mode authentication, Query and RCON** (signed chat moves to the play-state work, see
+   [Authentication](#authentication)).
 5. Custom ECS and region scheduler (deterministic parallel ticking).
 6. World storage format and chunk pipeline.
 7. Block updates, physics, redstone (bit-exact).

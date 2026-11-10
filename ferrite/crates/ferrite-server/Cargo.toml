@@ -15,11 +15,17 @@ uring = ["ferrite-net/uring"]
 clap.workspace = true
 ferrite-data.workspace = true
 ferrite-net = { path = "../ferrite-net", default-features = false }
+ferrite-remote = { path = "../ferrite-remote" }
 ferrite-protocol = { path = "../ferrite-protocol" }
 mimalloc = "0.1"
 tokio = { version = "1", features = ["rt-multi-thread", "net", "signal", "time", "macros", "sync"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+[dev-dependencies]
+ferrite-remote = { path = "../ferrite-remote" }
+ferrite-swarm = { path = "../ferrite-swarm" }
+tokio = { version = "1", features = ["full"] }
 
 [lints]
 workspace = true
