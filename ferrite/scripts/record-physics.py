@@ -209,7 +209,8 @@ class Recorder:
             if a[0] == "set":
                 _, x, y, z, state = a
                 reply = self.r.cmd(f"setblock {x} {y} {z} {state}")
-                if "Changed" not in reply:
+                # "Could not set the block" means it already was that state: a no-op to replay.
+                if "Changed" not in reply and "Could not set" not in reply:
                     sys.exit(f"{name}: setblock failed: {reply}")
                 lines.append(f"set {x} {y} {z} {state}")
             else:
@@ -366,7 +367,126 @@ def redstone_scenarios():
                                                        "setblock 10 100 8 redstone_block"],
         [("set", 9, 100, 7, "repeater[facing=north,delay=1,powered=true]"), ("set", 10, 100, 8, "air")] + steps(*[1] * 4)
         + [("set", 9, 100, 7, "air")] + steps(*[1] * 6))
+    W = "redstone_wire"
+    line = lambda x0, x1, y=100, z=8: [("set", x, y, z, W) for x in range(x0, x1 + 1)]
+    s["rs_wire_line_decays"] = (ARENA, line(2, 12) + [("set", 1, 100, 8, "redstone_block")] + steps(1)
+                                + [("set", 1, 100, 8, "air")] + steps(1))
+    s["rs_wire_placed_in_other_order"] = (ARENA, [("set", 1, 100, 8, "redstone_block")]
+                                          + [("set", x, 100, 8, W) for x in (6, 4, 5, 2, 3, 9, 8, 7)] + steps(1))
+    s["rs_wire_long_line"] = (ARENA, [("set", 1, 100, 8, "redstone_block")] + line(2, 14) + steps(1)
+                              + [("set", 1, 100, 8, "air")] + steps(1))
+    s["rs_wire_corner_and_t_and_cross"] = (ARENA, [("set", 8, 100, 8, "redstone_block")]
+        + [("set", x, 100, 8, W) for x in (9, 10)] + [("set", 10, 100, z, W) for z in (9, 10, 7, 6)]
+        + [("set", 11, 100, 8, W), ("set", 10, 100, 8, "air"), ("set", 10, 100, 8, W)] + steps(1))
+    s["rs_wire_dot_and_neighbours"] = (ARENA, [("set", 8, 100, 8, W), ("set", 8, 100, 9, W), ("set", 9, 100, 8, W),
+                                               ("set", 8, 100, 9, "air"), ("set", 9, 100, 8, "air")] + steps(1))
+    s["rs_wire_climbs_stone"] = (ARENA + ["setblock 5 100 8 stone", "setblock 6 101 8 stone", "setblock 8 100 8 stone"],
+        [("set", 4, 100, 8, "redstone_block")] + [("set", 4 + i, 100 + i, 8, W) for i in (1, 2)]
+        + [("set", 7, 102, 8, W), ("set", 3, 100, 8, W)] + steps(1))
+    s["rs_wire_climb_and_descend"] = (ARENA + ["setblock 8 100 8 stone", "setblock 9 100 8 stone", "setblock 10 100 8 stone"],
+        [("set", 6, 100, 8, "redstone_block"), ("set", 7, 100, 8, W), ("set", 8, 101, 8, W), ("set", 9, 101, 8, W),
+         ("set", 10, 101, 8, W), ("set", 11, 100, 8, W), ("set", 12, 100, 8, W)] + steps(1)
+        + [("set", 6, 100, 8, "air")] + steps(1))
+    s["rs_wire_blocked_by_a_conductor_above"] = (ARENA + ["setblock 8 100 8 stone", "setblock 7 101 8 stone"],
+        [("set", 6, 100, 8, "redstone_block"), ("set", 7, 100, 8, W), ("set", 8, 101, 8, W), ("set", 9, 100, 8, W)] + steps(1))
+    s["rs_wire_to_repeater_to_wire"] = (ARENA + ["setblock 9 100 8 repeater[facing=west,delay=1]"],
+        [("set", 7, 100, 8, "redstone_block"), ("set", 8, 100, 8, W), ("set", 10, 100, 8, W), ("set", 11, 100, 8, W)]
+        + steps(1, 1, 1, 1) + [("set", 7, 100, 8, "air")] + steps(1, 1, 1, 1))
+    s["rs_wire_only_connects_to_repeaters_ends"] = (ARENA + ["setblock 9 100 8 repeater[facing=west,delay=1]", "setblock 9 100 7 repeater[facing=north]"],
+        [("set", 8, 100, 8, W), ("set", 9, 100, 9, W), ("set", 10, 100, 8, W), ("set", 8, 100, 7, W)] + steps(1))
+    s["rs_wire_feeds_a_lamp"] = (ARENA + ["setblock 8 100 8 redstone_lamp"],
+        [("set", 4, 100, 8, "redstone_block")] + line(5, 7) + steps(1, 1, 1, 1, 1, 1)
+        + [("set", 4, 100, 8, "air")] + steps(1, 1, 1, 1, 1, 1))
+    s["rs_wire_powers_a_block_it_points_at"] = (ARENA + ["setblock 8 100 8 stone", "setblock 9 100 8 redstone_lamp", "setblock 8 101 8 redstone_lamp"],
+        [("set", 5, 100, 8, "redstone_block")] + line(6, 7) + steps(1, 1, 1))
+    s["rs_wire_strong_power_through_a_block"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 99 8 redstone_torch[lit=true]"],
+        [("set", 9, 100, 8, W), ("set", 8, 101, 8, W)] + steps(1, 1, 1))
+    s["rs_wire_two_sources"] = (ARENA, [("set", 2, 100, 8, "redstone_block"), ("set", 14, 100, 8, "redstone_block")] + line(3, 13)
+                                + [("set", 2, 100, 8, "air")] + steps(1) + [("set", 14, 100, 8, "air")] + steps(1))
+    s["rs_wire_loop"] = (ARENA, [("set", 8, 100, 8, "redstone_block")]
+        + [("set", x, 100, z, W) for (x, z) in [(9, 8), (10, 8), (10, 9), (10, 10), (9, 10), (8, 10), (8, 9), (7, 9), (7, 8)]] + steps(1)
+        + [("set", 8, 100, 8, "air")] + steps(1))
+    s["rs_wire_broken_by_support_removal"] = (ARENA + ["setblock 8 100 8 stone"], [("set", 8, 101, 8, W), ("set", 9, 101, 8, "redstone_block"),
+        ("set", 8, 100, 8, "air")] + steps(1))
+    s["rs_wire_powers_a_repeater_input"] = (ARENA + ["setblock 8 100 8 repeater[facing=east,delay=2]", "setblock 9 100 8 redstone_lamp"],
+        [("set", 5, 100, 8, "redstone_block"), ("set", 6, 100, 8, W), ("set", 7, 100, 8, W)] + steps(*[1] * 6)
+        + [("set", 5, 100, 8, "air")] + steps(*[1] * 6))
+    s["rs_torch_pulse_into_wire"] = (ARENA + ["setblock 8 100 8 stone", "setblock 8 101 8 redstone_torch[lit=true]",
+                                              "setblock 9 101 8 redstone_wire", "setblock 10 101 8 redstone_lamp", "setblock 9 100 8 stone"],
+        [("set", 8, 100, 8, "redstone_block")] + steps(1, 1, 1, 1, 1) + [("set", 8, 100, 8, "stone")] + steps(1, 1, 1, 1, 1))
     return s
+
+
+def random_redstone(count, seed):
+    parts = ["stone", "stone", "redstone_wire", "redstone_wire", "redstone_wire", "redstone_wire", "redstone_lamp",
+             "repeater[facing=north,delay=1]", "repeater[facing=east,delay=2]", "repeater[facing=south,delay=1]",
+             "repeater[facing=west,delay=3]", "redstone_torch[lit=true]", "redstone_wall_torch[facing=east,lit=true]",
+             "redstone_wall_torch[facing=north,lit=true]", "glass", "lever[face=floor,facing=north,powered=false]"]
+    out = {}
+    for n in range(count):
+        rng = random.Random(seed * 7919 + n)
+        setup = list(ARENA)
+        actions = []
+        cells = [(rng.randint(3, 12), rng.randint(100, 101), rng.randint(3, 12)) for _ in range(rng.randint(8, 30))]
+        for x, y, z in cells:
+            if y == 101 and not any(c == (x, 100, z) for c in cells):
+                continue
+            actions.append(("set", x, y, z, rng.choice(parts)))
+        for _ in range(rng.randint(1, 3)):
+            x, y, z = rng.randint(2, 13), 100, rng.randint(2, 13)
+            actions.append(("set", x, y, z, "redstone_block"))
+            actions += steps(*[rng.choice([1, 1, 2, 3]) for _ in range(rng.randint(1, 4))])
+        if rng.random() < 0.6:
+            actions.append(("set", *[next(a for a in actions if a[0] == "set" and a[4] == "redstone_block")[i] for i in (1, 2, 3)], "air"))
+            actions += steps(*[rng.choice([1, 2, 4]) for _ in range(4)])
+        actions += steps(20)
+        out[f"rs_random_{n:03}"] = (setup, actions)
+    return out
+
+
+def random_circuits(count, seed):
+    """A random walk away from a source: wire and repeaters oriented along the walk, with the
+    occasional lamp tap, stone step and torch inverter. The source is placed last and toggled."""
+    DIRS = {"north": (0, -1), "south": (0, 1), "west": (-1, 0), "east": (1, 0)}
+    OPP = {"north": "south", "south": "north", "west": "east", "east": "west"}
+    out = {}
+    for n in range(count):
+        rng = random.Random(seed * 104729 + n)
+        x, z = rng.randint(4, 11), rng.randint(4, 11)
+        sx, sz = x, z
+        actions, taken = [], {(x, z)}
+        d = rng.choice(list(DIRS))
+        for _ in range(rng.randint(6, 22)):
+            if rng.random() < 0.3:
+                d = rng.choice([k for k in DIRS if k != OPP[d]])
+            nx, nz = x + DIRS[d][0], z + DIRS[d][1]
+            if not (1 <= nx <= 14 and 1 <= nz <= 14) or (nx, nz) in taken:
+                break
+            x, z = nx, nz
+            taken.add((x, z))
+            roll = rng.random()
+            if roll < 0.6:
+                actions.append(("set", x, 100, z, "redstone_wire"))
+            elif roll < 0.85:  # input comes from the side we walked in from
+                actions.append(("set", x, 100, z, f"repeater[facing={OPP[d]},delay={rng.randint(1, 4)}]"))
+            elif roll < 0.92:
+                actions.append(("set", x, 100, z, "redstone_lamp"))
+                break
+            else:
+                actions.append(("set", x, 100, z, "stone"))
+                actions.append(("set", x, 101, z, rng.choice(["redstone_torch[lit=true]", "redstone_wire"])))
+            if rng.random() < 0.15:  # a lamp tap beside the path
+                tx, tz = x + DIRS[d][1], z + DIRS[d][0]
+                if 1 <= tx <= 14 and 1 <= tz <= 14 and (tx, tz) not in taken:
+                    taken.add((tx, tz))
+                    actions.append(("set", tx, 100, tz, "redstone_lamp"))
+        actions.append(("set", sx, 100, sz, "redstone_block"))
+        actions += steps(*[rng.choice([1, 1, 2, 3]) for _ in range(6)])
+        actions.append(("set", sx, 100, sz, "air"))
+        actions += steps(*[rng.choice([1, 1, 2, 3]) for _ in range(6)])
+        actions += steps(30)
+        out[f"rs_circuit_{n:03}"] = ([*ARENA], actions)
+    return out
 
 
 def random_scenarios(count, seed):
@@ -408,6 +528,8 @@ def main():
     ap.add_argument("--password", default=os.environ.get("FERRITE_ORACLE_RCON_PASSWORD", "ferrite-oracle"))
     ap.add_argument("--only", default="")
     ap.add_argument("--random", type=int, default=40)
+    ap.add_argument("--random-redstone", type=int, default=30)
+    ap.add_argument("--random-circuits", type=int, default=30)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "..", "crates", "ferrite-blocks", "tests", "fixtures"))
     args = ap.parse_args()
@@ -423,6 +545,8 @@ def main():
     rec = Recorder(r, args.world)
     todo = scenarios()
     todo.update(redstone_scenarios())
+    todo.update(random_redstone(args.random_redstone, args.seed))
+    todo.update(random_circuits(args.random_circuits, args.seed))
     todo.update(random_scenarios(args.random, args.seed))
     for name, (setup, actions) in todo.items():
         if name.startswith(args.only):

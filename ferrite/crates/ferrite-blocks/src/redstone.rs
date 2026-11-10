@@ -57,9 +57,9 @@ fn redstone_of(state: u16) -> Option<Redstone> {
 
 // ---- power queries -----------------------------------------------------------------------
 
-/// What the block `state` emits toward a neighbour that is `dir` away from the neighbour's
-/// point of view (the neighbour asks the block in direction `dir`).
-fn state_signal(state: u16, dir: Direction) -> u8 {
+/// What the block `state` at `pos` emits toward a neighbour that is `dir` away from the
+/// neighbour's point of view (the neighbour asks the block in direction `dir`).
+fn state_signal<A: BlockAccess>(world: &World<A>, pos: BlockPos, state: u16, dir: Direction) -> u8 {
     match redstone_of(state) {
         Some(Redstone::PowerBlock) => 15,
         Some(Redstone::Lever | Redstone::Button) => {
@@ -83,24 +83,46 @@ fn state_signal(state: u16, dir: Direction) -> u8 {
                 0
             }
         }
-        Some(Redstone::Repeater) => state_direct_signal(state, dir),
+        Some(Redstone::Repeater) => state_direct_signal(world, pos, state, dir),
+        Some(Redstone::Wire) => {
+            if !world.wires_give_power || dir == Direction::Down {
+                return 0;
+            }
+            let power = wire_power(state);
+            if power == 0 {
+                return 0;
+            }
+            if dir != Direction::Up {
+                let conn = wire_connection_state(world, pos, state);
+                if side_of(conn, dir.opposite()) == Arm::None {
+                    return 0;
+                }
+            }
+            power
+        }
         _ => 0,
     }
 }
 
-fn state_direct_signal(state: u16, dir: Direction) -> u8 {
+fn state_direct_signal<A: BlockAccess>(
+    world: &World<A>,
+    pos: BlockPos,
+    state: u16,
+    dir: Direction,
+) -> u8 {
     match redstone_of(state) {
         Some(Redstone::Lever | Redstone::Button) => {
             if is_true(state, "powered") && attached_direction(state) == dir { 15 } else { 0 }
         }
         Some(Redstone::Torch | Redstone::WallTorch) => {
             if dir == Direction::Down {
-                state_signal(state, dir)
+                state_signal(world, pos, state, dir)
             } else {
                 0
             }
         }
         Some(Redstone::Repeater) if is_true(state, "powered") && facing(state) == dir => 15,
+        Some(Redstone::Wire) if world.wires_give_power => state_signal(world, pos, state, dir),
         _ => 0,
     }
 }
@@ -108,8 +130,9 @@ fn state_direct_signal(state: u16, dir: Direction) -> u8 {
 fn direct_signal_to<A: BlockAccess>(world: &World<A>, pos: BlockPos) -> u8 {
     let mut best = 0;
     for dir in Direction::ALL {
-        if let Some(s) = world.block(pos.offset(dir)) {
-            best = best.max(state_direct_signal(s, dir));
+        let at = pos.offset(dir);
+        if let Some(s) = world.block(at) {
+            best = best.max(state_direct_signal(world, at, s, dir));
         }
     }
     best
@@ -118,12 +141,25 @@ fn direct_signal_to<A: BlockAccess>(world: &World<A>, pos: BlockPos) -> u8 {
 /// `Level.getSignal`: the strongest signal reaching `pos` from the block in direction `dir`.
 pub(crate) fn signal<A: BlockAccess>(world: &World<A>, pos: BlockPos, dir: Direction) -> u8 {
     let Some(state) = world.block(pos) else { return 0 };
-    let s = state_signal(state, dir);
+    let s = state_signal(world, pos, state, dir);
     if facts(state).has(flag::REDSTONE_CONDUCTOR) { s.max(direct_signal_to(world, pos)) } else { s }
 }
 
 pub(crate) fn has_neighbor_signal<A: BlockAccess>(world: &World<A>, pos: BlockPos) -> bool {
     Direction::ALL.into_iter().any(|d| signal(world, pos.offset(d), d) > 0)
+}
+
+/// `Level.getBestNeighborSignal`.
+fn best_neighbor_signal<A: BlockAccess>(world: &World<A>, pos: BlockPos) -> u8 {
+    let mut best = 0;
+    for d in Direction::ALL {
+        let s = signal(world, pos.offset(d), d);
+        if s >= 15 {
+            return 15;
+        }
+        best = best.max(s);
+    }
+    best
 }
 
 // ---- hooks called by the world ------------------------------------------------------------
@@ -133,6 +169,13 @@ pub(crate) fn on_place<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, stat
     match redstone_of(state) {
         Some(Redstone::Torch | Redstone::WallTorch) => notify_all_around(world, pos, state),
         Some(Redstone::Repeater) => update_neighbors_in_front(world, pos, state),
+        Some(Redstone::Wire) if redstone_of(_old) != Some(Redstone::Wire) => {
+            wire_update_power(world, pos, state);
+            for d in [Direction::Up, Direction::Down] {
+                world.update_neighbors_at(pos.offset(d), block_of(state));
+            }
+            update_neighboring_wires(world, pos);
+        }
         _ => {}
     }
 }
@@ -142,6 +185,14 @@ pub(crate) fn on_remove<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, old
     match redstone_of(old) {
         Some(Redstone::Torch | Redstone::WallTorch) => notify_all_around(world, pos, old),
         Some(Redstone::Repeater) => update_neighbors_in_front(world, pos, old),
+        Some(Redstone::Wire) => {
+            let block = block_of(old);
+            for d in Direction::ALL {
+                world.update_neighbors_at(pos.offset(d), block);
+            }
+            wire_update_power(world, pos, old);
+            update_neighboring_wires(world, pos);
+        }
         Some(Redstone::Lever | Redstone::Button) if is_true(old, "powered") => {
             let block = block_of(old);
             world.update_neighbors_at(pos, block);
@@ -180,6 +231,13 @@ pub(crate) fn neighbor_changed<A: BlockAccess>(
                 && !world.will_tick_this_tick(pos, block)
             {
                 world.schedule_block_tick(pos, block, 2, 0);
+            }
+        }
+        Some(Redstone::Wire) => {
+            if world.block(pos.below()).is_some_and(wire_can_survive_on) {
+                wire_update_power(world, pos, state);
+            } else {
+                world.set_block(pos, Kinds::get().air, update::ALL);
             }
         }
         Some(Redstone::Repeater) => {
@@ -270,7 +328,11 @@ fn input_signal<A: BlockAccess>(world: &World<A>, pos: BlockPos, state: u16) -> 
     if s >= 15 {
         return s;
     }
-    s
+    let wire_power_in_front = world
+        .block(front)
+        .filter(|b| redstone_of(*b) == Some(Redstone::Wire))
+        .map_or(0, wire_power);
+    s.max(wire_power_in_front)
 }
 
 fn alternate_signal<A: BlockAccess>(world: &World<A>, pos: BlockPos, state: u16) -> u8 {
@@ -339,4 +401,248 @@ pub(crate) fn repeater_lock_state<A: BlockAccess>(
     state: u16,
 ) -> u16 {
     set_prop(state, "locked", bool_str(repeater_locked(world, pos, state)))
+}
+
+// ---- wire -------------------------------------------------------------------------------
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Arm {
+    None,
+    Flat,
+    Up,
+}
+
+fn wire_power(state: u16) -> u8 {
+    prop(state, "power").and_then(|p| p.parse().ok()).unwrap_or(0)
+}
+
+pub(crate) fn wire_can_survive_on(state: u16) -> bool {
+    facts(state).is_face_sturdy(Direction::Up.index(), DataSupport::Full)
+        || Kinds::get().of_state(state).is_hopper
+}
+
+fn side_name(side: Arm) -> &'static str {
+    match side {
+        Arm::None => "none",
+        Arm::Flat => "side",
+        Arm::Up => "up",
+    }
+}
+
+fn side_of(state: u16, dir: Direction) -> Arm {
+    match prop(state, dir.name()) {
+        Some("side") => Arm::Flat,
+        Some("up") => Arm::Up,
+        _ => Arm::None,
+    }
+}
+
+fn with_side(state: u16, dir: Direction, side: Arm) -> u16 {
+    set_prop(state, dir.name(), side_name(side))
+}
+
+fn is_dot(state: u16) -> bool {
+    Direction::HORIZONTAL.into_iter().all(|d| side_of(state, d) == Arm::None)
+}
+
+fn is_cross(state: u16) -> bool {
+    Direction::HORIZONTAL.into_iter().all(|d| side_of(state, d) != Arm::None)
+}
+
+fn is_wire(state: u16) -> bool {
+    redstone_of(state) == Some(Redstone::Wire)
+}
+
+/// Whether a wire connects to this block (`dir` is the direction from the wire to it, if known).
+fn should_connect_to(state: u16, dir: Option<Direction>) -> bool {
+    match redstone_of(state) {
+        Some(Redstone::Wire) => true,
+        Some(Redstone::Repeater) => {
+            let f = facing(state);
+            Some(f) == dir || Some(f.opposite()) == dir
+        }
+        _ => {
+            let name = ferrite_data::blocks::block_of_state(state).map(|b| b.name);
+            if name == Some("minecraft:observer") {
+                return dir == prop(state, "facing").and_then(Direction::from_name);
+            }
+            facts(state).has(flag::SIGNAL_SOURCE) && dir.is_some()
+        }
+    }
+}
+
+fn conductor<A: BlockAccess>(world: &World<A>, pos: BlockPos) -> bool {
+    world.block(pos).is_some_and(|s| facts(s).has(flag::REDSTONE_CONDUCTOR))
+}
+
+fn connecting_side<A: BlockAccess>(
+    world: &World<A>,
+    pos: BlockPos,
+    dir: Direction,
+    can_go_up: bool,
+) -> Arm {
+    let rel = pos.offset(dir);
+    let rel_state = world.block(rel).unwrap_or(Kinds::get().air);
+    if can_go_up {
+        let supports =
+            Kinds::get().of_state(rel_state).is_trapdoor || wire_can_survive_on(rel_state);
+        if supports && world.block(rel.above()).is_some_and(|s| should_connect_to(s, None)) {
+            return if facts(rel_state).is_face_sturdy(dir.opposite().index(), DataSupport::Full) {
+                Arm::Up
+            } else {
+                Arm::Flat
+            };
+        }
+    }
+    if should_connect_to(rel_state, Some(dir))
+        || (!conductor(world, rel)
+            && world.block(rel.below()).is_some_and(|s| should_connect_to(s, None)))
+    {
+        return Arm::Flat;
+    }
+    Arm::None
+}
+
+fn missing_connections<A: BlockAccess>(world: &World<A>, mut state: u16, pos: BlockPos) -> u16 {
+    let can_go_up = !conductor(world, pos.above());
+    for dir in Direction::HORIZONTAL {
+        if side_of(state, dir) == Arm::None {
+            state = with_side(state, dir, connecting_side(world, pos, dir, can_go_up));
+        }
+    }
+    state
+}
+
+/// The wire state at `pos` with all four arms recomputed from its surroundings.
+fn wire_connection_state<A: BlockAccess>(world: &World<A>, pos: BlockPos, state: u16) -> u16 {
+    let was_dot = is_dot(state);
+    let fresh = set_prop(Kinds::get().wire_default(), "power", &wire_power(state).to_string());
+    let mut state = missing_connections(world, fresh, pos);
+    if was_dot && is_dot(state) {
+        return state;
+    }
+    let n = side_of(state, Direction::North) != Arm::None;
+    let s = side_of(state, Direction::South) != Arm::None;
+    let e = side_of(state, Direction::East) != Arm::None;
+    let w = side_of(state, Direction::West) != Arm::None;
+    let ns_free = !n && !s;
+    let ew_free = !e && !w;
+    if !w && ns_free {
+        state = with_side(state, Direction::West, Arm::Flat);
+    }
+    if !e && ns_free {
+        state = with_side(state, Direction::East, Arm::Flat);
+    }
+    if !n && ew_free {
+        state = with_side(state, Direction::North, Arm::Flat);
+    }
+    if !s && ew_free {
+        state = with_side(state, Direction::South, Arm::Flat);
+    }
+    state
+}
+
+/// `updateShape` for wire.
+pub(crate) fn wire_update_shape<A: BlockAccess>(
+    world: &World<A>,
+    state: u16,
+    dir: Direction,
+    pos: BlockPos,
+) -> u16 {
+    match dir {
+        Direction::Down => state, // support is checked by the generic rule
+        Direction::Up => wire_connection_state(world, pos, state),
+        _ => {
+            let can_go_up = !conductor(world, pos.above());
+            let side = connecting_side(world, pos, dir, can_go_up);
+            if (side != Arm::None) == (side_of(state, dir) != Arm::None) && !is_cross(state) {
+                return with_side(state, dir, side);
+            }
+            wire_connection_state(world, pos, with_side(state, dir, side))
+        }
+    }
+}
+
+fn wire_signal_of(state: Option<u16>) -> u8 {
+    state.filter(|s| is_wire(*s)).map_or(0, wire_power)
+}
+
+fn incoming_wire_signal<A: BlockAccess>(world: &World<A>, pos: BlockPos) -> u8 {
+    let mut best = 0;
+    for dir in Direction::HORIZONTAL {
+        let rel = pos.offset(dir);
+        let rel_state = world.block(rel);
+        best = best.max(wire_signal_of(rel_state));
+        let rel_conductor = conductor(world, rel);
+        if rel_conductor && !conductor(world, pos.above()) {
+            best = best.max(wire_signal_of(world.block(rel.above())));
+        } else if !rel_conductor {
+            best = best.max(wire_signal_of(world.block(rel.below())));
+        }
+    }
+    best.saturating_sub(1)
+}
+
+fn target_strength<A: BlockAccess>(world: &mut World<A>, pos: BlockPos) -> u8 {
+    world.wires_give_power = false;
+    let outside = best_neighbor_signal(world, pos);
+    world.wires_give_power = true;
+    if outside == 15 { outside } else { outside.max(incoming_wire_signal(world, pos)) }
+}
+
+/// Java's `HashSet<BlockPos>` iteration order for up to 12 elements: buckets of a 16-slot table
+/// in ascending order, insertion order within a bucket.
+fn java_hash_set_order(items: &[BlockPos]) -> Vec<BlockPos> {
+    let hash = |p: &BlockPos| -> usize {
+        let h = p.y.wrapping_add(p.z.wrapping_mul(31)).wrapping_mul(31).wrapping_add(p.x) as u32;
+        ((h ^ (h >> 16)) & 15) as usize
+    };
+    let mut keyed: Vec<(usize, usize, BlockPos)> = Vec::new();
+    for (i, p) in items.iter().enumerate() {
+        if !keyed.iter().any(|(_, _, q)| q == p) {
+            keyed.push((hash(p), i, *p));
+        }
+    }
+    keyed.sort_by_key(|(bucket, i, _)| (*bucket, *i));
+    keyed.into_iter().map(|(_, _, p)| p).collect()
+}
+
+fn wire_update_power<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, state: u16) {
+    let target = target_strength(world, pos);
+    if wire_power(state) == target {
+        return;
+    }
+    if world.block(pos) == Some(state) {
+        world.set_block(pos, set_prop(state, "power", &target.to_string()), update::CLIENTS);
+    }
+    let mut set = vec![pos];
+    set.extend(Direction::ALL.map(|d| pos.offset(d)));
+    let wire_block = block_of(Kinds::get().wire_default());
+    for p in java_hash_set_order(&set) {
+        world.update_neighbors_at(p, wire_block);
+    }
+}
+
+fn check_corner_change_at<A: BlockAccess>(world: &mut World<A>, pos: BlockPos) {
+    if world.block(pos).is_some_and(is_wire) {
+        let wire_block = block_of(Kinds::get().wire_default());
+        world.update_neighbors_at(pos, wire_block);
+        for d in Direction::ALL {
+            world.update_neighbors_at(pos.offset(d), wire_block);
+        }
+    }
+}
+
+fn update_neighboring_wires<A: BlockAccess>(world: &mut World<A>, pos: BlockPos) {
+    for d in Direction::HORIZONTAL {
+        check_corner_change_at(world, pos.offset(d));
+    }
+    for d in Direction::HORIZONTAL {
+        let p = pos.offset(d);
+        if conductor(world, p) {
+            check_corner_change_at(world, p.above());
+        } else {
+            check_corner_change_at(world, p.below());
+        }
+    }
 }

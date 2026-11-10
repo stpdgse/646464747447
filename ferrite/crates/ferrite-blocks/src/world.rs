@@ -89,6 +89,7 @@ pub struct World<A: BlockAccess> {
     block_ticks: TickQueue<u16>,
     running_ticks: Vec<(BlockPos, u16)>,
     running_next: usize,
+    pub(crate) wires_give_power: bool,
     pub(crate) toggles: Vec<(BlockPos, i64)>,
     occlusion: OcclusionCache,
     stack: Vec<Update>,
@@ -110,6 +111,7 @@ impl<A: BlockAccess> World<A> {
             block_ticks: TickQueue::new(),
             running_ticks: Vec::new(),
             running_next: 0,
+            wires_give_power: true,
             toggles: Vec::new(),
             occlusion: OcclusionCache::default(),
             stack: Vec::new(),
@@ -217,6 +219,7 @@ impl<A: BlockAccess> World<A> {
         }
         if flags & update::KNOWN_SHAPE == 0 && limit > 0 {
             let f = flags & !(update::NEIGHBORS | update::SUPPRESS_DROPS);
+            self.indirect_shape_updates(pos, old, f, limit - 1);
             for dir in SHAPE_UPDATE_ORDER {
                 self.add_and_run(Update::Shape {
                     dir: dir.opposite(),
@@ -227,18 +230,81 @@ impl<A: BlockAccess> World<A> {
                     limit: limit - 1,
                 });
             }
+            self.indirect_shape_updates(pos, state, f, limit - 1);
         }
         true
     }
 
-    /// What the `/setblock` command does: place the state exactly as given (it is *not* adapted
-    /// to its surroundings), then notify the neighbours.
+    /// Updates that reach blocks *diagonal* to `pos` (wire stairs), for the state `state` that
+    /// was, or now is, at `pos`.
+    fn indirect_shape_updates(&mut self, pos: BlockPos, state: u16, flags: u32, limit: i32) {
+        if Kinds::get().of_state(state).redstone != Some(crate::kinds::Redstone::Wire) {
+            return;
+        }
+        for dir in Direction::HORIZONTAL {
+            let arm = Kinds::get().property(state, dir.name());
+            let beside = pos.offset(dir);
+            let beside_is_wire = self.blocks.block(beside).is_some_and(|b| {
+                Kinds::get().of_state(b).redstone == Some(crate::kinds::Redstone::Wire)
+            });
+            if arm == Some("none") || beside_is_wire {
+                continue;
+            }
+            // The wire below-ahead sees `pos`'s lower neighbour as changed, and likewise above.
+            for (target, back) in [(beside.below(), pos.below()), (beside.above(), pos.above())] {
+                let Some(t) = self.blocks.block(target) else { continue };
+                if Kinds::get().of_state(t).redstone != Some(crate::kinds::Redstone::Wire) {
+                    continue;
+                }
+                let Some(neighbor_state) = self.blocks.block(back) else { continue };
+                self.add_and_run(Update::Shape {
+                    dir: dir.opposite(),
+                    neighbor_state,
+                    pos: target,
+                    neighbor_pos: back,
+                    flags,
+                    limit,
+                });
+            }
+        }
+    }
+
+    /// What the `/setblock` command does with a bare block name: the state adapts to its
+    /// neighbours before it is placed.
     pub fn command_set_block(&mut self, pos: BlockPos, state: u16) -> bool {
-        if !self.set_block(pos, state, update::CLIENTS) {
+        self.command_set_block_with(pos, state, &[])
+    }
+
+    /// `/setblock` with `defined` naming the properties the command spelled out (`oak_door[open=true]`
+    /// defines `open`). The state adapts to its neighbours, falling back to the given state if
+    /// that would destroy it, and the defined properties then override whatever adapted.
+    pub fn command_set_block_with(&mut self, pos: BlockPos, state: u16, defined: &[&str]) -> bool {
+        let adapted = self.update_from_neighbor_shapes(state, pos);
+        let mut placed = if facts(adapted).has(flag::AIR) { state } else { adapted };
+        if STATE_TO_BLOCK[usize::from(placed)] == STATE_TO_BLOCK[usize::from(state)] {
+            let kinds = Kinds::get();
+            for name in defined {
+                if let Some(value) = kinds.property(state, name) {
+                    placed = kinds.with_property(placed, name, value).unwrap_or(placed);
+                }
+            }
+        }
+        if !self.set_block(pos, placed, update::CLIENTS) {
             return false;
         }
-        self.update_neighbors_at(pos, STATE_TO_BLOCK[usize::from(state)]);
+        self.update_neighbors_at(pos, STATE_TO_BLOCK[usize::from(placed)]);
         true
+    }
+
+    /// Lets a state that is about to be placed at `pos` adapt to each neighbour in turn.
+    pub fn update_from_neighbor_shapes(&mut self, mut state: u16, pos: BlockPos) -> u16 {
+        for dir in SHAPE_UPDATE_ORDER {
+            let neighbor_pos = pos.offset(dir);
+            if let Some(neighbor) = self.blocks.block(neighbor_pos) {
+                state = self.update_shape(state, dir, neighbor, pos, neighbor_pos);
+            }
+        }
+        state
     }
 
     /// Tells the six neighbours of `pos` that it changed.
@@ -414,6 +480,13 @@ impl<A: BlockAccess> World<A> {
                     || sturdy(pos.below(), Direction::Up, DataSupport::Rigid)
                     || sturdy(pos.below(), Direction::Up, DataSupport::Center)
             }
+            Support::WireBase => {
+                dir != Direction::Down
+                    || self
+                        .blocks
+                        .block(pos.below())
+                        .is_some_and(crate::redstone::wire_can_survive_on)
+            }
             Support::RigidBelow => {
                 dir != Direction::Down || sturdy(pos.below(), Direction::Up, DataSupport::Rigid)
             }
@@ -441,6 +514,9 @@ impl<A: BlockAccess> World<A> {
     ) -> u16 {
         let kinds = Kinds::get();
         let mut state = self.update_shape_inner(state, neighbor_state, pos);
+        if kinds.of_state(state).redstone == Some(crate::kinds::Redstone::Wire) {
+            state = crate::redstone::wire_update_shape(self, state, dir, pos);
+        }
         if kinds.of_state(state).redstone == Some(crate::kinds::Redstone::Repeater)
             && dir != Direction::Down
             && dir != Direction::Up

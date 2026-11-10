@@ -113,7 +113,18 @@ fn replay(text: &str) -> Result<(), String> {
             }
             "set" => {
                 let [x, y, z] = nums(&parts[1..4]);
-                world.command_set_block(BlockPos::new(x, y, z), parse_state(parts[4]));
+                let text = parts[4];
+                // The properties written in the command override whatever the state adapts to.
+                let defined: Vec<&str> = text
+                    .split_once('[')
+                    .map(|(_, rest)| {
+                        rest.trim_end_matches(']')
+                            .split(',')
+                            .filter_map(|kv| kv.split_once('=').map(|(k, _)| k))
+                            .collect()
+                    })
+                    .unwrap_or_default();
+                world.command_set_block_with(BlockPos::new(x, y, z), parse_state(text), &defined);
             }
             "step" => {
                 for _ in 0..nums::<1>(&parts[1..2])[0] {

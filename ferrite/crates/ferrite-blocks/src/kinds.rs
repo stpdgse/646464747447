@@ -31,6 +31,8 @@ pub enum Support {
     SnowLayer,
     /// A rigid or centre-supporting top face below (pressure plates).
     RigidOrCenterBelow,
+    /// Redstone wire: a full top face (or a hopper) below.
+    WireBase,
     /// A rigid top face below (repeaters, comparators).
     RigidBelow,
     /// Face-attached (levers, buttons): the full face of the block it is stuck to.
@@ -52,6 +54,7 @@ pub enum Redstone {
     /// A redstone torch on a wall.
     WallTorch,
     Repeater,
+    Wire,
 }
 
 /// How a block's side arms follow its horizontal neighbours.
@@ -82,6 +85,8 @@ pub struct BlockKind {
     /// Counts as not blocking motion even though it is solid.
     pub never_blocks_motion: bool,
     /// Snow layers never rest on this block / always may, whatever its shape.
+    pub is_trapdoor: bool,
+    pub is_hopper: bool,
     pub snow_never: bool,
     pub snow_always: bool,
     /// Value index of `waterlogged=true`, and the property's stride, if the block has one.
@@ -100,6 +105,7 @@ pub struct Kinds {
     pub basalt: u16,
     pub soul_soil: u16,
     pub blue_ice: u16,
+    wire_default: u16,
     water_block: u16,
     lava_block: u16,
 }
@@ -149,6 +155,8 @@ impl Kinds {
                     liquid_container: waterlogged.is_some(),
                     refuses_fluid: false,
                     never_blocks_motion: false,
+                    is_trapdoor: false,
+                    is_hopper: false,
                     snow_never: false,
                     snow_always: false,
                     waterlogged,
@@ -255,6 +263,7 @@ impl Kinds {
             ("redstone_torch", Redstone::Torch),
             ("redstone_wall_torch", Redstone::WallTorch),
             ("repeater", Redstone::Repeater),
+            ("redstone_wire", Redstone::Wire),
         ] {
             by_block[id(name)].redstone = Some(kind);
         }
@@ -262,6 +271,11 @@ impl Kinds {
             by_block[usize::from(b)].redstone = Some(Redstone::Button);
         }
         by_block[id("repeater")].support = Some(Support::RigidBelow);
+        by_block[id("redstone_wire")].support = Some(Support::WireBase);
+        by_block[id("hopper")].is_hopper = true;
+        for &b in block_tag("minecraft:trapdoors") {
+            by_block[usize::from(b)].is_trapdoor = true;
+        }
         by_block[id("lever")].support = Some(Support::Attached);
         for &b in block_tag("minecraft:buttons") {
             by_block[usize::from(b)].support = Some(Support::Attached);
@@ -283,6 +297,7 @@ impl Kinds {
             basalt: default_state("basalt"),
             soul_soil: default_state("soul_soil"),
             blue_ice: default_state("blue_ice"),
+            wire_default: default_state("redstone_wire"),
             water_block: block_by_name("water").expect("water").first_state,
             lava_block: block_by_name("lava").expect("lava").first_state,
         }
@@ -296,6 +311,11 @@ impl Kinds {
     #[inline]
     pub fn of_state(&self, state: u16) -> &BlockKind {
         &self.by_block[usize::from(STATE_TO_BLOCK[usize::from(state)])]
+    }
+
+    /// The default state of redstone wire (power 0, no arms).
+    pub fn wire_default(&self) -> u16 {
+        self.wire_default
     }
 
     /// The water block state with the given `level` property (0..16).

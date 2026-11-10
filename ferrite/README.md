@@ -39,7 +39,7 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | `ferrite-remote` | Query (UDP) and RCON (TCP) servers plus clients, verified against vanilla |
 | `ferrite-ecs` | Archetype ECS: `#![forbid(unsafe_code)]`, generational entities, typed queries, bundles, deferred commands, resources. Deterministic by construction |
 | `ferrite-world` | Chunk model (paletted, bit-packed sections), versioned codec with zstd, and the crash-safe log-structured chunk store |
-| `ferrite-blocks` | Block behaviour: vanilla's neighbour/shape update propagation, scheduled ticks, water and lava, pane/fence connections, support rules. Checked against recordings of the official server |
+| `ferrite-blocks` | Block behaviour: vanilla's neighbour/shape update propagation, scheduled ticks, water and lava, redstone (wire, repeaters, torches, lamps), connections and support rules. Checked against recordings of the official server |
 | `ferrite-sim` | Region scheduler (rayon) with deterministic exchange, plus the particle workload and single-threaded reference used to prove determinism |
 | `ferrite-server` | The executable (mimalloc, clap flags, both backends, online mode, Query, RCON) |
 
@@ -352,12 +352,32 @@ official server (clean-room), and every rule is held to recordings of it:
   *not* a redstone conductor; vanilla saves pending ticks in scheduling order, not execution
   order; `/setblock` lets the new state adapt to its neighbours before placing it.
 
-Done so far: neighbour- and shape-update propagation (depth-first, vanilla's two direction orders),
-the scheduled-tick queue, water and lava (flow, slope search, falling, source formation, lava
-hardening), waterlogging, and the support/connection rules the scenery needed. Not yet: redstone,
-pistons, falling blocks, fire, random ticks, block entities, most block-specific behaviour. Lava
-that is *rising* uses vanilla's shared world random; Ferrite cannot match that stream, so recordings
-avoid it.
+Done so far: neighbour- and shape-update propagation (depth-first, vanilla's two direction orders,
+plus the indirect updates that make wire stairs work), the scheduled-tick queues (blocks, then
+fluids), water and lava (flow, slope search, falling, source formation, lava hardening),
+waterlogging, and **redstone**: weak/strong power, redstone blocks, levers, buttons, lamps, torches
+(with burnout), repeaters (delays, priorities, locking) and redstone wire (connections, power
+decay, stairs, vanilla's `HashSet` update order reproduced from `BlockPos.hashCode`).
+
+Things the recordings taught that memory had wrong, and that are now pinned by tests:
+`/setblock` adapts a bare state to its neighbours and then re-applies every property the command
+spelled out (so `oak_door[open=true]` keeps `open`, while a bare `oak_fence` connects); a placed
+block's own `onPlace` may change it, and neighbour updates only run if it is still the placed state;
+a torch does not power the block it stands on, and a wall torch not its wall.
+
+Redstone verification: 40 hand-written scenarios (every repeater delay, pulse extension, locking,
+torch burnout, wire climbing/descending, loops, strong power through blocks, ...), 30 random mazes
+and 30 random circuits committed, and a further 300 unseen random ones replayed cleanly. Mutating
+power decay, stair rules, update order, wire/lever connections, `/setblock` adaptation, delays and
+priorities makes the recordings fail; two mutants survive and are documented as equivalent or
+unreachable (wire power next to a repeater is already covered by the wire's own signal; the
+`HashSet` order only matters in configurations the sweeps did not produce).
+
+Not yet: comparators, observers, pistons, dispensers/droppers/hoppers, rails, pressure plates and
+tripwire (they need entities), falling blocks, fire, random ticks, block entities. Lava that is
+*rising* uses vanilla's shared world random, which Ferrite cannot match, so recordings avoid it.
+Levers and buttons are driven by `/setblock`-style state changes in the tests; the real "use" path
+(player interaction) arrives with the player work.
 
 ## Quality gates
 
