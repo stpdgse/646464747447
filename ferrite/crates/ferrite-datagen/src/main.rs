@@ -14,6 +14,7 @@ mod configuration;
 mod meta;
 mod packets;
 mod registries;
+mod shapes;
 mod util;
 
 use std::path::{Path, PathBuf};
@@ -86,6 +87,7 @@ fn main() -> Result<()> {
         ("packets.rs", packets::generate(&cx)?),
         ("registries.rs", registries::generate(&cx, &regs)?),
         ("blocks.rs", blocks::generate(&cx, &regs)?),
+        ("shapes.rs", shapes::generate(&cx)?),
         ("configuration.rs", configuration::generate(&cx, &regs)?),
         ("mod.rs", mod_rs(&cx)),
     ];
@@ -110,7 +112,7 @@ fn main() -> Result<()> {
 
 fn mod_rs(cx: &GenContext) -> String {
     format!(
-        "{}\npub mod blocks;\npub mod configuration;\npub mod meta;\npub mod packets;\npub mod registries;\n",
+        "{}\npub mod blocks;\npub mod configuration;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\n",
         cx.header
     )
 }
@@ -136,7 +138,74 @@ fn run_generator(java: &Path, jar: &Path, work: &Path) -> Result<PathBuf> {
     if !status.success() {
         bail!("data generator exited with {status}");
     }
+    run_shape_dump(java, &work, &out)?;
     Ok(out)
+}
+
+/// Compiles and runs `java/ShapeDump.java` against the libraries and server jar the bundler
+/// unpacked into `work`, writing `out/shapes.txt`.
+fn run_shape_dump(java: &Path, work: &Path, out: &Path) -> Result<()> {
+    let jars = unpacked_classpath(work)?;
+    let sep = if cfg!(windows) { ";" } else { ":" };
+    let cp = jars.iter().map(|p| p.display().to_string()).collect::<Vec<_>>().join(sep);
+    let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("java/ShapeDump.java");
+    let classes = work.join("shapedump-classes");
+    let _ = std::fs::remove_dir_all(&classes);
+    std::fs::create_dir_all(&classes)?;
+    let javac = java.with_file_name(if cfg!(windows) { "javac.exe" } else { "javac" });
+    let javac = if javac.exists() { javac } else { PathBuf::from("javac") };
+    eprintln!("compiling and running ShapeDump");
+    let status = Command::new(&javac)
+        .args(["-nowarn", "-cp", &cp, "-d"])
+        .arg(&classes)
+        .arg(&source)
+        .status()
+        .with_context(|| format!("launching {javac:?}"))?;
+    if !status.success() {
+        bail!("javac failed for ShapeDump.java (a JDK, not just a JRE, is required)");
+    }
+    let run_cp = format!("{}{sep}{cp}", classes.display());
+    let status = Command::new(java)
+        .current_dir(work)
+        .args(["-cp", &run_cp, "ShapeDump"])
+        .arg(out.join("shapes.txt"))
+        .status()
+        .with_context(|| format!("launching {java:?}"))?;
+    if !status.success() {
+        bail!("ShapeDump exited with {status}");
+    }
+    Ok(())
+}
+
+/// The server jar and every library jar the bundler extracted under `work`.
+fn unpacked_classpath(work: &Path) -> Result<Vec<PathBuf>> {
+    fn walk(dir: &Path, out: &mut Vec<PathBuf>) -> Result<()> {
+        if !dir.exists() {
+            return Ok(());
+        }
+        for entry in std::fs::read_dir(dir)? {
+            let path = entry?.path();
+            if path.is_dir() {
+                walk(&path, out)?;
+            } else if path.extension().is_some_and(|e| e == "jar") {
+                out.push(path);
+            }
+        }
+        Ok(())
+    }
+    let mut jars = Vec::new();
+    walk(&work.join("versions"), &mut jars)?;
+    walk(&work.join("libraries"), &mut jars)?;
+    jars.sort();
+    ensure_non_empty(&jars)?;
+    Ok(jars)
+}
+
+fn ensure_non_empty(jars: &[PathBuf]) -> Result<()> {
+    if jars.is_empty() {
+        bail!("the bundler did not unpack any jars");
+    }
+    Ok(())
 }
 
 fn hex(bytes: &[u8]) -> String {

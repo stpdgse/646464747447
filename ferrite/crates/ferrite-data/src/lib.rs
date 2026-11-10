@@ -11,6 +11,7 @@ pub mod configuration;
 #[allow(clippy::all, missing_docs, non_upper_case_globals)]
 pub mod generated;
 pub mod registries;
+pub mod shapes;
 
 pub use generated::meta::{
     DATA_PACK_MAJOR, DATA_PACK_MINOR, GAME_VERSION, PROTOCOL_VERSION, RESOURCE_PACK_MAJOR,
