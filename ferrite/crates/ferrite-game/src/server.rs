@@ -674,7 +674,7 @@ impl Game {
             | ServerboundCustomPayload::ID
             | PlayerInput::ID
             | PlayerCommand::ID
-            | Swing::ID => {}
+            | Punch::ID => {}
             _ => {}
         }
     }
@@ -907,21 +907,21 @@ impl Game {
                 } else if moved && turned {
                     let m = MoveEntityPosRot {
                         id: eid,
+                        on_ground: OnGround(p.on_ground),
                         dx: d[0] as i16,
                         dy: d[1] as i16,
                         dz: d[2] as i16,
                         y_rot: yr,
                         x_rot: xr,
-                        on_ground: p.on_ground,
                     };
                     push(MoveEntityPosRot::ID, enc(&|b| m.encode(b)));
                 } else if moved {
                     let m = MoveEntityPos {
                         id: eid,
+                        on_ground: OnGround(p.on_ground),
                         dx: d[0] as i16,
                         dy: d[1] as i16,
                         dz: d[2] as i16,
-                        on_ground: p.on_ground,
                     };
                     push(MoveEntityPos::ID, enc(&|b| m.encode(b)));
                 } else if turned {

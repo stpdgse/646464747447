@@ -144,7 +144,7 @@ async fn players_see_each_other_move_chat_and_leave() {
     assert_eq!(m.id, add.id);
     assert_eq!((m.dx, m.dy, m.dz), (4096, 0, 0), "one block east, in 1/4096 units");
     assert_eq!(m.y_rot, 64, "90 degrees is a quarter turn: 64/256");
-    assert!(m.on_ground);
+    assert!(m.on_ground.0);
     until(&mut a, 100, |p| p.name == "rotate_head").await;
 
     // Bob chats; Alice reads it.

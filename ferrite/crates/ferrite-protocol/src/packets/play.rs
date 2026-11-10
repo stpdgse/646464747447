@@ -47,6 +47,28 @@ impl<'a> Decode<'a> for PackedPos {
 /// An angle in 1/256 of a turn.
 pub type Angle = u8;
 
+/// The "properties" VarInt that leads relative entity movement: bit 0 is on-ground, the rest is a
+/// step count for multi-tick paths. Only single-step movement (count 0) is supported.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct OnGround(pub bool);
+
+impl Encode for OnGround {
+    fn encode<B: bytes::BufMut>(&self, buf: &mut B) -> Result<()> {
+        VarInt(i32::from(self.0)).encode(buf)
+    }
+}
+impl<'a> Decode<'a> for OnGround {
+    fn decode(buf: &mut &'a [u8]) -> Result<Self> {
+        let v = VarInt::decode(buf)?.0;
+        if v >> 1 != 0 {
+            return Err(crate::error::ProtocolError::Invalid(
+                "stepped entity movement is not supported",
+            ));
+        }
+        Ok(OnGround(v & 1 != 0))
+    }
+}
+
 /// A velocity in the compact "low precision" format: one zero byte, or 6 bytes (plus a VarInt for
 /// large magnitudes) holding a scale and three 15-bit components.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -628,20 +650,20 @@ packet! {
     /// Relative movement in 1/4096 of a block (at most 8 blocks per packet).
     MoveEntityPos in Play Clientbound = play::clientbound::MOVE_ENTITY_POS "move_entity_pos" {
         id: VarInt,
+        on_ground: OnGround,
         dx: i16,
         dy: i16,
         dz: i16,
-        on_ground: bool,
     }
 
     MoveEntityPosRot in Play Clientbound = play::clientbound::MOVE_ENTITY_POS_ROT "move_entity_pos_rot" {
         id: VarInt,
+        on_ground: OnGround,
         dx: i16,
         dy: i16,
         dz: i16,
         y_rot: Angle,
         x_rot: Angle,
-        on_ground: bool,
     }
 
     MoveEntityRot in Play Clientbound = play::clientbound::MOVE_ENTITY_ROT "move_entity_rot" {
@@ -889,9 +911,8 @@ packet! {
         item: ItemStack,
     }
 
-    Swing in Play Serverbound = play::serverbound::PUNCH "punch" {
-        hand: VarInt,
-    }
+    /// The player swung at the air. Carries no data in this version.
+    Punch in Play Serverbound = play::serverbound::PUNCH "punch" {}
 
     /// Sneaking, sprinting and the like.
     PlayerCommand in Play Serverbound = play::serverbound::PLAYER_COMMAND "player_command" {
