@@ -367,6 +367,34 @@ def redstone_scenarios():
                                                        "setblock 10 100 8 redstone_block"],
         [("set", 9, 100, 7, "repeater[facing=north,delay=1,powered=true]"), ("set", 10, 100, 8, "air")] + steps(*[1] * 4)
         + [("set", 9, 100, 7, "air")] + steps(*[1] * 6))
+    O = "observer[facing=west]"
+    s["rs_observer_pulses_on_a_change_in_front"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "stone")] + steps(*[1] * 6) + [("set", 8, 100, 8, "air")] + steps(*[1] * 6))
+    s["rs_observer_ignores_changes_behind_and_beside"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 redstone_lamp"],
+        [("set", 10, 100, 8, "stone"), ("set", 9, 100, 7, "stone"), ("set", 9, 101, 8, "stone"), ("set", 9, 100, 9, "stone")] + steps(*[1] * 5))
+    s["rs_observer_ignores_a_change_to_the_same_state"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 8 100 8 stone"],
+        [("set", 8, 100, 8, "stone")] + steps(*[1] * 4))
+    s["rs_observer_sees_a_block_state_change"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 8 100 8 stone_slab", "setblock 10 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "stone_slab[type=top]")] + steps(*[1] * 6))
+    s["rs_observer_drives_wire_and_repeater"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 redstone_wire", "setblock 11 100 8 repeater[facing=west,delay=1]",
+                                                     "setblock 12 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "stone")] + steps(*[1] * 10))
+    s["rs_observer_watching_a_wire"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "redstone_wire"), ("set", 7, 100, 8, "redstone_block")] + steps(*[1] * 6) + [("set", 7, 100, 8, "air")] + steps(*[1] * 6))
+    s["rs_observer_chain"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 observer[facing=west]", "setblock 11 100 8 observer[facing=west]",
+                                      "setblock 12 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "stone")] + steps(*[1] * 10))
+    s["rs_observer_clock"] = (ARENA, [("set", 9, 100, 8, "observer[facing=west]"), ("set", 8, 100, 8, "observer[facing=east]")] + steps(*[1] * 20))
+    s["rs_observer_placed_powered"] = (ARENA + ["setblock 10 100 8 redstone_lamp"],
+        [("set", 9, 100, 8, "observer[facing=west,powered=true]")] + steps(*[1] * 6))
+    s["rs_observer_removed_while_pulsing"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "stone")] + steps(1, 1) + [("set", 9, 100, 8, "air")] + steps(*[1] * 6))
+    s["rs_observer_removed_while_pulsing_through_stone"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 stone", "setblock 11 100 8 redstone_lamp"],
+        [("set", 8, 100, 8, "stone")] + steps(1, 1, 1) + [("set", 9, 100, 8, "air")] + steps(*[1] * 7))
+    s["rs_observer_sees_water_flow"] = (ARENA + ["setblock 9 100 8 " + O, "setblock 10 100 8 redstone_lamp"],
+        [("set", 6, 100, 8, "water")] + steps(*[1] * 20))
+    s["rs_observer_up_down_facing"] = (ARENA + ["setblock 8 100 8 observer[facing=up]", "setblock 8 99 8 redstone_lamp", "setblock 9 101 8 redstone_lamp"],
+        [("set", 8, 101, 8, "stone")] + steps(*[1] * 6))
     W = "redstone_wire"
     line = lambda x0, x1, y=100, z=8: [("set", x, y, z, W) for x in range(x0, x1 + 1)]
     s["rs_wire_line_decays"] = (ARENA, line(2, 12) + [("set", 1, 100, 8, "redstone_block")] + steps(1)
@@ -421,7 +449,8 @@ def random_redstone(count, seed):
     parts = ["stone", "stone", "redstone_wire", "redstone_wire", "redstone_wire", "redstone_wire", "redstone_lamp",
              "repeater[facing=north,delay=1]", "repeater[facing=east,delay=2]", "repeater[facing=south,delay=1]",
              "repeater[facing=west,delay=3]", "redstone_torch[lit=true]", "redstone_wall_torch[facing=east,lit=true]",
-             "redstone_wall_torch[facing=north,lit=true]", "glass", "lever[face=floor,facing=north,powered=false]"]
+             "redstone_wall_torch[facing=north,lit=true]", "glass", "lever[face=floor,facing=north,powered=false]",
+             "observer[facing=north]", "observer[facing=east]", "observer[facing=south]", "observer[facing=west]"]
     out = {}
     for n in range(count):
         rng = random.Random(seed * 7919 + n)
@@ -467,9 +496,11 @@ def random_circuits(count, seed):
             roll = rng.random()
             if roll < 0.6:
                 actions.append(("set", x, 100, z, "redstone_wire"))
-            elif roll < 0.85:  # input comes from the side we walked in from
+            elif roll < 0.8:  # input comes from the side we walked in from
                 actions.append(("set", x, 100, z, f"repeater[facing={OPP[d]},delay={rng.randint(1, 4)}]"))
-            elif roll < 0.92:
+            elif roll < 0.88:  # watches the previous cell, outputs forward
+                actions.append(("set", x, 100, z, f"observer[facing={OPP[d]}]"))
+            elif roll < 0.93:
                 actions.append(("set", x, 100, z, "redstone_lamp"))
                 break
             else:

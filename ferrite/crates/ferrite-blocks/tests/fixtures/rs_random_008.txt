@@ -336,85 +336,33 @@ r 108 14 15 15 stone
 r 108 15 0 15 stone
 end
 set 12 100 12 glass
-set 3 100 7 stone
-set 11 100 7 redstone_wire
-set 12 100 3 redstone_wire
-set 13 100 13 redstone_block
-step 3
-expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 12 100 3 redstone_wire
-b 12 100 12 glass
-b 13 100 13 redstone_block
-end
-step 1
-expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 12 100 3 redstone_wire
-b 12 100 12 glass
-b 13 100 13 redstone_block
-end
-step 1
-expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 12 100 3 redstone_wire
-b 12 100 12 glass
-b 13 100 13 redstone_block
-end
+set 3 100 7 observer[facing=north]
+set 11 100 7 observer[facing=west]
+set 12 100 3 stone
+set 11 100 10 redstone_block
 step 2
 expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 12 100 3 redstone_wire
+b 3 100 7 observer[facing=north,powered=true]
+b 11 100 7 observer[facing=west,powered=true]
+b 11 100 10 redstone_block
+b 12 100 3 stone
 b 12 100 12 glass
-b 13 100 13 redstone_block
-end
-set 11 100 11 redstone_block
-step 1
-expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 11 100 11 redstone_block
-b 12 100 3 redstone_wire
-b 12 100 12 glass
-b 13 100 13 redstone_block
+k 3 100 7 observer 2 0
+k 11 100 7 observer 2 0
 end
 step 3
 expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 11 100 11 redstone_block
-b 12 100 3 redstone_wire
+b 3 100 7 observer[facing=north,powered=false]
+b 11 100 7 observer[facing=west,powered=false]
+b 11 100 10 redstone_block
+b 12 100 3 stone
 b 12 100 12 glass
-b 13 100 13 redstone_block
-end
-step 2
-expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 11 100 11 redstone_block
-b 12 100 3 redstone_wire
-b 12 100 12 glass
-b 13 100 13 redstone_block
-end
-step 3
-expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 11 100 11 redstone_block
-b 12 100 3 redstone_wire
-b 12 100 12 glass
-b 13 100 13 redstone_block
 end
 step 20
 expect
-b 3 100 7 stone
-b 11 100 7 redstone_wire
-b 11 100 11 redstone_block
-b 12 100 3 redstone_wire
+b 3 100 7 observer[facing=north,powered=false]
+b 11 100 7 observer[facing=west,powered=false]
+b 11 100 10 redstone_block
+b 12 100 3 stone
 b 12 100 12 glass
-b 13 100 13 redstone_block
 end

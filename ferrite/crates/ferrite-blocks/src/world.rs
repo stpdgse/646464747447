@@ -163,6 +163,11 @@ impl<A: BlockAccess> World<A> {
         self.block_ticks.schedule(pos, block, self.time + delay, priority);
     }
 
+    /// Whether a block tick of `block` is pending at `pos` (not counting ticks already running).
+    pub fn has_scheduled_block_tick(&self, pos: BlockPos, block: u16) -> bool {
+        self.block_ticks.is_scheduled(pos, block)
+    }
+
     /// Whether a tick of `block` at `pos` is waiting to run later in the current game tick.
     pub fn will_tick_this_tick(&self, pos: BlockPos, block: u16) -> bool {
         self.running_ticks.iter().skip(self.running_next).any(|t| *t == (pos, block))
@@ -516,6 +521,9 @@ impl<A: BlockAccess> World<A> {
         let mut state = self.update_shape_inner(state, neighbor_state, pos);
         if kinds.of_state(state).redstone == Some(crate::kinds::Redstone::Wire) {
             state = crate::redstone::wire_update_shape(self, state, dir, pos);
+        }
+        if kinds.of_state(state).redstone == Some(crate::kinds::Redstone::Observer) {
+            crate::redstone::observer_shape(self, state, dir, pos);
         }
         if kinds.of_state(state).redstone == Some(crate::kinds::Redstone::Repeater)
             && dir != Direction::Down

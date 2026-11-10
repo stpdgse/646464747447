@@ -335,111 +335,80 @@ r 108 14 0 0 stone
 r 108 14 15 15 stone
 r 108 15 0 15 stone
 end
-set 7 100 5 lever[face=floor,facing=north,powered=false]
-set 5 100 12 redstone_wire
-set 7 100 7 stone
-set 8 100 12 glass
-set 8 100 5 repeater[facing=north,delay=1]
-set 8 100 7 redstone_lamp
-set 8 100 8 redstone_block
+set 7 100 5 observer[facing=south]
+set 5 100 12 observer[facing=west]
+set 7 100 7 observer[facing=west]
+set 8 100 12 lever[face=floor,facing=north,powered=false]
+set 8 100 5 redstone_wire
+set 8 100 7 observer[facing=east]
+set 9 100 11 redstone_block
+step 1
+expect
+b 5 100 12 observer[facing=west,powered=false]
+b 7 100 5 observer
+b 7 100 7 observer[facing=west,powered=false]
+b 8 100 5 redstone_wire
+b 8 100 7 observer[facing=east,powered=false]
+b 8 100 12 lever[face=floor,facing=north,powered=false]
+b 9 100 11 redstone_block
+k 7 100 5 observer 1 0
+k 5 100 12 observer 1 0
+k 7 100 7 observer 1 0
+k 8 100 7 observer 1 0
+end
 step 3
 expect
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
+b 5 100 12 observer[facing=west,powered=false]
+b 7 100 5 observer
+b 7 100 7 observer[facing=west,powered=false]
+b 8 100 5 redstone_wire
+b 8 100 7 observer[facing=east,powered=false]
+b 8 100 12 lever[face=floor,facing=north,powered=false]
+b 9 100 11 redstone_block
+end
+set 9 100 11 air
+step 2
+expect
+b 5 100 12 observer[facing=west,powered=false]
+b 7 100 5 observer
+b 7 100 7 observer[facing=west,powered=false]
+b 8 100 5 redstone_wire
+b 8 100 7 observer[facing=east,powered=false]
+b 8 100 12 lever[face=floor,facing=north,powered=false]
 end
 step 2
 expect
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
+b 5 100 12 observer[facing=west,powered=false]
+b 7 100 5 observer
+b 7 100 7 observer[facing=west,powered=false]
+b 8 100 5 redstone_wire
+b 8 100 7 observer[facing=east,powered=false]
+b 8 100 12 lever[face=floor,facing=north,powered=false]
 end
 step 2
 expect
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
+b 5 100 12 observer[facing=west,powered=false]
+b 7 100 5 observer
+b 7 100 7 observer[facing=west,powered=false]
+b 8 100 5 redstone_wire
+b 8 100 7 observer[facing=east,powered=false]
+b 8 100 12 lever[face=floor,facing=north,powered=false]
 end
 step 1
 expect
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
-end
-set 3 100 6 redstone_block
-step 2
-expect
-b 3 100 6 redstone_block
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
-end
-set 10 100 4 redstone_block
-step 2
-expect
-b 3 100 6 redstone_block
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
-b 10 100 4 redstone_block
-end
-step 1
-expect
-b 3 100 6 redstone_block
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
-b 10 100 4 redstone_block
-end
-step 1
-expect
-b 3 100 6 redstone_block
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
-b 10 100 4 redstone_block
+b 5 100 12 observer[facing=west,powered=false]
+b 7 100 5 observer
+b 7 100 7 observer[facing=west,powered=false]
+b 8 100 5 redstone_wire
+b 8 100 7 observer[facing=east,powered=false]
+b 8 100 12 lever[face=floor,facing=north,powered=false]
 end
 step 20
 expect
-b 3 100 6 redstone_block
-b 5 100 12 redstone_wire
-b 7 100 5 lever[face=floor,facing=north,powered=false]
-b 7 100 7 stone
-b 8 100 5 repeater
-b 8 100 7 redstone_lamp[lit=true]
-b 8 100 8 redstone_block
-b 8 100 12 glass
-b 10 100 4 redstone_block
+b 5 100 12 observer[facing=west,powered=false]
+b 7 100 5 observer
+b 7 100 7 observer[facing=west,powered=false]
+b 8 100 5 redstone_wire
+b 8 100 7 observer[facing=east,powered=false]
+b 8 100 12 lever[face=floor,facing=north,powered=false]
 end

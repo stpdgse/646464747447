@@ -335,204 +335,180 @@ r 108 14 0 0 stone
 r 108 14 15 15 stone
 r 108 15 0 15 stone
 end
-set 6 100 6 redstone_wall_torch[facing=east,lit=true]
-set 12 100 7 redstone_wire
-set 6 101 11 redstone_wall_torch[facing=north,lit=true]
-set 8 100 11 stone
-set 5 100 6 redstone_lamp
+set 6 100 6 observer[facing=east]
+set 12 100 7 redstone_wall_torch[facing=east,lit=true]
+set 6 101 11 redstone_wire
+set 8 100 11 redstone_wall_torch[facing=north,lit=true]
+set 5 100 6 observer[facing=north]
 set 10 100 3 stone
-set 6 100 11 lever[face=floor,facing=north,powered=false]
-set 9 100 3 redstone_wall_torch[facing=east,lit=true]
-set 9 100 5 redstone_wire
-set 12 100 9 lever[face=floor,facing=north,powered=false]
-set 3 100 9 repeater[facing=south,delay=1]
-set 9 100 9 redstone_wire
-set 7 100 10 redstone_block
+set 6 100 11 redstone_lamp
+set 9 100 3 stone
+set 9 100 5 lever[face=floor,facing=north,powered=false]
+set 12 100 9 redstone_wall_torch[facing=east,lit=true]
+set 3 100 9 redstone_wire
+set 9 100 9 lever[face=floor,facing=north,powered=false]
+set 4 100 10 redstone_block
 step 3
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 4 100 10 redstone_block
+b 5 100 6 observer[facing=north,powered=true]
+b 6 100 6 observer[facing=east,powered=true]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 stone
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
-end
-step 1
-expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
-b 10 100 3 stone
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
+k 6 100 6 observer 1 0
+k 5 100 6 observer 1 0
 end
 step 3
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 4 100 10 redstone_block
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 stone
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
 end
 step 1
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 4 100 10 redstone_block
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 stone
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
 end
-set 7 100 6 redstone_block
-step 1
+set 9 100 3 redstone_block
+step 2
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 6 redstone_block
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 4 100 10 redstone_block
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 redstone_block
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
 end
-step 1
+step 3
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 6 redstone_block
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 4 100 10 redstone_block
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 redstone_block
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
 end
 step 1
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 6 redstone_block
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 4 100 10 redstone_block
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 redstone_block
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
+end
+set 4 100 10 air
+step 1
+expect
+b 3 100 9 redstone_wire
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 redstone_block
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
+b 10 100 3 stone
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
+end
+step 1
+expect
+b 3 100 9 redstone_wire
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 redstone_block
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
+b 10 100 3 stone
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
 end
 step 2
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 6 redstone_block
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 redstone_block
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
 end
-set 11 100 8 redstone_block
-step 2
+step 4
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 6 redstone_block
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 redstone_block
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 11 100 8 redstone_block
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
-end
-step 2
-expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 6 redstone_block
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
-b 10 100 3 stone
-b 11 100 8 redstone_block
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
 end
 step 20
 expect
-b 3 100 9 repeater[delay=1,facing=south,locked=false,powered=false]
-b 5 100 6 redstone_lamp
-b 6 100 6 redstone_wall_torch[facing=east,lit=true]
-b 6 100 11 lever[face=floor,facing=north,powered=false]
-b 6 101 11 redstone_wall_torch
-b 7 100 6 redstone_block
-b 7 100 10 redstone_block
-b 8 100 11 stone
-b 9 100 3 redstone_wall_torch[facing=east,lit=true]
-b 9 100 5 redstone_wire
-b 9 100 9 redstone_wire
+b 3 100 9 redstone_wire
+b 5 100 6 observer[facing=north,powered=false]
+b 6 100 6 observer[facing=east,powered=false]
+b 6 100 11 redstone_lamp
+b 8 100 11 redstone_wall_torch
+b 9 100 3 redstone_block
+b 9 100 5 lever[face=floor,facing=north,powered=false]
+b 9 100 9 lever[face=floor,facing=north,powered=false]
 b 10 100 3 stone
-b 11 100 8 redstone_block
-b 12 100 7 redstone_wire
-b 12 100 9 lever[face=floor,facing=north,powered=false]
+b 12 100 7 redstone_wall_torch[facing=east,lit=true]
+b 12 100 9 redstone_wall_torch[facing=east,lit=true]
 end

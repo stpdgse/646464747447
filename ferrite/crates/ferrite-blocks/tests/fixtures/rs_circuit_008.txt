@@ -335,67 +335,86 @@ r 108 14 0 0 stone
 r 108 14 15 15 stone
 r 108 15 0 15 stone
 end
-set 4 100 7 redstone_lamp
+set 4 100 7 observer[facing=north]
+set 4 100 8 redstone_lamp
 set 4 100 6 redstone_block
-step 3
-expect
-b 4 100 6 redstone_block
-b 4 100 7 redstone_lamp[lit=true]
-end
 step 1
 expect
 b 4 100 6 redstone_block
-b 4 100 7 redstone_lamp[lit=true]
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp
+k 4 100 7 observer 1 0
 end
 step 3
 expect
 b 4 100 6 redstone_block
-b 4 100 7 redstone_lamp[lit=true]
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp[lit=true]
+k 4 100 8 redstone_lamp 4 0
 end
 step 3
 expect
 b 4 100 6 redstone_block
-b 4 100 7 redstone_lamp[lit=true]
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp[lit=true]
+k 4 100 8 redstone_lamp 1 0
 end
 step 2
 expect
 b 4 100 6 redstone_block
-b 4 100 7 redstone_lamp[lit=true]
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp
 end
 step 1
 expect
 b 4 100 6 redstone_block
-b 4 100 7 redstone_lamp[lit=true]
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp
+end
+step 1
+expect
+b 4 100 6 redstone_block
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp
 end
 set 4 100 6 air
 step 1
 expect
-b 4 100 7 redstone_lamp[lit=true]
-k 4 100 7 redstone_lamp 3 0
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp
+k 4 100 7 observer 1 0
 end
 step 1
 expect
-b 4 100 7 redstone_lamp[lit=true]
-k 4 100 7 redstone_lamp 2 0
+b 4 100 7 observer[facing=north,powered=true]
+b 4 100 8 redstone_lamp[lit=true]
+k 4 100 7 observer 2 0
 end
 step 1
 expect
-b 4 100 7 redstone_lamp[lit=true]
-k 4 100 7 redstone_lamp 1 0
-end
-step 1
-expect
-b 4 100 7 redstone_lamp
+b 4 100 7 observer[facing=north,powered=true]
+b 4 100 8 redstone_lamp[lit=true]
+k 4 100 7 observer 1 0
 end
 step 3
 expect
-b 4 100 7 redstone_lamp
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp[lit=true]
+k 4 100 8 redstone_lamp 2 0
 end
 step 1
 expect
-b 4 100 7 redstone_lamp
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp[lit=true]
+k 4 100 8 redstone_lamp 1 0
+end
+step 3
+expect
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp
 end
 step 30
 expect
-b 4 100 7 redstone_lamp
+b 4 100 7 observer[facing=north,powered=false]
+b 4 100 8 redstone_lamp
 end

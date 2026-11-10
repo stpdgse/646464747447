@@ -55,6 +55,7 @@ pub enum Redstone {
     WallTorch,
     Repeater,
     Wire,
+    Observer,
 }
 
 /// How a block's side arms follow its horizontal neighbours.
@@ -264,6 +265,7 @@ impl Kinds {
             ("redstone_wall_torch", Redstone::WallTorch),
             ("repeater", Redstone::Repeater),
             ("redstone_wire", Redstone::Wire),
+            ("observer", Redstone::Observer),
         ] {
             by_block[id(name)].redstone = Some(kind);
         }

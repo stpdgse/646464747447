@@ -339,78 +339,34 @@ set 9 100 8 lever[face=floor,facing=north,powered=false]
 set 4 100 7 repeater[facing=west,delay=3]
 set 12 100 9 redstone_torch[lit=true]
 set 5 100 9 redstone_wire
-set 11 100 5 redstone_wire
-set 2 100 5 redstone_block
+set 11 100 5 observer[facing=east]
+set 13 100 2 redstone_block
 step 1
 expect
-b 2 100 5 redstone_block
 b 4 100 7 repeater[delay=3,facing=west,locked=false,powered=false]
 b 5 100 9 redstone_wire
 b 9 100 8 lever[face=floor,facing=north,powered=false]
-b 11 100 5 redstone_wire
+b 11 100 5 observer[facing=east,powered=false]
 b 12 100 9 redstone_torch
-end
-set 5 100 5 redstone_block
-step 3
-expect
-b 2 100 5 redstone_block
-b 4 100 7 repeater[delay=3,facing=west,locked=false,powered=false]
-b 5 100 5 redstone_block
-b 5 100 9 redstone_wire
-b 9 100 8 lever[face=floor,facing=north,powered=false]
-b 11 100 5 redstone_wire
-b 12 100 9 redstone_torch
+b 13 100 2 redstone_block
+k 11 100 5 observer 1 0
 end
 step 1
 expect
-b 2 100 5 redstone_block
 b 4 100 7 repeater[delay=3,facing=west,locked=false,powered=false]
-b 5 100 5 redstone_block
 b 5 100 9 redstone_wire
 b 9 100 8 lever[face=floor,facing=north,powered=false]
-b 11 100 5 redstone_wire
+b 11 100 5 observer[facing=east,powered=true]
 b 12 100 9 redstone_torch
-end
-step 1
-expect
-b 2 100 5 redstone_block
-b 4 100 7 repeater[delay=3,facing=west,locked=false,powered=false]
-b 5 100 5 redstone_block
-b 5 100 9 redstone_wire
-b 9 100 8 lever[face=floor,facing=north,powered=false]
-b 11 100 5 redstone_wire
-b 12 100 9 redstone_torch
-end
-step 2
-expect
-b 2 100 5 redstone_block
-b 4 100 7 repeater[delay=3,facing=west,locked=false,powered=false]
-b 5 100 5 redstone_block
-b 5 100 9 redstone_wire
-b 9 100 8 lever[face=floor,facing=north,powered=false]
-b 11 100 5 redstone_wire
-b 12 100 9 redstone_torch
-end
-set 11 100 6 redstone_block
-step 3
-expect
-b 2 100 5 redstone_block
-b 4 100 7 repeater[delay=3,facing=west,locked=false,powered=false]
-b 5 100 5 redstone_block
-b 5 100 9 redstone_wire
-b 9 100 8 lever[face=floor,facing=north,powered=false]
-b 11 100 5 redstone_wire[east=none,north=side,power=15,south=side,west=none]
-b 11 100 6 redstone_block
-b 12 100 9 redstone_torch
+b 13 100 2 redstone_block
+k 11 100 5 observer 2 0
 end
 step 20
 expect
-b 2 100 5 redstone_block
 b 4 100 7 repeater[delay=3,facing=west,locked=false,powered=false]
-b 5 100 5 redstone_block
 b 5 100 9 redstone_wire
 b 9 100 8 lever[face=floor,facing=north,powered=false]
-b 11 100 5 redstone_wire[east=none,north=side,power=15,south=side,west=none]
-b 11 100 6 redstone_block
+b 11 100 5 observer[facing=east,powered=false]
 b 12 100 9 redstone_torch
+b 13 100 2 redstone_block
 end

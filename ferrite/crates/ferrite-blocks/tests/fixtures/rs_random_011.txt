@@ -342,12 +342,13 @@ set 11 100 6 repeater[facing=north,delay=1]
 set 10 100 9 redstone_wire
 set 8 100 6 redstone_torch[lit=true]
 set 10 101 9 repeater[facing=east,delay=2]
-set 3 100 4 redstone_lamp
+set 3 100 4 observer[facing=south]
 set 8 100 8 redstone_lamp
-set 13 100 12 redstone_block
+set 5 100 6 redstone_block
 step 1
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer
+b 5 100 6 redstone_block
 b 7 100 4 redstone_wire
 b 8 100 6 redstone_torch
 b 8 100 8 redstone_lamp
@@ -355,11 +356,12 @@ b 8 100 10 glass
 b 10 100 9 redstone_wire
 b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
 b 11 100 6 repeater
-b 13 100 12 redstone_block
+k 3 100 4 observer 1 0
 end
 step 1
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer[facing=south,powered=true]
+b 5 100 6 redstone_block
 b 7 100 4 redstone_wire
 b 8 100 6 redstone_torch
 b 8 100 8 redstone_lamp
@@ -367,12 +369,13 @@ b 8 100 10 glass
 b 10 100 9 redstone_wire
 b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
 b 11 100 6 repeater
-b 13 100 12 redstone_block
+k 3 100 4 observer 2 0
 end
 set 13 100 7 redstone_block
 step 2
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer
+b 5 100 6 redstone_block
 b 7 100 4 redstone_wire
 b 8 100 6 redstone_torch
 b 8 100 8 redstone_lamp
@@ -381,11 +384,11 @@ b 10 100 9 redstone_wire
 b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
 b 11 100 6 repeater
 b 13 100 7 redstone_block
-b 13 100 12 redstone_block
 end
 step 1
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer
+b 5 100 6 redstone_block
 b 7 100 4 redstone_wire
 b 8 100 6 redstone_torch
 b 8 100 8 redstone_lamp
@@ -394,11 +397,11 @@ b 10 100 9 redstone_wire
 b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
 b 11 100 6 repeater
 b 13 100 7 redstone_block
-b 13 100 12 redstone_block
 end
 step 2
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer
+b 5 100 6 redstone_block
 b 7 100 4 redstone_wire
 b 8 100 6 redstone_torch
 b 8 100 8 redstone_lamp
@@ -407,11 +410,11 @@ b 10 100 9 redstone_wire
 b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
 b 11 100 6 repeater
 b 13 100 7 redstone_block
-b 13 100 12 redstone_block
 end
 step 1
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer
+b 5 100 6 redstone_block
 b 7 100 4 redstone_wire
 b 8 100 6 redstone_torch
 b 8 100 8 redstone_lamp
@@ -420,14 +423,64 @@ b 10 100 9 redstone_wire
 b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
 b 11 100 6 repeater
 b 13 100 7 redstone_block
-b 13 100 12 redstone_block
 end
-set 13 100 12 air
+set 8 100 6 redstone_block
+step 2
+expect
+b 3 100 4 observer
+b 5 100 6 redstone_block
+b 7 100 4 redstone_wire
+b 8 100 6 redstone_block
+b 8 100 8 redstone_lamp
+b 8 100 10 glass
+b 10 100 9 redstone_wire
+b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
+b 11 100 6 repeater
+b 13 100 7 redstone_block
+end
+step 3
+expect
+b 3 100 4 observer
+b 5 100 6 redstone_block
+b 7 100 4 redstone_wire
+b 8 100 6 redstone_block
+b 8 100 8 redstone_lamp
+b 8 100 10 glass
+b 10 100 9 redstone_wire
+b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
+b 11 100 6 repeater
+b 13 100 7 redstone_block
+end
+set 5 100 6 air
+step 1
+expect
+b 3 100 4 observer
+b 7 100 4 redstone_wire
+b 8 100 6 redstone_block
+b 8 100 8 redstone_lamp
+b 8 100 10 glass
+b 10 100 9 redstone_wire
+b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
+b 11 100 6 repeater
+b 13 100 7 redstone_block
+end
 step 4
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer
 b 7 100 4 redstone_wire
-b 8 100 6 redstone_torch
+b 8 100 6 redstone_block
+b 8 100 8 redstone_lamp
+b 8 100 10 glass
+b 10 100 9 redstone_wire
+b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
+b 11 100 6 repeater
+b 13 100 7 redstone_block
+end
+step 4
+expect
+b 3 100 4 observer
+b 7 100 4 redstone_wire
+b 8 100 6 redstone_block
 b 8 100 8 redstone_lamp
 b 8 100 10 glass
 b 10 100 9 redstone_wire
@@ -437,33 +490,9 @@ b 13 100 7 redstone_block
 end
 step 1
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer
 b 7 100 4 redstone_wire
-b 8 100 6 redstone_torch
-b 8 100 8 redstone_lamp
-b 8 100 10 glass
-b 10 100 9 redstone_wire
-b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
-b 11 100 6 repeater
-b 13 100 7 redstone_block
-end
-step 2
-expect
-b 3 100 4 redstone_lamp
-b 7 100 4 redstone_wire
-b 8 100 6 redstone_torch
-b 8 100 8 redstone_lamp
-b 8 100 10 glass
-b 10 100 9 redstone_wire
-b 10 101 9 repeater[delay=2,facing=east,locked=false,powered=false]
-b 11 100 6 repeater
-b 13 100 7 redstone_block
-end
-step 2
-expect
-b 3 100 4 redstone_lamp
-b 7 100 4 redstone_wire
-b 8 100 6 redstone_torch
+b 8 100 6 redstone_block
 b 8 100 8 redstone_lamp
 b 8 100 10 glass
 b 10 100 9 redstone_wire
@@ -473,9 +502,9 @@ b 13 100 7 redstone_block
 end
 step 20
 expect
-b 3 100 4 redstone_lamp
+b 3 100 4 observer
 b 7 100 4 redstone_wire
-b 8 100 6 redstone_torch
+b 8 100 6 redstone_block
 b 8 100 8 redstone_lamp
 b 8 100 10 glass
 b 10 100 9 redstone_wire

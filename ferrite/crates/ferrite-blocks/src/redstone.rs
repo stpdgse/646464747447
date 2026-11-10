@@ -83,7 +83,9 @@ fn state_signal<A: BlockAccess>(world: &World<A>, pos: BlockPos, state: u16, dir
                 0
             }
         }
-        Some(Redstone::Repeater) => state_direct_signal(world, pos, state, dir),
+        Some(Redstone::Repeater | Redstone::Observer) => {
+            state_direct_signal(world, pos, state, dir)
+        }
         Some(Redstone::Wire) => {
             if !world.wires_give_power || dir == Direction::Down {
                 return 0;
@@ -121,7 +123,11 @@ fn state_direct_signal<A: BlockAccess>(
                 0
             }
         }
-        Some(Redstone::Repeater) if is_true(state, "powered") && facing(state) == dir => 15,
+        Some(Redstone::Repeater | Redstone::Observer)
+            if is_true(state, "powered") && facing(state) == dir =>
+        {
+            15
+        }
         Some(Redstone::Wire) if world.wires_give_power => state_signal(world, pos, state, dir),
         _ => 0,
     }
@@ -169,6 +175,13 @@ pub(crate) fn on_place<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, stat
     match redstone_of(state) {
         Some(Redstone::Torch | Redstone::WallTorch) => notify_all_around(world, pos, state),
         Some(Redstone::Repeater) => update_neighbors_in_front(world, pos, state),
+        Some(Redstone::Observer) if redstone_of(_old) != Some(Redstone::Observer) => {
+            if is_true(state, "powered") && !world.has_scheduled_block_tick(pos, block_of(state)) {
+                let off = set_prop(state, "powered", "false");
+                world.set_block(pos, off, 18);
+                update_neighbors_in_front(world, pos, off);
+            }
+        }
         Some(Redstone::Wire) if redstone_of(_old) != Some(Redstone::Wire) => {
             wire_update_power(world, pos, state);
             for d in [Direction::Up, Direction::Down] {
@@ -185,6 +198,11 @@ pub(crate) fn on_remove<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, old
     match redstone_of(old) {
         Some(Redstone::Torch | Redstone::WallTorch) => notify_all_around(world, pos, old),
         Some(Redstone::Repeater) => update_neighbors_in_front(world, pos, old),
+        Some(Redstone::Observer) => {
+            if is_true(old, "powered") && world.has_scheduled_block_tick(pos, block_of(old)) {
+                update_neighbors_in_front(world, pos, set_prop(old, "powered", "false"));
+            }
+        }
         Some(Redstone::Wire) => {
             let block = block_of(old);
             for d in Direction::ALL {
@@ -282,7 +300,31 @@ pub(crate) fn tick<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, state: u
             }
         }
         Some(Redstone::Repeater) => repeater_tick(world, pos, state),
+        Some(Redstone::Observer) => {
+            if is_true(state, "powered") {
+                world.set_block(pos, set_prop(state, "powered", "false"), update::CLIENTS);
+            } else {
+                world.set_block(pos, set_prop(state, "powered", "true"), update::CLIENTS);
+                world.schedule_block_tick(pos, block, 2, 0);
+            }
+            update_neighbors_in_front(world, pos, state);
+        }
         _ => {}
+    }
+}
+
+/// An observer saw its watched face change: pulse (after a short delay) unless already pulsing.
+pub(crate) fn observer_shape<A: BlockAccess>(
+    world: &mut World<A>,
+    state: u16,
+    dir: Direction,
+    pos: BlockPos,
+) {
+    if facing(state) == dir
+        && !is_true(state, "powered")
+        && !world.has_scheduled_block_tick(pos, block_of(state))
+    {
+        world.schedule_block_tick(pos, block_of(state), 2, 0);
     }
 }
 
