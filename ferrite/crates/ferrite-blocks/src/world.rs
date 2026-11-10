@@ -20,6 +20,8 @@ pub mod update {
     pub const KNOWN_SHAPE: u32 = 16;
     /// Do not drop items when a shape update destroys a block.
     pub const SUPPRESS_DROPS: u32 = 32;
+    /// The change is part of a piston move: blocks that would notify on removal do not.
+    pub const MOVING: u32 = 64;
     pub const ALL: u32 = NEIGHBORS | CLIENTS;
 }
 
@@ -90,6 +92,11 @@ pub struct World<A: BlockAccess> {
     running_ticks: Vec<(BlockPos, u16)>,
     running_next: usize,
     pub(crate) wires_give_power: bool,
+    pub(crate) block_events: std::collections::VecDeque<(BlockPos, u16, i32, i32)>,
+    pub(crate) bes: Vec<crate::piston::MovingBe>,
+    pub(crate) be_at: std::collections::HashMap<BlockPos, usize>,
+    pub(crate) be_tickers: Vec<usize>,
+    pub(crate) handling_tick: bool,
     pub(crate) toggles: Vec<(BlockPos, i64)>,
     occlusion: OcclusionCache,
     stack: Vec<Update>,
@@ -112,6 +119,11 @@ impl<A: BlockAccess> World<A> {
             running_ticks: Vec::new(),
             running_next: 0,
             wires_give_power: true,
+            block_events: std::collections::VecDeque::new(),
+            bes: Vec::new(),
+            be_at: std::collections::HashMap::new(),
+            be_tickers: Vec::new(),
+            handling_tick: false,
             toggles: Vec::new(),
             occlusion: OcclusionCache::default(),
             stack: Vec::new(),
@@ -163,6 +175,15 @@ impl<A: BlockAccess> World<A> {
         self.block_ticks.schedule(pos, block, self.time + delay, priority);
     }
 
+    /// Queues a block event (vanilla's `Level.blockEvent`); duplicates of a queued event are
+    /// ignored. Events run after the tick queues, in the order they were queued.
+    pub fn block_event(&mut self, pos: BlockPos, block: u16, id: i32, param: i32) {
+        let e = (pos, block, id, param);
+        if !self.block_events.contains(&e) {
+            self.block_events.push_back(e);
+        }
+    }
+
     /// Whether a block tick of `block` is pending at `pos` (not counting ticks already running).
     pub fn has_scheduled_block_tick(&self, pos: BlockPos, block: u16) -> bool {
         self.block_ticks.is_scheduled(pos, block)
@@ -198,10 +219,15 @@ impl<A: BlockAccess> World<A> {
             return false;
         }
         self.blocks.set_block_raw(pos, state);
-        if STATE_TO_BLOCK[usize::from(old)] != STATE_TO_BLOCK[usize::from(state)]
-            && Kinds::get().of_state(old).redstone.is_some()
-        {
-            crate::redstone::on_remove(self, pos, old);
+        if STATE_TO_BLOCK[usize::from(old)] != STATE_TO_BLOCK[usize::from(state)] {
+            let ok = Kinds::get().of_state(old);
+            let moved = flags & update::MOVING != 0;
+            if ok.redstone.is_some() {
+                crate::redstone::on_remove(self, pos, old, moved);
+            }
+            if ok.piston.is_some() {
+                crate::piston::on_remove(self, pos, old);
+            }
         }
         self.on_place(pos, state, old);
         // A non-liquid block that now holds a different fluid (waterlogging) gets that fluid's
@@ -225,24 +251,42 @@ impl<A: BlockAccess> World<A> {
         if flags & update::KNOWN_SHAPE == 0 && limit > 0 {
             let f = flags & !(update::NEIGHBORS | update::SUPPRESS_DROPS);
             self.indirect_shape_updates(pos, old, f, limit - 1);
-            for dir in SHAPE_UPDATE_ORDER {
-                self.add_and_run(Update::Shape {
-                    dir: dir.opposite(),
-                    neighbor_state: state,
-                    pos: pos.offset(dir),
-                    neighbor_pos: pos,
-                    flags: f,
-                    limit: limit - 1,
-                });
-            }
+            self.neighbour_shape_updates(pos, state, f, limit - 1);
             self.indirect_shape_updates(pos, state, f, limit - 1);
         }
         true
     }
 
+    /// `BlockState.updateNeighbourShapes`: tells the six neighbours that the block at `pos`
+    /// (whose state is `state`) changed shape.
+    pub(crate) fn neighbour_shape_updates(
+        &mut self,
+        pos: BlockPos,
+        state: u16,
+        flags: u32,
+        limit: i32,
+    ) {
+        for dir in SHAPE_UPDATE_ORDER {
+            self.add_and_run(Update::Shape {
+                dir: dir.opposite(),
+                neighbor_state: state,
+                pos: pos.offset(dir),
+                neighbor_pos: pos,
+                flags,
+                limit,
+            });
+        }
+    }
+
     /// Updates that reach blocks *diagonal* to `pos` (wire stairs), for the state `state` that
     /// was, or now is, at `pos`.
-    fn indirect_shape_updates(&mut self, pos: BlockPos, state: u16, flags: u32, limit: i32) {
+    pub(crate) fn indirect_shape_updates(
+        &mut self,
+        pos: BlockPos,
+        state: u16,
+        flags: u32,
+        limit: i32,
+    ) {
         if Kinds::get().of_state(state).redstone != Some(crate::kinds::Redstone::Wire) {
             return;
         }
@@ -422,6 +466,9 @@ impl<A: BlockAccess> World<A> {
         if kind.redstone.is_some() {
             crate::redstone::on_place(self, pos, state, old);
         }
+        if kind.piston.is_some() {
+            crate::piston::on_place(self, pos, state, old);
+        }
     }
 
     fn neighbor_changed(&mut self, pos: BlockPos, state: u16, source_block: u16) {
@@ -431,6 +478,9 @@ impl<A: BlockAccess> World<A> {
         }
         if kind.redstone.is_some() {
             crate::redstone::neighbor_changed(self, pos, state, source_block);
+        }
+        if kind.piston.is_some() {
+            crate::piston::neighbor_changed(self, pos, state, source_block);
         }
     }
 
@@ -485,6 +535,10 @@ impl<A: BlockAccess> World<A> {
                     || sturdy(pos.below(), Direction::Up, DataSupport::Rigid)
                     || sturdy(pos.below(), Direction::Up, DataSupport::Center)
             }
+            Support::PlantGround => {
+                // Plants re-check their ground on *any* neighbour change.
+                self.blocks.block(pos.below()).is_some_and(|b| kinds.of_state(b).plant_ground)
+            }
             Support::WireBase => {
                 dir != Direction::Down
                     || self
@@ -524,6 +578,12 @@ impl<A: BlockAccess> World<A> {
         }
         if kinds.of_state(state).redstone == Some(crate::kinds::Redstone::Observer) {
             crate::redstone::observer_shape(self, state, dir, pos);
+        }
+        if kinds.of_state(state).piston == Some(crate::kinds::Piston::Head)
+            && !crate::piston::head_can_survive(self, state, pos)
+            && dir.opposite() == crate::piston::facing_of(state)
+        {
+            return kinds.air;
         }
         if kinds.of_state(state).redstone == Some(crate::kinds::Redstone::Repeater)
             && dir != Direction::Down
@@ -610,6 +670,7 @@ impl<A: BlockAccess> World<A> {
     /// Advances the world by one game tick.
     pub fn tick(&mut self) {
         self.time += 1;
+        self.handling_tick = true;
         // Block ticks run before fluid ticks.
         let mut due = Vec::new();
         self.block_ticks.take_due(self.time, &mut due);
@@ -635,6 +696,9 @@ impl<A: BlockAccess> World<A> {
                 fluid::tick(self, pos, state, fluid);
             }
         }
+        crate::piston::run_block_events(self);
+        crate::piston::tick_block_entities(self);
+        self.handling_tick = false;
     }
 
     pub(crate) fn is_solid(state: u16) -> bool {

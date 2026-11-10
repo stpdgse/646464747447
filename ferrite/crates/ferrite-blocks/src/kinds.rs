@@ -31,6 +31,8 @@ pub enum Support {
     SnowLayer,
     /// A rigid or centre-supporting top face below (pressure plates).
     RigidOrCenterBelow,
+    /// Small plants: dirt-like ground (or farmland) below.
+    PlantGround,
     /// Redstone wire: a full top face (or a hopper) below.
     WireBase,
     /// A rigid top face below (repeaters, comparators).
@@ -58,6 +60,14 @@ pub enum Redstone {
     Observer,
 }
 
+/// The parts of a piston.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Piston {
+    Base { sticky: bool },
+    Head,
+    Moving,
+}
+
 /// How a block's side arms follow its horizontal neighbours.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Connects {
@@ -69,6 +79,11 @@ pub enum Connects {
 
 #[derive(Clone, Copy, Debug)]
 pub struct BlockKind {
+    pub piston: Option<Piston>,
+    /// Slime or honey: glues neighbours to itself when pushed.
+    pub sticky: bool,
+    /// Pistons never move these even though their destroy speed is not -1.
+    pub piston_immovable: bool,
     pub redstone: Option<Redstone>,
     pub connects: Option<Connects>,
     /// Never connected to, even with a sturdy face (leaves, pumpkins, shulker boxes, ...).
@@ -86,6 +101,8 @@ pub struct BlockKind {
     /// Counts as not blocking motion even though it is solid.
     pub never_blocks_motion: bool,
     /// Snow layers never rest on this block / always may, whatever its shape.
+    /// In the `dirt` block tag, or farmland: ground small plants can stand on.
+    pub plant_ground: bool,
     pub is_trapdoor: bool,
     pub is_hopper: bool,
     pub snow_never: bool,
@@ -107,6 +124,10 @@ pub struct Kinds {
     pub soul_soil: u16,
     pub blue_ice: u16,
     wire_default: u16,
+    pub moving_piston: u16,
+    pub piston_head: u16,
+    pub slime_block: u16,
+    pub honey_block: u16,
     water_block: u16,
     lava_block: u16,
 }
@@ -142,6 +163,9 @@ impl Kinds {
                     stride *= p.values.len() as u16;
                 }
                 BlockKind {
+                    piston: None,
+                    sticky: false,
+                    piston_immovable: false,
                     redstone: None,
                     connects: None,
                     connection_exception: false,
@@ -156,6 +180,7 @@ impl Kinds {
                     liquid_container: waterlogged.is_some(),
                     refuses_fluid: false,
                     never_blocks_motion: false,
+                    plant_ground: false,
                     is_trapdoor: false,
                     is_hopper: false,
                     snow_never: false,
@@ -272,9 +297,26 @@ impl Kinds {
         for &b in block_tag("minecraft:buttons") {
             by_block[usize::from(b)].redstone = Some(Redstone::Button);
         }
+        by_block[id("piston")].piston = Some(Piston::Base { sticky: false });
+        by_block[id("sticky_piston")].piston = Some(Piston::Base { sticky: true });
+        by_block[id("piston_head")].piston = Some(Piston::Head);
+        by_block[id("moving_piston")].piston = Some(Piston::Moving);
+        for name in ["slime_block", "honey_block"] {
+            by_block[id(name)].sticky = true;
+        }
+        for name in ["obsidian", "crying_obsidian", "respawn_anchor", "reinforced_deepslate"] {
+            by_block[id(name)].piston_immovable = true;
+        }
         by_block[id("repeater")].support = Some(Support::RigidBelow);
         by_block[id("redstone_wire")].support = Some(Support::WireBase);
         by_block[id("hopper")].is_hopper = true;
+        for &b in block_tag("minecraft:dirt") {
+            by_block[usize::from(b)].plant_ground = true;
+        }
+        by_block[id("farmland")].plant_ground = true;
+        for &b in block_tag("minecraft:small_flowers") {
+            by_block[usize::from(b)].support = Some(Support::PlantGround);
+        }
         for &b in block_tag("minecraft:trapdoors") {
             by_block[usize::from(b)].is_trapdoor = true;
         }
@@ -300,6 +342,10 @@ impl Kinds {
             soul_soil: default_state("soul_soil"),
             blue_ice: default_state("blue_ice"),
             wire_default: default_state("redstone_wire"),
+            moving_piston: default_state("moving_piston"),
+            piston_head: default_state("piston_head"),
+            slime_block: id("slime_block") as u16,
+            honey_block: id("honey_block") as u16,
             water_block: block_by_name("water").expect("water").first_state,
             lava_block: block_by_name("lava").expect("lava").first_state,
         }

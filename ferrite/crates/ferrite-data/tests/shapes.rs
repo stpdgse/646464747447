@@ -156,3 +156,11 @@ fn block_entity_and_unbreakable_flags() {
     );
     assert!(!facts(default_state("stone")).has(flag::UNBREAKABLE));
 }
+
+#[test]
+fn push_reactions_follow_this_versions_enum_order() {
+    assert_eq!(facts(default_state("stone")).piston_reaction(), 0);
+    assert_eq!(facts(default_state("white_glazed_terracotta")).piston_reaction(), 1);
+    assert_eq!(facts(default_state("torch")).piston_reaction(), 2);
+    assert_eq!(facts(default_state("obsidian")).piston_reaction(), 3);
+}

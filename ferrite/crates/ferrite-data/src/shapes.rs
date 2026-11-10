@@ -106,7 +106,8 @@ impl StateFacts {
     pub const fn light_dampening(&self) -> u8 {
         self.light_dampening
     }
-    /// Index into vanilla's push-reaction enum (`normal, destroy, block, ignore, push_only`).
+    /// Index into the game's push-reaction enum, in this version's order: `0` normal, `1` push-only
+    /// (glazed terracotta), `2` destroy (torches, flowers, doors), `3` block (obsidian, anvils, portals).
     pub const fn piston_reaction(&self) -> u8 {
         self.piston
     }

@@ -183,8 +183,10 @@ class Recorder:
         return blocks, ticks, block_ticks
 
     def clear(self):
+        # Pistons can push blocks out of the arena, so a wide margin is cleared too.
         for y in range(Y0, Y1 + 1, 4):
-            self.r.cmd(f"fill 0 {y} 0 15 {min(y + 3, Y1)} 15 air")
+            for z0, z1 in ((-16, 7), (8, 31)):
+                self.r.cmd(f"fill -16 {y} {z0} 31 {min(y + 3, Y1)} {z1} air")
         self.step(130)  # let every stale scheduled tick run out
         blocks, ticks, btk = self.snapshot()
         if blocks or ticks or btk:
@@ -452,6 +454,181 @@ def redstone_scenarios():
     return s
 
 
+def piston_scenarios():
+    s = {}
+    P = "piston[facing=east]"
+    SP = "sticky_piston[facing=east]"
+    n = lambda k: steps(*[1] * k)
+    s["pi_extend_and_retract"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6) + [("set", 7, 100, 8, "air")] + n(6))
+    s["pi_extend_empty_beside_a_lit_lamp"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 101 8 redstone_lamp[lit=true]", "setblock 9 100 9 redstone_lamp[lit=true]"],
+        [("set", 7, 100, 8, "redstone_block")] + n(8))
+    s["pi_extend_empty"] = (ARENA + ["setblock 8 100 8 " + P],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 7, 100, 8, "air")] + n(5))
+    s["pi_sticky_pulls_back"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6) + [("set", 7, 100, 8, "air")] + n(6))
+    s["pi_sticky_leaves_nothing_to_pull"] = (ARENA + ["setblock 8 100 8 " + SP],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 7, 100, 8, "air")] + n(5))
+    s["pi_pushes_a_row"] = (ARENA + ["setblock 8 100 8 " + P] + [f"setblock {x} 100 8 stone" for x in range(9, 13)],
+        [("set", 7, 100, 8, "redstone_block")] + n(6) + [("set", 7, 100, 8, "air")] + n(6))
+    # The east wall is opened at x=15 so the row has somewhere to go.
+    s["pi_pushes_twelve"] = (ARENA + ["setblock 15 100 8 air", "setblock 2 100 8 piston[facing=east]"] + [f"setblock {x} 100 8 stone" for x in range(3, 15)],
+        [("set", 1, 100, 8, "redstone_block")] + n(6))
+    s["pi_cannot_push_thirteen"] = (ARENA + ["setblock 15 100 8 air", "setblock 1 100 8 piston[facing=east]"] + [f"setblock {x} 100 8 stone" for x in range(2, 15)],
+        [("set", 0, 100, 8, "air"), ("set", 1, 100, 7, "redstone_block")] + n(6))
+    s["pi_obsidian_blocks"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone", "setblock 10 100 8 obsidian"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5))
+    s["pi_bedrock_blocks"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 bedrock"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5))
+    s["pi_chest_blocks"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 chest"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5))
+    s["pi_destroys_a_torch"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone", "setblock 10 100 8 torch"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_destroys_a_flower"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 poppy"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5))
+    s["pi_pushes_a_glazed_terracotta_only_along_its_axis"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 white_glazed_terracotta"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5))
+    s["pi_pushes_a_bed_is_refused"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 white_bed[part=foot,facing=east]"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5))
+    s["pi_slime_drags_neighbours"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 slime_block", "setblock 9 101 8 stone",
+                                               "setblock 9 100 9 stone", "setblock 9 100 7 stone", "setblock 9 99 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6) + [("set", 7, 100, 8, "air")] + n(6))
+    s["pi_sticky_with_slime_pulls_a_cluster"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 slime_block", "setblock 9 101 8 stone",
+                                                          "setblock 9 100 9 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6) + [("set", 7, 100, 8, "air")] + n(6))
+    s["pi_honey_and_slime_do_not_stick"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 honey_block", "setblock 9 101 8 slime_block",
+                                                     "setblock 9 101 9 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_slime_with_honey_beside"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 slime_block", "setblock 9 101 8 honey_block", "setblock 9 101 9 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_honey_with_slime_beside"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 honey_block", "setblock 9 100 9 slime_block", "setblock 9 100 10 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_sticky_retract_refuses_a_torch"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 10, 100, 8, "torch"), ("set", 7, 100, 8, "air")] + n(6))
+    s["pi_sticky_retract_pulls_a_normal_block_placed_later"] = (ARENA + ["setblock 8 100 8 " + SP],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 10, 100, 8, "cobblestone"), ("set", 7, 100, 8, "air")] + n(6))
+    s["pi_slime_carries_a_push_only_block_nowhere"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 slime_block", "setblock 9 100 7 white_glazed_terracotta"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_slime_carries_a_push_only_block_along_its_axis"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 slime_block", "setblock 10 100 8 white_glazed_terracotta"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_vacated_cells_notify_in_order"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 slime_block", "setblock 9 101 8 slime_block", "setblock 9 100 9 slime_block",
+                                                      "setblock 9 101 9 slime_block", "setblock 9 99 8 stone",
+                                                      "setblock 9 102 8 observer[facing=down]", "setblock 9 100 10 observer[facing=north]", "setblock 9 101 10 observer[facing=north]",
+                                                      "setblock 9 100 7 observer[facing=south]", "setblock 9 101 7 observer[facing=south]", "setblock 9 98 8 observer[facing=up]",
+                                                      "setblock 9 102 9 observer[facing=down]"],
+        [("set", 7, 100, 8, "redstone_block")] + n(8))
+    s["pi_old_cells_wake_their_neighbours"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 redstone_block", "setblock 9 101 8 redstone_lamp", "setblock 9 100 9 redstone_lamp",
+                                                        "setblock 9 100 7 redstone_lamp"],
+        [("set", 7, 100, 8, "redstone_block")] + n(8))
+    # Lit-but-unpowered lamps react to *any* neighbour update, so they reveal which cells of a
+    # pushed row were notified (the middle ones are not the piston's head cell).
+    s["pi_middle_cells_wake_their_neighbours"] = (ARENA + ["setblock 8 100 8 " + P] + [f"setblock {x} 100 8 stone" for x in (9, 10, 11)]
+        + [f"setblock {x} 100 9 redstone_lamp[lit=true]" for x in (9, 10, 11, 12)] + [f"setblock {x} 101 8 redstone_lamp[lit=true]" for x in (9, 10, 11)],
+        [("set", 7, 100, 8, "redstone_block")] + n(8))
+    s["pi_slime_plate_vacates_many_cells"] = (ARENA + ["setblock 8 101 8 " + P]
+        + [f"setblock 9 {y} {z} slime_block" for y in (101, 102, 103) for z in (7, 8, 9)]
+        + [f"setblock 9 {y} {z} observer[facing=south]" for y in (101, 102, 103) for z in (6,)]
+        + [f"setblock 9 {y} {z} observer[facing=north]" for y in (101, 102, 103) for z in (10,)]
+        + [f"setblock 9 104 {z} observer[facing=down]" for z in (7, 8, 9)] + [f"setblock 9 100 {z} observer[facing=up]" for z in (7, 8, 9)],
+        [("set", 7, 101, 8, "redstone_block")] + n(8))
+    s["pi_slime_chain_limit"] = (ARENA + ["setblock 3 100 8 " + P] + [f"setblock {x} 100 8 slime_block" for x in range(4, 8)]
+                                 + [f"setblock {x} 101 8 stone" for x in range(4, 14)] + [f"setblock {x} 100 9 stone" for x in range(4, 8)],
+        [("set", 2, 100, 8, "redstone_block")] + n(6))
+    s["pi_vertical_up"] = (ARENA + ["setblock 8 100 8 piston[facing=up]", "setblock 8 101 8 stone", "setblock 8 99 8 stone"],
+        [("set", 9, 100, 8, "redstone_block")] + n(6) + [("set", 9, 100, 8, "air")] + n(6))
+    s["pi_vertical_down_sticky"] = (ARENA + ["setblock 8 102 8 sticky_piston[facing=down]", "setblock 8 101 8 stone", "setblock 9 102 8 air"],
+        [("set", 9, 102, 8, "redstone_block")] + n(6) + [("set", 9, 102, 8, "air")] + n(6))
+    s["pi_quasi_connectivity"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone"],
+        [("set", 8, 102, 8, "redstone_block")] + n(5) + [("set", 8, 101, 8, "redstone_lamp")] + n(5) + [("set", 8, 102, 8, "air")] + n(5))
+    s["pi_not_powered_from_its_front"] = (ARENA + ["setblock 8 100 8 " + P],
+        [("set", 9, 100, 8, "redstone_block")] + n(5))
+    s["pi_short_pulse"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block"), ("set", 7, 100, 8, "air")] + n(8))
+    s["pi_pulse_of_one_tick"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(1) + [("set", 7, 100, 8, "air")] + n(8))
+    s["pi_pulse_of_two_ticks"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(2) + [("set", 7, 100, 8, "air")] + n(8))
+    s["pi_pulse_of_three_ticks"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(3) + [("set", 7, 100, 8, "air")] + n(8))
+    s["pi_head_removed"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 9, 100, 8, "air")] + n(4))
+    s["pi_base_removed_while_extended"] = (ARENA + ["setblock 8 100 8 " + P],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 8, 100, 8, "air")] + n(4))
+    s["pi_pushes_a_piston"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 " + P, "setblock 10 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_two_pistons_face_off"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 11 100 8 piston[facing=west]", "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block"), ("set", 12, 100, 8, "redstone_block")] + n(8))
+    s["pi_moves_a_redstone_block_and_a_lamp"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 redstone_block", "setblock 10 100 9 redstone_lamp",
+                                                          "setblock 11 100 8 redstone_lamp"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_moves_a_torch_block"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone", "setblock 9 101 8 redstone_torch[lit=true]",
+                                            "setblock 10 101 8 redstone_lamp"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_moves_a_repeater_and_observer"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone", "setblock 9 101 8 repeater[facing=west]",
+                                                      "setblock 9 100 9 observer[facing=south]", "setblock 9 100 10 redstone_lamp"],
+        [("set", 7, 100, 8, "redstone_block")] + n(8))
+    s["pi_moves_a_wire_pushed_off_its_support"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone", "setblock 9 101 8 redstone_wire",
+                                                            "setblock 10 101 8 redstone_block"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6))
+    s["pi_pushed_blocks_land_beside_wire"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 redstone_block", "setblock 11 100 8 redstone_wire", "setblock 12 100 8 redstone_lamp"],
+        [("set", 7, 100, 8, "redstone_block")] + n(6) + [("set", 7, 100, 8, "air")] + n(6))
+    s["pi_wire_powers_the_piston"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone", "setblock 8 100 9 redstone_wire", "setblock 8 100 10 redstone_wire"],
+        [("set", 8, 100, 11, "redstone_block")] + n(6) + [("set", 8, 100, 11, "air")] + n(6))
+    s["pi_piston_clock"] = (ARENA + ["setblock 8 100 8 piston[facing=east]", "setblock 9 100 8 redstone_block", "setblock 8 100 9 redstone_wire"],
+        [("set", 8, 100, 7, "redstone_block")] + n(12))
+    s["pi_sticky_retract_blocked_by_obsidian"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 stone"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 11, 100, 8, "obsidian"), ("set", 7, 100, 8, "air")] + n(6))
+    s["pi_pull_obsidian_refused"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 obsidian"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 7, 100, 8, "air")] + n(6))
+    s["pi_sticky_pulls_destroy_type_block_refused"] = (ARENA + ["setblock 8 100 8 " + SP, "setblock 9 100 8 torch"],
+        [("set", 7, 100, 8, "redstone_block")] + n(5) + [("set", 7, 100, 8, "air")] + n(6))
+    s["pi_push_into_water"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone", "setblock 10 100 8 water"],
+        [("set", 7, 100, 8, "redstone_block")] + n(12))
+    s["pi_pushes_waterlogged_slab"] = (ARENA + ["setblock 8 100 8 " + P, "setblock 9 100 8 stone_slab[waterlogged=true]"],
+        [("set", 7, 100, 8, "redstone_block")] + n(12))
+    return s
+
+
+def random_pistons(count, seed):
+    blocks = ["stone", "stone", "stone", "slime_block", "slime_block", "honey_block", "obsidian", "glass", "torch", "poppy",
+              "redstone_lamp", "redstone_block", "observer[facing=east]", "observer[facing=north]", "repeater[facing=west,delay=1]",
+              "white_glazed_terracotta", "chest", "oak_planks", "cobblestone", "redstone_wire", "stone_slab", "oak_fence"]
+    dirs = ["up", "down", "north", "south", "east", "west"]
+    out = {}
+    for n in range(count):
+        rng = random.Random(seed * 15485863 + n)
+        actions = []
+        pistons = []
+        for _ in range(rng.randint(1, 3)):
+            x, y, z = rng.randint(4, 11), rng.randint(100, 102), rng.randint(4, 11)
+            kind = rng.choice(["piston", "sticky_piston"])
+            actions.append(("set", x, y, z, f"{kind}[facing={rng.choice(dirs)}]"))
+            pistons.append((x, y, z))
+        for _ in range(rng.randint(6, 30)):
+            px, py, pz = rng.choice(pistons)
+            x = min(13, max(2, px + rng.randint(-4, 4)))
+            y = min(104, max(100, py + rng.randint(-2, 2)))
+            z = min(13, max(2, pz + rng.randint(-4, 4)))
+            if (x, y, z) in pistons:
+                continue
+            actions.append(("set", x, y, z, rng.choice(blocks)))
+        actions += steps(*[1] * 3)
+        for _ in range(rng.randint(2, 4)):
+            px, py, pz = rng.choice(pistons)
+            d = rng.choice([(-1, 0, 0), (1, 0, 0), (0, 0, -1), (0, 0, 1), (0, 1, 0), (0, 2, 0), (0, -1, 0)])
+            c = (px + d[0], py + d[1], pz + d[2])
+            if not (1 <= c[0] <= 14 and 100 <= c[1] <= 106 and 1 <= c[2] <= 14) or c in pistons:
+                continue
+            actions.append(("set", *c, "redstone_block"))
+            actions += steps(*[rng.choice([1, 1, 2, 3, 4]) for _ in range(rng.randint(2, 5))])
+            if rng.random() < 0.7:
+                actions.append(("set", *c, "air"))
+                actions += steps(*[rng.choice([1, 1, 2, 3, 4]) for _ in range(rng.randint(2, 5))])
+        actions += steps(10)
+        out[f"pi_random_{n:03}"] = ([*ARENA], actions)
+    return out
+
+
 def random_redstone(count, seed):
     parts = ["stone", "stone", "redstone_wire", "redstone_wire", "redstone_wire", "redstone_wire", "redstone_lamp",
              "repeater[facing=north,delay=1]", "repeater[facing=east,delay=2]", "repeater[facing=south,delay=1]",
@@ -567,13 +744,14 @@ def main():
     ap.add_argument("--only", default="")
     ap.add_argument("--random", type=int, default=40)
     ap.add_argument("--random-redstone", type=int, default=30)
+    ap.add_argument("--random-pistons", type=int, default=40)
     ap.add_argument("--random-circuits", type=int, default=30)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "..", "crates", "ferrite-blocks", "tests", "fixtures"))
     args = ap.parse_args()
 
     r = Rcon(args.rcon, args.password)
-    r.cmd("forceload add 0 0 31 31")
+    r.cmd("forceload add -16 -16 31 31")
     r.cmd("tick freeze")
     r.cmd("tick rate 1000")
     # Random ticks (melting, growth, fire) are random by design; recordings must not contain them.
@@ -583,6 +761,8 @@ def main():
     rec = Recorder(r, args.world)
     todo = scenarios()
     todo.update(redstone_scenarios())
+    todo.update(piston_scenarios())
+    todo.update(random_pistons(args.random_pistons, args.seed))
     todo.update(random_redstone(args.random_redstone, args.seed))
     todo.update(random_circuits(args.random_circuits, args.seed))
     todo.update(random_scenarios(args.random, args.seed))

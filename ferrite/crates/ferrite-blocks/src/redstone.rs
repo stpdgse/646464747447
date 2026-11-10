@@ -194,16 +194,21 @@ pub(crate) fn on_place<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, stat
 }
 
 /// The redstone block `old` at `pos` was replaced by a different kind of block.
-pub(crate) fn on_remove<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, old: u16) {
+pub(crate) fn on_remove<A: BlockAccess>(
+    world: &mut World<A>,
+    pos: BlockPos,
+    old: u16,
+    moved: bool,
+) {
     match redstone_of(old) {
-        Some(Redstone::Torch | Redstone::WallTorch) => notify_all_around(world, pos, old),
-        Some(Redstone::Repeater) => update_neighbors_in_front(world, pos, old),
+        Some(Redstone::Torch | Redstone::WallTorch) if !moved => notify_all_around(world, pos, old),
+        Some(Redstone::Repeater) if !moved => update_neighbors_in_front(world, pos, old),
         Some(Redstone::Observer) => {
             if is_true(old, "powered") && world.has_scheduled_block_tick(pos, block_of(old)) {
                 update_neighbors_in_front(world, pos, set_prop(old, "powered", "false"));
             }
         }
-        Some(Redstone::Wire) => {
+        Some(Redstone::Wire) if !moved => {
             let block = block_of(old);
             for d in Direction::ALL {
                 world.update_neighbors_at(pos.offset(d), block);
@@ -211,7 +216,7 @@ pub(crate) fn on_remove<A: BlockAccess>(world: &mut World<A>, pos: BlockPos, old
             wire_update_power(world, pos, old);
             update_neighboring_wires(world, pos);
         }
-        Some(Redstone::Lever | Redstone::Button) if is_true(old, "powered") => {
+        Some(Redstone::Lever | Redstone::Button) if is_true(old, "powered") && !moved => {
             let block = block_of(old);
             world.update_neighbors_at(pos, block);
             world.update_neighbors_at(pos.offset(attached_direction(old).opposite()), block);
@@ -635,7 +640,7 @@ fn target_strength<A: BlockAccess>(world: &mut World<A>, pos: BlockPos) -> u8 {
 
 /// Java's `HashSet<BlockPos>` iteration order for up to 12 elements: buckets of a 16-slot table
 /// in ascending order, insertion order within a bucket.
-fn java_hash_set_order(items: &[BlockPos]) -> Vec<BlockPos> {
+pub(crate) fn java_hash_set_order(items: &[BlockPos]) -> Vec<BlockPos> {
     let hash = |p: &BlockPos| -> usize {
         let h = p.y.wrapping_add(p.z.wrapping_mul(31)).wrapping_mul(31).wrapping_add(p.x) as u32;
         ((h ^ (h >> 16)) & 15) as usize
@@ -687,5 +692,41 @@ fn update_neighboring_wires<A: BlockAccess>(world: &mut World<A>, pos: BlockPos)
         } else {
             check_corner_change_at(world, p.below());
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// 400 orderings produced by the real `java.util.HashSet<net.minecraft.core.BlockPos>`
+    /// (see `tests/data/HashOrder.java`), including `BlockPos.hashCode` itself.
+    const JAVA: &str = include_str!("../tests/data/java_hashset_order.txt");
+
+    fn parse(list: &str) -> Vec<BlockPos> {
+        list.split_whitespace()
+            .map(|p| {
+                let v: Vec<i32> = p.split(',').map(|n| n.parse().expect("number")).collect();
+                BlockPos::new(v[0], v[1], v[2])
+            })
+            .collect()
+    }
+
+    #[test]
+    fn hash_set_order_matches_real_java() {
+        let mut checked = 0;
+        let mut reordered = 0;
+        for line in JAVA.lines().filter(|l| !l.starts_with('#')) {
+            let (inserted, iterated) = line.split_once('|').expect("separator");
+            let inserted = parse(inserted);
+            let want = parse(iterated);
+            assert_eq!(java_hash_set_order(&inserted), want, "insertion order {inserted:?}");
+            checked += 1;
+            if inserted != want {
+                reordered += 1;
+            }
+        }
+        assert_eq!(checked, 400);
+        assert!(reordered > 300, "the data must actually exercise reordering ({reordered})");
     }
 }

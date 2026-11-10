@@ -39,7 +39,7 @@ cargo run --release -p ferrite-swarm  -- --addr 127.0.0.1:25565 --mode join --co
 | `ferrite-remote` | Query (UDP) and RCON (TCP) servers plus clients, verified against vanilla |
 | `ferrite-ecs` | Archetype ECS: `#![forbid(unsafe_code)]`, generational entities, typed queries, bundles, deferred commands, resources. Deterministic by construction |
 | `ferrite-world` | Chunk model (paletted, bit-packed sections), versioned codec with zstd, and the crash-safe log-structured chunk store |
-| `ferrite-blocks` | Block behaviour: vanilla's neighbour/shape update propagation, scheduled ticks, water and lava, redstone (wire, repeaters, torches, lamps), connections and support rules. Checked against recordings of the official server |
+| `ferrite-blocks` | Block behaviour: vanilla's neighbour/shape update propagation, scheduled ticks, water and lava, redstone (wire, repeaters, torches, lamps, observers), pistons, connections and support rules. Checked against recordings of the official server |
 | `ferrite-sim` | Region scheduler (rayon) with deterministic exchange, plus the particle workload and single-threaded reference used to prove determinism |
 | `ferrite-server` | The executable (mimalloc, clap flags, both backends, online mode, Query, RCON) |
 
@@ -365,19 +365,34 @@ spelled out (so `oak_door[open=true]` keeps `open`, while a bare `oak_fence` con
 block's own `onPlace` may change it, and neighbour updates only run if it is still the placed state;
 a torch does not power the block it stands on, and a wall torch not its wall.
 
-Redstone verification: 40 hand-written scenarios (every repeater delay, pulse extension, locking,
-torch burnout, wire climbing/descending, loops, strong power through blocks, ...), 30 random mazes
-and 30 random circuits committed, and a further 300 unseen random ones replayed cleanly. Mutating
-power decay, stair rules, update order, wire/lever connections, `/setblock` adaptation, delays and
-priorities makes the recordings fail; two mutants survive and are documented as equivalent or
-unreachable (wire power next to a repeater is already covered by the wire's own signal; the
-`HashSet` order only matters in configurations the sweeps did not produce).
+Redstone verification: 55 hand-written scenarios (every repeater delay, pulse extension, locking,
+torch burnout, observers incl. clocks and mid-pulse removal, wire climbing/descending, loops, strong
+power through blocks, ...), 30 random mazes and 40 random circuits committed, and a further 570 unseen
+random ones replayed (one real bug found and fixed that way: a wall torch asks its support for a
+signal in the wrong direction). Mutating power decay, stair rules, update order, wire/lever
+connections, `/setblock` adaptation, delays, priorities, observer rules and more makes the
+recordings fail. Vanilla's `HashSet<BlockPos>` iteration order is additionally checked against
+**400 orderings produced by the real Java classes** (`tests/data/HashOrder.java`).
 
-Not yet: comparators, observers, pistons, dispensers/droppers/hoppers, rails, pressure plates and
-tripwire (they need entities), falling blocks, fire, random ticks, block entities. Lava that is
-*rising* uses vanilla's shared world random, which Ferrite cannot match, so recordings avoid it.
-Levers and buttons are driven by `/setblock`-style state changes in the tests; the real "use" path
-(player interaction) arrives with the player work.
+**Pistons.** Powering (including quasi-connectivity), the structure resolver (12-block limit, slime
+and honey stickiness, push reactions: normal / push-only / destroy / block, unbreakable blocks,
+block entities), block events, `moving_piston` block entities that carry blocks for two ticks, sticky
+pull-back, short pulses (event types 1 and 2), and the update fan-out order after a move. 90
+piston recordings (hand-written plus random) and 200 unseen random ones match; mutants of the
+push limit, stickiness, push-only rule, destroy handling, moving duration, event order and the
+neighbour-update fan-out are all caught. Two mutants survive and are documented as equivalent or
+unreachable: the hash order of vacated cells (the order *is* verified against real Java directly)
+and the redundant reaction guard on sticky pull-back.
+
+Found by the recordings: push-reaction ordinals in this version are `normal, push-only, destroy,
+block`; a recording server must clear the area around its arena (pistons push blocks out of it);
+`setBlockEntity` replaces an existing block entity at that position.
+
+Not yet: comparators, dispensers/droppers/hoppers, rails, pressure plates and tripwire (they need
+entities), falling blocks, fire, random ticks, container block entities. Lava that is *rising* uses
+vanilla's shared world random, which Ferrite cannot match, so recordings avoid it. Levers and
+buttons (and their timed release) are driven by `/setblock`-style state changes in the tests, since
+no server command can press them; the real "use" path arrives with the player work.
 
 ## Quality gates
 
