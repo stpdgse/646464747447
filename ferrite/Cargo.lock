@@ -948,6 +948,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "ferrite-game"
+version = "0.1.0"
+dependencies = [
+ "bytes",
+ "ferrite-blocks",
+ "ferrite-data",
+ "ferrite-protocol",
+ "ferrite-world",
+ "thiserror",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "ferrite-nbt"
 version = "0.1.0"
 dependencies = [
@@ -1036,6 +1050,7 @@ dependencies = [
 name = "ferrite-swarm"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bytes",
  "clap",
  "ferrite-data",

@@ -86,6 +86,17 @@ impl Conn {
         Ok(())
     }
 
+    /// Sends a packet whose body is already encoded (used to answer packets generically).
+    pub async fn send_raw(&mut self, id: i32, body: &[u8]) -> Result<()> {
+        let mut out = BytesMut::with_capacity(body.len() + 8);
+        self.enc.encode(id, body, &mut out)?;
+        if let Some(cipher) = &mut self.cipher {
+            cipher.apply(&mut out);
+        }
+        self.stream.write_all(&out).await?;
+        Ok(())
+    }
+
     pub async fn recv(&mut self) -> Result<Frame> {
         loop {
             if let Some(frame) = self.dec.next_frame()? {
@@ -280,8 +291,98 @@ pub async fn join_online_once(
     configure_and_enter(conn, start).await
 }
 
+/// One recorded clientbound play packet.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Captured {
+    pub id: i32,
+    pub name: &'static str,
+    pub body: Vec<u8>,
+}
+
+/// Joins `addr` as `name`, stays in the play state for `listen`, and returns every clientbound
+/// play packet exactly as received. The bot behaves like a minimal client: it answers
+/// keep-alives and pings, confirms teleports, acknowledges chunk batches and reports that it has
+/// loaded, so the server keeps streaming the world to it.
+pub async fn capture_play(addr: SocketAddr, name: &str, listen: Duration) -> Result<Vec<Captured>> {
+    let mut conn = Conn::connect(addr).await?;
+    conn.login(name).await?;
+    configure(&mut conn).await?;
+    let mut out = Vec::new();
+    let deadline = Instant::now() + listen;
+    let mut loaded_sent = false;
+    while Instant::now() < deadline {
+        let frame = match conn.recv().await {
+            Ok(f) => f,
+            Err(SwarmError::Timeout) => break,
+            Err(e) => return Err(e),
+        };
+        let packet_name = packet_name(State::Play, Direction::Clientbound, frame.id).unwrap_or("?");
+        match packet_name {
+            "keep_alive" => {
+                conn.send_raw(
+                    ferrite_data::generated::packets::play::serverbound::KEEP_ALIVE,
+                    &frame.body,
+                )
+                .await?
+            }
+            "ping" => {
+                conn.send_raw(
+                    ferrite_data::generated::packets::play::serverbound::PONG,
+                    &frame.body,
+                )
+                .await?
+            }
+            "player_position" => {
+                // player_position: id, x, y, z, dx, dy, dz, yRot, xRot, flags. The confirmation
+                // echoes the id, the position and the rotation.
+                let mut rest = &frame.body[..];
+                let teleport = <VarInt as ferrite_protocol::codec::Decode>::decode(&mut rest)?;
+                let mut id_only = Vec::new();
+                ferrite_protocol::codec::Encode::encode(&teleport, &mut id_only)?;
+                id_only.extend_from_slice(&rest[..24]); // x, y, z
+                id_only.extend_from_slice(&rest[48..56]); // yRot, xRot
+                conn.send_raw(
+                    ferrite_data::generated::packets::play::serverbound::ACCEPT_TELEPORTATION,
+                    &id_only,
+                )
+                .await?;
+                if !loaded_sent {
+                    conn.send_raw(
+                        ferrite_data::generated::packets::play::serverbound::PLAYER_LOADED,
+                        &[],
+                    )
+                    .await?;
+                    loaded_sent = true;
+                }
+            }
+            "chunk_batch_finished" => {
+                conn.send_raw(
+                    ferrite_data::generated::packets::play::serverbound::CHUNK_BATCH_RECEIVED,
+                    &25.0f32.to_be_bytes(),
+                )
+                .await?
+            }
+            _ => {}
+        }
+        out.push(Captured { id: frame.id, name: packet_name, body: frame.body.to_vec() });
+    }
+    Ok(out)
+}
+
 /// Everything after `login_finished`: acknowledge, configure, and read the first play packet.
 async fn configure_and_enter(mut conn: Conn, start: Instant) -> Result<JoinOutcome> {
+    let registries = configure(&mut conn).await?;
+    // The next packet belongs to the play state.
+    let frame = conn.recv().await?;
+    Ok(JoinOutcome {
+        latency: start.elapsed(),
+        first_play_packet: packet_name(State::Play, Direction::Clientbound, frame.id),
+        registries,
+    })
+}
+
+/// Acknowledges the login and walks through configuration; returns the number of registries seen.
+async fn configure(conn: &mut Conn) -> Result<usize> {
     conn.send(&LoginAcknowledged {}).await?;
     conn.send(&ClientInformation {
         locale: Str::new("en_US"),
@@ -324,11 +425,5 @@ async fn configure_and_enter(mut conn: Conn, start: Instant) -> Result<JoinOutco
         }
     }
 
-    // The next packet belongs to the play state.
-    let frame = conn.recv().await?;
-    Ok(JoinOutcome {
-        latency: start.elapsed(),
-        first_play_packet: packet_name(State::Play, Direction::Clientbound, frame.id),
-        registries,
-    })
+    Ok(registries)
 }

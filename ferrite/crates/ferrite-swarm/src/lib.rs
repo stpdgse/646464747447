@@ -8,7 +8,8 @@ mod report;
 mod runner;
 
 pub use client::{
-    Conn, JoinOutcome, SwarmError, join_once, join_online_once, ping_session, status_once,
+    Captured, Conn, JoinOutcome, SwarmError, capture_play, join_once, join_online_once,
+    ping_session, status_once,
 };
 pub use report::Report;
 pub use runner::{Mode, RunConfig, run};
