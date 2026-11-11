@@ -43,6 +43,37 @@ pub struct PlayerSave {
     pub health: f32,
     pub food: i32,
     pub saturation: f32,
+    /// Experience: total points, level and progress to the next level.
+    pub xp_total: i32,
+    pub xp_level: i32,
+    pub xp_progress: f32,
+}
+
+/// A furnace as saved: its three slots and where it is in burning and cooking.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct FurnaceSave {
+    pub slots: [ItemStack; 3],
+    pub lit: u32,
+    pub lit_total: u32,
+    pub spent: u32,
+    pub total: u32,
+    pub speed: f32,
+    /// Recipes whose output has not been collected yet, with counts (they hold the experience).
+    pub used: Vec<(String, u32)>,
+}
+
+/// One container to save.
+#[derive(Clone, Copy, Debug)]
+pub enum StoredContainer<'a> {
+    Chest(&'a [ItemStack]),
+    Furnace(&'a FurnaceSave),
+}
+
+/// The containers found in one chunk's record.
+#[derive(Debug, Default)]
+pub struct LoadedContainers {
+    pub chests: HashMap<BlockPos, Vec<ItemStack>>,
+    pub furnaces: HashMap<BlockPos, FurnaceSave>,
 }
 
 /// A dropped item as saved.
@@ -155,43 +186,66 @@ impl Persistence {
     pub fn save_containers(
         &self,
         chunk: ChunkPos,
-        containers: &[(BlockPos, &[ItemStack])],
+        containers: &[(BlockPos, StoredContainer<'_>)],
     ) -> Result<(), PersistError> {
-        if containers.iter().all(|(_, s)| s.iter().all(|i| i.count <= 0)) {
+        let empty = |slots: &[ItemStack]| slots.iter().all(|i| i.count <= 0);
+        if containers.iter().all(|(_, c)| match c {
+            StoredContainer::Chest(slots) => empty(slots),
+            StoredContainer::Furnace(_) => false,
+        }) {
             self.containers.delete(chunk)?;
             return Ok(());
         }
-        let mut out = vec![1u8];
-        out.extend_from_slice(&(containers.len() as u16).to_le_bytes());
-        for (pos, slots) in containers {
-            for v in [pos.x, pos.y, pos.z] {
-                out.extend_from_slice(&v.to_le_bytes());
-            }
+        let put_slots = |out: &mut Vec<u8>, slots: &[ItemStack]| {
             let filled: Vec<(usize, &ItemStack)> =
                 slots.iter().enumerate().filter(|(_, s)| s.count > 0).collect();
             out.extend_from_slice(&(slots.len() as u16).to_le_bytes());
             out.extend_from_slice(&(filled.len() as u16).to_le_bytes());
             for (i, s) in filled {
                 out.extend_from_slice(&(i as u16).to_le_bytes());
-                put_stack(&mut out, *s);
+                put_stack(out, *s);
+            }
+        };
+        let mut out = vec![2u8];
+        out.extend_from_slice(&(containers.len() as u16).to_le_bytes());
+        for (pos, container) in containers {
+            for v in [pos.x, pos.y, pos.z] {
+                out.extend_from_slice(&v.to_le_bytes());
+            }
+            match container {
+                StoredContainer::Chest(slots) => {
+                    out.push(0);
+                    put_slots(&mut out, slots);
+                }
+                StoredContainer::Furnace(f) => {
+                    out.push(1);
+                    put_slots(&mut out, &f.slots);
+                    for v in [f.lit, f.lit_total, f.spent, f.total] {
+                        out.extend_from_slice(&v.to_le_bytes());
+                    }
+                    out.extend_from_slice(&f.speed.to_le_bytes());
+                    out.extend_from_slice(&(f.used.len() as u16).to_le_bytes());
+                    for (name, n) in &f.used {
+                        out.push(name.len() as u8);
+                        out.extend_from_slice(name.as_bytes());
+                        out.extend_from_slice(&n.to_le_bytes());
+                    }
+                }
             }
         }
         self.containers.put(chunk, &out)?;
         Ok(())
     }
 
-    pub fn load_containers(
-        &self,
-        chunk: ChunkPos,
-    ) -> Result<HashMap<BlockPos, Vec<ItemStack>>, PersistError> {
-        let mut out = HashMap::new();
+    pub fn load_containers(&self, chunk: ChunkPos) -> Result<LoadedContainers, PersistError> {
+        let mut out = LoadedContainers::default();
         let Some(bytes) = self.containers.get(chunk)? else { return Ok(out) };
         let mut r = Reader(&bytes);
-        if r.u8()? != 1 {
+        let version = r.u8()?;
+        if !(1..=2).contains(&version) {
             return Err(PersistError::Corrupt { what: "containers", why: "unknown version" });
         }
-        for _ in 0..r.u16()? {
-            let pos = BlockPos::new(r.i32()?, r.i32()?, r.i32()?);
+        let read_slots = |r: &mut Reader<'_>| -> Result<Vec<ItemStack>, PersistError> {
             let size = usize::from(r.u16()?);
             let mut slots = vec![ItemStack::default(); size];
             for _ in 0..r.u16()? {
@@ -201,7 +255,42 @@ impl Persistence {
                     *slot = stack;
                 }
             }
-            out.insert(pos, slots);
+            Ok(slots)
+        };
+        for _ in 0..r.u16()? {
+            let pos = BlockPos::new(r.i32()?, r.i32()?, r.i32()?);
+            let kind = if version >= 2 { r.u8()? } else { 0 };
+            let slots = read_slots(&mut r)?;
+            match kind {
+                0 => {
+                    out.chests.insert(pos, slots);
+                }
+                1 => {
+                    let mut f = FurnaceSave::default();
+                    for (to, from) in f.slots.iter_mut().zip(slots) {
+                        *to = from;
+                    }
+                    f.lit = r.i32()? as u32;
+                    f.lit_total = r.i32()? as u32;
+                    f.spent = r.i32()? as u32;
+                    f.total = r.i32()? as u32;
+                    f.speed = r.f32()?;
+                    for _ in 0..r.u16()? {
+                        let n = usize::from(r.u8()?);
+                        let name = std::str::from_utf8(r.take(n)?)
+                            .map_err(|_| PersistError::Corrupt {
+                                what: "furnace",
+                                why: "bad recipe name",
+                            })?
+                            .to_string();
+                        f.used.push((name, r.i32()? as u32));
+                    }
+                    out.furnaces.insert(pos, f);
+                }
+                _ => {
+                    return Err(PersistError::Corrupt { what: "containers", why: "unknown kind" });
+                }
+            }
         }
         Ok(out)
     }
@@ -213,7 +302,7 @@ impl Persistence {
     }
 
     pub fn save_player(&self, uuid: Uuid, p: &PlayerSave) -> Result<(), PersistError> {
-        let mut out = vec![2u8];
+        let mut out = vec![3u8];
         for v in p.pos {
             out.extend_from_slice(&v.to_le_bytes());
         }
@@ -229,6 +318,9 @@ impl Persistence {
         out.extend_from_slice(&p.health.to_le_bytes());
         out.extend_from_slice(&p.food.to_le_bytes());
         out.extend_from_slice(&p.saturation.to_le_bytes());
+        out.extend_from_slice(&p.xp_total.to_le_bytes());
+        out.extend_from_slice(&p.xp_level.to_le_bytes());
+        out.extend_from_slice(&p.xp_progress.to_le_bytes());
         write_atomic(&self.player_path(uuid), &out)
     }
 
@@ -241,7 +333,7 @@ impl Persistence {
         }
         let mut r = Reader(&bytes);
         let version = r.u8()?;
-        if version != 1 && version != 2 {
+        if !(1..=3).contains(&version) {
             return Err(PersistError::Corrupt { what: "player", why: "unknown version" });
         }
         let pos = [r.f64()?, r.f64()?, r.f64()?];
@@ -256,6 +348,8 @@ impl Persistence {
         }
         let (health, food, saturation) =
             if version >= 2 { (r.f32()?, r.i32()?, r.f32()?) } else { (20.0, 20, 5.0) };
+        let (xp_total, xp_level, xp_progress) =
+            if version >= 3 { (r.i32()?, r.i32()?, r.f32()?) } else { (0, 0, 0.0) };
         Ok(Some(PlayerSave {
             pos,
             yaw,
@@ -266,6 +360,9 @@ impl Persistence {
             health,
             food,
             saturation,
+            xp_total,
+            xp_level,
+            xp_progress,
         }))
     }
 
@@ -359,13 +456,34 @@ mod tests {
         chest[3] = stack("minecraft:stone", 12);
         chest[26] = stack("minecraft:diamond", 1);
         let at = BlockPos::new(5, 70, -9);
-        p.save_containers(ChunkPos::new(0, -1), &[(at, &chest)]).unwrap();
+        let furnace = FurnaceSave {
+            slots: [
+                stack("minecraft:raw_iron", 5),
+                stack("minecraft:coal", 2),
+                ItemStack::default(),
+            ],
+            lit: 1234,
+            lit_total: 1600,
+            spent: 57,
+            total: 200,
+            speed: 1.0,
+            used: vec![("minecraft:iron_ingot_from_smelting_raw_iron".into(), 3)],
+        };
+        let oven = BlockPos::new(6, 70, -9);
+        p.save_containers(
+            ChunkPos::new(0, -1),
+            &[(at, StoredContainer::Chest(&chest)), (oven, StoredContainer::Furnace(&furnace))],
+        )
+        .unwrap();
         let back = p.load_containers(ChunkPos::new(0, -1)).unwrap();
-        assert_eq!(back[&at], chest);
-        assert!(p.load_containers(ChunkPos::new(7, 7)).unwrap().is_empty());
+        assert_eq!(back.chests[&at], chest);
+        assert_eq!(back.furnaces[&oven], furnace);
+        let none = p.load_containers(ChunkPos::new(7, 7)).unwrap();
+        assert!(none.chests.is_empty() && none.furnaces.is_empty());
         // An emptied chunk's record goes away.
-        p.save_containers(ChunkPos::new(0, -1), &[(at, &vec![ItemStack::default(); 27])]).unwrap();
-        assert!(p.load_containers(ChunkPos::new(0, -1)).unwrap().is_empty());
+        let blank = vec![ItemStack::default(); 27];
+        p.save_containers(ChunkPos::new(0, -1), &[(at, StoredContainer::Chest(&blank))]).unwrap();
+        assert!(p.load_containers(ChunkPos::new(0, -1)).unwrap().chests.is_empty());
 
         let uuid = Uuid::from_u128(42);
         let save = PlayerSave {
@@ -378,6 +496,9 @@ mod tests {
             health: 13.5,
             food: 7,
             saturation: 2.5,
+            xp_total: 321,
+            xp_level: 17,
+            xp_progress: 0.25,
         };
         p.save_player(uuid, &save).unwrap();
         assert_eq!(p.load_player(uuid).unwrap(), Some(save));

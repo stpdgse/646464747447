@@ -698,3 +698,87 @@ async fn animals_spawn_with_chunks_move_and_can_be_killed_for_their_drops() {
     assert!(died, "the animal dies from repeated blows");
     assert!(drops, "its loot drops as item entities");
 }
+
+#[tokio::test]
+async fn a_blast_furnace_burns_fuel_cooks_and_tells_the_window() {
+    use ferrite_protocol::codec::VarInt;
+    use ferrite_protocol::types::LenVec;
+    let s = server(4).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    a.send(&SetCreativeModeSlot {
+        slot: 36,
+        item: ItemStack { count: 1, item: item("minecraft:blast_furnace") },
+    })
+    .await
+    .unwrap();
+    let at = |seq| UseItemOn {
+        hand: VarInt(0),
+        pos: PackedPos::new(1, -61, 0),
+        face: VarInt(1),
+        cursor_x: 0.5,
+        cursor_y: 1.0,
+        cursor_z: 0.5,
+        inside: false,
+        world_border_hit: false,
+        sequence: VarInt(seq),
+    };
+    a.send(&at(1)).await.unwrap();
+    block_update_at(&mut a, 1, -60, 0).await;
+    for (slot, name) in [(36i16, "minecraft:raw_iron"), (37, "minecraft:coal")] {
+        a.send(&SetCreativeModeSlot { slot, item: ItemStack { count: 64, item: item(name) } })
+            .await
+            .unwrap();
+    }
+    a.send(&SetCreativeModeSlot { slot: 38, item: ItemStack::default() }).await.unwrap();
+    // Empty-handed (the held slot is 0: it holds the iron, which cannot be placed as a block).
+    let open = UseItemOn { pos: PackedPos::new(1, -60, 0), ..at(2) };
+    a.send(&open).await.unwrap();
+    let screen: OpenScreen = decode(&until(&mut a, 600, |p| p.name == "open_screen").await);
+    assert_eq!(screen.menu_type.0, 10, "the blast furnace menu");
+    let content: ContainerSetContent =
+        decode(&until(&mut a, 100, |p| p.name == "container_set_content").await);
+    assert_eq!(content.items.0.len(), 39, "3 furnace slots and the 36 inventory slots");
+    for property in 0..4 {
+        let d: ContainerSetData =
+            decode(&until(&mut a, 100, |p| p.name == "container_set_data").await);
+        assert_eq!((d.window_id.0, d.property, d.value), (screen.container_id.0, property, 0));
+    }
+    let mut state = content.state_id.0;
+    // Shift-click the raw iron and the coal (hotbar slots 30 and 31 of this window): they go to
+    // the ingredient and the fuel slot on their own.
+    for slot in [30i16, 31] {
+        a.send(&ContainerClick {
+            window_id: screen.container_id,
+            state_id: VarInt(state),
+            slot,
+            button: 0,
+            click_type: VarInt(1),
+            changed: LenVec(vec![]),
+            carried: HashedStack(None),
+        })
+        .await
+        .unwrap();
+    }
+    // The coal catches fire: the burn time (a blast furnace burns coal for 800 ticks) arrives.
+    let lit = until(&mut a, 600, |p| {
+        p.name == "container_set_data" && {
+            let d: ContainerSetData = decode(p);
+            d.property == 0 && d.value > 700
+        }
+    })
+    .await;
+    assert!(decode::<ContainerSetData>(&lit).value <= 800);
+    // About 5 seconds later (100 ticks) the first ingot appears in the output slot.
+    let out = until(&mut a, 3000, |p| {
+        p.name == "container_set_slot" && {
+            let c: ContainerSetSlot = decode(p);
+            c.slot == 2 && c.item.count > 0
+        }
+    })
+    .await;
+    let out: ContainerSetSlot = decode(&out);
+    assert_eq!(out.item, ItemStack { count: 1, item: item("minecraft:iron_ingot") });
+    state = out.state_id.0;
+    let _ = state;
+}

@@ -21,6 +21,7 @@ use ferrite_world::{Chunk, ChunkPos};
 use uuid::Uuid;
 
 mod containers;
+mod furnaces;
 mod mobs;
 mod survival;
 mod vitals;
@@ -219,6 +220,10 @@ struct Player {
     saturation: f32,
     exhaustion: f32,
     food_timer: u32,
+    /// Experience: total points collected, level, and progress (0..1) to the next level.
+    xp_total: i32,
+    xp_level: i32,
+    xp_progress: f32,
     fall_distance: f64,
     dead: bool,
     invulnerable_ticks: u32,
@@ -258,6 +263,8 @@ struct Game {
     dirty: HashSet<(i32, i32)>,
     /// Contents of chests and barrels, by position (27 slots each).
     containers: HashMap<BlockPos, Vec<ItemStack>>,
+    /// Furnaces, blast furnaces and smokers that have been opened or filled.
+    furnaces: HashMap<BlockPos, crate::furnace::Furnace>,
     /// How many players have each chest open.
     viewers: HashMap<BlockPos, u8>,
     /// Mobs.
@@ -314,6 +321,7 @@ impl Game {
             persist,
             dirty: HashSet::new(),
             containers: HashMap::new(),
+            furnaces: HashMap::new(),
             viewers: HashMap::new(),
             mobs: std::collections::BTreeMap::new(),
             items: restored,
@@ -440,6 +448,9 @@ impl Game {
             saturation: saved.as_ref().map_or(5.0, |s| s.saturation),
             exhaustion: 0.0,
             food_timer: 0,
+            xp_total: saved.as_ref().map_or(0, |s| s.xp_total),
+            xp_level: saved.as_ref().map_or(0, |s| s.xp_level),
+            xp_progress: saved.as_ref().map_or(0.0, |s| s.xp_progress),
             fall_distance: 0.0,
             dead: false,
             invulnerable_ticks: 0,
@@ -612,7 +623,14 @@ impl Game {
         send(s, &TickingStep { steps: VarInt(0) });
         send(s, &SetChunkCacheCenter { x: VarInt(p.center.0), z: VarInt(p.center.1) });
         send(s, &SetHealth { health: p.health, food: VarInt(p.food), saturation: p.saturation });
-        send(s, &SetExperience { progress: 0.0, total: VarInt(0), level: VarInt(0) });
+        send(
+            s,
+            &SetExperience {
+                progress: p.xp_progress,
+                total: VarInt(p.xp_total),
+                level: VarInt(p.xp_level),
+            },
+        );
         send(
             s,
             &ContainerSetContent {
@@ -702,7 +720,7 @@ impl Game {
             }
             if let Some(p) = &self.persist {
                 match p.load_containers(pos) {
-                    Ok(found) => self.containers.extend(found),
+                    Ok(found) => self.restore_containers(found),
                     Err(e) => tracing::error!("containers of chunk {cx},{cz} are unreadable: {e}"),
                 }
             }
@@ -1172,6 +1190,7 @@ impl Game {
         self.broadcast_block_changes();
         self.tick_items();
         self.tick_mobs();
+        self.tick_furnaces();
         if self.tick.is_multiple_of(SAVE_EVERY) {
             self.save_all();
         }

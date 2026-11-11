@@ -142,6 +142,9 @@ impl Game {
         p.food = 20;
         p.saturation = 5.0;
         p.exhaustion = 0.0;
+        p.xp_total = 0;
+        p.xp_level = 0;
+        p.xp_progress = 0.0;
         p.fall_distance = 0.0;
         p.invulnerable_ticks = 0;
         p.x = x;
@@ -187,6 +190,7 @@ impl Game {
             },
         );
         self.send_vitals(id);
+        self.send_experience(id);
         self.resync_inventory(id);
         self.plan_chunks(id);
         // Others see the player at the spawn again.

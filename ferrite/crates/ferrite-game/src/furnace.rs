@@ -49,7 +49,7 @@ impl Furnace {
             lit: 0,
             lit_total: 0,
             spent: 0,
-            total: 200,
+            total: 0,
             speed: 1.0,
             used: BTreeMap::new(),
         }

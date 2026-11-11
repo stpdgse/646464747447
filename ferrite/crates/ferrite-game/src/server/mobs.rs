@@ -50,7 +50,7 @@ pub fn damage_after_armor(damage: f32, armor: f32, toughness: f32) -> f32 {
 }
 
 impl Game {
-    fn mob_dice(&mut self) -> Rng {
+    pub(super) fn mob_dice(&mut self) -> Rng {
         let mut s = ferrite_loot::SplitMix(self.rng);
         let v = s.next_below(u32::MAX);
         self.rng = s.0;

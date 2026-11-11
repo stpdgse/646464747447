@@ -51,12 +51,16 @@ pub enum Layout {
     Crafting,
     /// A chest-like container with this many rows of nine slots.
     Generic(usize),
+    /// A furnace, blast furnace or smoker: ingredient, fuel and a take-only output.
+    Furnace(ferrite_crafting::Cooker),
 }
 
 /// Where the parts of a window sit.
 #[derive(Clone, Debug)]
 struct Geometry {
     result: Option<usize>,
+    /// A slot that only takes out (a furnace's output).
+    output: Option<usize>,
     grid: std::ops::Range<usize>,
     grid_width: usize,
     armor: std::ops::Range<usize>,
@@ -70,6 +74,7 @@ impl Layout {
         match self {
             Layout::Player => Geometry {
                 result: Some(0),
+                output: None,
                 grid: 1..5,
                 grid_width: 2,
                 armor: 5..9,
@@ -79,6 +84,7 @@ impl Layout {
             },
             Layout::Crafting => Geometry {
                 result: Some(0),
+                output: None,
                 grid: 1..10,
                 grid_width: 3,
                 armor: 0..0,
@@ -86,8 +92,19 @@ impl Layout {
                 hotbar: 37..46,
                 offhand: None,
             },
+            Layout::Furnace(_) => Geometry {
+                result: None,
+                output: Some(2),
+                grid: 0..0,
+                grid_width: 0,
+                armor: 0..0,
+                main: 3..30,
+                hotbar: 30..39,
+                offhand: None,
+            },
             Layout::Generic(rows) => Geometry {
                 result: None,
+                output: None,
                 grid: 0..0,
                 grid_width: 0,
                 armor: 0..0,
@@ -102,6 +119,7 @@ impl Layout {
         match self {
             Layout::Player | Layout::Crafting => 46,
             Layout::Generic(rows) => 9 * rows + 36,
+            Layout::Furnace(_) => 39,
         }
     }
 }
@@ -203,14 +221,25 @@ fn armor_slot(item: i32) -> Option<usize> {
     }
 }
 
+fn is_bucket(item: i32) -> bool {
+    ferrite_data::registries::item::by_name.get("minecraft:bucket").map(|i| *i as i32) == Some(item)
+}
+
+fn is_fuel(item: i32) -> bool {
+    item_info(item).is_some_and(|i| i.fuel > 0)
+}
+
 impl Menu {
     fn may_place(&self, slot: usize, stack: ItemStack) -> bool {
         let g = self.geo();
-        if g.result == Some(slot) {
+        if g.result == Some(slot) || g.output == Some(slot) {
             return false;
         }
         if g.armor.contains(&slot) {
             return armor_slot(stack.item) == Some(slot);
+        }
+        if matches!(self.layout, Layout::Furnace(_)) && slot == 1 {
+            return is_fuel(stack.item) || is_bucket(stack.item);
         }
         true
     }
@@ -220,7 +249,9 @@ impl Menu {
     }
 
     fn slot_max(&self, slot: usize, item: i32) -> i32 {
-        if self.geo().armor.contains(&slot) { 1 } else { max_stack(item) }
+        let bucket_in_fuel_slot =
+            matches!(self.layout, Layout::Furnace(_)) && slot == 1 && is_bucket(item);
+        if self.geo().armor.contains(&slot) || bucket_in_fuel_slot { 1 } else { max_stack(item) }
     }
 
     /// Recomputes the crafting result from the 2x2 grid.
@@ -422,6 +453,24 @@ impl Menu {
                     self.move_to(&mut stack, g.main.start, inventory_end, true)
                 } else {
                     self.move_to(&mut stack, 0, 9 * rows, false)
+                }
+            }
+            Layout::Furnace(cooker) => {
+                if g.output == Some(slot) {
+                    // The output goes to the inventory, last slots first.
+                    self.move_to(&mut stack, 3, 39, true)
+                } else if slot > 2 {
+                    if ferrite_crafting::cook(cooker, stack.item).is_some() {
+                        self.move_to(&mut stack, 0, 1, false)
+                    } else if is_fuel(stack.item) {
+                        self.move_to(&mut stack, 1, 2, false)
+                    } else if slot < 30 {
+                        self.move_to(&mut stack, 30, 39, false)
+                    } else {
+                        self.move_to(&mut stack, 3, 30, false)
+                    }
+                } else {
+                    self.move_to(&mut stack, 3, 39, false)
                 }
             }
             Layout::Crafting => {

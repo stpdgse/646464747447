@@ -117,6 +117,8 @@ fn serverbound_samples() -> String {
 fn clientbound_samples() -> String {
     use ferrite_protocol::types::Text;
     let mut s = String::new();
+    s += &line(&ContainerSetData { window_id: VarInt(3), property: 2, value: 117 });
+    s += &line(&SetExperience { progress: 0.375, total: VarInt(1234), level: VarInt(27) });
     s += &line(&ContainerSetSlot {
         window_id: VarInt(0),
         state_id: VarInt(3),

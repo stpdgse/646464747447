@@ -4,6 +4,7 @@ use ferrite_data::shapes::{facts, flag};
 
 use super::*;
 use crate::inventory::{Input, Layout, Menu};
+use ferrite_crafting::Cooker;
 
 /// What an open window is showing.
 #[derive(Clone, Debug)]
@@ -12,6 +13,8 @@ pub(super) enum Source {
     /// One chest, or the two halves of a double chest (first half's slots first).
     Chest(Vec<BlockPos>),
     Barrel(BlockPos),
+    /// A furnace, blast furnace or smoker.
+    Furnace(BlockPos),
 }
 
 #[derive(Clone, Debug)]
@@ -20,11 +23,16 @@ pub(super) struct Window {
     pub menu: Menu,
     pub source: Source,
     pub state: i32,
+    /// The furnace numbers the client was last told (window properties).
+    pub sent_data: [i16; 4],
 }
 
 const MENU_GENERIC_9X3: i32 = 2;
 const MENU_GENERIC_9X6: i32 = 5;
 const MENU_CRAFTING: i32 = 12;
+const MENU_FURNACE: i32 = 14;
+const MENU_BLAST_FURNACE: i32 = 10;
+const MENU_SMOKER: i32 = 22;
 
 fn title(key: &str) -> Text {
     let mut c = ferrite_nbt::Compound::new();
@@ -108,6 +116,18 @@ impl Game {
                 );
                 true
             }
+            "furnace" | "blast_furnace" | "smoker" => {
+                let (cooker, menu, key) = match name {
+                    "furnace" => (Cooker::Furnace, MENU_FURNACE, "container.furnace"),
+                    "blast_furnace" => {
+                        (Cooker::BlastFurnace, MENU_BLAST_FURNACE, "container.blast_furnace")
+                    }
+                    _ => (Cooker::Smoker, MENU_SMOKER, "container.smoker"),
+                };
+                self.furnaces.entry(pos).or_insert_with(|| crate::furnace::Furnace::new(cooker));
+                self.open_window(id, Source::Furnace(pos), Layout::Furnace(cooker), menu, key);
+                true
+            }
             _ => false,
         }
     }
@@ -117,6 +137,7 @@ impl Game {
             Source::Crafting => Vec::new(),
             Source::Chest(p) => p.clone(),
             Source::Barrel(p) => vec![*p],
+            Source::Furnace(_) => Vec::new(),
         }
     }
 
@@ -133,6 +154,13 @@ impl Game {
         }
         let positions = Self::container_positions(&source);
         let mut contents: Vec<ItemStack> = Vec::new();
+        let mut data = [0i16; 4];
+        if let Source::Furnace(pos) = &source
+            && let Some(f) = self.furnaces.get(pos)
+        {
+            contents.extend(f.slots);
+            data = super::furnaces::furnace_data(f);
+        }
         for pos in &positions {
             let stored =
                 self.containers.entry(*pos).or_insert_with(|| vec![ItemStack::default(); 27]);
@@ -163,7 +191,16 @@ impl Game {
                 carried: ItemStack::default(),
             },
         );
-        p.window = Some(Window { id: wid, menu, source: source.clone(), state: 1 });
+        if matches!(source, Source::Furnace(_)) {
+            for (property, value) in data.into_iter().enumerate() {
+                send(
+                    &p.sink,
+                    &ContainerSetData { window_id: VarInt(wid), property: property as i16, value },
+                );
+            }
+        }
+        p.window =
+            Some(Window { id: wid, menu, source: source.clone(), state: 1, sent_data: data });
         for pos in positions {
             self.adjust_viewers(pos, 1);
         }
@@ -198,6 +235,10 @@ impl Game {
     /// Copies the window's container slots back into storage.
     fn store_window(&mut self, id: PlayerId) {
         let Some(w) = self.players.get(&id).and_then(|p| p.window.as_ref()) else { return };
+        if let Source::Furnace(pos) = w.source {
+            let slots = [w.menu.slots[0], w.menu.slots[1], w.menu.slots[2]];
+            return self.set_furnace_slots(pos, slots);
+        }
         let positions = Self::container_positions(&w.source);
         for (i, pos) in positions.iter().enumerate() {
             if let Some(stored) = self.containers.get_mut(pos) {
@@ -215,6 +256,10 @@ impl Game {
             return self.resync_window(id);
         }
         let creative = p.game_mode == 1;
+        let furnace_out = match w.source {
+            Source::Furnace(pos) => Some((pos, w.menu.slots[2].count)),
+            _ => None,
+        };
         let drops = w.menu.click(i32::from(c.slot), i32::from(c.button), input, creative);
         let agrees = c.changed.0.iter().all(|ch| {
             usize::try_from(ch.slot)
@@ -225,6 +270,16 @@ impl Game {
         w.menu.write_back(&mut p.menu);
         p.menu.refresh_result();
         self.store_window(id);
+        // Taking anything out of the output pays out all the experience stored in the furnace.
+        if let Some((pos, before)) = furnace_out
+            && self
+                .players
+                .get(&id)
+                .and_then(|p| p.window.as_ref())
+                .is_some_and(|w| w.menu.slots[2].count < before)
+        {
+            self.award_furnace_experience(id, pos);
+        }
         for stack in drops {
             self.throw_item(id, stack, false);
         }
@@ -292,12 +347,21 @@ impl Game {
             {
                 tracing::error!("cannot save chunk {cx},{cz}: {e}");
             }
-            let inside: Vec<(BlockPos, &[ItemStack])> = self
+            let saves: Vec<(BlockPos, crate::persist::FurnaceSave)> = self
+                .furnaces
+                .iter()
+                .filter(|(p, _)| (p.x >> 4, p.z >> 4) == (cx, cz))
+                .map(|(p, f)| (*p, super::furnaces::furnace_to_save(f)))
+                .collect();
+            let mut inside: Vec<(BlockPos, crate::persist::StoredContainer<'_>)> = self
                 .containers
                 .iter()
                 .filter(|(p, _)| (p.x >> 4, p.z >> 4) == (cx, cz))
-                .map(|(p, v)| (*p, v.as_slice()))
+                .map(|(p, v)| (*p, crate::persist::StoredContainer::Chest(v.as_slice())))
                 .collect();
+            inside.extend(
+                saves.iter().map(|(p, f)| (*p, crate::persist::StoredContainer::Furnace(f))),
+            );
             if let Err(e) = persist.save_containers(pos, &inside) {
                 tracing::error!("cannot save the containers of chunk {cx},{cz}: {e}");
             }
@@ -350,6 +414,9 @@ impl Game {
             health: p.health,
             food: p.food,
             saturation: p.saturation,
+            xp_total: p.xp_total,
+            xp_level: p.xp_level,
+            xp_progress: p.xp_progress,
         };
         if let Err(e) = persist.save_player(p.uuid, &save) {
             tracing::error!("cannot save player {}: {e}", p.name);
@@ -358,6 +425,13 @@ impl Game {
 
     /// What was inside a container that is gone: it spills out as items.
     pub(super) fn spill_container(&mut self, pos: BlockPos) {
+        if let Some(f) = self.furnaces.remove(&pos) {
+            self.dirty.insert((pos.x >> 4, pos.z >> 4));
+            for stack in f.slots.into_iter().filter(|s| s.count > 0) {
+                self.drop_item(pos, stack);
+            }
+            return;
+        }
         let Some(items) = self.containers.remove(&pos) else { return };
         self.dirty.insert((pos.x >> 4, pos.z >> 4));
         for stack in items.into_iter().filter(|s| s.count > 0) {

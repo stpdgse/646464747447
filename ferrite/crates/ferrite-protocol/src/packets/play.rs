@@ -821,6 +821,14 @@ packet! {
         item: ItemStack,
     }
 
+    /// A window property: for a furnace 0 is the fuel's remaining burn time, 1 how long that fuel
+    /// burns in all, 2 the cooking progress and 3 the time the item takes.
+    ContainerSetData in Play Clientbound = play::clientbound::CONTAINER_SET_DATA "container_set_data" {
+        window_id: VarInt,
+        property: i16,
+        value: i16,
+    }
+
     /// Opens an inventory window on the client. `menu_type` is the id in the `menu` registry.
     OpenScreen in Play Clientbound = play::clientbound::OPEN_SCREEN "open_screen" {
         container_id: VarInt,
