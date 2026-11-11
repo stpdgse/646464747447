@@ -119,11 +119,11 @@ impl Menu {
 
     /// Takes one craft's worth out of the grid (the game's `ResultSlot.onTake`).
     fn consume_ingredients(&mut self) {
-        for slot in 1..=4 {
-            if !empty(self.slots[slot]) {
-                self.slots[slot].count -= 1;
-                if self.slots[slot].count <= 0 {
-                    self.slots[slot] = ItemStack::default();
+        for cell in &mut self.slots[1..=4] {
+            if !empty(*cell) {
+                cell.count -= 1;
+                if cell.count <= 0 {
+                    *cell = ItemStack::default();
                 }
             }
         }
