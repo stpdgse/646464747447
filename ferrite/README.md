@@ -579,3 +579,27 @@ charge, reduced by armor with vanilla's formula, with knockback, invulnerability
 and loot from the generated entity loot tables. Honest status: the movement constants and the damage formula
 come from the vanilla source and are unit tested; mob behaviour is not yet compared against the official
 server, and hostile mobs, breeding and mob persistence are not done.
+
+## Furnaces
+
+Furnaces, blast furnaces and smokers keep real state (burn time left, cooking progress, the output and
+the experience it has earned) and tick with the world. Their rules come straight from the official
+server and are checked against it:
+
+- the state machine (`crates/ferrite-game/src/furnace.rs`) is replayed tick by tick against 600
+  recorded scenarios of all three cookers (`scripts/record-furnace.py`, `tests/furnace.rs`); the second
+  batch of 400 was recorded after the model was written. That recording found two things worth knowing:
+  a fuel changes the cooking speed (blast furnaces and smokers cook twice as fast and burn fuel for half
+  as long, and changing the speed rescales the progress with float arithmetic that matters for exact
+  agreement), and a furnace placed by a command starts with a cooking time of 0 and finishes an item on
+  its first tick;
+- fuel burn times and what a used-up item leaves behind (a lava bucket leaves a bucket) are generated
+  from the jar, cooking recipes from its recipe files;
+- clicks in the furnace window (what fits in which slot, shift-click, when cooking restarts, the
+  experience paid out) are replayed against recorded clicks (`scripts/record-furnace-windows.py`,
+  `tests/furnace_windows.rs`);
+- burn and cooking numbers reach the open window as `container_set_data` packets, and everyone
+  looking at a furnace sees its slots change.
+
+Not done yet: experience goes straight to the player instead of through orbs (there are no orb entities
+yet), a furnace's light and smoke, hoppers feeding furnaces, and the recipe book.

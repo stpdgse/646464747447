@@ -118,6 +118,20 @@ impl Furnace {
         *self.used.entry(format!("minecraft:{name}")).or_insert(0) += 1;
     }
 
+    /// Replaces the three slots the way the game's `setItem` does: when the ingredient is
+    /// replaced by a different item (or removed), cooking starts over.
+    pub fn set_slots(&mut self, new: [ItemStack; 3]) {
+        let old = self.slots[INGREDIENT];
+        let now = new[INGREDIENT];
+        let untouched = (is_empty(&old) && is_empty(&now)) || old == now;
+        let same = !is_empty(&now) && !is_empty(&old) && old.item == now.item;
+        self.slots = new;
+        if !untouched && !same {
+            self.total = self.cook_time();
+            self.spent = 0;
+        }
+    }
+
     /// One game tick. Returns whether the block's `lit` state flipped.
     pub fn tick(&mut self) -> bool {
         let was_lit = self.is_lit();

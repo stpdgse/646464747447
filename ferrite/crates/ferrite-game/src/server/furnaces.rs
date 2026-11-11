@@ -74,14 +74,7 @@ impl Game {
     /// restarts cooking.
     pub(super) fn set_furnace_slots(&mut self, pos: BlockPos, new: [ItemStack; 3]) {
         let Some(f) = self.furnaces.get_mut(&pos) else { return };
-        let old = f.slots[crate::furnace::INGREDIENT];
-        let now = new[crate::furnace::INGREDIENT];
-        let same = now.count > 0 && old.count > 0 && old.item == now.item;
-        f.slots = new;
-        if !same {
-            f.total = f.cook_time();
-            f.spent = 0;
-        }
+        f.set_slots(new);
         self.dirty.insert((pos.x >> 4, pos.z >> 4));
     }
 

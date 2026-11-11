@@ -201,17 +201,28 @@ async fn main() -> anyhow::Result<()> {
                         }
                         "set_player_inventory" => {
                             let c: SetPlayerInventory = ferrite_protocol::codec::decode_exact(&p.body)?;
-                            let container = match c.slot.0 {
-                                i @ 0..=8 => Some(36 + i as usize),
-                                i @ 9..=35 => Some(i as usize),
-                                36 => Some(8),
-                                37 => Some(7),
-                                38 => Some(6),
-                                39 => Some(5),
-                                40 => Some(45),
-                                _ => None,
+                            // The player's slots sit at the end of any other window; in window
+                            // 0 they have the player-inventory layout.
+                            let inv = slots.len().saturating_sub(36);
+                            let container = if win == 0 {
+                                match c.slot.0 {
+                                    i @ 0..=8 => Some(36 + i as usize),
+                                    i @ 9..=35 => Some(i as usize),
+                                    36 => Some(8),
+                                    37 => Some(7),
+                                    38 => Some(6),
+                                    39 => Some(5),
+                                    40 => Some(45),
+                                    _ => None,
+                                }
+                            } else {
+                                match c.slot.0 {
+                                    i @ 0..=8 => Some(inv + 27 + i as usize),
+                                    i @ 9..=35 => Some(inv + i as usize - 9),
+                                    _ => None,
+                                }
                             };
-                            if let Some(i) = container {
+                            if let Some(i) = container.filter(|i| *i < slots.len()) {
                                 slots[i] = c.item;
                             }
                         }

@@ -782,3 +782,99 @@ async fn a_blast_furnace_burns_fuel_cooks_and_tells_the_window() {
     state = out.state_id.0;
     let _ = state;
 }
+
+#[tokio::test]
+async fn a_furnace_keeps_burning_state_across_a_restart() {
+    use ferrite_protocol::codec::VarInt;
+    use ferrite_protocol::types::LenVec;
+    let dir = tempfile::tempdir().unwrap();
+    let cfg = || GameConfig {
+        view_distance: 4,
+        world_dir: Some(dir.path().to_path_buf()),
+        ..GameConfig::default()
+    };
+    let use_at = |seq, y| UseItemOn {
+        hand: VarInt(0),
+        pos: PackedPos::new(1, y, 0),
+        face: VarInt(1),
+        cursor_x: 0.5,
+        cursor_y: 1.0,
+        cursor_z: 0.5,
+        inside: false,
+        world_border_hit: false,
+        sequence: VarInt(seq),
+    };
+    let lit_value;
+    {
+        let s = server_with(cfg()).await;
+        let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+        until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+        a.send(&SetCreativeModeSlot {
+            slot: 36,
+            item: ItemStack { count: 1, item: item("minecraft:furnace") },
+        })
+        .await
+        .unwrap();
+        a.send(&use_at(1, -61)).await.unwrap();
+        block_update_at(&mut a, 1, -60, 0).await;
+        a.send(&SetCreativeModeSlot {
+            slot: 36,
+            item: ItemStack { count: 8, item: item("minecraft:raw_iron") },
+        })
+        .await
+        .unwrap();
+        a.send(&SetCreativeModeSlot {
+            slot: 37,
+            item: ItemStack { count: 4, item: item("minecraft:coal") },
+        })
+        .await
+        .unwrap();
+        a.send(&SetCreativeModeSlot { slot: 38, item: ItemStack::default() }).await.unwrap();
+        // Hold the empty slot 2 (the item in hand 0 is raw iron, which does not place).
+        a.send(&use_at(2, -60)).await.unwrap();
+        let screen: OpenScreen = decode(&until(&mut a, 600, |p| p.name == "open_screen").await);
+        assert_eq!(screen.menu_type.0, 14, "the furnace menu");
+        let content: ContainerSetContent =
+            decode(&until(&mut a, 100, |p| p.name == "container_set_content").await);
+        for slot in [30i16, 31] {
+            a.send(&ContainerClick {
+                window_id: screen.container_id,
+                state_id: content.state_id,
+                slot,
+                button: 0,
+                click_type: VarInt(1),
+                changed: LenVec(vec![]),
+                carried: HashedStack(None),
+            })
+            .await
+            .unwrap();
+        }
+        let lit = until(&mut a, 600, |p| {
+            p.name == "container_set_data" && {
+                let d: ContainerSetData = decode(p);
+                d.property == 0 && d.value > 1500
+            }
+        })
+        .await;
+        lit_value = decode::<ContainerSetData>(&lit).value;
+        a.send(&ContainerClose { window_id: screen.container_id }).await.unwrap();
+        until(&mut a, 600, |p| p.name == "container_close").await;
+        tokio::time::sleep(Duration::from_millis(300)).await;
+    }
+    let s = server_with(cfg()).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    a.send(&SetCreativeModeSlot { slot: 36, item: ItemStack::default() }).await.unwrap();
+    a.send(&use_at(5, -60)).await.unwrap();
+    until(&mut a, 600, |p| p.name == "open_screen").await;
+    let content: ContainerSetContent =
+        decode(&until(&mut a, 100, |p| p.name == "container_set_content").await);
+    // Cooking takes 10 seconds: the iron is still all there, the coal already lit.
+    assert_eq!(content.items.0[0], ItemStack { count: 8, item: item("minecraft:raw_iron") });
+    assert_eq!(content.items.0[1], ItemStack { count: 3, item: item("minecraft:coal") });
+    // Still burning, and not past where it was when the first server stopped.
+    let burn: ContainerSetData =
+        decode(&until(&mut a, 100, |p| p.name == "container_set_data").await);
+    assert_eq!(burn.property, 0);
+    assert!(burn.value > 0 && burn.value <= lit_value, "{} vs {}", burn.value, lit_value);
+}
