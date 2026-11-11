@@ -338,3 +338,58 @@ async fn survival_players_dig_blocks_collect_the_drops_and_others_see_the_progre
     let taken = until(&mut a, 50, |p| p.name == "take_item_entity").await;
     assert_eq!(decode::<TakeItemEntity>(&taken).collected.0, spawned.id.0);
 }
+
+#[tokio::test]
+async fn inventory_clicks_move_stacks_and_disagreements_are_corrected() {
+    use ferrite_protocol::codec::VarInt;
+    use ferrite_protocol::types::LenVec;
+    let s = server(4).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    let stone = ItemStack { count: 10, item: item("minecraft:stone") };
+    a.send(&SetCreativeModeSlot { slot: 36, item: stone }).await.unwrap();
+    let click = |slot: i16, changed: Vec<ChangedSlot>, carried: ItemStack| ContainerClick {
+        window_id: VarInt(0),
+        state_id: VarInt(1),
+        slot,
+        button: 0,
+        click_type: VarInt(0),
+        changed: LenVec(changed),
+        carried: HashedStack::plain(carried),
+    };
+    let nothing = ItemStack::default();
+    // Pick the stack up, then put it down in the main inventory: both agree with the server.
+    a.send(&click(36, vec![ChangedSlot { slot: 36, item: HashedStack(None) }], stone))
+        .await
+        .unwrap();
+    a.send(&click(20, vec![ChangedSlot { slot: 20, item: HashedStack::plain(stone) }], nothing))
+        .await
+        .unwrap();
+    // A click that claims something else happened is answered with the real inventory.
+    a.send(&click(
+        20,
+        vec![ChangedSlot { slot: 20, item: HashedStack(None) }],
+        nothing, // really the stack is now on the cursor
+    ))
+    .await
+    .unwrap();
+    let content = until(&mut a, 600, |p| p.name == "container_set_content").await;
+    let content: ContainerSetContent = decode(&content);
+    assert_eq!(content.items.0[20], nothing, "the stack was picked up");
+    assert_eq!(content.carried, stone, "and is on the cursor, whatever the client believed");
+    // Dropping with the drop key throws one item and updates the slot.
+    a.send(&SetCreativeModeSlot { slot: 36, item: stone }).await.unwrap();
+    a.send(&PlayerAction {
+        action: VarInt(4),
+        pos: PackedPos::new(0, 0, 0),
+        face: 0,
+        sequence: VarInt(0),
+    })
+    .await
+    .unwrap();
+    let thrown = until(&mut a, 600, |p| p.name == "add_entity").await;
+    assert_eq!(
+        decode::<AddEntity>(&thrown).kind.0 as u32,
+        ferrite_data::registries::entity_type::by_name["minecraft:item"]
+    );
+}

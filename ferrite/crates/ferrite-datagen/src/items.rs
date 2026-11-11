@@ -15,7 +15,7 @@ pub fn generate(cx: &GenContext, regs: &[Registry]) -> Result<String> {
     let dir = cx.reports.join("minecraft/components/item");
     let mut out = String::new();
     out.push_str(&cx.header);
-    out.push_str("\nuse crate::items::{ItemInfo, ToolInfo, ToolRule};\n\n");
+    out.push_str("\nuse crate::items::{EquipSlot, ItemInfo, ToolInfo, ToolRule};\n\n");
     let _ = writeln!(out, "pub static ITEMS: [ItemInfo; {}] = [", items.names.len());
     for name in &items.names {
         let short = name.strip_prefix("minecraft:").unwrap_or(name);
@@ -63,9 +63,26 @@ pub fn generate(cx: &GenContext, regs: &[Registry]) -> Result<String> {
                 )
             }
         };
+        let equip = match c.get("minecraft:equippable").and_then(|e| e["slot"].as_str()) {
+            None => "None".to_string(),
+            Some(slot) => {
+                let variant = match slot {
+                    "head" => "Head",
+                    "chest" => "Chest",
+                    "legs" => "Legs",
+                    "feet" => "Feet",
+                    "body" => "Body",
+                    "saddle" => "Saddle",
+                    "offhand" => "Offhand",
+                    "mainhand" => "Mainhand",
+                    other => bail!("{name}: unknown equipment slot {other}"),
+                };
+                format!("Some(EquipSlot::{variant})")
+            }
+        };
         let _ = writeln!(
             out,
-            "    ItemInfo {{ max_stack: {max_stack}, max_damage: {max_damage}, tool: {tool} }}, // {name}"
+            "    ItemInfo {{ max_stack: {max_stack}, max_damage: {max_damage}, tool: {tool}, equip: {equip} }}, // {name}"
         );
     }
     out.push_str("];\n");

@@ -9,6 +9,7 @@
 
 pub mod chunkenc;
 pub mod flat;
+pub mod inventory;
 pub mod items;
 pub mod server;
 

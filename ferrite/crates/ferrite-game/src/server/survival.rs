@@ -83,7 +83,7 @@ impl Game {
     /// The digger's tool and condition, as the speed rules see them.
     fn digger_for(&self, id: PlayerId) -> Digger {
         let Some(p) = self.players.get(&id) else { return Digger::default() };
-        let held = p.inventory[36 + usize::from(p.held_slot)];
+        let held = p.menu.slots[36 + usize::from(p.held_slot)];
         let tool = if held.count > 0 { item_info(held.item) } else { None };
         Digger { tool, on_ground: p.on_ground, ..Digger::default() }
     }
@@ -194,7 +194,7 @@ impl Game {
             let held_name = self
                 .players
                 .get(&id)
-                .map(|p| p.inventory[36 + usize::from(p.held_slot)])
+                .map(|p| p.menu.slots[36 + usize::from(p.held_slot)])
                 .filter(|s| s.count > 0)
                 .and_then(|s| ferrite_data::registries::item::names.get(s.item as usize).copied())
                 .unwrap_or("");
@@ -314,7 +314,7 @@ impl Game {
         let before = stack.count;
         let Some(p) = self.players.get_mut(&pid) else { return };
         let held = usize::from(p.held_slot);
-        let changed = add_to_inventory(&mut p.inventory, held, &mut stack);
+        let changed = add_to_inventory(&mut p.menu.slots, held, &mut stack);
         let taken = before - stack.count;
         if taken == 0 {
             return;
@@ -327,7 +327,7 @@ impl Game {
                     window_id: VarInt(0),
                     state_id: VarInt(p.inv_state),
                     slot: slot as i16,
-                    item: p.inventory[slot],
+                    item: p.menu.slots[slot],
                 },
             );
         }
@@ -476,5 +476,123 @@ impl Game {
                 }
             }
         }
+    }
+}
+
+// ---- inventory --------------------------------------------------------------------------
+
+impl Game {
+    /// Sends the whole inventory window and the cursor stack, as after any disagreement.
+    pub(super) fn resync_inventory(&mut self, id: PlayerId) {
+        let Some(p) = self.players.get_mut(&id) else { return };
+        p.inv_state = (p.inv_state + 1) & 0x7FFF;
+        send(
+            &p.sink,
+            &ContainerSetContent {
+                window_id: VarInt(0),
+                state_id: VarInt(p.inv_state),
+                items: LenVec(p.menu.slots.to_vec()),
+                carried: p.menu.carried,
+            },
+        );
+    }
+
+    pub(super) fn on_container_click(&mut self, id: PlayerId, c: &ContainerClick) {
+        use crate::inventory::Input;
+        if c.window_id.0 != 0 {
+            return;
+        }
+        let Some(p) = self.players.get_mut(&id) else { return };
+        let (Some(input), true) = (Input::from_id(c.click_type.0), p.game_mode != 3) else {
+            return self.resync_inventory(id);
+        };
+        if c.state_id.0 != p.inv_state {
+            // The client acted on a stale view: ignore the click and show the truth.
+            return self.resync_inventory(id);
+        }
+        let creative = p.game_mode == 1;
+        let drops = p.menu.click(i32::from(c.slot), i32::from(c.button), input, creative);
+        // The client says what it believes happened; any difference means a resync.
+        let agrees = c.changed.0.iter().all(|ch| {
+            usize::try_from(ch.slot)
+                .ok()
+                .and_then(|s| p.menu.slots.get(s))
+                .is_some_and(|ours| HashedStack::plain(*ours) == ch.item)
+        }) && HashedStack::plain(p.menu.carried) == c.carried;
+        for stack in drops {
+            self.throw_item(id, stack, false);
+        }
+        if !agrees {
+            self.resync_inventory(id);
+        }
+    }
+
+    /// The player closes the inventory: the cursor stack and crafting grid fall to the floor.
+    pub(super) fn close_inventory(&mut self, id: PlayerId) {
+        let Some(p) = self.players.get_mut(&id) else { return };
+        let mut drops = vec![std::mem::take(&mut p.menu.carried)];
+        for slot in 1..=4 {
+            drops.push(std::mem::take(&mut p.menu.slots[slot]));
+        }
+        for stack in drops.into_iter().filter(|s| s.count > 0) {
+            self.throw_item(id, stack, false);
+        }
+    }
+
+    /// The drop key: one item, or the whole stack with ctrl.
+    pub(super) fn drop_held(&mut self, id: PlayerId, whole: bool) {
+        let Some(p) = self.players.get_mut(&id) else { return };
+        if p.game_mode == 3 {
+            return;
+        }
+        let slot = 36 + usize::from(p.held_slot);
+        let held = p.menu.slots[slot];
+        if held.count <= 0 {
+            return;
+        }
+        let n = if whole { held.count } else { 1 };
+        p.menu.slots[slot].count -= n;
+        if p.menu.slots[slot].count <= 0 {
+            p.menu.slots[slot] = ItemStack::default();
+        }
+        p.inv_state = (p.inv_state + 1) & 0x7FFF;
+        send(
+            &p.sink,
+            &ContainerSetSlot {
+                window_id: VarInt(0),
+                state_id: VarInt(p.inv_state),
+                slot: slot as i16,
+                item: p.menu.slots[slot],
+            },
+        );
+        self.throw_item(id, ItemStack { count: n, item: held.item }, true);
+    }
+
+    /// Drops a stack from the player's eyes the way the game does (`Player.drop`): thrown along
+    /// the look direction, or just dropped in front when `forward` is false.
+    pub(super) fn throw_item(&mut self, id: PlayerId, stack: ItemStack, _key: bool) {
+        let Some(p) = self.players.get(&id) else { return };
+        let (yaw, pitch) = (f64::from(p.yaw).to_radians(), f64::from(p.pitch).to_radians());
+        let at = [p.x, p.y + 1.62 - 0.3, p.z];
+        let speed = 0.3;
+        let mut vel = [
+            -yaw.sin() * pitch.cos() * speed,
+            -pitch.sin() * speed + 0.1,
+            yaw.cos() * pitch.cos() * speed,
+        ];
+        let angle = self.next_random() * std::f64::consts::TAU;
+        let spread = 0.02 * self.next_random();
+        vel[0] += angle.cos() * spread;
+        vel[1] += (self.next_random() - self.next_random()) * 0.1;
+        vel[2] += angle.sin() * spread;
+        let eid = self.next_entity;
+        self.next_entity += 1;
+        let uuid = Uuid::from_u128(
+            (u128::from(self.next_random().to_bits()) << 64)
+                | u128::from(self.next_random().to_bits()),
+        );
+        let mut item = ItemEntity::new(eid, uuid, at, vel, stack);
+        item.pickup_delay = 40;
+        self.items.insert(eid, item);
     }
 }

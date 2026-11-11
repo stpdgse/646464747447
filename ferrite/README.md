@@ -476,7 +476,16 @@ vanilla server to accept a timed dig, so the formula is checked against known ti
 and item merging, durability, enchantments (stacks carry no components yet), and drops from
 blocks that vanish as a side effect of another break are not implemented.
 
-**Not yet:** damage, hunger, item components, the
+### Inventory
+
+The player inventory window is server-authoritative (`ferrite-game::inventory`): pickup, quick
+move (shift-click), number-key swap, throw, drag and double-click behave as vanilla's, armor slots
+only take their armor, and the drop key throws items with the game's velocity. If a click's
+claimed result differs from the server's, the client is sent the real inventory. The logic is
+checked against 2,075 clicks recorded from the official server (`scripts/record-inventory.py`,
+`tests/inventory.rs`), all identical. Crafting (the 2x2 grid and recipes) is not implemented.
+
+**Not yet:** crafting and recipes, damage, hunger, item components, the
 inventory beyond the hotbar being synchronised from the client, signed chat, commands, persistence of changes, lighting,
 and the io_uring backend's play state.
 

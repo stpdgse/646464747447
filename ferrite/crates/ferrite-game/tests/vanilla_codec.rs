@@ -11,6 +11,7 @@ use std::process::Command;
 use ferrite_protocol::codec::{Encode, VarInt};
 use ferrite_protocol::packet::Packet;
 use ferrite_protocol::packets::play::*;
+use ferrite_protocol::types::LenVec;
 
 fn line<P: Packet + Encode>(p: &P) -> String {
     let mut body = Vec::new();
@@ -62,6 +63,25 @@ fn serverbound_samples() -> String {
     s += &line(&SetCarriedItem { slot: 3 });
     s += &line(&SetCreativeModeSlot { slot: 36, item: ItemStack { count: 64, item: 1 } });
     s += &line(&SetCreativeModeSlot { slot: 37, item: ItemStack::default() });
+    s += &line(&ContainerClick {
+        window_id: VarInt(0),
+        state_id: VarInt(4),
+        slot: 36,
+        button: 0,
+        click_type: VarInt(0),
+        changed: LenVec(vec![ChangedSlot { slot: 36, item: HashedStack(None) }]),
+        carried: HashedStack::plain(ItemStack { count: 5, item: 1 }),
+    });
+    s += &line(&ContainerClick {
+        window_id: VarInt(0),
+        state_id: VarInt(5),
+        slot: 9,
+        button: 1,
+        click_type: VarInt(1),
+        changed: LenVec(vec![]),
+        carried: HashedStack(None),
+    });
+    s += &line(&ContainerClose { window_id: VarInt(0) });
     s += &line(&Punch {});
     s += &line(&PlayerCommand { entity_id: VarInt(5), action: VarInt(1), data: VarInt(0) });
     s += &line(&PlayerInput { flags: 0b0100_0001 });

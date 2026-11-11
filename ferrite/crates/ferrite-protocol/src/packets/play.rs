@@ -175,6 +175,94 @@ impl<'a> Decode<'a> for ItemStack {
     }
 }
 
+/// A stack as a client describes it in an inventory click: the components are only hashes, which
+/// the server compares with its own.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct HashedStack(pub Option<HashedItem>);
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct HashedItem {
+    pub item: i32,
+    pub count: i32,
+    /// `(component type, hash)` for components set on the stack.
+    pub added: Vec<(i32, i32)>,
+    /// Component types removed from the item's defaults.
+    pub removed: Vec<i32>,
+}
+
+impl HashedStack {
+    /// The stack a client with no item components would describe.
+    pub fn plain(stack: ItemStack) -> Self {
+        if stack.count <= 0 {
+            return HashedStack(None);
+        }
+        HashedStack(Some(HashedItem { item: stack.item, count: stack.count, ..Default::default() }))
+    }
+}
+
+impl Encode for HashedStack {
+    fn encode<B: bytes::BufMut>(&self, buf: &mut B) -> Result<()> {
+        let Some(h) = &self.0 else { return false.encode(buf) };
+        true.encode(buf)?;
+        VarInt(h.item).encode(buf)?;
+        VarInt(h.count).encode(buf)?;
+        VarInt(h.added.len() as i32).encode(buf)?;
+        for (kind, hash) in &h.added {
+            VarInt(*kind).encode(buf)?;
+            hash.encode(buf)?;
+        }
+        VarInt(h.removed.len() as i32).encode(buf)?;
+        for kind in &h.removed {
+            VarInt(*kind).encode(buf)?;
+        }
+        Ok(())
+    }
+}
+impl<'a> Decode<'a> for HashedStack {
+    fn decode(buf: &mut &'a [u8]) -> Result<Self> {
+        if !bool::decode(buf)? {
+            return Ok(HashedStack(None));
+        }
+        let item = VarInt::decode(buf)?.0;
+        let count = VarInt::decode(buf)?.0;
+        let n = VarInt::decode(buf)?.0;
+        if !(0..=256).contains(&n) {
+            return Err(crate::error::ProtocolError::Invalid("too many hashed components"));
+        }
+        let mut added = Vec::with_capacity(n as usize);
+        for _ in 0..n {
+            added.push((VarInt::decode(buf)?.0, i32::decode(buf)?));
+        }
+        let m = VarInt::decode(buf)?.0;
+        if !(0..=256).contains(&m) {
+            return Err(crate::error::ProtocolError::Invalid("too many removed components"));
+        }
+        let mut removed = Vec::with_capacity(m as usize);
+        for _ in 0..m {
+            removed.push(VarInt::decode(buf)?.0);
+        }
+        Ok(HashedStack(Some(HashedItem { item, count, added, removed })))
+    }
+}
+
+/// A slot the client changed in a click, with what it now holds.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ChangedSlot {
+    pub slot: i16,
+    pub item: HashedStack,
+}
+impl Encode for ChangedSlot {
+    fn encode<B: bytes::BufMut>(&self, buf: &mut B) -> Result<()> {
+        self.slot.encode(buf)?;
+        self.item.encode(buf)
+    }
+}
+impl<'a> Decode<'a> for ChangedSlot {
+    fn decode(buf: &mut &'a [u8]) -> Result<Self> {
+        Ok(ChangedSlot { slot: i16::decode(buf)?, item: HashedStack::decode(buf)? })
+    }
+}
+
 /// One entry of a [`PlayerInfoUpdate`]. Which fields are present depends on the update's action
 /// bits; absent ones are `None`.
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -713,6 +801,18 @@ packet! {
         item: ItemStack,
     }
 
+    /// The stack on the cursor.
+    SetCursorItem in Play Clientbound = play::clientbound::SET_CURSOR_ITEM "set_cursor_item" {
+        item: ItemStack,
+    }
+
+    /// A change to a slot of the player's own inventory, by inventory index (hotbar 0-8, main
+    /// 9-35, armor 36-39, off hand 40).
+    SetPlayerInventory in Play Clientbound = play::clientbound::SET_PLAYER_INVENTORY "set_player_inventory" {
+        slot: VarInt,
+        item: ItemStack,
+    }
+
     /// An item entity flies into a player's hands (the pickup animation).
     TakeItemEntity in Play Clientbound = play::clientbound::TAKE_ITEM_ENTITY "take_item_entity" {
         collected: VarInt,
@@ -926,6 +1026,22 @@ packet! {
         sequence: VarInt,
         y_rot: f32,
         x_rot: f32,
+    }
+
+    /// A click in an inventory window. `click_type`: 0 pickup, 1 quick move, 2 swap, 3 clone,
+    /// 4 throw, 5 quick craft, 6 pickup all.
+    ContainerClick in Play Serverbound = play::serverbound::CONTAINER_CLICK "container_click" {
+        window_id: VarInt,
+        state_id: VarInt,
+        slot: i16,
+        button: i8,
+        click_type: VarInt,
+        changed: LenVec<ChangedSlot, 128>,
+        carried: HashedStack,
+    }
+
+    ContainerClose in Play Serverbound = play::serverbound::CONTAINER_CLOSE "container_close" {
+        window_id: VarInt,
     }
 
     SetCarriedItem in Play Serverbound = play::serverbound::SET_CARRIED_ITEM "set_carried_item" {

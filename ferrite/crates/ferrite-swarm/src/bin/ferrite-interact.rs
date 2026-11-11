@@ -14,6 +14,8 @@
 //!                                                  send a digging action (survival mining)
 //!           ground                                 report standing on the ground (the server
 //!                                                  counts a client that never moved as airborne)
+//!           click <slot> <button> <type>           send an inventory click claiming no changes
+//!           dump                                   print the inventory this client believes in
 //!           quit
 //!   stdout: ready                                  joined and the first chunks have arrived
 //!           ack <sequence>                         the server acknowledged that click
@@ -27,8 +29,9 @@ use std::time::Duration;
 use clap::Parser;
 use ferrite_protocol::codec::VarInt;
 use ferrite_protocol::packets::play::{
-    BlockChangedAck, ItemStack, MovePlayerStatusOnly, PackedPos, PlayerAction, SetCreativeModeSlot,
-    UseItemOn,
+    BlockChangedAck, ContainerClick, ContainerSetContent, ContainerSetSlot, HashedStack, ItemStack,
+    MovePlayerStatusOnly, PackedPos, PlayerAction, SetCreativeModeSlot, SetCursorItem,
+    SetPlayerInventory, UseItemOn,
 };
 use ferrite_swarm::PlayBot;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -55,6 +58,10 @@ async fn main() -> anyhow::Result<()> {
     }
     println!("ready");
     let mut teleports = 0u32;
+    // The inventory as the server last told this client.
+    let mut slots = [ItemStack::default(); 46];
+    let mut carried = ItemStack::default();
+    let mut state_id = 0i32;
     let mut stdin = BufReader::new(tokio::io::stdin()).lines();
     loop {
         tokio::select! {
@@ -116,6 +123,28 @@ async fn main() -> anyhow::Result<()> {
                         })
                         .await?;
                     }
+                    ["click", slot, button, kind] => {
+                        bot.send(&ContainerClick {
+                            window_id: VarInt(0),
+                            state_id: VarInt(state_id),
+                            slot: slot.parse()?,
+                            button: button.parse()?,
+                            click_type: VarInt(kind.parse()?),
+                            changed: ferrite_protocol::types::LenVec(vec![]),
+                            carried: HashedStack(None),
+                        })
+                        .await?;
+                        // The client claimed an empty cursor; the server only corrects it if
+                        // the cursor really is not empty.
+                        carried = ItemStack::default();
+                    }
+                    ["dump"] => {
+                        let show = |s: &ItemStack| {
+                            if s.count > 0 { format!("{}:{}", s.count, s.item) } else { "-".to_string() }
+                        };
+                        let all: Vec<String> = slots.iter().map(show).collect();
+                        println!("inv {} {} {}", state_id, show(&carried), all.join(" "));
+                    }
                     ["ground"] => {
                         bot.send(&MovePlayerStatusOnly { flags: 1 }).await?;
                     }
@@ -129,6 +158,46 @@ async fn main() -> anyhow::Result<()> {
                     let p = p?;
                     if std::env::var_os("FERRITE_INTERACT_TRACE").is_some() {
                         eprintln!("pkt {} {:?}", p.name, p.body);
+                    }
+                    match p.name {
+                        "container_set_content" => {
+                            let c: ContainerSetContent = ferrite_protocol::codec::decode_exact(&p.body)?;
+                            if c.window_id.0 == 0 {
+                                for (i, it) in c.items.0.iter().enumerate().take(46) {
+                                    slots[i] = *it;
+                                }
+                                carried = c.carried;
+                                state_id = c.state_id.0;
+                            }
+                        }
+                        "container_set_slot" => {
+                            let c: ContainerSetSlot = ferrite_protocol::codec::decode_exact(&p.body)?;
+                            if c.window_id.0 == 0 && (0..46).contains(&c.slot) {
+                                slots[c.slot as usize] = c.item;
+                                state_id = c.state_id.0;
+                            }
+                        }
+                        "set_cursor_item" => {
+                            let c: SetCursorItem = ferrite_protocol::codec::decode_exact(&p.body)?;
+                            carried = c.item;
+                        }
+                        "set_player_inventory" => {
+                            let c: SetPlayerInventory = ferrite_protocol::codec::decode_exact(&p.body)?;
+                            let container = match c.slot.0 {
+                                i @ 0..=8 => Some(36 + i as usize),
+                                i @ 9..=35 => Some(i as usize),
+                                36 => Some(8),
+                                37 => Some(7),
+                                38 => Some(6),
+                                39 => Some(5),
+                                40 => Some(45),
+                                _ => None,
+                            };
+                            if let Some(i) = container {
+                                slots[i] = c.item;
+                            }
+                        }
+                        _ => {}
                     }
                     if p.name == "player_position" {
                         teleports += 1;

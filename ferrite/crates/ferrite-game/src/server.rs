@@ -186,7 +186,7 @@ struct Player {
     sent: SentState,
     moved: bool,
     held_slot: u8,
-    inventory: [ItemStack; 46],
+    menu: crate::inventory::Menu,
     sneaking: bool,
     /// The latest block-change sequence number to acknowledge at the end of the tick.
     ack: Option<i32>,
@@ -344,13 +344,13 @@ impl Game {
             },
             moved: false,
             held_slot: 0,
-            inventory: [ItemStack::default(); 46],
+            menu: crate::inventory::Menu::default(),
             sneaking: false,
             ack: None,
             game_mode: self.cfg.game_mode,
             joined: self.tick,
             dig: None,
-            inv_state: 0,
+            inv_state: 1,
             tracked_items: HashSet::new(),
         };
         self.players.insert(id, player);
@@ -703,6 +703,16 @@ impl Game {
                     pl.held_slot = p.slot as u8;
                 }
             }
+            ContainerClick::ID => {
+                let p = decode!(ContainerClick);
+                self.on_container_click(id, &p);
+            }
+            ContainerClose::ID => {
+                let p = decode!(ContainerClose);
+                if p.window_id.0 == 0 {
+                    self.close_inventory(id);
+                }
+            }
             PlayerAction::ID => {
                 let p = decode!(PlayerAction);
                 self.on_player_action(id, &p);
@@ -719,7 +729,7 @@ impl Game {
                 {
                     let mut item = p.item;
                     item.count = item.count.clamp(0, 99);
-                    pl.inventory[p.slot as usize] = item;
+                    pl.menu.slots[p.slot as usize] = item;
                 }
             }
             PlayerInput::ID => {
@@ -789,6 +799,7 @@ impl Game {
                 }
             }
             1 => self.abort_dig(id),
+            3 | 4 => self.drop_held(id, a.action.0 == 3),
             2 => {
                 if mode == 0 && self.in_reach(id, pos) {
                     self.stop_dig(id, pos);
@@ -820,7 +831,7 @@ impl Game {
             return self.kick(id, "Invalid packet");
         };
         let (sneaking, held) = match self.players.get(&id) {
-            Some(p) => (p.sneaking, p.inventory[36 + usize::from(p.held_slot)]),
+            Some(p) => (p.sneaking, p.menu.slots[36 + usize::from(p.held_slot)]),
             None => return,
         };
         let mut place_pos = target.offset(face);

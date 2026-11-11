@@ -22,12 +22,26 @@ pub struct ToolInfo {
     pub default_mining_speed: f32,
 }
 
+/// Where an item can be worn (its `equippable` component).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EquipSlot {
+    Head,
+    Chest,
+    Legs,
+    Feet,
+    Body,
+    Saddle,
+    Offhand,
+    Mainhand,
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct ItemInfo {
     pub max_stack: u8,
     /// 0 for items without durability.
     pub max_damage: u16,
     pub tool: Option<ToolInfo>,
+    pub equip: Option<EquipSlot>,
 }
 
 /// The facts about the item with this protocol id.
