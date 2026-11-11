@@ -703,7 +703,7 @@ impl Game {
         send(
             s,
             &PlayerPosition {
-                teleport_id: VarInt(0),
+                teleport_id: VarInt(1),
                 x,
                 y,
                 z,
@@ -761,7 +761,7 @@ impl Game {
                 carried: ItemStack::default(),
             },
         );
-        self.players.get_mut(&id).expect("just inserted").pending_teleport = Some(0);
+        self.players.get_mut(&id).expect("just inserted").pending_teleport = Some(1);
         self.plan_chunks(id);
     }
 

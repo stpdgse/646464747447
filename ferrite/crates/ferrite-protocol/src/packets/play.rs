@@ -556,6 +556,25 @@ impl<'a> Decode<'a> for OptNbt {
     }
 }
 
+/// The entity a [`PlayerLookAt`] follows.
+#[derive(Clone, Debug, PartialEq)]
+pub struct LookAtEntity {
+    pub id: VarInt,
+    /// Which part of it: 0 feet, 1 eyes.
+    pub anchor: VarInt,
+}
+impl Encode for LookAtEntity {
+    fn encode<B: bytes::BufMut>(&self, buf: &mut B) -> Result<()> {
+        self.id.encode(buf)?;
+        self.anchor.encode(buf)
+    }
+}
+impl<'a> Decode<'a> for LookAtEntity {
+    fn decode(buf: &mut &'a [u8]) -> Result<Self> {
+        Ok(LookAtEntity { id: Decode::decode(buf)?, anchor: Decode::decode(buf)? })
+    }
+}
+
 /// One signed argument of a command: its name and a 256-byte signature.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SignedArgument {
@@ -955,6 +974,16 @@ packet! {
     }
 
     /// Teleports the player. The client must answer with `accept_teleportation`.
+    /// Turns the player to face a point or an entity (`/tp ... facing`). Anchors: 0 feet, 1 eyes.
+    PlayerLookAt in Play Clientbound = play::clientbound::PLAYER_LOOK_AT "player_look_at" {
+        from_anchor: VarInt,
+        x: f64,
+        y: f64,
+        z: f64,
+        /// The entity to look at (and which anchor of it), when it is not just the point.
+        entity: Option<LookAtEntity>,
+    }
+
     PlayerPosition in Play Clientbound = play::clientbound::PLAYER_POSITION "player_position" {
         teleport_id: VarInt,
         x: f64,

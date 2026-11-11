@@ -13,7 +13,9 @@ use ferrite_protocol::packets::play::{ChatCommand, DisguisedChat, SystemChat};
 use ferrite_swarm::PlayBot;
 use tokio::net::TcpListener;
 
-const WATCH: [&str; 9] = [
+const WATCH: &[&str] = &[
+    "player_look_at",
+    "player_position",
     "ticking_state",
     "ticking_step",
     "set_time",
@@ -89,6 +91,17 @@ async fn collect(bot: &mut PlayBot) -> Vec<String> {
                     }
                     // (The game time at the front of a time packet depends on the world's age.)
                     let hex = if p.name == "set_time" { hex[16..].to_string() } else { hex };
+                    // (Entity ids differ between servers: the one a look-at follows is masked.)
+                    let hex = if p.name == "player_look_at" && hex[50..].starts_with("01") {
+                        let tail = &hex[50..];
+                        let mut i = 2;
+                        while u8::from_str_radix(&tail[i..i + 2], 16).unwrap() & 0x80 != 0 {
+                            i += 2;
+                        }
+                        format!("{}01ID{}", &hex[..50], &tail[i + 2..])
+                    } else {
+                        hex
+                    };
                     out.push(format!("evt {} {hex}", p.name));
                 }
             }

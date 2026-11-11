@@ -86,11 +86,13 @@ fn sin_table() -> &'static [f32; 65536] {
     })
 }
 
-fn table_sin(x: f32) -> f32 {
+/// `Mth.sin`: the game's table sine of an angle in radians.
+pub fn table_sin(x: f32) -> f32 {
     sin_table()[((f64::from(x) * 10430.378350470453) as i32 & 65535) as usize]
 }
 
-fn table_cos(x: f32) -> f32 {
+/// `Mth.cos`.
+pub fn table_cos(x: f32) -> f32 {
     sin_table()[((f64::from(x) * 10430.378350470453 + 16384.0) as i32 & 65535) as usize]
 }
 

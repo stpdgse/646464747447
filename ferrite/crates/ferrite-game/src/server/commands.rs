@@ -245,6 +245,7 @@ impl Game {
             "list" => self.cmd_list(id, false),
             "list/uuids" => self.cmd_list(id, true),
             "seed" => self.cmd_seed(id),
+            key if key.starts_with("teleport/") => self.cmd_teleport(id, key, args),
             "say/message" => self.cmd_say(id, args, "minecraft:say_command", "message"),
             "me/action" => self.cmd_say(id, args, "minecraft:emote_command", "action"),
             "msg/targets/message" => self.cmd_msg(id, args),
@@ -345,8 +346,8 @@ impl Game {
         // Spectators fly; survival players cannot; creative players keep flying if they were.
         match mode {
             3 => p.flying = true,
-            0 | 2 => p.flying = false,
-            _ => {}
+            // Leaving spectator mode stops the flying it forced.
+            _ => p.flying = false,
         }
         let uuid = p.uuid;
         let abilities = PlayerAbilities {
@@ -1057,5 +1058,316 @@ impl Game {
                 other.replace('/', " ")
             ))))),
         }
+    }
+}
+
+/// `String.format("%f", x)`.
+fn six_decimals(x: f64) -> String {
+    format!("{x:.6}")
+}
+
+/// A position argument's parts: `(relative, value)` for each axis (local coordinates have none).
+fn coordinate_parts(args: &Args, name: &str) -> Option<ferrite_commands::coordinates::Coordinates> {
+    match args.get(name).map(|a| &a.value) {
+        Some(Value::Position(c)) => Some(*c),
+        _ => None,
+    }
+}
+
+impl Game {
+    fn entity_name(&self, id: PlayerId) -> Component {
+        self.players
+            .get(&id)
+            .map_or_else(Component::empty, |p| player_display_name(&p.name, p.uuid))
+    }
+
+    /// `/teleport`: players only for now.
+    fn cmd_teleport(&mut self, source: PlayerId, key: &str, args: &Args) -> CommandResult {
+        use ferrite_commands::coordinates::Coordinates;
+        let rest = key.trim_start_matches("teleport/");
+        // Who is moved: the sender, or the `targets` argument.
+        let targets: Vec<PlayerId> = if rest.starts_with("targets") {
+            let Some(dispatch::ParsedArgument { value: Value::Selector(sel), .. }) =
+                args.get("targets")
+            else {
+                return Err(failure("argument.entity.invalid", vec![]));
+            };
+            let sel = (**sel).clone();
+            let found = self.select_players(source, &sel);
+            if found.is_empty() {
+                return Err(failure("argument.entity.notfound.entity", vec![]));
+            }
+            found
+        } else {
+            vec![source]
+        };
+        // To an entity.
+        if rest == "destination" || rest == "targets/destination" {
+            let Some(dispatch::ParsedArgument { value: Value::Selector(sel), .. }) =
+                args.get("destination")
+            else {
+                return Err(failure("argument.entity.invalid", vec![]));
+            };
+            let sel = (**sel).clone();
+            let dest = self.select_players(source, &sel);
+            let Some(&dest_id) = dest.first() else {
+                return Err(failure("argument.entity.notfound.entity", vec![]));
+            };
+            let (pos, rot) = {
+                let d = &self.players[&dest_id];
+                ([d.x, d.y, d.z], (d.yaw, d.pitch))
+            };
+            for t in &targets {
+                self.teleport_player(*t, pos, Some(rot), [false; 3], [false; 2])?;
+            }
+            let dest_name = self.entity_name(dest_id);
+            let message = if targets.len() == 1 {
+                Component::translatable(
+                    "commands.teleport.success.entity.single",
+                    vec![self.entity_name(targets[0]).into(), dest_name.into()],
+                )
+            } else {
+                Component::translatable(
+                    "commands.teleport.success.entity.multiple",
+                    vec![(targets.len() as i32).into(), dest_name.into()],
+                )
+            };
+            self.send_success(source, message, true);
+            return Ok(targets.len() as i32);
+        }
+        // To a place.
+        let Some(coords) = coordinate_parts(args, "location") else {
+            return Err(failure("argument.pos3d.incomplete", vec![]));
+        };
+        let rotation = args.get("rotation").and_then(|a| match &a.value {
+            Value::Pair(p) => Some(*p),
+            _ => None,
+        });
+        let mut results = Vec::new();
+        for t in &targets {
+            let Some(p) = self.players.get(t) else { continue };
+            let (cur, yaw, pitch) = ([p.x, p.y, p.z], p.yaw, p.pitch);
+            let (pos, rel) = match coords {
+                Coordinates::World(c) => (
+                    [c[0].value, c[1].value, c[2].value],
+                    [c[0].relative, c[1].relative, c[2].relative],
+                ),
+                Coordinates::Local { left, up, forward } => {
+                    // `^ ^ ^`: along where the target looks (`LocalCoordinates.getPosition`),
+                    // with the game's table sine and cosine.
+                    use ferrite_blocks::{table_cos, table_sin};
+                    let rad = std::f32::consts::PI / 180.0;
+                    let f = table_cos((yaw + 90.0) * rad);
+                    let g = table_sin((yaw + 90.0) * rad);
+                    let h = table_cos(-pitch * rad);
+                    let i = table_sin(-pitch * rad);
+                    let j = table_cos((-pitch + 90.0) * rad);
+                    let k = table_sin((-pitch + 90.0) * rad);
+                    let fwd = [f64::from(f * h), f64::from(i), f64::from(g * h)];
+                    let upv = [f64::from(f * j), f64::from(k), f64::from(g * j)];
+                    let cross = [
+                        fwd[1] * upv[2] - fwd[2] * upv[1],
+                        fwd[2] * upv[0] - fwd[0] * upv[2],
+                        fwd[0] * upv[1] - fwd[1] * upv[0],
+                    ];
+                    let lft = [-cross[0], -cross[1], -cross[2]];
+                    (
+                        [
+                            fwd[0] * forward + upv[0] * up + lft[0] * left,
+                            fwd[1] * forward + upv[1] * up + lft[1] * left,
+                            fwd[2] * forward + upv[2] * up + lft[2] * left,
+                        ],
+                        [true; 3],
+                    )
+                }
+            };
+            let rot = rotation
+                .map(|r| ((r[0].value as f32, r[0].relative), (r[1].value as f32, r[1].relative)));
+            let (rot_values, rot_rel) = match rot {
+                Some(((yv, yr), (pv, pr))) => (Some((yv, pv)), [yr, pr]),
+                None => (None, [true, true]),
+            };
+            let abs = [
+                if rel[0] { cur[0] + pos[0] } else { pos[0] },
+                if rel[1] { cur[1] + pos[1] } else { pos[1] },
+                if rel[2] { cur[2] + pos[2] } else { pos[2] },
+            ];
+            self.teleport_player(*t, pos, rot_values.or(Some((0.0, 0.0))), rel, rot_rel)?;
+            results.push(abs);
+        }
+        // `facing`: turn to look at a point or an entity.
+        self.teleport_facing(&targets, rest, args)?;
+        let first = results[0];
+        let message = if targets.len() == 1 {
+            Component::translatable(
+                "commands.teleport.success.location.single",
+                vec![
+                    self.entity_name(targets[0]).into(),
+                    six_decimals(first[0]).into(),
+                    six_decimals(first[1]).into(),
+                    six_decimals(first[2]).into(),
+                ],
+            )
+        } else {
+            Component::translatable(
+                "commands.teleport.success.location.multiple",
+                vec![
+                    (targets.len() as i32).into(),
+                    six_decimals(first[0]).into(),
+                    six_decimals(first[1]).into(),
+                    six_decimals(first[2]).into(),
+                ],
+            )
+        };
+        self.send_success(source, message, true);
+        Ok(targets.len() as i32)
+    }
+
+    /// Moves a player and tells them (`PlayerPosition`). `pos` are offsets where `relative`.
+    fn teleport_player(
+        &mut self,
+        id: PlayerId,
+        pos: [f64; 3],
+        rot: Option<(f32, f32)>,
+        relative: [bool; 3],
+        rot_relative: [bool; 2],
+    ) -> std::result::Result<(), Failure> {
+        let Some(p) = self.players.get_mut(&id) else { return Ok(()) };
+        let cur = [p.x, p.y, p.z];
+        let abs = [
+            if relative[0] { cur[0] + pos[0] } else { pos[0] },
+            if relative[1] { cur[1] + pos[1] } else { pos[1] },
+            if relative[2] { cur[2] + pos[2] } else { pos[2] },
+        ];
+        // Out of the world: the block must be within the spawnable bounds.
+        let (bx, by, bz) = (abs[0].floor() as i64, abs[1].floor() as i64, abs[2].floor() as i64);
+        if !(-30_000_000..30_000_000).contains(&bx)
+            || !(-30_000_000..30_000_000).contains(&bz)
+            || !(-20_000_000..20_000_000).contains(&by)
+        {
+            return Err(failure("commands.teleport.invalidPosition", vec![]));
+        }
+        let (yaw, pitch) = rot.unwrap_or((0.0, 0.0));
+        let new_yaw = if rot_relative[0] { p.yaw + yaw } else { yaw };
+        let new_pitch = if rot_relative[1] { p.pitch + pitch } else { pitch };
+        let new_pitch = new_pitch.clamp(-90.0, 90.0);
+        // Until the client confirms the teleport, the game holds the numbers it was given: a
+        // relative axis keeps its offset (the next command sees it).
+        p.x = if relative[0] { pos[0] } else { abs[0] };
+        p.y = if relative[1] { pos[1] } else { abs[1] };
+        p.z = if relative[2] { pos[2] } else { abs[2] };
+        p.yaw = if rot_relative[0] { yaw } else { new_yaw };
+        p.pitch = if rot_relative[1] { pitch } else { new_pitch };
+        p.on_ground = true;
+        p.fall_distance = 0.0;
+        let tp = p.next_teleport + 1;
+        p.next_teleport = tp;
+        p.pending_teleport = Some(tp);
+        p.sent.base = [quantize(abs[0]), quantize(abs[1]), quantize(abs[2])];
+        // Relative bits: each relative axis (and its velocity), and the turn.
+        let mut flags: u32 = 0;
+        for (i, r) in relative.iter().enumerate() {
+            if *r {
+                flags |= (1 << i) | (32 << i);
+            }
+        }
+        if rot_relative[0] {
+            flags |= 8;
+        }
+        if rot_relative[1] {
+            flags |= 16;
+        }
+        send(
+            &p.sink,
+            &PlayerPosition {
+                teleport_id: VarInt(tp),
+                x: pos[0],
+                y: pos[1],
+                z: pos[2],
+                dx: 0.0,
+                dy: 0.0,
+                dz: 0.0,
+                y_rot: yaw,
+                x_rot: pitch,
+                relative: flags,
+            },
+        );
+        Ok(())
+    }
+
+    /// The `facing` part of `/teleport`.
+    fn teleport_facing(
+        &mut self,
+        targets: &[PlayerId],
+        rest: &str,
+        args: &Args,
+    ) -> std::result::Result<(), Failure> {
+        use ferrite_commands::coordinates::Coordinates;
+        let anchor = |name: &str| -> i32 {
+            match args.get(name).map(|a| &a.value) {
+                Some(Value::Word(w)) if w == "eyes" => 1,
+                _ => 0,
+            }
+        };
+        if rest.contains("facing/entity") {
+            let Some(dispatch::ParsedArgument { value: Value::Selector(sel), .. }) =
+                args.get("facingEntity")
+            else {
+                return Ok(());
+            };
+            let sel = (**sel).clone();
+            let found = self.select_players(targets[0], &sel);
+            let Some(&entity) = found.first() else {
+                return Err(failure("argument.entity.notfound.entity", vec![]));
+            };
+            let to_anchor = anchor("facingAnchor");
+            let (ex, ey, ez, eid) = {
+                let e = &self.players[&entity];
+                (e.x, e.y + if to_anchor == 1 { f64::from(1.62f32) } else { 0.0 }, e.z, e.entity_id)
+            };
+            for t in targets {
+                self.look_at(*t, 0, [ex, ey, ez], Some((eid, to_anchor)));
+            }
+        } else if rest.ends_with("facing/facingLocation") {
+            let Some(Coordinates::World(c)) = coordinate_parts(args, "facingLocation") else {
+                return Ok(());
+            };
+            for t in targets {
+                let Some(p) = self.players.get(t) else { continue };
+                let cur = [p.x, p.y, p.z];
+                let pos = [
+                    if c[0].relative { cur[0] + c[0].value } else { c[0].value },
+                    if c[1].relative { cur[1] + c[1].value } else { c[1].value },
+                    if c[2].relative { cur[2] + c[2].value } else { c[2].value },
+                ];
+                self.look_at(*t, 0, pos, None);
+            }
+        }
+        Ok(())
+    }
+
+    /// Turns a player towards a point and tells them.
+    fn look_at(
+        &mut self,
+        id: PlayerId,
+        from_anchor: i32,
+        at: [f64; 3],
+        entity: Option<(i32, i32)>,
+    ) {
+        let Some(p) = self.players.get_mut(&id) else { return };
+        let eye = [p.x, p.y + if from_anchor == 1 { f64::from(1.62f32) } else { 0.0 }, p.z];
+        // The client turns itself; the game keeps the rotation it had until the client reports.
+        let _ = eye;
+        send(
+            &p.sink,
+            &PlayerLookAt {
+                from_anchor: VarInt(from_anchor),
+                x: at[0],
+                y: at[1],
+                z: at[2],
+                entity: entity
+                    .map(|(eid, anchor)| LookAtEntity { id: VarInt(eid), anchor: VarInt(anchor) }),
+            },
+        );
     }
 }

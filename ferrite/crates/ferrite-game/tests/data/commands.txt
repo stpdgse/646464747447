@@ -51,10 +51,10 @@ evt game_event 0340400000
 evt player_abilities 073d4ccccd3dcccccd
 sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.spectator"}]} 0
 > gamemode creative InteractBot
-evt player_abilities 0f3d4ccccd3dcccccd
+evt player_abilities 0d3d4ccccd3dcccccd
 evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c401
 evt game_event 033f800000
-evt player_abilities 0f3d4ccccd3dcccccd
+evt player_abilities 0d3d4ccccd3dcccccd
 sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.creative"}]} 0
 > gamemode survival @s
 evt player_abilities 003d4ccccd3dcccccd
@@ -324,3 +324,101 @@ chat {extra:[{click_event:{action:"suggest_command",command:"/tell InteractBot "
 sys {color:"red",extra:[{translate:"commands.teammsg.failed.noteam"}],text:""} 0
 > tm hello
 sys {color:"red",extra:[{translate:"commands.teammsg.failed.noteam"}],text:""} 0
+
+scenario teleport
+> tp 10 -60 10
+evt player_position 024025000000000000c04e0000000000004025000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"10.500000"},{"":"-60.000000"},{"":"10.500000"}]} 0
+> tp ~ 5 ~
+evt player_position 030000000000000000401400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000bd
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"10.500000"},{"":"5.000000"},{"":"10.500000"}]} 0
+> tp 5 ~ 5
+evt player_position 0440160000000000000000000000000000401600000000000000000000000000000000000000000000000000000000000000000000000000000000005a
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"5.500000"},{"":"5.000000"},{"":"5.500000"}]} 0
+> tp ~1 ~ ~
+evt player_position 053ff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ff
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"6.500000"},{"":"0.000000"},{"":"5.500000"}]} 0
+> tp ~ ~ ~
+evt player_position 060000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ff
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"1.000000"},{"":"0.000000"},{"":"0.000000"}]} 0
+> tp @s 0 -60 0 90 45
+evt player_position 073fe0000000000000c04e0000000000003fe000000000000000000000000000000000000000000000000000000000000042b400004234000000000000
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s 0 -60 0 ~10 ~5
+evt player_position 083fe0000000000000c04e0000000000003fe00000000000000000000000000000000000000000000000000000000000004120000040a0000000000018
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s 0 -60 0 ~ 20
+evt player_position 093fe0000000000000c04e0000000000003fe00000000000000000000000000000000000000000000000000000000000000000000041a0000000000008
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s ~2 ~ ~ 10 20
+evt player_position 0a4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004120000041a00000000000e7
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"2.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s ^ ^ ^
+evt player_position 0b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ff
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"2.000000"},{"":"0.000000"},{"":"0.000000"}]} 0
+> tp @s ^1 ^2 ^3
+evt player_position 0c3ff0000000000002400000000000000040080000000000010000000000000000000000000000000000000000000000000000000000000000000000ff
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"1.000000"},{"":"2.000000"},{"":"3.000000"}]} 0
+> tp @s 0 -60 0 90 45
+evt player_position 0d3fe0000000000000c04e0000000000003fe000000000000000000000000000000000000000000000000000000000000042b400004234000000000000
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s ^1 ^2 ^3
+evt player_position 0ec00c485b60000000bfe6a09e600000003fefff9b6e4041e40000000000000000000000000000000000000000000000000000000000000000000000ff
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"-3.035331"},{"":"-60.707107"},{"":"1.499952"}]} 0
+> tp @s 0 -60 0 0 0
+evt player_position 0f3fe0000000000000c04e0000000000003fe0000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp InteractBot 1 2 3
+evt player_position 103ff80000000000004000000000000000400c000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"1.500000"},{"":"2.000000"},{"":"3.500000"}]} 0
+> tp @s 5.5 -60 5.5
+evt player_position 114016000000000000c04e0000000000004016000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"5.500000"},{"":"-60.000000"},{"":"5.500000"}]} 0
+> tp @s InteractBot
+evt player_position 124016000000000000c04e0000000000004016000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+sys {translate:"commands.teleport.success.entity.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}]} 0
+> tp @a 3 -60 3
+evt player_position 13400c000000000000c04e000000000000400c000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"3.500000"},{"":"-60.000000"},{"":"3.500000"}]} 0
+> tp 1 2
+sys {color:"red",extra:[{translate:"argument.entity.notfound.entity"}],text:""} 0
+> tp Nobody 1 2 3
+sys {color:"red",extra:[{translate:"argument.entity.notfound.entity"}],text:""} 0
+> tp @s Nobody
+sys {color:"red",extra:[{translate:"argument.entity.notfound.entity"}],text:""} 0
+> tp 1000000000 0 0
+sys {color:"red",extra:[{translate:"commands.teleport.invalidPosition"}],text:""} 0
+> tp 30000000 -60 0
+sys {color:"red",extra:[{translate:"commands.teleport.invalidPosition"}],text:""} 0
+> tp @s 0 -60 0 facing 5 -60 5
+evt player_position 143fe0000000000000c04e0000000000003fe0000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+evt player_look_at 004016000000000000c04e000000000000401600000000000000
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s 0 -60 0 facing ~ ~ ~5
+evt player_position 153fe0000000000000c04e0000000000003fe0000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+evt player_look_at 003fe0000000000000c04e000000000000401600000000000000
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s 0 -60 0 facing entity @s
+evt player_position 163fe0000000000000c04e0000000000003fe0000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+evt player_look_at 003fe0000000000000c04e0000000000003fe000000000000001ID00
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s 0 -60 0 facing entity @s eyes
+evt player_position 173fe0000000000000c04e0000000000003fe0000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+evt player_look_at 003fe0000000000000c04d30a3d70000003fe000000000000001ID01
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s 0 -60 0 facing entity @s feet
+evt player_position 183fe0000000000000c04e0000000000003fe0000000000000000000000000000000000000000000000000000000000000000000000000000000000018
+evt player_look_at 003fe0000000000000c04e0000000000003fe000000000000001ID00
+sys {translate:"commands.teleport.success.location.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":"0.500000"},{"":"-60.000000"},{"":"0.500000"}]} 0
+> tp @s @s
+evt player_position 193fe0000000000000c04e0000000000003fe0000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+sys {translate:"commands.teleport.success.entity.single",with:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}]} 0
+> tp 0 -60 0 facing entity InteractBot
+sys {color:"red",extra:[{translate:"command.unknown.argument"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/tp 0 -60 0 facing entity InteractBot"},color:"gray",extra:[{"":"..."},{"":"p 0 -60 0 "},{color:"red",text:"facing entity InteractBot",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> tp 0 -60 0 ~ ~
+sys {color:"red",extra:[{translate:"command.unknown.argument"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/tp 0 -60 0 ~ ~"},color:"gray",extra:[{"":"..."},{"":"p 0 -60 0 "},{color:"red",text:"~ ~",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> tp 0 -60 0 0 91
+sys {color:"red",extra:[{translate:"command.unknown.argument"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/tp 0 -60 0 0 91"},color:"gray",extra:[{"":"..."},{"":"p 0 -60 0 "},{color:"red",text:"0 91",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0

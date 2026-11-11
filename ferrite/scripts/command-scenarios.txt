@@ -125,3 +125,37 @@ say @a[limit=0]
 say x @s y @s z
 teammsg hello
 tm hello
+
+scenario teleport
+tp 10 -60 10
+tp ~ 5 ~
+tp 5 ~ 5
+tp ~1 ~ ~
+tp ~ ~ ~
+tp @s 0 -60 0 90 45
+tp @s 0 -60 0 ~10 ~5
+tp @s 0 -60 0 ~ 20
+tp @s ~2 ~ ~ 10 20
+tp @s ^ ^ ^
+tp @s ^1 ^2 ^3
+tp @s 0 -60 0 90 45
+tp @s ^1 ^2 ^3
+tp @s 0 -60 0 0 0
+tp InteractBot 1 2 3
+tp @s 5.5 -60 5.5
+tp @s InteractBot
+tp @a 3 -60 3
+tp 1 2
+tp Nobody 1 2 3
+tp @s Nobody
+tp 1000000000 0 0
+tp 30000000 -60 0
+tp @s 0 -60 0 facing 5 -60 5
+tp @s 0 -60 0 facing ~ ~ ~5
+tp @s 0 -60 0 facing entity @s
+tp @s 0 -60 0 facing entity @s eyes
+tp @s 0 -60 0 facing entity @s feet
+tp @s @s
+tp 0 -60 0 facing entity InteractBot
+tp 0 -60 0 ~ ~
+tp 0 -60 0 0 91

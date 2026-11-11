@@ -26,6 +26,8 @@ mod world;
 
 pub use kinds::{Behaviour, Kinds, Piston, Redstone, block_id_of as kinds_block_id};
 pub use level::{BlockAccess, Chunks};
-pub use placement::{Formula, PlaceContext, horizontal_direction, looking_directions};
+pub use placement::{
+    Formula, PlaceContext, horizontal_direction, looking_directions, table_cos, table_sin,
+};
 pub use pos::{BlockPos, Direction};
 pub use world::{NEIGHBOR_UPDATE_ORDER, Rules, SHAPE_UPDATE_ORDER, World, update};
