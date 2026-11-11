@@ -706,6 +706,32 @@ packet! {
         carried: ItemStack,
     }
 
+    ContainerSetSlot in Play Clientbound = play::clientbound::CONTAINER_SET_SLOT "container_set_slot" {
+        window_id: VarInt,
+        state_id: VarInt,
+        slot: i16,
+        item: ItemStack,
+    }
+
+    /// An item entity flies into a player's hands (the pickup animation).
+    TakeItemEntity in Play Clientbound = play::clientbound::TAKE_ITEM_ENTITY "take_item_entity" {
+        collected: VarInt,
+        collector: VarInt,
+        amount: VarInt,
+    }
+
+    /// Block-breaking progress shown to other players: stage 0..=9, or 255 to clear.
+    BlockDestruction in Play Clientbound = play::clientbound::BLOCK_DESTRUCTION "block_destruction" {
+        id: VarInt,
+        pos: PackedPos,
+        progress: u8,
+    }
+
+    SetEntityMotion in Play Clientbound = play::clientbound::SET_ENTITY_MOTION "set_entity_motion" {
+        id: VarInt,
+        velocity: LpVec3,
+    }
+
     /// The command tree; Ferrite sends only the empty root for now.
     Commands in Play Clientbound = play::clientbound::COMMANDS "commands" {
         nodes: LenVec<CommandNode, 4096>,

@@ -299,20 +299,42 @@ async fn a_block_cannot_be_placed_inside_a_player() {
 }
 
 #[tokio::test]
-async fn survival_players_cannot_break_blocks_yet() {
+async fn survival_players_dig_blocks_collect_the_drops_and_others_see_the_progress() {
     use ferrite_protocol::codec::VarInt;
     let s =
         server_with(GameConfig { game_mode: 0, view_distance: 4, ..GameConfig::default() }).await;
     let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    let mut b = PlayBot::join(s.addr, "Bob").await.unwrap();
     until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
-    a.send(&PlayerAction {
-        action: VarInt(0),
-        pos: PackedPos::new(0, -61, 0),
-        face: 1,
-        sequence: VarInt(3),
-    })
-    .await
-    .unwrap();
-    // The client is told the block is still there.
+    until(&mut b, 600, |p| p.name == "chunk_batch_finished").await;
+    let at = PackedPos::new(0, -61, 0);
+    a.send(&PlayerAction { action: VarInt(0), pos: at, face: 1, sequence: VarInt(1) })
+        .await
+        .unwrap();
+    // Grass by hand takes 0.6 / 30 per tick: about 11 ticks to the 70% mark the server accepts.
+    // The server must not break it early...
+    a.send(&PlayerAction { action: VarInt(2), pos: at, face: 1, sequence: VarInt(2) })
+        .await
+        .unwrap();
     assert_eq!(block_update_at(&mut a, 0, -61, 0).await.state.0, state("grass_block"));
+    // ...and Bob is shown the digging progress.
+    until(&mut b, 600, |p| p.name == "block_destruction").await;
+    // The server finishes the dig by itself once enough time has passed.
+    let u = block_update_at(&mut a, 0, -61, 0).await;
+    assert_eq!(u.state.0, state("air"));
+    // The drop appears, is picked up by the player standing over it, and lands in the hotbar.
+    let spawned = until(&mut a, 600, |p| p.name == "add_entity").await;
+    let spawned: AddEntity = decode(&spawned);
+    assert_eq!(
+        spawned.kind.0 as u32,
+        ferrite_data::registries::entity_type::by_name["minecraft:item"]
+    );
+    // (Vanilla sends the inventory change first, then the pickup animation.)
+    // The item falls into the hole; the player steps down to it.
+    a.send(&MovePlayerPos { x: 0.5, y: -61.0, z: 0.5, flags: 1 }).await.unwrap();
+    let slot = until(&mut a, 600, |p| p.name == "container_set_slot").await;
+    let slot: ContainerSetSlot = decode(&slot);
+    assert_eq!((slot.slot, slot.item.item, slot.item.count), (36, item("minecraft:dirt"), 1));
+    let taken = until(&mut a, 50, |p| p.name == "take_item_entity").await;
+    assert_eq!(decode::<TakeItemEntity>(&taken).collected.0, spawned.id.0);
 }

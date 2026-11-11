@@ -5,9 +5,9 @@ use ferrite_protocol::codec::{Encode, decode_exact};
 use ferrite_protocol::packets::play::*;
 
 fn captures() -> Vec<(String, Vec<u8>)> {
-    let text = include_str!("captures/join.txt");
+    let text = [include_str!("captures/join.txt"), include_str!("captures/items.txt")].join("\n");
     text.lines()
-        .filter(|l| !l.starts_with('#'))
+        .filter(|l| !l.starts_with('#') && !l.is_empty())
         .map(|l| {
             let mut parts = l.splitn(3, ' ');
             let _id = parts.next().unwrap();
@@ -83,6 +83,9 @@ fn every_captured_packet_with_a_type_round_trips() {
         "player_info_update" => PlayerInfoUpdate,
         "set_entity_data" => SetEntityData,
         "container_set_content" => ContainerSetContent,
+        "container_set_slot" => ContainerSetSlot,
+        "take_item_entity" => TakeItemEntity,
+        "set_entity_motion" => SetEntityMotion,
     );
     assert!(errors.is_empty(), "{}", errors.join("\n"));
     eprintln!("verified against vanilla: {}", verified.join(", "));

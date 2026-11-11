@@ -420,7 +420,7 @@ impl Eval<'_, '_> {
             Value::Array(a) => a.iter().filter_map(Value::as_str).collect(),
             _ => Vec::new(),
         };
-        if !names.is_empty() && !names.iter().any(|n| *n == actual) {
+        if !names.is_empty() && !names.contains(&actual) {
             return false;
         }
         let Some(obj) = state.as_object() else { return true };

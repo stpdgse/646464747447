@@ -20,6 +20,8 @@ use ferrite_protocol::types::{Identifier, LenVec, Str, Text};
 use ferrite_world::{Chunk, ChunkPos};
 use uuid::Uuid;
 
+mod survival;
+
 use crate::chunkenc::{encode_sections, full_bright_light, heightmaps};
 use crate::flat::FlatGenerator;
 use crate::synchronized_id;
@@ -190,6 +192,12 @@ struct Player {
     ack: Option<i32>,
     game_mode: u8,
     joined: u64,
+    /// The block being dug (survival).
+    dig: Option<survival::Dig>,
+    /// The inventory window's state id, bumped on every change sent.
+    inv_state: i32,
+    /// Dropped items this player has been told about.
+    tracked_items: HashSet<i32>,
 }
 
 /// The world's random source (splitmix64), for the few placements that roll dice.
@@ -215,6 +223,8 @@ struct Game {
     /// Encoded chunk packets, dropped when a block in the chunk changes.
     chunk_cache: HashMap<(i32, i32), Arc<Vec<u8>>>,
     players: HashMap<PlayerId, Player>,
+    /// Dropped items.
+    items: std::collections::BTreeMap<i32, crate::items::ItemEntity>,
     /// Join order, for stable iteration.
     order: Vec<PlayerId>,
     next_entity: i32,
@@ -239,6 +249,7 @@ impl Game {
             world,
             chunk_cache: HashMap::new(),
             players: HashMap::new(),
+            items: std::collections::BTreeMap::new(),
             order: Vec::new(),
             next_entity: 1,
             tick: 0,
@@ -338,6 +349,9 @@ impl Game {
             ack: None,
             game_mode: self.cfg.game_mode,
             joined: self.tick,
+            dig: None,
+            inv_state: 0,
+            tracked_items: HashSet::new(),
         };
         self.players.insert(id, player);
         self.order.push(id);
@@ -762,15 +776,27 @@ impl Game {
 
     fn on_player_action(&mut self, id: PlayerId, a: &PlayerAction) {
         let pos = BlockPos::new(a.pos.x(), a.pos.y(), a.pos.z());
-        // Action 0 starts digging; in creative that breaks the block at once. Survival digging
-        // (hardness, tools, drops) is not implemented, so those requests are refused.
-        if a.action.0 == 0 {
-            let creative = self.players.get(&id).is_some_and(|p| p.game_mode == 1);
-            if creative && self.in_reach(id, pos) {
-                self.world.destroy_block(pos);
-            } else {
-                self.resend_block(id, pos);
+        let mode = self.players.get(&id).map_or(0, |p| p.game_mode);
+        match a.action.0 {
+            // Start digging: creative breaks the block at once, survival begins timed mining.
+            0 => {
+                if !self.in_reach(id, pos) || mode == 2 || mode == 3 {
+                    self.resend_block(id, pos);
+                } else if mode == 1 {
+                    self.world.destroy_block(pos);
+                } else {
+                    self.start_dig(id, pos);
+                }
             }
+            1 => self.abort_dig(id),
+            2 => {
+                if mode == 0 && self.in_reach(id, pos) {
+                    self.stop_dig(id, pos);
+                } else {
+                    self.resend_block(id, pos);
+                }
+            }
+            _ => {}
         }
         if matches!(a.action.0, 0..=2) {
             self.ack(id, a.sequence);
@@ -979,7 +1005,9 @@ impl Game {
     fn tick(&mut self) {
         self.tick += 1;
         self.world.tick();
+        self.tick_digging();
         self.broadcast_block_changes();
+        self.tick_items();
         let ids: Vec<PlayerId> = self.order.clone();
         for id in &ids {
             self.keep_alive(*id);

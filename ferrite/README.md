@@ -458,8 +458,26 @@ the light-dependent mushroom rule treats everything as fully lit until there is 
 lily pads and frogspawn (placed by `use_item` on water) and merging placements (extra candles,
 slab pairs, snow layers) are not covered yet.
 
-**Not yet:** survival mode (digging time, tools, drops, damage, hunger), item components, the
-inventory beyond creative hotbar slots, signed chat, commands, persistence of changes, lighting,
+### Survival mining and drops
+
+Survival players dig blocks in the time vanilla takes: hardness and tool requirements come from
+the game's own registries (`ShapeDump`), tool speeds from the item components (`ferrite-data::items`),
+and `ferrite-blocks::dig` applies vanilla's formula (efficiency, haste, fatigue, water, airborne).
+It reproduces the known breaking times (dirt by hand 0.75 s, stone with an iron pickaxe 0.4 s,
+obsidian with a diamond pickaxe 9.4 s). Breaking a block rolls its real loot table
+(`ferrite-loot` evaluates the game's block tables: silk touch, fortune, shears, crop ages, slab
+halves, explosion decay, ...), the drops fall as item entities with block collisions, and a
+player standing near picks them up into the hotbar and then the main inventory (stacks merge up
+to the item's stack size). Vanilla's packets for dropped items and pickup were captured and are
+checked like the others (`tests/captures/items.txt`).
+
+Not verified against the official server: dig *timing* (the scripted client could not get the
+vanilla server to accept a timed dig, so the formula is checked against known times instead),
+and item merging, durability, enchantments (stacks carry no components yet), and drops from
+blocks that vanish as a side effect of another break are not implemented.
+
+**Not yet:** damage, hunger, item components, the
+inventory beyond the hotbar being synchronised from the client, signed chat, commands, persistence of changes, lighting,
 and the io_uring backend's play state.
 
 ## Quality gates

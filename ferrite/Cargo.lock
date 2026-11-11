@@ -954,6 +954,7 @@ dependencies = [
  "bytes",
  "ferrite-blocks",
  "ferrite-data",
+ "ferrite-loot",
  "ferrite-nbt",
  "ferrite-net",
  "ferrite-protocol",

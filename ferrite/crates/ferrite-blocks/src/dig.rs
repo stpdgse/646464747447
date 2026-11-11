@@ -111,3 +111,48 @@ impl Digger {
         self.speed(state) / hardness / divisor
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ferrite_data::blocks::block_by_name;
+    use ferrite_data::items::item_info;
+    use ferrite_data::registries::item;
+
+    fn ticks_to_break(block: &str, tool: &str, efficiency: u8) -> u32 {
+        let state = block_by_name(block).expect("block").default_state;
+        let info = item::by_name
+            .get(format!("minecraft:{tool}").as_str())
+            .and_then(|id| item_info(*id as i32));
+        let digger = Digger { tool: info, efficiency, on_ground: true, ..Digger::default() };
+        let p = digger.progress_per_tick(state);
+        if p <= 0.0 {
+            return u32::MAX;
+        }
+        (1.0 / p).ceil() as u32
+    }
+
+    // Times from the game's wiki table of breaking speeds, in seconds * 20.
+    #[test]
+    fn matches_the_known_breaking_times() {
+        assert_eq!(ticks_to_break("dirt", "air", 0), 15); // 0.75 s by hand
+        assert_eq!(ticks_to_break("stone", "air", 0), 150); // 7.5 s: no drops, so the slow divisor
+        assert_eq!(ticks_to_break("stone", "iron_pickaxe", 0), 8); // 0.4 s (7.5 ticks, rounded up)
+        assert_eq!(ticks_to_break("stone", "wooden_pickaxe", 0), 23); // 1.15 s
+        assert_eq!(ticks_to_break("obsidian", "diamond_pickaxe", 0), 188); // 9.4 s
+        assert_eq!(ticks_to_break("oak_log", "iron_axe", 0), 10); // 0.5 s
+    }
+
+    #[test]
+    fn efficiency_and_unbreakable_blocks() {
+        assert!(
+            ticks_to_break("stone", "iron_pickaxe", 5) < ticks_to_break("stone", "iron_pickaxe", 0)
+        );
+        assert_eq!(ticks_to_break("bedrock", "diamond_pickaxe", 0), u32::MAX);
+        // Obsidian needs a diamond pickaxe for drops: with an iron one it is 5x slower.
+        assert!(
+            ticks_to_break("obsidian", "iron_pickaxe", 0)
+                > 4 * ticks_to_break("obsidian", "diamond_pickaxe", 0)
+        );
+    }
+}

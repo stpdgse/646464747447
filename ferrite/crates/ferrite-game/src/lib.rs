@@ -9,6 +9,7 @@
 
 pub mod chunkenc;
 pub mod flat;
+pub mod items;
 pub mod server;
 
 pub use server::{GameConfig, GameHost, GameThread, start};
