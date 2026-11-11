@@ -620,8 +620,10 @@ the exact text components:
   skipped by the test and reported to players honestly.
 - **Errors** are shown as the game shows them: the message in red, then the command with the place it
   went wrong underlined.
-- **Commands** implemented so far: `gamemode`, `difficulty`, `list`, `seed`, `time` (the new clock and
-  timeline based `time`, with markers) and `tick` (rate, freeze, step, sprint, query). Their output is
+- **Commands** implemented so far: `gamemode`, `difficulty`, `list`, `seed`, `say`, `me`, `msg`/`tell`/`w`,
+  `teammsg`, `teleport`/`tp` (absolute, relative and local coordinates, rotation, entity destinations,
+  `facing`), `time` (the new clock and timeline based `time`, with markers) and `tick` (rate, freeze, step,
+  sprint, query). Their output is
   recorded from the official server (`scripts/record-commands.py`) and replayed over a real connection
   (`tests/commands.rs`), comparing system messages and the packets the commands send, so game mode
   changes, difficulty broadcasts, clock updates and tick state are checked packet by packet.
