@@ -63,6 +63,23 @@ fn covers_unit_square(rects: &[[f64; 4]]) -> bool {
     true
 }
 
+/// Whether `shape` presents anything at all on its face towards `dir`.
+pub fn presents_face(shape: &[Box6], dir: Direction) -> bool {
+    let axis = match dir {
+        Direction::West | Direction::East => 0,
+        Direction::Down | Direction::Up => 1,
+        Direction::North | Direction::South => 2,
+    };
+    let mut rects = Vec::new();
+    face_rects(
+        shape,
+        axis,
+        matches!(dir, Direction::East | Direction::Up | Direction::South),
+        &mut rects,
+    );
+    rects.iter().any(|r| r[2] - r[0] > EPS && r[3] - r[1] > EPS)
+}
+
 /// Whether the faces two neighbouring shapes present to each other together seal the boundary
 /// between them. `dir` points from the block owning `from` to the block owning `to`.
 pub fn merged_face_occludes(from: &[Box6], to: &[Box6], dir: Direction) -> bool {

@@ -165,16 +165,31 @@ class Bot:
         if self.p.stdout.readline().strip() != "ready":
             sys.exit("the interaction bot did not join")
         self.seq = 0
+        self.tps = 0  # teleports the bot has confirmed so far (counted from `tp <n>` lines)
+
+    def _read(self):
+        line = self.p.stdout.readline()
+        if not line:
+            sys.exit("the interaction bot disconnected")
+        line = line.strip()
+        if line.startswith("tp "):
+            self.tps = int(line.split()[1])
+        return line
+
+    def teleport(self, r, command):
+        """Runs a /tp for the bot and waits until it has confirmed it: the server ignores clicks
+        from a player whose last teleport is still unconfirmed."""
+        want = self.tps + 1
+        r.cmd(command)
+        while self.tps < want:
+            self._read()
 
     def use(self, x, y, z):
         self.seq += 1
         self.p.stdin.write(f"use {x} {y} {z} 1 {self.seq}\n")
         self.p.stdin.flush()
         while True:
-            line = self.p.stdout.readline()
-            if not line:
-                sys.exit("the interaction bot disconnected")
-            if line.strip() == f"ack {self.seq}":
+            if self._read() == f"ack {self.seq}":
                 return
 
     def close(self):
@@ -247,7 +262,7 @@ class Recorder:
                 if self.bot is None:
                     sys.exit(f"{name}: a 'use' action needs --interact-bin and --game")
                 # Stand next to the block (the server only checks reach), then click it.
-                self.r.cmd(f"tp {Bot.NAME} {x + 0.5} {y + 1.0} {z + 0.5}")
+                self.bot.teleport(self.r, f"tp {Bot.NAME} {x + 0.5} {y + 1.0} {z + 0.5}")
                 self.bot.use(x, y, z)
                 lines.append(f"use {x} {y} {z}")
             elif a[0] == "set":

@@ -529,7 +529,7 @@ impl<A: BlockAccess> World<A> {
 
     /// Whether the block `state` at `pos` still has the support it needs, given that the
     /// neighbour in direction `dir` changed. Blocks without needs always do.
-    fn survives(&self, state: u16, dir: Direction, pos: BlockPos) -> bool {
+    pub(crate) fn survives(&self, state: u16, dir: Direction, pos: BlockPos) -> bool {
         let kinds = Kinds::get();
         let Some(rule) = kinds.of_state(state).support else { return true };
         // Each rule only reacts to the neighbour it depends on.
@@ -578,10 +578,59 @@ impl<A: BlockAccess> World<A> {
                     || sturdy(pos.below(), Direction::Up, DataSupport::Rigid)
                     || sturdy(pos.below(), Direction::Up, DataSupport::Center)
             }
-            Support::PlantGround => {
+            Support::Ground(set) => {
                 // Plants re-check their ground on *any* neighbour change.
-                self.blocks.block(pos.below()).is_some_and(|b| kinds.of_state(b).plant_ground)
+                if kinds.property(state, "half") == Some("upper") {
+                    // The upper half of a double plant needs its own lower half below.
+                    self.blocks.block(pos.below()).is_some_and(|b| {
+                        crate::kinds::block_id_of(b) == crate::kinds::block_id_of(state)
+                            && kinds.property(b, "half") == Some("lower")
+                    })
+                } else {
+                    self.blocks
+                        .block(pos.below())
+                        .is_some_and(|b| set.contains(&crate::kinds::block_id_of(b)))
+                }
             }
+            Support::SolidBelow => {
+                dir != Direction::Down
+                    || self.blocks.block(pos.below()).is_some_and(|s| facts(s).has(flag::SOLID))
+            }
+            Support::SolidBehind => {
+                let facing = kinds
+                    .property(state, "facing")
+                    .and_then(Direction::from_name)
+                    .expect("wall-mounted blocks have a facing");
+                dir != facing.opposite()
+                    || self
+                        .blocks
+                        .block(pos.offset(facing.opposite()))
+                        .is_some_and(|s| facts(s).has(flag::SOLID))
+            }
+            Support::CenterBelowSturdy => {
+                dir != Direction::Down || sturdy(pos.below(), Direction::Up, DataSupport::Center)
+            }
+            Support::CenterAbove => {
+                dir != Direction::Up || sturdy(pos.above(), Direction::Down, DataSupport::Center)
+            }
+            Support::Multiface => true,
+            other @ (Support::SturdyBelow
+            | Support::FullAbove
+            | Support::AnyFaceBelow
+            | Support::Cactus
+            | Support::CactusFlower
+            | Support::SugarCane
+            | Support::LilyPad
+            | Support::Frogspawn
+            | Support::Mushroom
+            | Support::ChorusPlant
+            | Support::ChorusFlower
+            | Support::WaterPlant
+            | Support::Growing { .. }
+            | Support::Scaffolding
+            | Support::Bell
+            | Support::Propagule
+            | Support::Spike) => self.survives_special(other, state, dir, pos),
             Support::WireBase => {
                 dir != Direction::Down
                     || self
@@ -656,6 +705,28 @@ impl<A: BlockAccess> World<A> {
             }
         }
         let state = self.connect(state, dir, neighbor_state);
+        let state = if dir == Direction::Up && kinds.property(state, "snowy").is_some() {
+            let snow = ferrite_data::blocks::block_of_state(neighbor_state)
+                .is_some_and(|b| matches!(b.name, "minecraft:snow" | "minecraft:snow_block"));
+            kinds
+                .with_property(state, "snowy", if snow { "true" } else { "false" })
+                .unwrap_or(state)
+        } else {
+            state
+        };
+        let state = if kinds.of_state(state).support == Some(Support::ChorusPlant) {
+            let joins = Self::chorus_joins(neighbor_state, dir);
+            kinds
+                .with_property(state, dir.name(), if joins { "true" } else { "false" })
+                .unwrap_or(state)
+        } else {
+            state
+        };
+        let state = if kinds.of_state(state).is_wall {
+            self.wall_update_shape(state, dir, neighbor_state, pos)
+        } else {
+            state
+        };
         if self.survives(state, dir, pos) { state } else { kinds.air }
     }
 

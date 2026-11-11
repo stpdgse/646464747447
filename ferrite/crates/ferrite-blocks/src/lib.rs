@@ -8,16 +8,21 @@
 #![forbid(unsafe_code)]
 
 pub mod fluid;
+mod generated_placement;
 mod kinds;
 mod level;
 mod piston;
+mod placement;
 mod pos;
 mod redstone;
 pub mod shape;
+mod survival;
 pub mod ticks;
+mod wall;
 mod world;
 
 pub use kinds::{Behaviour, Kinds, Piston, Redstone};
 pub use level::{BlockAccess, Chunks};
+pub use placement::{Formula, PlaceContext, horizontal_direction, looking_directions};
 pub use pos::{BlockPos, Direction};
 pub use world::{NEIGHBOR_UPDATE_ORDER, Rules, SHAPE_UPDATE_ORDER, World, update};

@@ -1,0 +1,245 @@
+# recorded from the official server by scripts/record-placement.py
+# target stone at (8, 101, 8); the player stands at (8.5, 99.0, 5.5); cells are relative to the target
+case dropper 1 0.5 1.0 0.5 -180.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -180.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -180.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -180.0 -20.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -180.0 0.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -180.0 20.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -180.0 45.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -180.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -180.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 -20.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 0.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 20.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 45.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -135.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 -20.0
+b 0 1 0 dropper[facing=west,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 0.0
+b 0 1 0 dropper[facing=west,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 20.0
+b 0 1 0 dropper[facing=west,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 45.0
+b 0 1 0 dropper[facing=west,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -90.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -45.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -45.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -45.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -45.0 -20.0
+b 0 1 0 dropper
+end
+case dropper 1 0.5 1.0 0.5 -45.0 0.0
+b 0 1 0 dropper
+end
+case dropper 1 0.5 1.0 0.5 -45.0 20.0
+b 0 1 0 dropper
+end
+case dropper 1 0.5 1.0 0.5 -45.0 45.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -45.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 -45.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 0.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 0.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 0.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 0.0 -20.0
+b 0 1 0 dropper
+end
+case dropper 1 0.5 1.0 0.5 0.0 0.0
+b 0 1 0 dropper
+end
+case dropper 1 0.5 1.0 0.5 0.0 20.0
+b 0 1 0 dropper
+end
+case dropper 1 0.5 1.0 0.5 0.0 45.0
+b 0 1 0 dropper
+end
+case dropper 1 0.5 1.0 0.5 0.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 0.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 -20.0
+b 0 1 0 dropper[facing=east,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 0.0
+b 0 1 0 dropper[facing=east,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 20.0
+b 0 1 0 dropper[facing=east,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 45.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 45.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 -20.0
+b 0 1 0 dropper[facing=east,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 0.0
+b 0 1 0 dropper[facing=east,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 20.0
+b 0 1 0 dropper[facing=east,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 45.0
+b 0 1 0 dropper[facing=east,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 90.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 -20.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 0.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 20.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 45.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 135.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 -90.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 -80.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 -45.0
+b 0 1 0 dropper[facing=down,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 -20.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 0.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 20.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 45.0
+b 0 1 0 dropper[facing=south,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 80.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end
+case dropper 1 0.5 1.0 0.5 180.0 90.0
+b 0 1 0 dropper[facing=up,triggered=false]
+end

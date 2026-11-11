@@ -192,8 +192,24 @@ struct Player {
     joined: u64,
 }
 
+/// The world's random source (splitmix64), for the few placements that roll dice.
+struct SplitMix(u64);
+
+impl SplitMix {
+    fn below(&mut self, bound: u32) -> u32 {
+        self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        let mut z = self.0;
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^= z >> 31;
+        ((z >> 32) as u32) % bound.max(1)
+    }
+}
+
 struct Game {
     cfg: GameConfig,
+    /// State of the random source.
+    rng: u64,
     rx: Receiver<Event>,
     world: World<Chunks>,
     /// Encoded chunk packets, dropped when a block in the chunk changes.
@@ -218,6 +234,7 @@ impl Game {
         world.track_changes(true);
         Game {
             cfg,
+            rng: 0x2545_F491_4F6C_DD1D,
             rx,
             world,
             chunk_cache: HashMap::new(),
@@ -761,9 +778,14 @@ impl Game {
     }
 
     /// The block a held item places: items and blocks share names.
-    fn block_for_item(item: i32) -> Option<u16> {
+    fn block_for_item(item: i32) -> Option<&'static str> {
         let name = ferrite_data::registries::item::names.get(usize::try_from(item).ok()?)?;
-        ferrite_data::blocks::block_by_name(name).map(|b| b.default_state)
+        let name = name.trim_start_matches("minecraft:");
+        // The crop item is not the seeds that plant the crop block.
+        if matches!(name, "wheat" | "lily_pad" | "frogspawn") {
+            return None;
+        }
+        ferrite_data::blocks::block_by_name(name).map(|b| b.name.trim_start_matches("minecraft:"))
     }
 
     fn on_use_item_on(&mut self, id: PlayerId, u: &UseItemOn) {
@@ -790,23 +812,8 @@ impl Game {
             }) {
                 place_pos = target;
             }
-            if held.count > 0
-                && let Some(state) = Self::block_for_item(held.item)
-                && self.in_reach(id, place_pos)
-                && self.world.block(place_pos).is_some_and(|s| {
-                    ferrite_data::shapes::facts(s).has(ferrite_data::shapes::flag::REPLACEABLE)
-                })
-                && !self.blocked_by_player(state, place_pos)
-            {
-                let adapted = self.world.update_from_neighbor_shapes(state, place_pos);
-                let placed =
-                    if ferrite_data::shapes::facts(adapted).has(ferrite_data::shapes::flag::AIR) {
-                        state
-                    } else {
-                        adapted
-                    };
-                self.world.set_block(place_pos, placed, ferrite_blocks::update::ALL);
-            } else {
+            let placed = self.try_place(id, u, target, face, sneaking, held.item, held.count > 0);
+            if !placed {
                 self.resend_block(id, place_pos);
             }
         } else {
@@ -816,13 +823,67 @@ impl Game {
         self.ack(id, u.sequence);
     }
 
+    /// Places the held item's block the way a player's click does; whether anything was placed.
+    #[allow(clippy::too_many_arguments)]
+    fn try_place(
+        &mut self,
+        id: PlayerId,
+        u: &UseItemOn,
+        target: BlockPos,
+        face: ferrite_blocks::Direction,
+        sneaking: bool,
+        item: i32,
+        holding: bool,
+    ) -> bool {
+        if !holding {
+            return false;
+        }
+        let Some(name) = Self::block_for_item(item) else { return false };
+        let Some((yaw, pitch)) = self.players.get(&id).map(|p| (p.yaw, p.pitch)) else {
+            return false;
+        };
+        let place_pos = if self.world.block(target).is_some_and(|s| {
+            ferrite_data::shapes::facts(s).has(ferrite_data::shapes::flag::REPLACEABLE)
+        }) {
+            target
+        } else {
+            target.offset(face)
+        };
+        if !self.in_reach(id, place_pos) {
+            return false;
+        }
+        let ctx = ferrite_blocks::PlaceContext {
+            clicked: target,
+            face,
+            cursor: [u.cursor_x, u.cursor_y, u.cursor_z],
+            yaw,
+            pitch,
+            sneaking,
+            // There are no operators yet, so game-master blocks cannot be placed.
+            operator: false,
+        };
+        let players = &self.players;
+        let mut dice = SplitMix(self.rng);
+        let placed = self
+            .world
+            .place_block(
+                name,
+                &ctx,
+                |state, pos| Self::overlaps_player(players, state, pos),
+                &mut |bound| dice.below(bound),
+            )
+            .is_some();
+        self.rng = dice.0;
+        placed
+    }
+
     /// Whether a block in `state` at `pos` would overlap a player (which vanilla does not allow).
-    fn blocked_by_player(&self, state: u16, pos: BlockPos) -> bool {
+    fn overlaps_player(players: &HashMap<PlayerId, Player>, state: u16, pos: BlockPos) -> bool {
         let boxes = ferrite_data::shapes::facts(state).collision_shape();
         if boxes.is_empty() {
             return false;
         }
-        self.players.values().any(|p| {
+        players.values().any(|p| {
             let (px0, px1) = (p.x - 0.3, p.x + 0.3);
             let (py0, py1) = (p.y, p.y + 1.8);
             let (pz0, pz1) = (p.z - 0.3, p.z + 0.3);

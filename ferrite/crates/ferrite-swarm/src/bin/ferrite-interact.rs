@@ -6,9 +6,15 @@
 //! ```text
 //! ferrite-interact 127.0.0.1:25565 [--name Bot]
 //!   stdin:  use <x> <y> <z> <face> <sequence>     right-click the block at x y z
+//!           place <item> <x> <y> <z> <face> <cx> <cy> <cz> <sequence>
+//!                                                  put <item> (e.g. minecraft:stone) in the first
+//!                                                  hotbar slot (creative) and right-click x y z at
+//!                                                  the given face and cursor position
 //!           quit
 //!   stdout: ready                                  joined and the first chunks have arrived
 //!           ack <sequence>                         the server acknowledged that click
+//!           tp <n>                                 the n-th teleport was confirmed (the server
+//!                                                  ignores clicks until the previous one is)
 //! ```
 
 use std::net::ToSocketAddrs;
@@ -16,7 +22,9 @@ use std::time::Duration;
 
 use clap::Parser;
 use ferrite_protocol::codec::VarInt;
-use ferrite_protocol::packets::play::{BlockChangedAck, PackedPos, UseItemOn};
+use ferrite_protocol::packets::play::{
+    BlockChangedAck, ItemStack, PackedPos, SetCreativeModeSlot, UseItemOn,
+};
 use ferrite_swarm::PlayBot;
 use tokio::io::{AsyncBufReadExt, BufReader};
 
@@ -41,6 +49,7 @@ async fn main() -> anyhow::Result<()> {
         }
     }
     println!("ready");
+    let mut teleports = 0u32;
     let mut stdin = BufReader::new(tokio::io::stdin()).lines();
     loop {
         tokio::select! {
@@ -62,6 +71,30 @@ async fn main() -> anyhow::Result<()> {
                         })
                         .await?;
                     }
+                    ["place", item, x, y, z, face, cx, cy, cz, seq] => {
+                        let id = ferrite_data::registries::item::by_name
+                            .get(item.strip_prefix("minecraft:").map_or(*item, |s| s))
+                            .or_else(|| ferrite_data::registries::item::by_name.get(*item))
+                            .copied()
+                            .ok_or_else(|| anyhow::anyhow!("unknown item {item}"))?;
+                        bot.send(&SetCreativeModeSlot {
+                            slot: 36,
+                            item: ItemStack { count: 1, item: id as i32 },
+                        })
+                        .await?;
+                        bot.send(&UseItemOn {
+                            hand: VarInt(0),
+                            pos: PackedPos::new(x.parse()?, y.parse()?, z.parse()?),
+                            face: VarInt(face.parse()?),
+                            cursor_x: cx.parse()?,
+                            cursor_y: cy.parse()?,
+                            cursor_z: cz.parse()?,
+                            inside: false,
+                            world_border_hit: false,
+                            sequence: VarInt(seq.parse()?),
+                        })
+                        .await?;
+                    }
                     ["quit"] => break,
                     _ => eprintln!("unknown command: {line}"),
                 }
@@ -70,6 +103,10 @@ async fn main() -> anyhow::Result<()> {
                 // Keep answering keep-alives and report acknowledgements.
                 if let Ok(p) = packet {
                     let p = p?;
+                    if p.name == "player_position" {
+                        teleports += 1;
+                        println!("tp {teleports}");
+                    }
                     if p.name == "block_changed_ack" {
                         let ack: BlockChangedAck = ferrite_protocol::codec::decode_exact(&p.body)?;
                         println!("ack {}", ack.sequence.0);

@@ -31,8 +31,56 @@ pub enum Support {
     SnowLayer,
     /// A rigid or centre-supporting top face below (pressure plates).
     RigidOrCenterBelow,
-    /// Small plants: dirt-like ground (or farmland) below.
-    PlantGround,
+    /// Plants: the block below must be one of these (a `supports_*` block tag); re-checked on
+    /// every neighbour change.
+    Ground(&'static [u16]),
+    /// A solid block below (standing signs and banners, cakes).
+    SolidBelow,
+    /// A solid block behind, opposite `facing` (wall signs, wall banners, wall heads).
+    SolidBehind,
+    /// The centre of the top face below (candles, coral, sea pickles).
+    CenterBelowSturdy,
+    /// The centre of the bottom face above (hanging signs, spore blossoms, hanging roots).
+    CenterAbove,
+    /// Mangrove propagules: leaves above when hanging, else the ground below.
+    Propagule,
+    /// A full top face below (coral, leaf litter).
+    SturdyBelow,
+    /// A full bottom face above (hanging moss).
+    FullAbove,
+    /// Any top face at all below (sea pickles).
+    AnyFaceBelow,
+    /// Cacti: sand-like ground, no solid block or lava beside, nothing liquid above.
+    Cactus,
+    /// Cactus flowers: a cactus or farmland, or a centre-supporting top face, below.
+    CactusFlower,
+    /// Sugar cane: more cane, or sandy ground with water (or frosted ice) beside it.
+    SugarCane,
+    /// Lily pads: water (or ice) below with nothing liquid above.
+    LilyPad,
+    /// Frogspawn: on water with air above.
+    Frogspawn,
+    /// Mushrooms: dim light and a solid base, or mycelium-like ground.
+    Mushroom,
+    /// Chorus plants and flowers.
+    ChorusPlant,
+    ChorusFlower,
+    /// Seagrass: a sturdy top face below that is not magma.
+    WaterPlant,
+    /// Kelp and the nether vines: more of the same plant behind, or a sturdy face there. `up` is
+    /// the direction it grows in; `same` the blocks that count as itself.
+    Growing {
+        up: bool,
+        same: &'static [u16],
+    },
+    /// Scaffolding: must be within six steps of the ground through other scaffolding.
+    Scaffolding,
+    /// Bells: sturdy ground below, a centre-supporting ceiling above, or a sturdy wall they face.
+    Bell,
+    /// Pointed dripstone (and the sulfur spike): the base it points away from must hold it.
+    Spike,
+    /// Vines and lichen: some neighbouring face must hold the block.
+    Multiface,
     /// Redstone wire: a full top face (or a hopper) below.
     WireBase,
     /// A rigid top face below (repeaters, comparators).
@@ -132,13 +180,23 @@ pub struct Kinds {
     lava_block: u16,
 }
 
+fn set_support(by_block: &mut [BlockKind], name: &str, support: Support) {
+    let id = block_by_name(name).unwrap_or_else(|| panic!("block {name} is missing")).id;
+    by_block[usize::from(id)].support = Some(support);
+}
+
+/// The block a state belongs to, as its numeric id.
+pub fn block_id_of(state: u16) -> u16 {
+    STATE_TO_BLOCK[usize::from(state)]
+}
+
 fn default_state(name: &str) -> u16 {
     block_by_name(name)
         .unwrap_or_else(|| panic!("block {name} is missing from the data"))
         .default_state
 }
 
-fn block_tag(name: &str) -> &'static [u16] {
+pub(crate) fn block_tag(name: &str) -> &'static [u16] {
     TAG_REGISTRIES
         .iter()
         .find(|r| r.registry == "minecraft:block")
@@ -148,6 +206,194 @@ fn block_tag(name: &str) -> &'static [u16] {
 }
 
 impl Kinds {
+    /// Which ground each plant-like block needs. The ground sets are the game's own
+    /// `supports_*` block tags; which block uses which is observed behaviour (see
+    /// `tests/placement.rs`).
+    fn assign_plant_support(by_block: &mut [BlockKind]) {
+        let vegetation = block_tag("minecraft:supports_vegetation");
+        let dry = block_tag("minecraft:supports_dry_vegetation");
+        let crops = block_tag("minecraft:supports_crops");
+        let stems = block_tag("minecraft:supports_stem_crops");
+        for &b in block_tag("minecraft:small_flowers") {
+            let name = BLOCKS[usize::from(b)].name.trim_start_matches("minecraft:");
+            if name == "wither_rose" {
+                by_block[usize::from(b)].support =
+                    Some(Support::Ground(block_tag("minecraft:supports_wither_rose")));
+            } else {
+                by_block[usize::from(b)].support = Some(Support::Ground(vegetation));
+            }
+        }
+        for &b in block_tag("minecraft:saplings") {
+            by_block[usize::from(b)].support = Some(Support::Ground(vegetation));
+        }
+        for name in [
+            "short_grass",
+            "fern",
+            "bush",
+            "firefly_bush",
+            "red_shrub",
+            "tall_grass",
+            "large_fern",
+            "sunflower",
+            "lilac",
+            "rose_bush",
+            "peony",
+            "pitcher_plant",
+            "pink_petals",
+            "wildflowers",
+        ] {
+            set_support(by_block, name, Support::Ground(vegetation));
+        }
+        for name in ["dead_bush", "short_dry_grass", "tall_dry_grass"] {
+            set_support(by_block, name, Support::Ground(dry));
+        }
+        for name in
+            ["wheat", "carrots", "potatoes", "beetroots", "torchflower_crop", "pitcher_crop"]
+        {
+            set_support(by_block, name, Support::Ground(crops));
+        }
+        for name in ["melon_stem", "pumpkin_stem"] {
+            set_support(by_block, name, Support::Ground(stems));
+        }
+        set_support(by_block, "azalea", Support::Ground(block_tag("minecraft:supports_azalea")));
+        set_support(
+            by_block,
+            "flowering_azalea",
+            Support::Ground(block_tag("minecraft:supports_azalea")),
+        );
+        set_support(
+            by_block,
+            "crimson_fungus",
+            Support::Ground(block_tag("minecraft:supports_crimson_fungus")),
+        );
+        set_support(
+            by_block,
+            "warped_fungus",
+            Support::Ground(block_tag("minecraft:supports_warped_fungus")),
+        );
+        set_support(
+            by_block,
+            "crimson_roots",
+            Support::Ground(block_tag("minecraft:supports_crimson_roots")),
+        );
+        set_support(
+            by_block,
+            "warped_roots",
+            Support::Ground(block_tag("minecraft:supports_warped_roots")),
+        );
+        set_support(
+            by_block,
+            "nether_sprouts",
+            Support::Ground(block_tag("minecraft:supports_nether_sprouts")),
+        );
+        set_support(
+            by_block,
+            "nether_wart",
+            Support::Ground(block_tag("minecraft:supports_nether_wart")),
+        );
+        set_support(
+            by_block,
+            "bamboo_sapling",
+            Support::Ground(block_tag("minecraft:supports_bamboo")),
+        );
+        set_support(
+            by_block,
+            "small_dripleaf",
+            Support::Ground(block_tag("minecraft:supports_small_dripleaf")),
+        );
+        set_support(
+            by_block,
+            "big_dripleaf",
+            Support::Ground(block_tag("minecraft:supports_big_dripleaf")),
+        );
+        for &b in block_tag("minecraft:standing_signs") {
+            by_block[usize::from(b)].support = Some(Support::SolidBelow);
+        }
+        for &b in block_tag("minecraft:wall_signs") {
+            by_block[usize::from(b)].support = Some(Support::SolidBehind);
+        }
+        for &b in block_tag("minecraft:banners") {
+            let name = BLOCKS[usize::from(b)].name;
+            by_block[usize::from(b)].support = Some(if name.ends_with("wall_banner") {
+                Support::SolidBehind
+            } else {
+                Support::SolidBelow
+            });
+        }
+        for &b in block_tag("minecraft:ceiling_hanging_signs") {
+            by_block[usize::from(b)].support = Some(Support::CenterAbove);
+        }
+        for &b in block_tag("minecraft:candles") {
+            by_block[usize::from(b)].support = Some(Support::CenterBelowSturdy);
+        }
+        for &b in block_tag("minecraft:rails") {
+            by_block[usize::from(b)].support = Some(Support::RigidBelow);
+        }
+        set_support(by_block, "comparator", Support::RigidBelow);
+        set_support(by_block, "cake", Support::SolidBelow);
+        set_support(by_block, "bamboo", Support::Ground(block_tag("minecraft:supports_bamboo")));
+        set_support(by_block, "leaf_litter", Support::SturdyBelow);
+        for name in ["moss_carpet", "pale_moss_carpet"] {
+            set_support(by_block, name, Support::NotAirBelow);
+        }
+        for &b in block_tag("minecraft:coral_plants") {
+            by_block[usize::from(b)].support = Some(Support::SturdyBelow);
+        }
+        for b in BLOCKS.iter() {
+            let name = b.name.trim_start_matches("minecraft:");
+            if name.ends_with("_coral") || name.ends_with("_coral_fan") {
+                by_block[usize::from(b.id)].support = Some(Support::SturdyBelow);
+            } else if name.ends_with("_coral_wall_fan") {
+                by_block[usize::from(b.id)].support = Some(Support::FullBehind);
+            }
+        }
+        set_support(by_block, "tripwire_hook", Support::FullBehind);
+        set_support(by_block, "pale_hanging_moss", Support::FullAbove);
+        set_support(by_block, "sea_pickle", Support::AnyFaceBelow);
+        set_support(by_block, "cactus", Support::Cactus);
+        set_support(by_block, "cactus_flower", Support::CactusFlower);
+        set_support(by_block, "sugar_cane", Support::SugarCane);
+        set_support(by_block, "lily_pad", Support::LilyPad);
+        set_support(by_block, "frogspawn", Support::Frogspawn);
+        set_support(by_block, "brown_mushroom", Support::Mushroom);
+        set_support(by_block, "red_mushroom", Support::Mushroom);
+        set_support(by_block, "chorus_plant", Support::ChorusPlant);
+        set_support(by_block, "chorus_flower", Support::ChorusFlower);
+        let ids = |names: &[&str]| -> &'static [u16] {
+            Box::leak(
+                names
+                    .iter()
+                    .map(|n| block_by_name(n).unwrap_or_else(|| panic!("{n}")).id)
+                    .collect::<Vec<_>>()
+                    .into_boxed_slice(),
+            )
+        };
+        let kelp = ids(&["kelp", "kelp_plant"]);
+        let twisting = ids(&["twisting_vines", "twisting_vines_plant"]);
+        let weeping = ids(&["weeping_vines", "weeping_vines_plant"]);
+        for (names, up, same) in [
+            (["kelp", "kelp_plant"], true, kelp),
+            (["twisting_vines", "twisting_vines_plant"], true, twisting),
+            (["weeping_vines", "weeping_vines_plant"], false, weeping),
+        ] {
+            for name in names {
+                set_support(by_block, name, Support::Growing { up, same });
+            }
+        }
+        set_support(by_block, "seagrass", Support::WaterPlant);
+        set_support(by_block, "scaffolding", Support::Scaffolding);
+        set_support(by_block, "bell", Support::Bell);
+        set_support(by_block, "shelf_mushroom", Support::FullBehind);
+        set_support(by_block, "pointed_dripstone", Support::Spike);
+        set_support(by_block, "sulfur_spike", Support::Spike);
+        set_support(by_block, "spore_blossom", Support::CenterAbove);
+        set_support(by_block, "hanging_roots", Support::FullAbove);
+        set_support(by_block, "mangrove_propagule", Support::Propagule);
+        for name in ["glow_lichen", "sculk_vein", "resin_clump", "vine"] {
+            set_support(by_block, name, Support::Multiface);
+        }
+    }
+
     fn build() -> Kinds {
         let mut by_block: Vec<BlockKind> = BLOCKS
             .iter()
@@ -314,9 +560,7 @@ impl Kinds {
             by_block[usize::from(b)].plant_ground = true;
         }
         by_block[id("farmland")].plant_ground = true;
-        for &b in block_tag("minecraft:small_flowers") {
-            by_block[usize::from(b)].support = Some(Support::PlantGround);
-        }
+        Self::assign_plant_support(&mut by_block);
         for &b in block_tag("minecraft:trapdoors") {
             by_block[usize::from(b)].is_trapdoor = true;
         }
