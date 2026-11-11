@@ -531,8 +531,8 @@ impl Game {
     pub(super) fn close_inventory(&mut self, id: PlayerId) {
         let Some(p) = self.players.get_mut(&id) else { return };
         let mut drops = vec![std::mem::take(&mut p.menu.carried)];
-        for slot in 1..=4 {
-            drops.push(std::mem::take(&mut p.menu.slots[slot]));
+        for crafting in &mut p.menu.slots[1..=4] {
+            drops.push(std::mem::take(crafting));
         }
         for stack in drops.into_iter().filter(|s| s.count > 0) {
             self.throw_item(id, stack, false);
