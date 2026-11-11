@@ -1,0 +1,32 @@
+[package]
+name = "ferrite-game"
+description = "The game server: players, the tick loop, chunk streaming and block interaction"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+bytes.workspace = true
+ferrite-blocks = { path = "../ferrite-blocks" }
+ferrite-loot = { path = "../ferrite-loot" }
+ferrite-commands = { path = "../ferrite-commands" }
+ferrite-crafting = { path = "../ferrite-crafting" }
+ferrite-text = { path = "../ferrite-text" }
+ferrite-data.workspace = true
+ferrite-net = { path = "../ferrite-net" }
+ferrite-protocol = { path = "../ferrite-protocol" }
+ferrite-world = { path = "../ferrite-world" }
+thiserror.workspace = true
+tracing = "0.1"
+uuid.workspace = true
+ferrite-nbt = { path = "../ferrite-nbt" }
+
+[dev-dependencies]
+tempfile.workspace = true
+ferrite-swarm = { path = "../ferrite-swarm" }
+tokio = { version = "1", features = ["full"] }
+
+[lints]
+workspace = true

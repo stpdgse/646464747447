@@ -1,0 +1,161 @@
+# Command scenarios: each `scenario` rejoins; lines are commands run by an operator.
+scenario errors
+rcon tick freeze
+rcon time set 54
+nonsense
+gamemode
+gamemode foo
+gamemode creative extra extra
+time set abc
+say
+difficulty hard extra
+
+scenario gamemode
+gamemode creative
+gamemode survival
+gamemode adventure
+gamemode spectator
+gamemode creative InteractBot
+gamemode survival @s
+gamemode creative @a
+gamemode survival Nobody
+gamemode survival @e
+gamemode survival @p
+
+scenario difficulty
+difficulty
+difficulty hard
+difficulty hard
+difficulty peaceful
+difficulty
+difficulty easy
+
+scenario list
+list
+list uuids
+
+scenario time
+rcon tick freeze
+rcon time set 123
+rcon time of minecraft:the_end set 77
+time query time
+time set noon
+time query time
+time set noon
+time query time
+time set day
+time query time
+time set 1000
+time set 1000
+time set night
+time query time
+time set midnight
+time query time
+time set 0
+time set 0
+time set 24000
+time query time
+time set minecraft:wake_up_from_sleep
+time query time
+time set roll_village_siege
+time query time
+time of minecraft:the_end query time
+time of minecraft:the_end set noon
+time of minecraft:the_end add 5
+time of minecraft:the_end pause
+time of minecraft:the_end resume
+time of minecraft:the_end rate 3
+time query minecraft:moon
+time query minecraft:moon repetition
+time query minecraft:early_game
+time query minecraft:villager_schedule
+time query minecraft:day
+time add 100000
+time query minecraft:day
+time query minecraft:day repetition
+time of foo query time
+time of minecraft:overworld rate 0
+time of minecraft:overworld rate -1
+time of minecraft:overworld rate 100000
+time of minecraft:overworld rate 0.001
+time add 0
+time set -5
+time set abc
+time pause
+time pause
+time resume
+time resume
+time rate 2
+time rate 1
+time add 2147483647
+time query time
+
+scenario tick
+rcon tick freeze
+tick unfreeze
+tick rate 40
+tick rate 20
+tick freeze
+tick freeze
+tick step
+tick step 3
+tick step stop
+tick unfreeze
+tick sprint stop
+tick rate 0.5
+tick rate 10000
+tick rate 1
+tick rate 20.0
+tick freeze
+
+scenario chat
+say hello
+say hello world
+me waves
+msg InteractBot hi there
+tell InteractBot hello
+w InteractBot x
+msg Nobody hi
+msg @a hi
+msg @e hi
+say @s
+say @a hello @p
+say hi @x
+say @a[limit=0]
+say x @s y @s z
+teammsg hello
+tm hello
+
+scenario teleport
+tp 10 -60 10
+tp ~ 5 ~
+tp 5 ~ 5
+tp ~1 ~ ~
+tp ~ ~ ~
+tp @s 0 -60 0 90 45
+tp @s 0 -60 0 ~10 ~5
+tp @s 0 -60 0 ~ 20
+tp @s ~2 ~ ~ 10 20
+tp @s ^ ^ ^
+tp @s ^1 ^2 ^3
+tp @s 0 -60 0 90 45
+tp @s ^1 ^2 ^3
+tp @s 0 -60 0 0 0
+tp InteractBot 1 2 3
+tp @s 5.5 -60 5.5
+tp @s InteractBot
+tp @a 3 -60 3
+tp 1 2
+tp Nobody 1 2 3
+tp @s Nobody
+tp 1000000000 0 0
+tp 30000000 -60 0
+tp @s 0 -60 0 facing 5 -60 5
+tp @s 0 -60 0 facing ~ ~ ~5
+tp @s 0 -60 0 facing entity @s
+tp @s 0 -60 0 facing entity @s eyes
+tp @s 0 -60 0 facing entity @s feet
+tp @s @s
+tp 0 -60 0 facing entity InteractBot
+tp 0 -60 0 ~ ~
+tp 0 -60 0 0 91

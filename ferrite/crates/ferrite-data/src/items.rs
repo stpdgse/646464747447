@@ -1,0 +1,78 @@
+//! Per-item facts: stack size, durability and tool behaviour, generated from the official item
+//! component reports.
+
+pub use crate::generated::items::ITEMS;
+
+/// One entry of a tool's `rules`: which blocks it affects and how.
+#[derive(Clone, Copy, Debug)]
+pub struct ToolRule {
+    /// A block name (`minecraft:cobweb`) or a block tag (`#minecraft:mineable/pickaxe`).
+    pub blocks: &'static str,
+    /// Mining speed on these blocks, if the rule sets one.
+    pub speed: Option<f32>,
+    /// Whether the tool counts as the correct one for drops, if the rule says.
+    pub correct_for_drops: Option<bool>,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct ToolInfo {
+    pub rules: &'static [ToolRule],
+    pub damage_per_block: u8,
+    pub can_destroy_blocks_in_creative: bool,
+    pub default_mining_speed: f32,
+}
+
+/// Where an item can be worn (its `equippable` component).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EquipSlot {
+    Head,
+    Chest,
+    Legs,
+    Feet,
+    Body,
+    Saddle,
+    Offhand,
+    Mainhand,
+}
+
+/// What eating an item does.
+#[derive(Clone, Copy, Debug)]
+pub struct FoodInfo {
+    pub nutrition: i32,
+    pub saturation: f32,
+    /// Can be eaten with a full hunger bar (golden apples).
+    pub can_always_eat: bool,
+    /// How long eating takes, in ticks.
+    pub consume_ticks: u32,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct ItemInfo {
+    pub max_stack: u8,
+    /// 0 for items without durability.
+    pub max_damage: u16,
+    pub tool: Option<ToolInfo>,
+    pub equip: Option<EquipSlot>,
+    pub food: Option<FoodInfo>,
+    /// Attack damage the item adds to a bare hand's 1.
+    pub attack_damage: f32,
+    /// Change to the base attack speed of 4 (a sword's is -2.4).
+    pub attack_speed_modifier: f32,
+    /// Ticks this item burns in an ordinary furnace (blast furnaces and smokers halve it); 0 if it
+    /// is no fuel.
+    pub fuel: u32,
+}
+
+/// The facts about the item with this protocol id.
+pub fn item_info(id: i32) -> Option<&'static ItemInfo> {
+    ITEMS.get(usize::try_from(id).ok()?)
+}
+
+/// What the item with this id leaves in its place when it is used up in a recipe or as fuel
+/// (a lava bucket leaves a bucket).
+pub fn craft_remainder(id: i32) -> Option<i32> {
+    let id = u16::try_from(id).ok()?;
+    let i =
+        crate::generated::items::CRAFT_REMAINDERS.binary_search_by_key(&id, |(a, _)| *a).ok()?;
+    Some(i32::from(crate::generated::items::CRAFT_REMAINDERS[i].1))
+}

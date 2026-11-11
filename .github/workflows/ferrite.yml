@@ -1,0 +1,123 @@
+name: ferrite
+
+on:
+  push:
+    branches: [main]
+    paths: ["ferrite/**", ".github/workflows/ferrite.yml"]
+  pull_request:
+    paths: ["ferrite/**", ".github/workflows/ferrite.yml"]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+
+defaults:
+  run:
+    working-directory: ferrite
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with: { workspaces: ferrite }
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo doc --workspace --no-deps
+        env: { RUSTDOCFLAGS: "-D warnings" }
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with: { workspaces: ferrite }
+      - run: cargo test --workspace
+        env:
+          # On Linux a skipped io_uring test is a failure, not a silent pass. (Inert on Windows,
+          # where the io_uring backend is not compiled.)
+          FERRITE_REQUIRE_URING: "1"
+      - run: cargo bench --workspace --no-run
+      - name: Hammer the ECS and scheduler property tests
+        # The determinism guarantee is only as good as the number of worlds it was tried on.
+        run: cargo test -p ferrite-ecs -p ferrite-sim
+        env:
+          PROPTEST_CASES: "2000"
+
+  datagen-is-reproducible:
+    # The committed tables must be exactly what the generator produces from the official jar.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "25" }
+      - name: Install pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with: { workspaces: ferrite }
+      - name: Fetch and verify the server jar
+        run: |
+          version="$(grep -m1 'GAME_VERSION' crates/ferrite-data/src/generated/meta.rs | sed -E 's/.*"([^"]+)".*/\1/')"
+          ./scripts/fetch-server-jar.sh "$version" "$RUNNER_TEMP/jar"
+          echo "JAR=$RUNNER_TEMP/jar/server-$version.jar" >> "$GITHUB_ENV"
+      - run: cargo datagen --jar "$JAR" --work-dir "$RUNNER_TEMP/gen"
+      - name: Generated tables are up to date
+        run: git diff --exit-code -- crates/ferrite-data/src/generated
+
+  miri:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - name: Miri on the unsafe VarInt store
+        run: cargo miri test -p ferrite-protocol --test varint -- put_i32 wide_store
+        env:
+          MIRIFLAGS: -Zmiri-strict-provenance -Zmiri-symbolic-alignment-check -Zmiri-disable-isolation
+          PROPTEST_DISABLE_FAILURE_PERSISTENCE: "true"
+          PROPTEST_CASES: "24"
+
+  audit:
+    # Known-vulnerable dependencies fail the build. This matters here: online mode decrypts
+    # attacker-supplied RSA ciphertext, which is why `rsa` must stay at 0.10 or newer
+    # (RUSTSEC-2023-0071). "Unmaintained" notices for transitive crates only warn.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo install --locked cargo-audit
+      - run: cargo audit
+        working-directory: ferrite
+
+  fuzz-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            ferrite/crates/ferrite-protocol/fuzz
+            ferrite/crates/ferrite-nbt/fuzz
+            ferrite/crates/ferrite-remote/fuzz
+            ferrite/crates/ferrite-net/fuzz
+            ferrite/crates/ferrite-world/fuzz
+      - run: cargo install --locked cargo-fuzz
+      - name: Fuzz each target for 30 seconds
+        working-directory: ferrite/crates
+        run: |
+          fuzz() { (cd "$1" && cargo fuzz run "$2" -- -max_total_time=30 -max_len=4096); }
+          for target in frame_decoder codec_readers frame_roundtrip session play_packets; do fuzz ferrite-protocol/fuzz "$target"; done
+          fuzz ferrite-nbt/fuzz read
+          for target in query_handler query_parsers; do fuzz ferrite-remote/fuzz "$target"; done
+          fuzz ferrite-net/fuzz parse_profile
+          for target in decode_chunk store_open; do fuzz ferrite-world/fuzz "$target"; done
