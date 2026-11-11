@@ -55,10 +55,6 @@ pub struct ParseResults {
     pub unsupported: bool,
 }
 
-fn unsupported_is_error(tree: &Tree, node: usize) -> bool {
-    tree.nodes[node].parser.as_ref().is_some_and(|p| !p.is_supported())
-}
-
 /// The children of `node` that could match at the reader's cursor.
 fn relevant_nodes(tree: &Tree, node: usize, reader: &Reader) -> Vec<usize> {
     let n = &tree.nodes[node];
@@ -111,12 +107,6 @@ fn parse_node(
             )))
         }
         NodeKind::Argument => {
-            if unsupported_is_error(tree, node) {
-                return Err(reader.error(Message::lit(format!(
-                    "argument type of '{}' is not supported yet",
-                    n.name
-                ))));
-            }
             let parser = n.parser.as_ref().expect("an argument has a parser");
             let value = parser.parse(reader, source)?;
             let range = (start, reader.cursor());
@@ -142,7 +132,6 @@ fn parse_nodes(
     for child in relevant_nodes(tree, node, original) {
         let mut context = so_far.clone();
         let mut reader = original.clone();
-        unsupported |= unsupported_is_error(tree, child);
         let outcome = parse_node(tree, source, child, &mut reader, &mut context).and_then(|()| {
             if reader.can_read() && reader.peek() != ' ' {
                 Err(reader.error(Message::tr("command.expected.separator")))
@@ -151,7 +140,7 @@ fn parse_nodes(
             }
         });
         if let Err(e) = outcome {
-            unsupported |= crate::selector::is_unsupported(&e);
+            unsupported |= crate::args::is_unsupported(&e);
             errors.push((child, e));
             reader.set_cursor(cursor);
             continue;

@@ -12,6 +12,7 @@
 mod error;
 mod mutf8;
 mod read;
+pub mod snbt;
 mod tag;
 mod write;
 

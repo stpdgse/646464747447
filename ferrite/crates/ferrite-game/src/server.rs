@@ -20,6 +20,7 @@ use ferrite_protocol::types::{Identifier, LenVec, Str, Text};
 use ferrite_world::{Chunk, ChunkPos};
 use uuid::Uuid;
 
+mod commands;
 mod containers;
 mod furnaces;
 mod mobs;
@@ -61,6 +62,12 @@ pub struct GameConfig {
     pub world_dir: Option<std::path::PathBuf>,
     /// The chance that a newly generated chunk comes with a herd of animals.
     pub animal_chance: f64,
+    /// The difficulty a new world starts with: 0 peaceful, 1 easy, 2 normal, 3 hard.
+    pub difficulty: u8,
+    /// Permission level of players who are not operators (0 to 4).
+    pub default_permission_level: u8,
+    /// Operators by name (case does not matter) with their permission level.
+    pub ops: Vec<(String, u8)>,
 }
 
 impl Default for GameConfig {
@@ -76,6 +83,9 @@ impl Default for GameConfig {
             generator: FlatGenerator::overworld(),
             world_dir: None,
             animal_chance: 0.1,
+            difficulty: 1,
+            default_permission_level: 0,
+            ops: Vec::new(),
         }
     }
 }
@@ -213,6 +223,10 @@ struct Player {
     tracked_items: HashSet<i32>,
     /// Mobs this player has been told about.
     tracked_mobs: HashSet<i32>,
+    /// What commands the player may use: 0 (none to speak of) to 4 (owner).
+    permission_level: u8,
+    /// Whether the player is flying (creative and spectator).
+    flying: bool,
     /// Ticks since the last attack (the swing's charge).
     attack_ticker: u32,
     health: f32,
@@ -275,6 +289,8 @@ struct Game {
     order: Vec<PlayerId>,
     next_entity: i32,
     tick: u64,
+    /// The difficulty: 0 peaceful, 1 easy, 2 normal, 3 hard.
+    difficulty: u8,
 }
 
 fn send<P: Packet>(sink: &PlayerSink, packet: &P) {
@@ -311,6 +327,7 @@ impl Game {
             restored.insert(next_entity, e);
             next_entity += 1;
         }
+        let difficulty = cfg.difficulty;
         Game {
             cfg,
             rng: 0x2545_F491_4F6C_DD1D,
@@ -328,6 +345,7 @@ impl Game {
             order: Vec::new(),
             next_entity,
             tick: 0,
+            difficulty,
         }
     }
 
@@ -442,6 +460,8 @@ impl Game {
             window: None,
             next_window: 0,
             tracked_mobs: HashSet::new(),
+            permission_level: self.permission_level_of(&name),
+            flying: false,
             attack_ticker: 100,
             health: saved.as_ref().map_or(20.0, |s| if s.health > 0.0 { s.health } else { 20.0 }),
             food: saved.as_ref().map_or(20, |s| s.food),
@@ -572,13 +592,25 @@ impl Game {
                 enforces_secure_chat: false,
             },
         );
-        send(s, &ChangeDifficulty { difficulty: 1, locked: false });
+        send(s, &ChangeDifficulty { difficulty: self.difficulty, locked: false });
         send(
             s,
-            &PlayerAbilities { flags: abilities_for(gm), flying_speed: 0.05, walking_speed: 0.1 },
+            &PlayerAbilities {
+                flags: abilities_for(gm) | if p.flying { 2 } else { 0 },
+                flying_speed: 0.05,
+                walking_speed: 0.1,
+            },
         );
         send(s, &SetHeldSlot { slot: VarInt(i32::from(p.held_slot)) });
-        send(s, &Commands { nodes: LenVec(vec![CommandNode::default()]), root: VarInt(0) });
+        send(s, &EntityEvent { entity_id: p.entity_id, event: 24 + p.permission_level as i8 });
+        send(
+            s,
+            &Commands {
+                body: ferrite_protocol::types::Remaining(
+                    commands::tree_bytes(p.permission_level).to_vec(),
+                ),
+            },
+        );
         send(
             s,
             &PlayerPosition {
@@ -822,6 +854,22 @@ impl Game {
                 if replan {
                     self.plan_chunks(id);
                 }
+            }
+            PlayerAbilitiesChange::ID => {
+                let p = decode!(PlayerAbilitiesChange);
+                if let Some(pl) = self.players.get_mut(&id)
+                    && abilities_for(pl.game_mode) & 4 != 0
+                {
+                    pl.flying = p.flags & 2 != 0;
+                }
+            }
+            ChatCommand::ID => {
+                let p = decode!(ChatCommand);
+                self.on_chat_command(id, &p.command.0);
+            }
+            ChatCommandSigned::ID => {
+                let p = decode!(ChatCommandSigned);
+                self.on_chat_command(id, &p.command.0);
             }
             Chat::ID => {
                 let p = decode!(Chat);

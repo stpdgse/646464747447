@@ -1,0 +1,33 @@
+# Command scenarios: each `scenario` rejoins; lines are commands run by an operator.
+scenario errors
+nonsense
+gamemode
+gamemode foo
+gamemode creative extra extra
+time set abc
+say
+difficulty hard extra
+
+scenario gamemode
+gamemode creative
+gamemode survival
+gamemode adventure
+gamemode spectator
+gamemode creative InteractBot
+gamemode survival @s
+gamemode creative @a
+gamemode survival Nobody
+gamemode survival @e
+gamemode survival @p
+
+scenario difficulty
+difficulty
+difficulty hard
+difficulty hard
+difficulty peaceful
+difficulty
+difficulty easy
+
+scenario list
+list
+list uuids

@@ -969,6 +969,7 @@ version = "0.1.0"
 dependencies = [
  "bytes",
  "ferrite-blocks",
+ "ferrite-commands",
  "ferrite-crafting",
  "ferrite-data",
  "ferrite-loot",
@@ -976,6 +977,7 @@ dependencies = [
  "ferrite-net",
  "ferrite-protocol",
  "ferrite-swarm",
+ "ferrite-text",
  "ferrite-world",
  "tempfile",
  "thiserror",
@@ -1086,12 +1088,20 @@ dependencies = [
  "bytes",
  "clap",
  "ferrite-data",
+ "ferrite-nbt",
  "ferrite-protocol",
  "getrandom 0.4.3",
  "socket2 0.5.10",
  "thiserror",
  "tokio",
  "uuid",
+]
+
+[[package]]
+name = "ferrite-text"
+version = "0.1.0"
+dependencies = [
+ "ferrite-nbt",
 ]
 
 [[package]]

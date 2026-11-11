@@ -116,6 +116,16 @@ fn one_of(reader: &mut Reader, allowed: &[&str], key: &str) -> Result<Value> {
     }
 }
 
+/// The error for an argument type that is not parsed yet.
+pub fn unsupported(reader: &Reader) -> SyntaxError {
+    reader.error(Message::tr("ferrite.unsupported"))
+}
+
+/// Whether `e` says an argument type is not parsed yet (see [`unsupported`]).
+pub fn is_unsupported(e: &SyntaxError) -> bool {
+    matches!(&e.message, Message::Translatable { key, .. } if key == "ferrite.unsupported")
+}
+
 fn sax(reader: &Reader, message: Message) -> SyntaxError {
     reader.error(message)
 }
@@ -384,7 +394,14 @@ impl Parser {
                 read_identifier(reader).map(Value::Identifier)
             }
             Parser::Simple(id::ENTITY_ANCHOR) => {
-                one_of(reader, &["feet", "eyes"], "argument.anchor.invalid")
+                let word = read_word(reader);
+                if matches!(word.as_str(), "feet" | "eyes") {
+                    Ok(Value::Word(word))
+                } else {
+                    // Unlike the other enums, this error points at the start of the word.
+                    reader.set_cursor(start);
+                    Err(invalid(reader, "argument.anchor.invalid", &word))
+                }
             }
             Parser::Simple(id::TEAM_COLOR) => one_of(reader, &COLORS, "argument.color.invalid"),
             Parser::Simple(id::OPERATION) => {
@@ -454,34 +471,10 @@ impl Parser {
                     _ => Err(unknown_resource(reader, &id, registry)),
                 }
             }
-            Parser::Simple(id) => {
-                Err(sax(reader, Message::lit(format!("argument type {id} is not supported yet"))))
-            }
-            other => Err(sax(
-                reader,
-                Message::lit(format!("argument type {other:?} is not supported yet")),
-            )),
+            // Not parsed yet: reported so callers know the result may differ from the official
+            // server's.
+            Parser::Simple(_) | Parser::Resource { .. } => Err(unsupported(reader)),
         }
-    }
-
-    /// Whether [`Parser::parse`] handles this type.
-    pub fn is_supported(&self) -> bool {
-        matches!(
-            self,
-            Parser::Bool
-                | Parser::Integer { .. }
-                | Parser::Long { .. }
-                | Parser::Float { .. }
-                | Parser::Double { .. }
-                | Parser::String(_)
-                | Parser::Time { .. }
-                | Parser::Entity { .. }
-                | Parser::ScoreHolder { .. }
-                | Parser::Resource { kind: ResourceKind::Resource, .. }
-                | Parser::Simple(
-                    id::BLOCK_POS | id::VEC3 | id::COLUMN_POS | id::VEC2 | id::ROTATION | id::ANGLE
-                )
-        )
     }
 }
 

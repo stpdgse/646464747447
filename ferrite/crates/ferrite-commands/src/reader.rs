@@ -8,6 +8,7 @@ use std::fmt;
 pub enum Arg {
     Str(String),
     Int(i64),
+    Long(i64),
     Float(f32),
     Double(f64),
     Msg(Box<Message>),
@@ -68,7 +69,7 @@ impl Message {
                         }
                         match a {
                             Arg::Str(s) => string(s, &mut out),
-                            Arg::Int(v) => out.push_str(&v.to_string()),
+                            Arg::Int(v) | Arg::Long(v) => out.push_str(&v.to_string()),
                             Arg::Float(v) => out.push_str(&crate::args::java_float(*v)),
                             Arg::Double(v) => out.push_str(&crate::args::java_double(*v)),
                             Arg::Msg(m) => out.push_str(&m.to_json()),

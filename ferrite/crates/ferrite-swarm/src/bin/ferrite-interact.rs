@@ -18,9 +18,15 @@
 //!           click <slot> <button> <type>           send an inventory click claiming no changes
 //!           close                                  close the open window
 //!           dump                                   print the inventory this client believes in
+//!           mark                                   print `mark` (separates the output of commands)
+//!           cmd <command>                          run a command (without the leading slash)
+//!           chat <text>                            say something in chat
 //!           quit
 //!   stdout: ready                                  joined and the first chunks have arrived
 //!           ack <sequence>                         the server acknowledged that click
+//!           evt <name> <hex>                       a packet named in FERRITE_INTERACT_WATCH
+//!                                                  (comma separated), body as hex
+//!           sys <snbt> <0|1>                       a system message (text component, overlay)
 //!           tp <n>                                 the n-th teleport was confirmed (the server
 //!                                                  ignores clicks until the previous one is)
 //! ```
@@ -31,9 +37,10 @@ use std::time::Duration;
 use clap::Parser;
 use ferrite_protocol::codec::VarInt;
 use ferrite_protocol::packets::play::{
-    BlockChangedAck, ContainerClick, ContainerClose, ContainerSetContent, ContainerSetSlot,
-    HashedStack, ItemStack, MovePlayerPos, MovePlayerStatusOnly, OpenScreen, PackedPos,
-    PlayerAction, SetCreativeModeSlot, SetCursorItem, SetPlayerInventory, UseItemOn,
+    BlockChangedAck, ChatCommand, ContainerClick, ContainerClose, ContainerSetContent,
+    ContainerSetSlot, HashedStack, ItemStack, MovePlayerPos, MovePlayerStatusOnly, OpenScreen,
+    PackedPos, PlayerAction, SetCreativeModeSlot, SetCursorItem, SetPlayerInventory, SystemChat,
+    UseItemOn,
 };
 use ferrite_swarm::PlayBot;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -65,6 +72,9 @@ async fn main() -> anyhow::Result<()> {
     let mut win = 0i32;
     let mut carried = ItemStack::default();
     let mut state_id = 0i32;
+    let watch: Vec<String> = std::env::var("FERRITE_INTERACT_WATCH")
+        .map(|v| v.split(',').map(str::to_string).collect())
+        .unwrap_or_default();
     let mut stdin = BufReader::new(tokio::io::stdin()).lines();
     loop {
         tokio::select! {
@@ -140,6 +150,14 @@ async fn main() -> anyhow::Result<()> {
                         // The client claimed an empty cursor; the server only corrects it if
                         // the cursor really is not empty.
                         carried = ItemStack::default();
+                    }
+                    ["mark"] => println!("mark"),
+                    ["cmd", rest @ ..] => {
+                        let command = rest.join(" ");
+                        bot.send(&ChatCommand {
+                            command: ferrite_protocol::types::Str(command),
+                        })
+                        .await?;
                     }
                     ["close"] => {
                         bot.send(&ContainerClose { window_id: VarInt(win) }).await?;
@@ -227,6 +245,18 @@ async fn main() -> anyhow::Result<()> {
                             }
                         }
                         _ => {}
+                    }
+                    if watch.iter().any(|w| w == p.name) {
+                        let hex: String = p.body.iter().map(|b| format!("{b:02x}")).collect();
+                        println!("evt {} {hex}", p.name);
+                    }
+                    if p.name == "system_chat" {
+                        let c: SystemChat = ferrite_protocol::codec::decode_exact(&p.body)?;
+                        println!(
+                            "sys {} {}",
+                            ferrite_nbt::snbt::to_sorted_snbt(&c.content.0),
+                            u8::from(c.overlay)
+                        );
                     }
                     if p.name == "player_position" {
                         teleports += 1;

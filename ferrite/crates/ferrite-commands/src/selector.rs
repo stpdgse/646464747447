@@ -347,7 +347,7 @@ fn handle_option(
         "nbt" => {
             // NBT needs the SNBT parser, which Ferrite does not have yet.
             st.unsupported = true;
-            return Err(err(reader, "ferrite.unsupported"));
+            return Err(crate::args::unsupported(reader));
         }
         "scores" => {
             reader.expect('{')?;
@@ -506,11 +506,6 @@ fn parse_options(reader: &mut Reader, sel: &mut Selector, st: &mut State) -> Res
     }
     reader.skip();
     Ok(())
-}
-
-/// Whether parsing stopped because of something Ferrite cannot parse yet.
-pub fn is_unsupported(e: &SyntaxError) -> bool {
-    matches!(&e.message, Message::Translatable { key, .. } if key == "ferrite.unsupported")
 }
 
 fn parse_selector_type(reader: &mut Reader) -> Result<Selector> {

@@ -1,0 +1,101 @@
+# Recorded from the official server by scripts/record-commands.py
+
+scenario errors
+> nonsense
+sys {color:"red",extra:[{translate:"command.unknown.command"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/nonsense"},color:"gray",extra:[{color:"red",text:"nonsense",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> gamemode
+sys {color:"red",extra:[{translate:"command.unknown.command"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/gamemode"},color:"gray",extra:[{"":"gamemode"},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> gamemode foo
+sys {color:"red",extra:[{translate:"argument.gamemode.invalid",with:["foo"]}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/gamemode foo"},color:"gray",extra:[{"":"..."},{"":"memode foo"},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> gamemode creative extra extra
+sys {color:"red",extra:[{translate:"command.unknown.argument"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/gamemode creative extra extra"},color:"gray",extra:[{"":"..."},{"":"ive extra "},{color:"red",text:"extra",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> time set abc
+sys {color:"red",extra:[{translate:"commands.time.no_time_marker_found",with:["minecraft:abc","minecraft:overworld"]}],text:""} 0
+> say
+sys {color:"red",extra:[{translate:"command.unknown.command"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/say"},color:"gray",extra:[{"":"say"},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> difficulty hard extra
+sys {color:"red",extra:[{translate:"command.unknown.argument"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/difficulty hard extra"},color:"gray",extra:[{"":"..."},{"":"ulty hard "},{color:"red",text:"extra",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+
+scenario gamemode
+> gamemode creative
+evt player_abilities 0d3d4ccccd3dcccccd
+evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c401
+evt game_event 033f800000
+evt player_abilities 0d3d4ccccd3dcccccd
+sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.creative"}]} 0
+> gamemode survival
+evt player_abilities 003d4ccccd3dcccccd
+evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c400
+evt game_event 0300000000
+evt player_abilities 003d4ccccd3dcccccd
+sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.survival"}]} 0
+> gamemode adventure
+evt player_abilities 003d4ccccd3dcccccd
+evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c402
+evt game_event 0340000000
+evt player_abilities 003d4ccccd3dcccccd
+sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.adventure"}]} 0
+> gamemode spectator
+evt player_abilities 073d4ccccd3dcccccd
+evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c403
+evt game_event 0340400000
+evt player_abilities 073d4ccccd3dcccccd
+sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.spectator"}]} 0
+> gamemode creative InteractBot
+evt player_abilities 0f3d4ccccd3dcccccd
+evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c401
+evt game_event 033f800000
+evt player_abilities 0f3d4ccccd3dcccccd
+sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.creative"}]} 0
+> gamemode survival @s
+evt player_abilities 003d4ccccd3dcccccd
+evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c400
+evt game_event 0300000000
+evt player_abilities 003d4ccccd3dcccccd
+sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.survival"}]} 0
+> gamemode creative @a
+evt player_abilities 0d3d4ccccd3dcccccd
+evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c401
+evt game_event 033f800000
+evt player_abilities 0d3d4ccccd3dcccccd
+sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.creative"}]} 0
+> gamemode survival Nobody
+sys {color:"red",extra:[{translate:"argument.entity.notfound.player"}],text:""} 0
+> gamemode survival @e
+sys {color:"red",extra:[{translate:"argument.player.entities"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/gamemode survival @e"},color:"gray",extra:[{color:"red",text:"gamemode survival @e",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> gamemode survival @p
+evt player_abilities 003d4ccccd3dcccccd
+evt player_info_update 04016a88f3a47cc930caa1060367fa2a73c400
+evt game_event 0300000000
+evt player_abilities 003d4ccccd3dcccccd
+sys {translate:"commands.gamemode.success.self",with:[{translate:"gameMode.survival"}]} 0
+
+scenario difficulty
+> difficulty
+sys {translate:"commands.difficulty.query",with:[{translate:"options.difficulty.peaceful"}]} 0
+> difficulty hard
+evt change_difficulty 0300
+sys {translate:"commands.difficulty.success",with:[{translate:"options.difficulty.hard"}]} 0
+> difficulty hard
+sys {color:"red",extra:[{translate:"commands.difficulty.failure",with:[{translate:"options.difficulty.hard"}]}],text:""} 0
+> difficulty peaceful
+evt change_difficulty 0000
+sys {translate:"commands.difficulty.success",with:[{translate:"options.difficulty.peaceful"}]} 0
+> difficulty
+sys {translate:"commands.difficulty.query",with:[{translate:"options.difficulty.peaceful"}]} 0
+> difficulty easy
+evt change_difficulty 0100
+sys {translate:"commands.difficulty.success",with:[{translate:"options.difficulty.easy"}]} 0
+
+scenario list
+> list
+sys {translate:"commands.list.players",with:[{"":1},{"":4},{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}]} 0
+> list uuids
+sys {translate:"commands.list.players",with:[{"":1},{"":4},{translate:"commands.list.nameAndId",with:["InteractBot","6a88f3a4-7cc9-30ca-a106-0367fa2a73c4"]}]} 0

@@ -181,9 +181,6 @@ fn pick_str(rng: &mut Rng, pool: &[&str]) -> String {
 
 fn sample(node: &Node, rng: &mut Rng) -> Option<String> {
     let parser = node.parser.as_ref()?;
-    if !parser.is_supported() {
-        return None;
-    }
     Some(match parser {
         Parser::Bool => rng.pick(&["true", "false", "maybe", "TRUE", "", "tru"]).to_string(),
         Parser::Integer { min, max } => numbers(min.map(f64::from), max.map(f64::from), true, rng),

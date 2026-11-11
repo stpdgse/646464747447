@@ -556,39 +556,21 @@ impl<'a> Decode<'a> for OptNbt {
     }
 }
 
-/// A node of the command tree. Only unrestricted literal and root nodes are modelled.
-#[derive(Clone, Debug, Default, PartialEq)]
-pub struct CommandNode {
-    /// Bits 0-1: type (0 root, 1 literal, 2 argument); 4: executable; 8: has redirect.
-    pub flags: u8,
-    pub children: LenVec<VarInt, 4096>,
-    /// The literal's name, for literal nodes.
-    pub name: Option<crate::types::Str<64>>,
+/// One signed argument of a command: its name and a 256-byte signature.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SignedArgument {
+    pub name: crate::types::Str<16>,
+    pub signature: Fixed<256>,
 }
-impl Encode for CommandNode {
+impl Encode for SignedArgument {
     fn encode<B: bytes::BufMut>(&self, buf: &mut B) -> Result<()> {
-        self.flags.encode(buf)?;
-        self.children.encode(buf)?;
-        if self.flags & 3 == 1 {
-            self.name
-                .as_ref()
-                .ok_or(crate::error::ProtocolError::Invalid("a literal command node needs a name"))?
-                .encode(buf)?;
-        }
-        Ok(())
+        self.name.encode(buf)?;
+        self.signature.encode(buf)
     }
 }
-impl<'a> Decode<'a> for CommandNode {
+impl<'a> Decode<'a> for SignedArgument {
     fn decode(buf: &mut &'a [u8]) -> Result<Self> {
-        let flags = u8::decode(buf)?;
-        if flags & 3 == 2 || flags & 8 != 0 {
-            return Err(crate::error::ProtocolError::Invalid(
-                "argument and redirect command nodes are not supported yet",
-            ));
-        }
-        let children = LenVec::decode(buf)?;
-        let name = if flags & 3 == 1 { Some(Decode::decode(buf)?) } else { None };
-        Ok(CommandNode { flags, children, name })
+        Ok(SignedArgument { name: Decode::decode(buf)?, signature: Decode::decode(buf)? })
     }
 }
 
@@ -909,10 +891,19 @@ packet! {
         velocity: LpVec3,
     }
 
-    /// The command tree; Ferrite sends only the empty root for now.
+    /// The command tree. `body` is the packet exactly as the official server writes it for a
+    /// permission level (a node count, the nodes, the root index); `ferrite-commands` decodes it.
     Commands in Play Clientbound = play::clientbound::COMMANDS "commands" {
-        nodes: LenVec<CommandNode, 4096>,
-        root: VarInt,
+        body: crate::types::Remaining<1048576>,
+    }
+
+    /// A chat message sent by the server that no player signed (`/say`, `/me`, `/msg`...).
+    /// `chat_type` is the id in the `chat_type` registry plus one.
+    DisguisedChat in Play Clientbound = play::clientbound::DISGUISED_CHAT "disguised_chat" {
+        message: Text,
+        chat_type: VarInt,
+        name: Text,
+        target_name: Option<Text>,
     }
 
     SystemChat in Play Clientbound = play::clientbound::SYSTEM_CHAT "system_chat" {
@@ -945,6 +936,11 @@ packet! {
     ChangeDifficulty in Play Clientbound = play::clientbound::CHANGE_DIFFICULTY "change_difficulty" {
         difficulty: u8,
         locked: bool,
+    }
+
+    /// The client started or stopped flying (`flags` bit 1).
+    PlayerAbilitiesChange in Play Serverbound = play::serverbound::PLAYER_ABILITIES "player_abilities" {
+        flags: u8,
     }
 
     /// `flags`: 1 invulnerable, 2 flying, 4 may fly, 8 instant build.
@@ -1189,6 +1185,18 @@ packet! {
 
     ChatCommand in Play Serverbound = play::serverbound::CHAT_COMMAND "chat_command" {
         command: crate::types::Str<32767>,
+    }
+
+    /// A command with signed arguments (sent when the client has a chat session). Ferrite does
+    /// not verify the signatures.
+    ChatCommandSigned in Play Serverbound = play::serverbound::CHAT_COMMAND_SIGNED "chat_command_signed" {
+        command: crate::types::Str<32767>,
+        timestamp: i64,
+        salt: i64,
+        signatures: LenVec<SignedArgument, 8>,
+        offset: VarInt,
+        acknowledged: Fixed<3>,
+        checksum: i8,
     }
 
     /// Echo of a teleport: the id plus the position and rotation the client applied.

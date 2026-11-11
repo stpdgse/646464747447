@@ -667,3 +667,96 @@ mod examples {
         }
     }
 }
+
+#[cfg(test)]
+mod usage {
+    use super::*;
+
+    impl Tree {
+        /// Every way to complete a command, in the notation of `/help` (for reading and tests).
+        pub fn usages(&self, command: &str) -> Vec<String> {
+            let mut out = Vec::new();
+            let Some(start) = self.literal(self.root, command) else { return out };
+            fn walk(
+                t: &Tree,
+                n: usize,
+                path: &mut Vec<String>,
+                out: &mut Vec<String>,
+                depth: usize,
+            ) {
+                let node = &t.nodes[n];
+                if node.executable {
+                    out.push(path.join(" "));
+                }
+                if depth > 12 {
+                    return;
+                }
+                for &c in &node.children {
+                    let child = &t.nodes[c];
+                    path.push(match child.kind {
+                        NodeKind::Literal => child.name.clone(),
+                        _ => format!("<{}>", child.name),
+                    });
+                    match child.redirect {
+                        Some(r) if r == t.root => {
+                            out.push(format!("{} -> (a command)", path.join(" ")));
+                        }
+                        Some(r) if !child.executable && child.children.is_empty() => {
+                            out.push(format!("{} -> {}", path.join(" "), t.nodes[r].name));
+                        }
+                        _ => walk(t, c, path, out, depth + 1),
+                    }
+                    path.pop();
+                }
+            }
+            let mut path = vec![command.to_string()];
+            walk(self, start, &mut path, &mut out, 0);
+            out
+        }
+    }
+
+    #[test]
+    #[ignore]
+    fn print_usages() {
+        let t = Tree::for_level(4);
+        for c in [
+            "gamemode",
+            "time",
+            "teleport",
+            "tp",
+            "say",
+            "me",
+            "msg",
+            "list",
+            "seed",
+            "difficulty",
+            "kill",
+            "give",
+            "setblock",
+            "fill",
+            "clear",
+            "weather",
+            "xp",
+            "defaultgamemode",
+            "setworldspawn",
+            "spawnpoint",
+            "op",
+            "deop",
+            "kick",
+            "stop",
+            "summon",
+            "tick",
+            "gamerule",
+            "save-all",
+            "tellraw",
+            "title",
+            "effect",
+            "version",
+            "help",
+        ] {
+            for u in t.usages(c) {
+                eprintln!("{u}");
+            }
+        }
+    }
+}
