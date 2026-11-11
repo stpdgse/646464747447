@@ -32,6 +32,8 @@ pub fn generate(cx: &GenContext) -> Result<String> {
     let data = cx.reports.parent().unwrap_or(&cx.reports).join("data/minecraft");
     let mut blocks = Vec::new();
     collect(&data.join("loot_table/blocks"), "blocks/", &mut blocks)?;
+    let mut entities = Vec::new();
+    collect(&data.join("loot_table/entities"), "entities/", &mut entities)?;
     let mut predicates = Vec::new();
     collect(&data.join("predicate"), "", &mut predicates)?;
     let mut recipes = Vec::new();
@@ -40,11 +42,15 @@ pub fn generate(cx: &GenContext) -> Result<String> {
     out.push_str(&cx.header);
     out.push('\n');
     blocks.sort();
+    entities.sort();
     predicates.sort();
     recipes.sort();
-    for (label, list) in
-        [("BLOCK_LOOT", &blocks), ("PREDICATES", &predicates), ("RECIPES", &recipes)]
-    {
+    for (label, list) in [
+        ("BLOCK_LOOT", &blocks),
+        ("ENTITY_LOOT", &entities),
+        ("PREDICATES", &predicates),
+        ("RECIPES", &recipes),
+    ] {
         let _ = writeln!(out, "/// `(name, minified JSON)`, sorted by name.");
         let _ = writeln!(out, "pub static {label}: [(&str, &str); {}] = [", list.len());
         for (name, json) in list {

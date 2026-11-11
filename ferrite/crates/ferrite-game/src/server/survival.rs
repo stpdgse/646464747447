@@ -206,6 +206,7 @@ impl Game {
                 has_this_entity: true,
                 explosion_radius: None,
                 world: &view,
+                entity: None,
             };
             drops = ferrite_loot::block_drops(&ctx, &mut Dice(&mut self.rng));
         }

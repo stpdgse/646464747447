@@ -2,6 +2,7 @@
 
 pub mod blocks;
 pub mod configuration;
+pub mod entities;
 pub mod items;
 pub mod loot;
 pub mod meta;

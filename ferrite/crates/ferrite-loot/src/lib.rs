@@ -78,6 +78,17 @@ pub struct LootContext<'a> {
     /// Explosion radius if the block was destroyed by an explosion.
     pub explosion_radius: Option<f32>,
     pub world: &'a dyn LootWorld,
+    /// Set when evaluating an entity's table.
+    pub entity: Option<EntityLoot>,
+}
+
+/// What an entity's loot table may ask about the kill.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct EntityLoot {
+    pub on_fire: bool,
+    pub killed_by_player: bool,
+    /// Looting level of the killer's weapon.
+    pub looting: u8,
 }
 
 /// One stack the table produced.
@@ -118,6 +129,32 @@ pub fn block_drops(ctx: &LootContext<'_>, rng: &mut dyn LootRandom) -> Vec<Drop>
         return Vec::new();
     };
     let mut ev = Eval { ctx, rng };
+    ev.table(table)
+}
+
+/// What killing the entity called `entity` (e.g. `minecraft:cow`) drops.
+pub fn entity_drops(
+    entity: &str,
+    state: EntityLoot,
+    tool: Tool<'_>,
+    world: &dyn LootWorld,
+    rng: &mut dyn LootRandom,
+) -> Vec<Drop> {
+    let name = entity.trim_start_matches("minecraft:");
+    let key = format!("entity:{name}");
+    let Some(table) = cached(&key, || ferrite_data::loot::entity_loot(name)) else {
+        return Vec::new();
+    };
+    let ctx = LootContext {
+        block: "",
+        properties: &[],
+        tool,
+        has_this_entity: true,
+        explosion_radius: None,
+        world,
+        entity: Some(state),
+    };
+    let mut ev = Eval { ctx: &ctx, rng };
     ev.table(table)
 }
 
@@ -205,6 +242,23 @@ impl Eval<'_, '_> {
                     None => vec![drop],
                 }
             }
+            "minecraft:loot_table" => {
+                // Another table, by name (sheep wool, for instance).
+                let Some(id) = entry["value"].as_str() else { return Vec::new() };
+                let short = id.trim_start_matches("minecraft:");
+                let key = format!("table:{short}");
+                let found = cached(&key, || {
+                    ferrite_data::loot::ENTITY_LOOT
+                        .binary_search_by(|(n, _)| (*n).cmp(&format!("minecraft:{short}").as_str()))
+                        .ok()
+                        .map(|i| ferrite_data::loot::ENTITY_LOOT[i].1)
+                });
+                let mut out = found.map(|t| self.table(t)).unwrap_or_default();
+                if let Some(m) = entry.get("modifier") {
+                    out = out.into_iter().filter_map(|d| self.apply_all(m, d)).collect();
+                }
+                out
+            }
             // Contents of containers are copied from the block entity, which has none here.
             _ => Vec::new(),
         }
@@ -259,6 +313,25 @@ impl Eval<'_, '_> {
                     }
                     if let Some(lo) = lo {
                         drop.count = drop.count.max(lo);
+                    }
+                }
+                "minecraft:enchanted_count_increase" => {
+                    let level = i32::from(self.ctx.entity.map_or(0, |e| e.looting));
+                    if level > 0 {
+                        let mut extra = 0;
+                        for _ in 0..level {
+                            extra += self.int(f.get("count"), 0);
+                        }
+                        if let Some(limit) = f.get("limit").and_then(Value::as_i64) {
+                            drop.count = (drop.count + extra).min(limit as i32).max(drop.count);
+                        } else {
+                            drop.count += extra;
+                        }
+                    }
+                }
+                "minecraft:furnace_smelt" => {
+                    if let Some(cooked) = smelts_to(&drop.item) {
+                        drop.item = cooked;
                     }
                 }
                 // Item components are not modelled yet: stacks carry only item and count.
@@ -403,7 +476,31 @@ impl Eval<'_, '_> {
                     props.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone())
                 })
             }
-            "minecraft:entity_properties" => self.ctx.has_this_entity,
+            "minecraft:entity_properties" => {
+                let Some(e) = self.ctx.entity else { return self.ctx.has_this_entity };
+                // The only things the tables ask: is it burning, what does the attacker hold.
+                if c["entity"].as_str() == Some("this") {
+                    return match c["predicate"]["minecraft:flags"]["is_on_fire"].as_bool() {
+                        Some(want) => e.on_fire == want,
+                        None => c["predicate"].as_object().is_none_or(|o| o.is_empty()),
+                    };
+                }
+                // The killer's weapon: no components modelled, so nothing enchanted.
+                c["predicate"].as_object().is_none_or(|o| o.is_empty())
+            }
+            "minecraft:killed_by_player" => self.ctx.entity.is_some_and(|e| e.killed_by_player),
+            "minecraft:random_chance_with_enchanted_bonus" => {
+                let level = f64::from(self.ctx.entity.map_or(0, |e| e.looting));
+                let chance = if level > 0.0 {
+                    let ec = &c["enchanted_chance"];
+                    ec["base"].as_f64().unwrap_or(0.0)
+                        + ec["per_level_above_first"].as_f64().unwrap_or(0.0) * (level - 1.0)
+                } else {
+                    self.float(c.get("unenchanted_chance"), 0.0).into()
+                };
+                f64::from(self.rng.next_f32()) < chance
+            }
+            "minecraft:damage_source_properties" => false,
             _ => false,
         }
     }
@@ -462,6 +559,26 @@ impl Eval<'_, '_> {
     }
 }
 
+/// What an item smelts into (the first smelting recipe that takes it).
+fn smelts_to(item: &str) -> Option<String> {
+    for (_, json) in ferrite_data::loot::RECIPES.iter() {
+        if !json.contains("\"minecraft:smelting\"") || !json.contains(item) {
+            continue;
+        }
+        let v: Value = serde_json::from_str(json).ok()?;
+        let ing = &v["ingredient"];
+        let hit = match ing {
+            Value::String(s) => s == item,
+            Value::Array(a) => a.iter().any(|x| x.as_str() == Some(item)),
+            _ => false,
+        };
+        if hit {
+            return v["result"]["id"].as_str().map(str::to_string);
+        }
+    }
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -482,6 +599,7 @@ mod tests {
             has_this_entity: true,
             explosion_radius: None,
             world: &NoWorld,
+            entity: None,
         };
         block_drops(&ctx, &mut SplitMix(seed))
     }
@@ -571,10 +689,56 @@ mod tests {
             has_this_entity: false,
             explosion_radius: Some(4.0),
             world: &NoWorld,
+            entity: None,
         };
         let kept = (0..4000).filter(|s| !block_drops(&ctx, &mut SplitMix(*s)).is_empty()).count();
         let p = kept as f64 / 4000.0;
         assert!((p - 0.25).abs() < 0.03, "survival rate {p}");
+    }
+
+    #[test]
+    fn mobs_drop_what_their_tables_say() {
+        let state = EntityLoot { on_fire: false, killed_by_player: true, looting: 0 };
+        // A cow leaves 0-2 leather and 1-3 raw beef (cooked when burning).
+        let mut beef = 0;
+        for seed in 0..500 {
+            let drops = entity_drops(
+                "minecraft:cow",
+                state,
+                Tool::default(),
+                &NoWorld,
+                &mut SplitMix(seed),
+            );
+            assert!(
+                drops.iter().all(|d| d.item == "minecraft:leather" || d.item == "minecraft:beef"),
+                "{drops:?}"
+            );
+            beef +=
+                drops.iter().filter(|d| d.item == "minecraft:beef").map(|d| d.count).sum::<i32>();
+        }
+        assert!((500..=1500).contains(&beef), "beef {beef}");
+        let burning = EntityLoot { on_fire: true, ..state };
+        let cooked =
+            entity_drops("minecraft:cow", burning, Tool::default(), &NoWorld, &mut SplitMix(3));
+        assert!(cooked.iter().any(|d| d.item == "minecraft:cooked_beef"), "{cooked:?}");
+        // Zombie rare drops need the player to have killed it.
+        let by_player = (0..4000).any(|s| {
+            entity_drops("minecraft:zombie", state, Tool::default(), &NoWorld, &mut SplitMix(s))
+                .iter()
+                .any(|d| d.item == "minecraft:iron_ingot")
+        });
+        let by_nature = (0..4000).any(|s| {
+            entity_drops(
+                "minecraft:zombie",
+                EntityLoot::default(),
+                Tool::default(),
+                &NoWorld,
+                &mut SplitMix(s),
+            )
+            .iter()
+            .any(|d| d.item == "minecraft:iron_ingot")
+        });
+        assert!(by_player && !by_nature);
     }
 
     #[test]

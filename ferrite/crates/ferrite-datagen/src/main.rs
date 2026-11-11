@@ -11,6 +11,7 @@
 
 mod blocks;
 mod configuration;
+mod entities;
 mod items;
 mod loot;
 mod meta;
@@ -91,6 +92,7 @@ fn main() -> Result<()> {
         ("blocks.rs", blocks::generate(&cx, &regs)?),
         ("shapes.rs", shapes::generate(&cx)?),
         ("items.rs", items::generate(&cx, &regs)?),
+        ("entities.rs", entities::generate(&cx)?),
         ("loot.rs", loot::generate(&cx)?),
         ("configuration.rs", configuration::generate(&cx, &regs)?),
         ("mod.rs", mod_rs(&cx)),
@@ -116,7 +118,7 @@ fn main() -> Result<()> {
 
 fn mod_rs(cx: &GenContext) -> String {
     format!(
-        "{}\npub mod blocks;\npub mod configuration;\npub mod items;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\n",
+        "{}\npub mod blocks;\npub mod configuration;\npub mod entities;\npub mod items;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\n",
         cx.header
     )
 }
@@ -143,6 +145,7 @@ fn run_generator(java: &Path, jar: &Path, work: &Path) -> Result<PathBuf> {
         bail!("data generator exited with {status}");
     }
     run_shape_dump(java, &work, &out)?;
+    run_entity_dump(java, &work, &out)?;
     Ok(out)
 }
 
@@ -177,6 +180,40 @@ fn run_shape_dump(java: &Path, work: &Path, out: &Path) -> Result<()> {
         .with_context(|| format!("launching {java:?}"))?;
     if !status.success() {
         bail!("ShapeDump exited with {status}");
+    }
+    Ok(())
+}
+
+/// Compiles and runs `java/EntityDump.java` the same way, writing `out/entities.txt`.
+fn run_entity_dump(java: &Path, work: &Path, out: &Path) -> Result<()> {
+    let jars = unpacked_classpath(work)?;
+    let sep = if cfg!(windows) { ";" } else { ":" };
+    let cp = jars.iter().map(|p| p.display().to_string()).collect::<Vec<_>>().join(sep);
+    let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("java/EntityDump.java");
+    let classes = work.join("entitydump-classes");
+    let _ = std::fs::remove_dir_all(&classes);
+    std::fs::create_dir_all(&classes)?;
+    let javac = java.with_file_name(if cfg!(windows) { "javac.exe" } else { "javac" });
+    let javac = if javac.exists() { javac } else { PathBuf::from("javac") };
+    eprintln!("compiling and running EntityDump");
+    let status = Command::new(&javac)
+        .args(["-nowarn", "-cp", &cp, "-d"])
+        .arg(&classes)
+        .arg(&source)
+        .status()
+        .with_context(|| format!("launching {javac:?}"))?;
+    if !status.success() {
+        bail!("javac failed for EntityDump.java");
+    }
+    let run_cp = format!("{}{sep}{cp}", classes.display());
+    let status = Command::new(java)
+        .current_dir(work)
+        .args(["-cp", &run_cp, "EntityDump"])
+        .arg(out.join("entities.txt"))
+        .status()
+        .with_context(|| format!("launching {java:?}"))?;
+    if !status.success() {
+        bail!("EntityDump exited with {status}");
     }
     Ok(())
 }
