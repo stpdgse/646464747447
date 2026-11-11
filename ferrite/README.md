@@ -610,7 +610,7 @@ Players send commands as `/gamemode creative` and the server answers like the of
 the exact text components:
 
 - **The command tree** is the official server's, dumped from the jar per permission level
-  (`CommandDump.java`); it reaches the client byte for byte and round-trips through `ferrite-commands`.
+  (`CommandDump.java`); it reaches the client with only its literal siblings sorted (vanilla orders some, like the game rules, by JVM hash) and round-trips through `ferrite-commands`.
 - **Parsing** is a port of Brigadier and of Minecraft's argument types (numbers, strings, coordinates,
   entity selectors with all their options, ranges, game modes, times, registry entries, messages, ...).
   `scripts/vanilla-commands.sh` feeds tens of thousands of generated lines (valid, invalid, edge cases) to

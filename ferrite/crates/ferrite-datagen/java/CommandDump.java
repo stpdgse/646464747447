@@ -24,9 +24,32 @@ import net.minecraft.server.permissions.PermissionLevel;
  * of the {@code commands} packet, byte for byte, built exactly as {@code Commands.sendCommands}
  * does it (through its own private helpers).
  *
- * One line per level 0 to 4: {@code level <n> <hex>}.
+ * Literal children of every node are sorted by name. One line per level 0 to 4: {@code level <n> <hex>}.
  */
 public class CommandDump {
+    /**
+     * Vanilla registers some literals (the game rules) in hash order, which differs from one JVM
+     * run to the next; sorting every node's children by name makes the dump reproducible.
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    static void sortChildren(CommandNode node) throws Exception {
+        Field f = CommandNode.class.getDeclaredField("children");
+        f.setAccessible(true);
+        Map<String, CommandNode> children = (Map<String, CommandNode>) f.get(node);
+        // Literals are found by name, so their order is free; arguments are tried in the order
+        // they were registered, which is deterministic and must stay.
+        java.util.TreeMap<String, CommandNode> literals = new java.util.TreeMap<>();
+        java.util.LinkedHashMap<String, CommandNode> arguments = new java.util.LinkedHashMap<>();
+        for (Map.Entry<String, CommandNode> e : children.entrySet()) {
+            if (e.getValue() instanceof com.mojang.brigadier.tree.LiteralCommandNode) literals.put(e.getKey(), e.getValue());
+            else arguments.put(e.getKey(), e.getValue());
+        }
+        children.clear();
+        children.putAll(literals);
+        children.putAll(arguments);
+        for (Object c : children.values()) sortChildren((CommandNode) c);
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void main(String[] args) throws Exception {
         SharedConstants.tryDetectVersion();
@@ -47,6 +70,7 @@ public class CommandDump {
                 RootCommandNode newRoot = new RootCommandNode();
                 map.put(root, newRoot);
                 fill.invoke(null, root, newRoot, source, map);
+                sortChildren(newRoot);
                 ClientboundCommandsPacket packet = new ClientboundCommandsPacket(newRoot,
                     (ClientboundCommandsPacket.NodeInspector) inspector.get(null));
                 FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
