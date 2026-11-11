@@ -87,6 +87,7 @@ fn list(l: &List, sorted: bool, out: &mut String) {
         List::String(v) => items(v, out, |x, o| quote(x, o)),
         List::List(v) => items(v, out, |x, o| list(x, sorted, o)),
         List::Compound(v) => items(v, out, |x, o| compound(x, sorted, o)),
+        List::Mixed(v) => items(v, out, |x, o| write_tag(x, sorted, o)),
         List::IntArray(v) => items(v, out, |x, o| write_tag(&Tag::IntArray(x.clone()), sorted, o)),
         List::LongArray(v) => {
             items(v, out, |x, o| write_tag(&Tag::LongArray(x.clone()), sorted, o))

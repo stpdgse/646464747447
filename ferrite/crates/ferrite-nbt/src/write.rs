@@ -92,6 +92,16 @@ fn list(l: &List, out: &mut Vec<u8>) -> Result<()> {
         List::Compound(v) => v.iter().try_for_each(|x| compound(x, out))?,
         List::IntArray(v) => v.iter().try_for_each(|x| int_array(x, out))?,
         List::LongArray(v) => v.iter().try_for_each(|x| long_array(x, out))?,
+        List::Mixed(v) => v.iter().try_for_each(|x| match x {
+            Tag::Compound(c) => compound(c, out),
+            other => {
+                out.push(other.type_id());
+                string("", out)?;
+                payload(other, out)?;
+                out.push(id::END);
+                Ok(())
+            }
+        })?,
     }
     Ok(())
 }

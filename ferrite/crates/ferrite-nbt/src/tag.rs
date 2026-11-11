@@ -38,6 +38,10 @@ pub enum List {
     Compound(Vec<Compound>),
     IntArray(Vec<Vec<i32>>),
     LongArray(Vec<Vec<i64>>),
+    /// Elements of different types, which text (SNBT) allows. On the wire and on disk vanilla
+    /// stores such a list as a list of compounds, wrapping each non-compound element as
+    /// `{"": element}`, and the writer does the same.
+    Mixed(Vec<Tag>),
 }
 
 /// Named tags, in insertion order. Vanilla treats compounds as unordered; keeping order makes our
@@ -106,6 +110,7 @@ impl List {
             List::Compound(_) => id::COMPOUND,
             List::IntArray(_) => id::INT_ARRAY,
             List::LongArray(_) => id::LONG_ARRAY,
+            List::Mixed(_) => id::COMPOUND,
         }
     }
 
@@ -124,6 +129,7 @@ impl List {
             List::Compound(v) => v.len(),
             List::IntArray(v) => v.len(),
             List::LongArray(v) => v.len(),
+            List::Mixed(v) => v.len(),
         }
     }
 

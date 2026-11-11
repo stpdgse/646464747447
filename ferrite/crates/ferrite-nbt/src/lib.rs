@@ -11,6 +11,7 @@
 
 mod error;
 mod mutf8;
+pub mod parse;
 mod read;
 pub mod snbt;
 mod tag;
