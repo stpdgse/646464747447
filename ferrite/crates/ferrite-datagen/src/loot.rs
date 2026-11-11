@@ -1,4 +1,4 @@
-//! Block loot tables and the named predicates they refer to, as the data generator wrote them.
+//! Block loot tables, recipes, and the named predicates they refer to, as the data generator wrote them.
 //! They are embedded as minified JSON; `ferrite-loot` parses and evaluates them.
 
 use std::fmt::Write;
@@ -34,12 +34,17 @@ pub fn generate(cx: &GenContext) -> Result<String> {
     collect(&data.join("loot_table/blocks"), "blocks/", &mut blocks)?;
     let mut predicates = Vec::new();
     collect(&data.join("predicate"), "", &mut predicates)?;
+    let mut recipes = Vec::new();
+    collect(&data.join("recipe"), "", &mut recipes)?;
     let mut out = String::new();
     out.push_str(&cx.header);
     out.push('\n');
     blocks.sort();
     predicates.sort();
-    for (label, list) in [("BLOCK_LOOT", &blocks), ("PREDICATES", &predicates)] {
+    recipes.sort();
+    for (label, list) in
+        [("BLOCK_LOOT", &blocks), ("PREDICATES", &predicates), ("RECIPES", &recipes)]
+    {
         let _ = writeln!(out, "/// `(name, minified JSON)`, sorted by name.");
         let _ = writeln!(out, "pub static {label}: [(&str, &str); {}] = [", list.len());
         for (name, json) in list {

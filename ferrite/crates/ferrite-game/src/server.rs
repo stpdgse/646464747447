@@ -730,6 +730,7 @@ impl Game {
                     let mut item = p.item;
                     item.count = item.count.clamp(0, 99);
                     pl.menu.slots[p.slot as usize] = item;
+                    pl.menu.refresh_result();
                 }
             }
             PlayerInput::ID => {

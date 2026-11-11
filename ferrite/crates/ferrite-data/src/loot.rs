@@ -1,6 +1,6 @@
 //! Loot tables as generated JSON text (see `ferrite-loot` for evaluation).
 
-pub use crate::generated::loot::{BLOCK_LOOT, PREDICATES};
+pub use crate::generated::loot::{BLOCK_LOOT, PREDICATES, RECIPES};
 
 /// The JSON of a block's loot table, by block name (`minecraft:stone`).
 pub fn block_loot(block: &str) -> Option<&'static str> {

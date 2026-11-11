@@ -916,6 +916,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ferrite-crafting"
+version = "0.1.0"
+dependencies = [
+ "ferrite-data",
+ "serde_json",
+]
+
+[[package]]
 name = "ferrite-data"
 version = "0.1.0"
 dependencies = [
@@ -953,6 +961,7 @@ version = "0.1.0"
 dependencies = [
  "bytes",
  "ferrite-blocks",
+ "ferrite-crafting",
  "ferrite-data",
  "ferrite-loot",
  "ferrite-nbt",

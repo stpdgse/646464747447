@@ -11,6 +11,7 @@ publish.workspace = true
 bytes.workspace = true
 ferrite-blocks = { path = "../ferrite-blocks" }
 ferrite-loot = { path = "../ferrite-loot" }
+ferrite-crafting = { path = "../ferrite-crafting" }
 ferrite-data.workspace = true
 ferrite-net = { path = "../ferrite-net" }
 ferrite-protocol = { path = "../ferrite-protocol" }

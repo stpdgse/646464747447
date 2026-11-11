@@ -105,8 +105,44 @@ impl Menu {
         if (5..=8).contains(&slot) { 1 } else { max_stack(item) }
     }
 
+    /// Recomputes the crafting result from the 2x2 grid.
+    pub fn refresh_result(&mut self) {
+        let grid: Vec<ferrite_crafting::Stack> = self.slots[1..=4]
+            .iter()
+            .map(|s| ferrite_crafting::Stack { item: s.item, count: s.count })
+            .collect();
+        self.slots[0] = match ferrite_crafting::craft(&grid, 2, 2) {
+            Some((_, out)) => ItemStack { count: out.count, item: out.item },
+            None => ItemStack::default(),
+        };
+    }
+
+    /// Takes one craft's worth out of the grid (the game's `ResultSlot.onTake`).
+    fn consume_ingredients(&mut self) {
+        for slot in 1..=4 {
+            if !empty(self.slots[slot]) {
+                self.slots[slot].count -= 1;
+                if self.slots[slot].count <= 0 {
+                    self.slots[slot] = ItemStack::default();
+                }
+            }
+        }
+    }
+
     /// Applies one click. Returns the stacks the player drops as a result.
     pub fn click(
+        &mut self,
+        slot: i32,
+        button: i32,
+        input: Input,
+        creative: bool,
+    ) -> Vec<ItemStack> {
+        let drops = self.click_inner(slot, button, input, creative);
+        self.refresh_result();
+        drops
+    }
+
+    fn click_inner(
         &mut self,
         slot: i32,
         button: i32,
@@ -183,6 +219,9 @@ impl Menu {
         if s >= SLOTS {
             return;
         }
+        if s == 0 {
+            return self.pickup_result(button);
+        }
         let (a, c) = (self.slots[s], self.carried);
         if empty(a) {
             if !empty(c) && self.may_place(s, c) {
@@ -216,6 +255,23 @@ impl Menu {
         }
     }
 
+    /// A click on the crafting result: it can only be taken whole, onto an empty cursor or one
+    /// holding the same item with room for all of it.
+    fn pickup_result(&mut self, button: i32) {
+        let (a, c) = (self.slots[0], self.carried);
+        if empty(a) {
+            return;
+        }
+        if empty(c) {
+            self.carried = a;
+            self.consume_ingredients();
+        } else if same(a, c) && c.count + a.count <= max_stack(c.item) {
+            self.carried.count += a.count;
+            self.consume_ingredients();
+        }
+        let _ = button;
+    }
+
     /// Moves stack `slot` to where shift-click sends it; returns what was moved (empty if
     /// nothing).
     fn quick_move(&mut self, slot: usize) -> ItemStack {
@@ -224,6 +280,18 @@ impl Menu {
         }
         let original = self.slots[slot];
         let mut stack = original;
+        if slot == 0 {
+            // Craft into the inventory (preferring the hotbar's end), consuming one craft.
+            if !self.move_to(&mut stack, 9, 45, true) {
+                return ItemStack::default();
+            }
+            if stack.count == original.count {
+                return ItemStack::default();
+            }
+            self.consume_ingredients();
+            self.refresh_result();
+            return original;
+        }
         let moved = if (1..=4).contains(&slot) || (5..=8).contains(&slot) || slot == 45 {
             self.move_to(&mut stack, 9, 45, false)
         } else if let Some(armor) = armor_slot(stack.item).filter(|a| empty(self.slots[*a])) {

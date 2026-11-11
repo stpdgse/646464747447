@@ -483,9 +483,16 @@ move (shift-click), number-key swap, throw, drag and double-click behave as vani
 only take their armor, and the drop key throws items with the game's velocity. If a click's
 claimed result differs from the server's, the client is sent the real inventory. The logic is
 checked against 2,075 clicks recorded from the official server (`scripts/record-inventory.py`,
-`tests/inventory.rs`), all identical. Crafting (the 2x2 grid and recipes) is not implemented.
+`tests/inventory.rs`), all identical, including clicks on the crafting grid and its result slot.
 
-**Not yet:** crafting and recipes, damage, hunger, item components, the
+`ferrite-crafting` matches the game's own recipes (shaped, shapeless, transmute, dye) against the
+2x2 grid: the grid is trimmed to its items' bounding box, shaped recipes are tried mirrored, and
+shapeless ones need a one-to-one assignment. About 520 grids recorded from the official server
+(every 2x2 recipe with real items, plus random grids) produce the same results. Not yet: the 3x3
+crafting table window, remainders (a bucket left over), special recipes (banners, fireworks,
+repair), smelting.
+
+**Not yet:** the crafting table and furnace windows, damage, hunger, item components, the
 inventory beyond the hotbar being synchronised from the client, signed chat, commands, persistence of changes, lighting,
 and the io_uring backend's play state.
 
