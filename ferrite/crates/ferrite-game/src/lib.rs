@@ -9,6 +9,7 @@
 
 pub mod chunkenc;
 pub mod flat;
+pub mod furnace;
 pub mod inventory;
 pub mod items;
 pub mod mobs;

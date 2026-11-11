@@ -112,11 +112,62 @@ pub fn generate(cx: &GenContext, regs: &[Registry]) -> Result<String> {
                 _ => {}
             }
         }
+        // Fuel: the burn time in ticks in an ordinary furnace; blast furnaces and smokers halve it.
+        let fuel = match c.get("minecraft:cooking_fuel") {
+            None => 0,
+            Some(f) => {
+                let key = f["burn_time"].as_str().context("fuel burn_time")?;
+                let rel = key.strip_prefix("minecraft:").unwrap_or(key);
+                let path = cx
+                    .reports
+                    .parent()
+                    .unwrap_or(&cx.reports)
+                    .join(format!("data/minecraft/context_int_provider/{rel}.json"));
+                let p: Value = serde_json::from_slice(
+                    &std::fs::read(&path).with_context(|| format!("reading {path:?}"))?,
+                )?;
+                p["left"].as_u64().with_context(|| format!("{name}: unknown burn time form"))?
+            }
+        };
         let _ = writeln!(
             out,
-            "    ItemInfo {{ max_stack: {max_stack}, max_damage: {max_damage}, tool: {tool}, equip: {equip}, food: {food}, attack_damage: {:?}f32, attack_speed_modifier: {:?}f32 }}, // {name}",
+            "    ItemInfo {{ max_stack: {max_stack}, max_damage: {max_damage}, tool: {tool}, equip: {equip}, food: {food}, attack_damage: {:?}f32, attack_speed_modifier: {:?}f32, fuel: {fuel} }}, // {name}",
             damage as f32, speed as f32
         );
+    }
+    out.push_str("];\n");
+    // What items leave behind when used up in crafting or as fuel (from `java/ItemDump.java`).
+    let path = cx.reports.parent().unwrap_or(&cx.reports).join("item_remainders.txt");
+    let text = std::fs::read_to_string(&path)
+        .with_context(|| format!("reading {path:?} (run with --work-dir)"))?;
+    let mut lines = text.lines();
+    let n: usize = lines
+        .next()
+        .and_then(|l| l.strip_prefix("remainders "))
+        .context("missing `remainders N`")?
+        .parse()?;
+    let id_of = |name: &str| -> Result<usize> {
+        items.names.iter().position(|n| n == name).with_context(|| format!("unknown item {name}"))
+    };
+    let mut rows = Vec::new();
+    for line in lines {
+        let f: Vec<&str> = line.split(' ').collect();
+        if f.len() != 3 {
+            bail!("remainder row {line:?}");
+        }
+        if f[2] != "1" {
+            bail!("{}: a remainder of {} items is not supported", f[0], f[2]);
+        }
+        rows.push((id_of(f[0])?, id_of(f[1])?));
+    }
+    if rows.len() != n {
+        bail!("remainders: expected {n}, found {}", rows.len());
+    }
+    rows.sort_unstable();
+    let _ = writeln!(out, "\n/// `(item, remainder)`, sorted by item id.");
+    let _ = writeln!(out, "pub static CRAFT_REMAINDERS: [(u16, u16); {}] = [", rows.len());
+    for (item, rem) in rows {
+        let _ = writeln!(out, "    ({item}, {rem}),");
     }
     out.push_str("];\n");
     Ok(out)

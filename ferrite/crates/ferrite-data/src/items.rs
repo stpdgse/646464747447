@@ -58,9 +58,21 @@ pub struct ItemInfo {
     pub attack_damage: f32,
     /// Change to the base attack speed of 4 (a sword's is -2.4).
     pub attack_speed_modifier: f32,
+    /// Ticks this item burns in an ordinary furnace (blast furnaces and smokers halve it); 0 if it
+    /// is no fuel.
+    pub fuel: u32,
 }
 
 /// The facts about the item with this protocol id.
 pub fn item_info(id: i32) -> Option<&'static ItemInfo> {
     ITEMS.get(usize::try_from(id).ok()?)
+}
+
+/// What the item with this id leaves in its place when it is used up in a recipe or as fuel
+/// (a lava bucket leaves a bucket).
+pub fn craft_remainder(id: i32) -> Option<i32> {
+    let id = u16::try_from(id).ok()?;
+    let i =
+        crate::generated::items::CRAFT_REMAINDERS.binary_search_by_key(&id, |(a, _)| *a).ok()?;
+    Some(i32::from(crate::generated::items::CRAFT_REMAINDERS[i].1))
 }

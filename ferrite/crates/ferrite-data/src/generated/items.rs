@@ -11,6 +11,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:air
     ItemInfo {
         max_stack: 64,
@@ -20,6 +21,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone
     ItemInfo {
         max_stack: 64,
@@ -29,6 +31,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:granite
     ItemInfo {
         max_stack: 64,
@@ -38,6 +41,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_granite
     ItemInfo {
         max_stack: 64,
@@ -47,6 +51,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diorite
     ItemInfo {
         max_stack: 64,
@@ -56,6 +61,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_diorite
     ItemInfo {
         max_stack: 64,
@@ -65,6 +71,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:andesite
     ItemInfo {
         max_stack: 64,
@@ -74,6 +81,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_andesite
     ItemInfo {
         max_stack: 64,
@@ -83,6 +91,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate
     ItemInfo {
         max_stack: 64,
@@ -92,6 +101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobbled_deepslate
     ItemInfo {
         max_stack: 64,
@@ -101,6 +111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_deepslate
     ItemInfo {
         max_stack: 64,
@@ -110,6 +121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:calcite
     ItemInfo {
         max_stack: 64,
@@ -119,6 +131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tuff
     ItemInfo {
         max_stack: 64,
@@ -128,6 +141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tuff_slab
     ItemInfo {
         max_stack: 64,
@@ -137,6 +151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tuff_stairs
     ItemInfo {
         max_stack: 64,
@@ -146,6 +161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tuff_wall
     ItemInfo {
         max_stack: 64,
@@ -155,6 +171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_tuff
     ItemInfo {
         max_stack: 64,
@@ -164,6 +181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_tuff
     ItemInfo {
         max_stack: 64,
@@ -173,6 +191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_tuff_slab
     ItemInfo {
         max_stack: 64,
@@ -182,6 +201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_tuff_stairs
     ItemInfo {
         max_stack: 64,
@@ -191,6 +211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_tuff_wall
     ItemInfo {
         max_stack: 64,
@@ -200,6 +221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tuff_bricks
     ItemInfo {
         max_stack: 64,
@@ -209,6 +231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tuff_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -218,6 +241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tuff_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -227,6 +251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tuff_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -236,6 +261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_tuff_bricks
     ItemInfo {
         max_stack: 64,
@@ -245,6 +271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur
     ItemInfo {
         max_stack: 64,
@@ -254,6 +281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:potent_sulfur
     ItemInfo {
         max_stack: 64,
@@ -263,6 +291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_slab
     ItemInfo {
         max_stack: 64,
@@ -272,6 +301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_stairs
     ItemInfo {
         max_stack: 64,
@@ -281,6 +311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_wall
     ItemInfo {
         max_stack: 64,
@@ -290,6 +321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_sulfur
     ItemInfo {
         max_stack: 64,
@@ -299,6 +331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_sulfur_slab
     ItemInfo {
         max_stack: 64,
@@ -308,6 +341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_sulfur_stairs
     ItemInfo {
         max_stack: 64,
@@ -317,6 +351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_sulfur_wall
     ItemInfo {
         max_stack: 64,
@@ -326,6 +361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_bricks
     ItemInfo {
         max_stack: 64,
@@ -335,6 +371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -344,6 +381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -353,6 +391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -362,6 +401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_sulfur
     ItemInfo {
         max_stack: 64,
@@ -371,6 +411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cinnabar
     ItemInfo {
         max_stack: 64,
@@ -380,6 +421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cinnabar_slab
     ItemInfo {
         max_stack: 64,
@@ -389,6 +431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cinnabar_stairs
     ItemInfo {
         max_stack: 64,
@@ -398,6 +441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cinnabar_wall
     ItemInfo {
         max_stack: 64,
@@ -407,6 +451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_cinnabar
     ItemInfo {
         max_stack: 64,
@@ -416,6 +461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_cinnabar_slab
     ItemInfo {
         max_stack: 64,
@@ -425,6 +471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_cinnabar_stairs
     ItemInfo {
         max_stack: 64,
@@ -434,6 +481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_cinnabar_wall
     ItemInfo {
         max_stack: 64,
@@ -443,6 +491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cinnabar_bricks
     ItemInfo {
         max_stack: 64,
@@ -452,6 +501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cinnabar_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -461,6 +511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cinnabar_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -470,6 +521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cinnabar_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -479,6 +531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_cinnabar
     ItemInfo {
         max_stack: 64,
@@ -488,6 +541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dripstone_block
     ItemInfo {
         max_stack: 64,
@@ -497,6 +551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:grass_block
     ItemInfo {
         max_stack: 64,
@@ -506,6 +561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dirt
     ItemInfo {
         max_stack: 64,
@@ -515,6 +571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:coarse_dirt
     ItemInfo {
         max_stack: 64,
@@ -524,6 +581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:podzol
     ItemInfo {
         max_stack: 64,
@@ -533,6 +591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rooted_dirt
     ItemInfo {
         max_stack: 64,
@@ -542,6 +601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mud
     ItemInfo {
         max_stack: 64,
@@ -551,6 +611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_nylium
     ItemInfo {
         max_stack: 64,
@@ -560,6 +621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_nylium
     ItemInfo {
         max_stack: 64,
@@ -569,6 +631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobblestone
     ItemInfo {
         max_stack: 64,
@@ -578,6 +641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_planks
     ItemInfo {
         max_stack: 64,
@@ -587,6 +651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_planks
     ItemInfo {
         max_stack: 64,
@@ -596,6 +661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_planks
     ItemInfo {
         max_stack: 64,
@@ -605,6 +671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_planks
     ItemInfo {
         max_stack: 64,
@@ -614,6 +681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_planks
     ItemInfo {
         max_stack: 64,
@@ -623,6 +691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_planks
     ItemInfo {
         max_stack: 64,
@@ -632,6 +701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_planks
     ItemInfo {
         max_stack: 64,
@@ -641,6 +711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_planks
     ItemInfo {
         max_stack: 64,
@@ -650,6 +721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_planks
     ItemInfo {
         max_stack: 64,
@@ -659,6 +731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_planks
     ItemInfo {
         max_stack: 64,
@@ -668,6 +741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_planks
     ItemInfo {
         max_stack: 64,
@@ -677,6 +751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_planks
     ItemInfo {
         max_stack: 64,
@@ -686,6 +761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_planks
     ItemInfo {
         max_stack: 64,
@@ -695,6 +771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_mosaic
     ItemInfo {
         max_stack: 64,
@@ -704,6 +781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:oak_sapling
     ItemInfo {
         max_stack: 64,
@@ -713,6 +791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:spruce_sapling
     ItemInfo {
         max_stack: 64,
@@ -722,6 +801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:birch_sapling
     ItemInfo {
         max_stack: 64,
@@ -731,6 +811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:jungle_sapling
     ItemInfo {
         max_stack: 64,
@@ -740,6 +821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:acacia_sapling
     ItemInfo {
         max_stack: 64,
@@ -749,6 +831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:cherry_sapling
     ItemInfo {
         max_stack: 64,
@@ -758,6 +841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:dark_oak_sapling
     ItemInfo {
         max_stack: 64,
@@ -767,6 +851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:pale_oak_sapling
     ItemInfo {
         max_stack: 64,
@@ -776,6 +861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:mangrove_propagule
     ItemInfo {
         max_stack: 64,
@@ -785,6 +871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:poplar_sapling
     ItemInfo {
         max_stack: 64,
@@ -794,6 +881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bedrock
     ItemInfo {
         max_stack: 64,
@@ -803,6 +891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sand
     ItemInfo {
         max_stack: 64,
@@ -812,6 +901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:suspicious_sand
     ItemInfo {
         max_stack: 64,
@@ -821,6 +911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:suspicious_gravel
     ItemInfo {
         max_stack: 64,
@@ -830,6 +921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_sand
     ItemInfo {
         max_stack: 64,
@@ -839,6 +931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gravel
     ItemInfo {
         max_stack: 64,
@@ -848,6 +941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:coal_ore
     ItemInfo {
         max_stack: 64,
@@ -857,6 +951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_coal_ore
     ItemInfo {
         max_stack: 64,
@@ -866,6 +961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_ore
     ItemInfo {
         max_stack: 64,
@@ -875,6 +971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_iron_ore
     ItemInfo {
         max_stack: 64,
@@ -884,6 +981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_ore
     ItemInfo {
         max_stack: 64,
@@ -893,6 +991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_copper_ore
     ItemInfo {
         max_stack: 64,
@@ -902,6 +1001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gold_ore
     ItemInfo {
         max_stack: 64,
@@ -911,6 +1011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_gold_ore
     ItemInfo {
         max_stack: 64,
@@ -920,6 +1021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:redstone_ore
     ItemInfo {
         max_stack: 64,
@@ -929,6 +1031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_redstone_ore
     ItemInfo {
         max_stack: 64,
@@ -938,6 +1041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:emerald_ore
     ItemInfo {
         max_stack: 64,
@@ -947,6 +1051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_emerald_ore
     ItemInfo {
         max_stack: 64,
@@ -956,6 +1061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lapis_ore
     ItemInfo {
         max_stack: 64,
@@ -965,6 +1071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_lapis_ore
     ItemInfo {
         max_stack: 64,
@@ -974,6 +1081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_ore
     ItemInfo {
         max_stack: 64,
@@ -983,6 +1091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_diamond_ore
     ItemInfo {
         max_stack: 64,
@@ -992,6 +1101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_gold_ore
     ItemInfo {
         max_stack: 64,
@@ -1001,6 +1111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_quartz_ore
     ItemInfo {
         max_stack: 64,
@@ -1010,6 +1121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ancient_debris
     ItemInfo {
         max_stack: 64,
@@ -1019,6 +1131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 16000,
     }, // minecraft:coal_block
     ItemInfo {
         max_stack: 64,
@@ -1028,6 +1141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:raw_iron_block
     ItemInfo {
         max_stack: 64,
@@ -1037,6 +1151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:raw_copper_block
     ItemInfo {
         max_stack: 64,
@@ -1046,6 +1161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:raw_gold_block
     ItemInfo {
         max_stack: 64,
@@ -1055,6 +1171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:heavy_core
     ItemInfo {
         max_stack: 64,
@@ -1064,6 +1181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:amethyst_block
     ItemInfo {
         max_stack: 64,
@@ -1073,6 +1191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:budding_amethyst
     ItemInfo {
         max_stack: 64,
@@ -1082,6 +1201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_block
     ItemInfo {
         max_stack: 64,
@@ -1091,6 +1211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_block
     ItemInfo {
         max_stack: 64,
@@ -1100,6 +1221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper
     ItemInfo {
         max_stack: 64,
@@ -1109,6 +1231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper
     ItemInfo {
         max_stack: 64,
@@ -1118,6 +1241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper
     ItemInfo {
         max_stack: 64,
@@ -1127,6 +1251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_block
     ItemInfo {
         max_stack: 64,
@@ -1136,6 +1261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper
     ItemInfo {
         max_stack: 64,
@@ -1145,6 +1271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper
     ItemInfo {
         max_stack: 64,
@@ -1154,6 +1281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper
     ItemInfo {
         max_stack: 64,
@@ -1163,6 +1291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gold_block
     ItemInfo {
         max_stack: 64,
@@ -1172,6 +1301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_block
     ItemInfo {
         max_stack: 64,
@@ -1181,6 +1311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_block
     ItemInfo {
         max_stack: 64,
@@ -1190,6 +1321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_copper
     ItemInfo {
         max_stack: 64,
@@ -1199,6 +1331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_chiseled_copper
     ItemInfo {
         max_stack: 64,
@@ -1208,6 +1341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_chiseled_copper
     ItemInfo {
         max_stack: 64,
@@ -1217,6 +1351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_chiseled_copper
     ItemInfo {
         max_stack: 64,
@@ -1226,6 +1361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_chiseled_copper
     ItemInfo {
         max_stack: 64,
@@ -1235,6 +1371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_chiseled_copper
     ItemInfo {
         max_stack: 64,
@@ -1244,6 +1381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_chiseled_copper
     ItemInfo {
         max_stack: 64,
@@ -1253,6 +1391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_chiseled_copper
     ItemInfo {
         max_stack: 64,
@@ -1262,6 +1401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cut_copper
     ItemInfo {
         max_stack: 64,
@@ -1271,6 +1411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_cut_copper
     ItemInfo {
         max_stack: 64,
@@ -1280,6 +1421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_cut_copper
     ItemInfo {
         max_stack: 64,
@@ -1289,6 +1431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_cut_copper
     ItemInfo {
         max_stack: 64,
@@ -1298,6 +1441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_cut_copper
     ItemInfo {
         max_stack: 64,
@@ -1307,6 +1451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_cut_copper
     ItemInfo {
         max_stack: 64,
@@ -1316,6 +1461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_cut_copper
     ItemInfo {
         max_stack: 64,
@@ -1325,6 +1471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_cut_copper
     ItemInfo {
         max_stack: 64,
@@ -1334,6 +1481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cut_copper_stairs
     ItemInfo {
         max_stack: 64,
@@ -1343,6 +1491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_cut_copper_stairs
     ItemInfo {
         max_stack: 64,
@@ -1352,6 +1501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_cut_copper_stairs
     ItemInfo {
         max_stack: 64,
@@ -1361,6 +1511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_cut_copper_stairs
     ItemInfo {
         max_stack: 64,
@@ -1370,6 +1521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_cut_copper_stairs
     ItemInfo {
         max_stack: 64,
@@ -1379,6 +1531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_cut_copper_stairs
     ItemInfo {
         max_stack: 64,
@@ -1388,6 +1541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_cut_copper_stairs
     ItemInfo {
         max_stack: 64,
@@ -1397,6 +1551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_cut_copper_stairs
     ItemInfo {
         max_stack: 64,
@@ -1406,6 +1561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cut_copper_slab
     ItemInfo {
         max_stack: 64,
@@ -1415,6 +1571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_cut_copper_slab
     ItemInfo {
         max_stack: 64,
@@ -1424,6 +1581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_cut_copper_slab
     ItemInfo {
         max_stack: 64,
@@ -1433,6 +1591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_cut_copper_slab
     ItemInfo {
         max_stack: 64,
@@ -1442,6 +1601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_cut_copper_slab
     ItemInfo {
         max_stack: 64,
@@ -1451,6 +1611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_cut_copper_slab
     ItemInfo {
         max_stack: 64,
@@ -1460,6 +1621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_cut_copper_slab
     ItemInfo {
         max_stack: 64,
@@ -1469,6 +1631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_cut_copper_slab
     ItemInfo {
         max_stack: 64,
@@ -1478,6 +1641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_log
     ItemInfo {
         max_stack: 64,
@@ -1487,6 +1651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_log
     ItemInfo {
         max_stack: 64,
@@ -1496,6 +1661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_log
     ItemInfo {
         max_stack: 64,
@@ -1505,6 +1671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_log
     ItemInfo {
         max_stack: 64,
@@ -1514,6 +1681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_log
     ItemInfo {
         max_stack: 64,
@@ -1523,6 +1691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_log
     ItemInfo {
         max_stack: 64,
@@ -1532,6 +1701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_log
     ItemInfo {
         max_stack: 64,
@@ -1541,6 +1711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_log
     ItemInfo {
         max_stack: 64,
@@ -1550,6 +1721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_log
     ItemInfo {
         max_stack: 64,
@@ -1559,6 +1731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_log
     ItemInfo {
         max_stack: 64,
@@ -1568,6 +1741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_roots
     ItemInfo {
         max_stack: 64,
@@ -1577,6 +1751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:muddy_mangrove_roots
     ItemInfo {
         max_stack: 64,
@@ -1586,6 +1761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_stem
     ItemInfo {
         max_stack: 64,
@@ -1595,6 +1771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_stem
     ItemInfo {
         max_stack: 64,
@@ -1604,6 +1781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_block
     ItemInfo {
         max_stack: 64,
@@ -1613,6 +1791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_oak_log
     ItemInfo {
         max_stack: 64,
@@ -1622,6 +1801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_spruce_log
     ItemInfo {
         max_stack: 64,
@@ -1631,6 +1811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_birch_log
     ItemInfo {
         max_stack: 64,
@@ -1640,6 +1821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_jungle_log
     ItemInfo {
         max_stack: 64,
@@ -1649,6 +1831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_acacia_log
     ItemInfo {
         max_stack: 64,
@@ -1658,6 +1841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_cherry_log
     ItemInfo {
         max_stack: 64,
@@ -1667,6 +1851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_dark_oak_log
     ItemInfo {
         max_stack: 64,
@@ -1676,6 +1861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_pale_oak_log
     ItemInfo {
         max_stack: 64,
@@ -1685,6 +1871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_mangrove_log
     ItemInfo {
         max_stack: 64,
@@ -1694,6 +1881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_poplar_log
     ItemInfo {
         max_stack: 64,
@@ -1703,6 +1891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stripped_crimson_stem
     ItemInfo {
         max_stack: 64,
@@ -1712,6 +1901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stripped_warped_stem
     ItemInfo {
         max_stack: 64,
@@ -1721,6 +1911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_oak_wood
     ItemInfo {
         max_stack: 64,
@@ -1730,6 +1921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_spruce_wood
     ItemInfo {
         max_stack: 64,
@@ -1739,6 +1931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_birch_wood
     ItemInfo {
         max_stack: 64,
@@ -1748,6 +1941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_jungle_wood
     ItemInfo {
         max_stack: 64,
@@ -1757,6 +1951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_acacia_wood
     ItemInfo {
         max_stack: 64,
@@ -1766,6 +1961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_cherry_wood
     ItemInfo {
         max_stack: 64,
@@ -1775,6 +1971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_dark_oak_wood
     ItemInfo {
         max_stack: 64,
@@ -1784,6 +1981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_pale_oak_wood
     ItemInfo {
         max_stack: 64,
@@ -1793,6 +1991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_mangrove_wood
     ItemInfo {
         max_stack: 64,
@@ -1802,6 +2001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_poplar_wood
     ItemInfo {
         max_stack: 64,
@@ -1811,6 +2011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stripped_crimson_hyphae
     ItemInfo {
         max_stack: 64,
@@ -1820,6 +2021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stripped_warped_hyphae
     ItemInfo {
         max_stack: 64,
@@ -1829,6 +2031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:stripped_bamboo_block
     ItemInfo {
         max_stack: 64,
@@ -1838,6 +2041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_wood
     ItemInfo {
         max_stack: 64,
@@ -1847,6 +2051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_wood
     ItemInfo {
         max_stack: 64,
@@ -1856,6 +2061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_wood
     ItemInfo {
         max_stack: 64,
@@ -1865,6 +2071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_wood
     ItemInfo {
         max_stack: 64,
@@ -1874,6 +2081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_wood
     ItemInfo {
         max_stack: 64,
@@ -1883,6 +2091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_wood
     ItemInfo {
         max_stack: 64,
@@ -1892,6 +2101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_wood
     ItemInfo {
         max_stack: 64,
@@ -1901,6 +2111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_wood
     ItemInfo {
         max_stack: 64,
@@ -1910,6 +2121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_wood
     ItemInfo {
         max_stack: 64,
@@ -1919,6 +2131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_wood
     ItemInfo {
         max_stack: 64,
@@ -1928,6 +2141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_hyphae
     ItemInfo {
         max_stack: 64,
@@ -1937,6 +2151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_hyphae
     ItemInfo {
         max_stack: 64,
@@ -1946,6 +2161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oak_leaves
     ItemInfo {
         max_stack: 64,
@@ -1955,6 +2171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:spruce_leaves
     ItemInfo {
         max_stack: 64,
@@ -1964,6 +2181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:birch_leaves
     ItemInfo {
         max_stack: 64,
@@ -1973,6 +2191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:jungle_leaves
     ItemInfo {
         max_stack: 64,
@@ -1982,6 +2201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:acacia_leaves
     ItemInfo {
         max_stack: 64,
@@ -1991,6 +2211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cherry_leaves
     ItemInfo {
         max_stack: 64,
@@ -2000,6 +2221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dark_oak_leaves
     ItemInfo {
         max_stack: 64,
@@ -2009,6 +2231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pale_oak_leaves
     ItemInfo {
         max_stack: 64,
@@ -2018,6 +2241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mangrove_leaves
     ItemInfo {
         max_stack: 64,
@@ -2027,6 +2251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_poplar_leaves
     ItemInfo {
         max_stack: 64,
@@ -2036,6 +2261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_poplar_leaves
     ItemInfo {
         max_stack: 64,
@@ -2045,6 +2271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_poplar_leaves
     ItemInfo {
         max_stack: 64,
@@ -2054,6 +2281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:azalea_leaves
     ItemInfo {
         max_stack: 64,
@@ -2063,6 +2291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:flowering_azalea_leaves
     ItemInfo {
         max_stack: 64,
@@ -2072,6 +2301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sponge
     ItemInfo {
         max_stack: 64,
@@ -2081,6 +2311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wet_sponge
     ItemInfo {
         max_stack: 64,
@@ -2090,6 +2321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glass
     ItemInfo {
         max_stack: 64,
@@ -2099,6 +2331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tinted_glass
     ItemInfo {
         max_stack: 64,
@@ -2108,6 +2341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lapis_block
     ItemInfo {
         max_stack: 64,
@@ -2117,6 +2351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sandstone
     ItemInfo {
         max_stack: 64,
@@ -2126,6 +2361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_sandstone
     ItemInfo {
         max_stack: 64,
@@ -2135,6 +2371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cut_sandstone
     ItemInfo {
         max_stack: 64,
@@ -2144,6 +2381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobweb
     ItemInfo {
         max_stack: 64,
@@ -2153,6 +2391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:short_grass
     ItemInfo {
         max_stack: 64,
@@ -2162,6 +2401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:fern
     ItemInfo {
         max_stack: 64,
@@ -2171,6 +2411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bush
     ItemInfo {
         max_stack: 64,
@@ -2180,6 +2421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_shrub
     ItemInfo {
         max_stack: 64,
@@ -2189,6 +2431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:azalea
     ItemInfo {
         max_stack: 64,
@@ -2198,6 +2441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:flowering_azalea
     ItemInfo {
         max_stack: 64,
@@ -2207,6 +2451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:dead_bush
     ItemInfo {
         max_stack: 64,
@@ -2216,6 +2461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:firefly_bush
     ItemInfo {
         max_stack: 64,
@@ -2225,6 +2471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:short_dry_grass
     ItemInfo {
         max_stack: 64,
@@ -2234,6 +2481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:tall_dry_grass
     ItemInfo {
         max_stack: 64,
@@ -2243,6 +2491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:seagrass
     ItemInfo {
         max_stack: 64,
@@ -2252,6 +2501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sea_pickle
     ItemInfo {
         max_stack: 64,
@@ -2261,6 +2511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:white_wool
     ItemInfo {
         max_stack: 64,
@@ -2270,6 +2521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:orange_wool
     ItemInfo {
         max_stack: 64,
@@ -2279,6 +2531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:magenta_wool
     ItemInfo {
         max_stack: 64,
@@ -2288,6 +2541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:light_blue_wool
     ItemInfo {
         max_stack: 64,
@@ -2297,6 +2551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:yellow_wool
     ItemInfo {
         max_stack: 64,
@@ -2306,6 +2561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:lime_wool
     ItemInfo {
         max_stack: 64,
@@ -2315,6 +2571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:pink_wool
     ItemInfo {
         max_stack: 64,
@@ -2324,6 +2581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:gray_wool
     ItemInfo {
         max_stack: 64,
@@ -2333,6 +2591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:light_gray_wool
     ItemInfo {
         max_stack: 64,
@@ -2342,6 +2601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:cyan_wool
     ItemInfo {
         max_stack: 64,
@@ -2351,6 +2611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:purple_wool
     ItemInfo {
         max_stack: 64,
@@ -2360,6 +2621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:blue_wool
     ItemInfo {
         max_stack: 64,
@@ -2369,6 +2631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:brown_wool
     ItemInfo {
         max_stack: 64,
@@ -2378,6 +2641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:green_wool
     ItemInfo {
         max_stack: 64,
@@ -2387,6 +2651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:red_wool
     ItemInfo {
         max_stack: 64,
@@ -2396,6 +2661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:black_wool
     ItemInfo {
         max_stack: 64,
@@ -2405,6 +2671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:white_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2414,6 +2681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:orange_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2423,6 +2691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:magenta_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2432,6 +2701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:light_blue_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2441,6 +2711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:yellow_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2450,6 +2721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:lime_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2459,6 +2731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:pink_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2468,6 +2741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:gray_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2477,6 +2751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:light_gray_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2486,6 +2761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:cyan_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2495,6 +2771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:purple_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2504,6 +2781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:blue_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2513,6 +2791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:brown_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2522,6 +2801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:green_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2531,6 +2811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:red_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2540,6 +2821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:black_wool_stairs
     ItemInfo {
         max_stack: 64,
@@ -2549,6 +2831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:white_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2558,6 +2841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:orange_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2567,6 +2851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:magenta_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2576,6 +2861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:light_blue_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2585,6 +2871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:yellow_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2594,6 +2881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:lime_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2603,6 +2891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:pink_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2612,6 +2901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:gray_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2621,6 +2911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:light_gray_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2630,6 +2921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:cyan_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2639,6 +2931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:purple_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2648,6 +2941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:blue_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2657,6 +2951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:brown_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2666,6 +2961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:green_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2675,6 +2971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:red_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2684,6 +2981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:black_wool_slab
     ItemInfo {
         max_stack: 64,
@@ -2693,6 +2991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dandelion
     ItemInfo {
         max_stack: 64,
@@ -2702,6 +3001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_dandelion
     ItemInfo {
         max_stack: 64,
@@ -2711,6 +3011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:open_eyeblossom
     ItemInfo {
         max_stack: 64,
@@ -2720,6 +3021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:closed_eyeblossom
     ItemInfo {
         max_stack: 64,
@@ -2729,6 +3031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:poppy
     ItemInfo {
         max_stack: 64,
@@ -2738,6 +3041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_orchid
     ItemInfo {
         max_stack: 64,
@@ -2747,6 +3051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:allium
     ItemInfo {
         max_stack: 64,
@@ -2756,6 +3061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:azure_bluet
     ItemInfo {
         max_stack: 64,
@@ -2765,6 +3071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_tulip
     ItemInfo {
         max_stack: 64,
@@ -2774,6 +3081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_tulip
     ItemInfo {
         max_stack: 64,
@@ -2783,6 +3091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_tulip
     ItemInfo {
         max_stack: 64,
@@ -2792,6 +3101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_tulip
     ItemInfo {
         max_stack: 64,
@@ -2801,6 +3111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxeye_daisy
     ItemInfo {
         max_stack: 64,
@@ -2810,6 +3121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cornflower
     ItemInfo {
         max_stack: 64,
@@ -2819,6 +3131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lily_of_the_valley
     ItemInfo {
         max_stack: 64,
@@ -2828,6 +3141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wither_rose
     ItemInfo {
         max_stack: 64,
@@ -2837,6 +3151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:torchflower
     ItemInfo {
         max_stack: 64,
@@ -2846,6 +3161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pitcher_plant
     ItemInfo {
         max_stack: 64,
@@ -2855,6 +3171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:spore_blossom
     ItemInfo {
         max_stack: 64,
@@ -2864,6 +3181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_mushroom
     ItemInfo {
         max_stack: 64,
@@ -2873,6 +3191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_mushroom
     ItemInfo {
         max_stack: 64,
@@ -2882,6 +3201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shelf_mushroom
     ItemInfo {
         max_stack: 64,
@@ -2891,6 +3211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_fungus
     ItemInfo {
         max_stack: 64,
@@ -2900,6 +3221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_fungus
     ItemInfo {
         max_stack: 64,
@@ -2909,6 +3231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_roots
     ItemInfo {
         max_stack: 64,
@@ -2918,6 +3241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_roots
     ItemInfo {
         max_stack: 64,
@@ -2927,6 +3251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_sprouts
     ItemInfo {
         max_stack: 64,
@@ -2936,6 +3261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weeping_vines
     ItemInfo {
         max_stack: 64,
@@ -2945,6 +3271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:twisting_vines
     ItemInfo {
         max_stack: 64,
@@ -2954,6 +3281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sugar_cane
     ItemInfo {
         max_stack: 64,
@@ -2963,6 +3291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:kelp
     ItemInfo {
         max_stack: 64,
@@ -2972,6 +3301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_petals
     ItemInfo {
         max_stack: 64,
@@ -2981,6 +3311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wildflowers
     ItemInfo {
         max_stack: 64,
@@ -2990,6 +3321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:leaf_litter
     ItemInfo {
         max_stack: 64,
@@ -2999,6 +3331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:moss_carpet
     ItemInfo {
         max_stack: 64,
@@ -3008,6 +3341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:moss_block
     ItemInfo {
         max_stack: 64,
@@ -3017,6 +3351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pale_moss_carpet
     ItemInfo {
         max_stack: 64,
@@ -3026,6 +3361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pale_hanging_moss
     ItemInfo {
         max_stack: 64,
@@ -3035,6 +3371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pale_moss_block
     ItemInfo {
         max_stack: 64,
@@ -3044,6 +3381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:hanging_roots
     ItemInfo {
         max_stack: 64,
@@ -3053,6 +3391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:big_dripleaf
     ItemInfo {
         max_stack: 64,
@@ -3062,6 +3401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:small_dripleaf
     ItemInfo {
         max_stack: 64,
@@ -3071,6 +3411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:bamboo
     ItemInfo {
         max_stack: 64,
@@ -3080,6 +3421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:oak_slab
     ItemInfo {
         max_stack: 64,
@@ -3089,6 +3431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:spruce_slab
     ItemInfo {
         max_stack: 64,
@@ -3098,6 +3441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:birch_slab
     ItemInfo {
         max_stack: 64,
@@ -3107,6 +3451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:jungle_slab
     ItemInfo {
         max_stack: 64,
@@ -3116,6 +3461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:acacia_slab
     ItemInfo {
         max_stack: 64,
@@ -3125,6 +3471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:cherry_slab
     ItemInfo {
         max_stack: 64,
@@ -3134,6 +3481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:dark_oak_slab
     ItemInfo {
         max_stack: 64,
@@ -3143,6 +3491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:pale_oak_slab
     ItemInfo {
         max_stack: 64,
@@ -3152,6 +3501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:mangrove_slab
     ItemInfo {
         max_stack: 64,
@@ -3161,6 +3511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:poplar_slab
     ItemInfo {
         max_stack: 64,
@@ -3170,6 +3521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:bamboo_slab
     ItemInfo {
         max_stack: 64,
@@ -3179,6 +3531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 150,
     }, // minecraft:bamboo_mosaic_slab
     ItemInfo {
         max_stack: 64,
@@ -3188,6 +3541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_slab
     ItemInfo {
         max_stack: 64,
@@ -3197,6 +3551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_slab
     ItemInfo {
         max_stack: 64,
@@ -3206,6 +3561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone_slab
     ItemInfo {
         max_stack: 64,
@@ -3215,6 +3571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_stone_slab
     ItemInfo {
         max_stack: 64,
@@ -3224,6 +3581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sandstone_slab
     ItemInfo {
         max_stack: 64,
@@ -3233,6 +3591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cut_sandstone_slab
     ItemInfo {
         max_stack: 64,
@@ -3242,6 +3601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:petrified_oak_slab
     ItemInfo {
         max_stack: 64,
@@ -3251,6 +3611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobblestone_slab
     ItemInfo {
         max_stack: 64,
@@ -3260,6 +3621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brick_slab
     ItemInfo {
         max_stack: 64,
@@ -3269,6 +3631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -3278,6 +3641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mud_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -3287,6 +3651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -3296,6 +3661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:quartz_slab
     ItemInfo {
         max_stack: 64,
@@ -3305,6 +3671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_sandstone_slab
     ItemInfo {
         max_stack: 64,
@@ -3314,6 +3681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cut_red_sandstone_slab
     ItemInfo {
         max_stack: 64,
@@ -3323,6 +3691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purpur_slab
     ItemInfo {
         max_stack: 64,
@@ -3332,6 +3701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine_slab
     ItemInfo {
         max_stack: 64,
@@ -3341,6 +3711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -3350,6 +3721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dark_prismarine_slab
     ItemInfo {
         max_stack: 64,
@@ -3359,6 +3731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_quartz
     ItemInfo {
         max_stack: 64,
@@ -3368,6 +3741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_red_sandstone
     ItemInfo {
         max_stack: 64,
@@ -3377,6 +3751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_sandstone
     ItemInfo {
         max_stack: 64,
@@ -3386,6 +3761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_stone
     ItemInfo {
         max_stack: 64,
@@ -3395,6 +3771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bricks
     ItemInfo {
         max_stack: 64,
@@ -3404,6 +3781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_shelf
     ItemInfo {
         max_stack: 64,
@@ -3413,6 +3791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_shelf
     ItemInfo {
         max_stack: 64,
@@ -3422,6 +3801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_shelf
     ItemInfo {
         max_stack: 64,
@@ -3431,6 +3811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_shelf
     ItemInfo {
         max_stack: 64,
@@ -3440,6 +3821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_shelf
     ItemInfo {
         max_stack: 64,
@@ -3449,6 +3831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_shelf
     ItemInfo {
         max_stack: 64,
@@ -3458,6 +3841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_shelf
     ItemInfo {
         max_stack: 64,
@@ -3467,6 +3851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_shelf
     ItemInfo {
         max_stack: 64,
@@ -3476,6 +3861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_shelf
     ItemInfo {
         max_stack: 64,
@@ -3485,6 +3871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_shelf
     ItemInfo {
         max_stack: 64,
@@ -3494,6 +3881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_shelf
     ItemInfo {
         max_stack: 64,
@@ -3503,6 +3891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_shelf
     ItemInfo {
         max_stack: 64,
@@ -3512,6 +3901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_shelf
     ItemInfo {
         max_stack: 64,
@@ -3521,6 +3911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bookshelf
     ItemInfo {
         max_stack: 64,
@@ -3530,6 +3921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:chiseled_bookshelf
     ItemInfo {
         max_stack: 64,
@@ -3539,6 +3931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:decorated_pot
     ItemInfo {
         max_stack: 64,
@@ -3548,6 +3941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mossy_cobblestone
     ItemInfo {
         max_stack: 64,
@@ -3557,6 +3951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:obsidian
     ItemInfo {
         max_stack: 64,
@@ -3566,6 +3961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:torch
     ItemInfo {
         max_stack: 64,
@@ -3575,6 +3971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:end_rod
     ItemInfo {
         max_stack: 64,
@@ -3584,6 +3981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chorus_plant
     ItemInfo {
         max_stack: 64,
@@ -3593,6 +3991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chorus_flower
     ItemInfo {
         max_stack: 64,
@@ -3602,6 +4001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purpur_block
     ItemInfo {
         max_stack: 64,
@@ -3611,6 +4011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purpur_pillar
     ItemInfo {
         max_stack: 64,
@@ -3620,6 +4021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purpur_stairs
     ItemInfo {
         max_stack: 64,
@@ -3629,6 +4031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:spawner
     ItemInfo {
         max_stack: 64,
@@ -3638,6 +4041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:creaking_heart
     ItemInfo {
         max_stack: 64,
@@ -3647,6 +4051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:chest
     ItemInfo {
         max_stack: 64,
@@ -3656,6 +4061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:crafting_table
     ItemInfo {
         max_stack: 64,
@@ -3665,6 +4071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:farmland
     ItemInfo {
         max_stack: 64,
@@ -3674,6 +4081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:furnace
     ItemInfo {
         max_stack: 64,
@@ -3683,6 +4091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:ladder
     ItemInfo {
         max_stack: 64,
@@ -3692,6 +4101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobblestone_stairs
     ItemInfo {
         max_stack: 64,
@@ -3701,6 +4111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:snow
     ItemInfo {
         max_stack: 64,
@@ -3710,6 +4121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ice
     ItemInfo {
         max_stack: 64,
@@ -3719,6 +4131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:snow_block
     ItemInfo {
         max_stack: 64,
@@ -3728,6 +4141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cactus
     ItemInfo {
         max_stack: 64,
@@ -3737,6 +4151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cactus_flower
     ItemInfo {
         max_stack: 64,
@@ -3746,6 +4161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:clay
     ItemInfo {
         max_stack: 64,
@@ -3755,6 +4171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jukebox
     ItemInfo {
         max_stack: 64,
@@ -3764,6 +4181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_fence
     ItemInfo {
         max_stack: 64,
@@ -3773,6 +4191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_fence
     ItemInfo {
         max_stack: 64,
@@ -3782,6 +4201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_fence
     ItemInfo {
         max_stack: 64,
@@ -3791,6 +4211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_fence
     ItemInfo {
         max_stack: 64,
@@ -3800,6 +4221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_fence
     ItemInfo {
         max_stack: 64,
@@ -3809,6 +4231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_fence
     ItemInfo {
         max_stack: 64,
@@ -3818,6 +4241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_fence
     ItemInfo {
         max_stack: 64,
@@ -3827,6 +4251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_fence
     ItemInfo {
         max_stack: 64,
@@ -3836,6 +4261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_fence
     ItemInfo {
         max_stack: 64,
@@ -3845,6 +4271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_fence
     ItemInfo {
         max_stack: 64,
@@ -3854,6 +4281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_fence
     ItemInfo {
         max_stack: 64,
@@ -3863,6 +4291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_fence
     ItemInfo {
         max_stack: 64,
@@ -3872,6 +4301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_fence
     ItemInfo {
         max_stack: 64,
@@ -3881,6 +4311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pumpkin
     ItemInfo {
         max_stack: 64,
@@ -3890,6 +4321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:carved_pumpkin
     ItemInfo {
         max_stack: 64,
@@ -3899,6 +4331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:jack_o_lantern
     ItemInfo {
         max_stack: 64,
@@ -3908,6 +4341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherrack
     ItemInfo {
         max_stack: 64,
@@ -3917,6 +4351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:soul_sand
     ItemInfo {
         max_stack: 64,
@@ -3926,6 +4361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:soul_soil
     ItemInfo {
         max_stack: 64,
@@ -3935,6 +4371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:basalt
     ItemInfo {
         max_stack: 64,
@@ -3944,6 +4381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_basalt
     ItemInfo {
         max_stack: 64,
@@ -3953,6 +4391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_basalt
     ItemInfo {
         max_stack: 64,
@@ -3962,6 +4401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:soul_torch
     ItemInfo {
         max_stack: 64,
@@ -3971,6 +4411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_torch
     ItemInfo {
         max_stack: 64,
@@ -3980,6 +4421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glowstone
     ItemInfo {
         max_stack: 64,
@@ -3989,6 +4431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:infested_stone
     ItemInfo {
         max_stack: 64,
@@ -3998,6 +4441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:infested_cobblestone
     ItemInfo {
         max_stack: 64,
@@ -4007,6 +4451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:infested_stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4016,6 +4461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:infested_mossy_stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4025,6 +4471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:infested_cracked_stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4034,6 +4481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:infested_chiseled_stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4043,6 +4491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:infested_deepslate
     ItemInfo {
         max_stack: 64,
@@ -4052,6 +4501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4061,6 +4511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mossy_stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4070,6 +4521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cracked_stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4079,6 +4531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4088,6 +4541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:packed_mud
     ItemInfo {
         max_stack: 64,
@@ -4097,6 +4551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mud_bricks
     ItemInfo {
         max_stack: 64,
@@ -4106,6 +4561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_bricks
     ItemInfo {
         max_stack: 64,
@@ -4115,6 +4571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cracked_deepslate_bricks
     ItemInfo {
         max_stack: 64,
@@ -4124,6 +4581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_tiles
     ItemInfo {
         max_stack: 64,
@@ -4133,6 +4591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cracked_deepslate_tiles
     ItemInfo {
         max_stack: 64,
@@ -4142,6 +4601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_deepslate
     ItemInfo {
         max_stack: 64,
@@ -4151,6 +4611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:reinforced_deepslate
     ItemInfo {
         max_stack: 64,
@@ -4160,6 +4621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_mushroom_block
     ItemInfo {
         max_stack: 64,
@@ -4169,6 +4631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_mushroom_block
     ItemInfo {
         max_stack: 64,
@@ -4178,6 +4641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mushroom_stem
     ItemInfo {
         max_stack: 64,
@@ -4187,6 +4651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_bars
     ItemInfo {
         max_stack: 64,
@@ -4196,6 +4661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_bars
     ItemInfo {
         max_stack: 64,
@@ -4205,6 +4671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_bars
     ItemInfo {
         max_stack: 64,
@@ -4214,6 +4681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_bars
     ItemInfo {
         max_stack: 64,
@@ -4223,6 +4691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_bars
     ItemInfo {
         max_stack: 64,
@@ -4232,6 +4701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_bars
     ItemInfo {
         max_stack: 64,
@@ -4241,6 +4711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_bars
     ItemInfo {
         max_stack: 64,
@@ -4250,6 +4721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_bars
     ItemInfo {
         max_stack: 64,
@@ -4259,6 +4731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_bars
     ItemInfo {
         max_stack: 64,
@@ -4268,6 +4741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_chain
     ItemInfo {
         max_stack: 64,
@@ -4277,6 +4751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_chain
     ItemInfo {
         max_stack: 64,
@@ -4286,6 +4761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_chain
     ItemInfo {
         max_stack: 64,
@@ -4295,6 +4771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_chain
     ItemInfo {
         max_stack: 64,
@@ -4304,6 +4781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_chain
     ItemInfo {
         max_stack: 64,
@@ -4313,6 +4791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_chain
     ItemInfo {
         max_stack: 64,
@@ -4322,6 +4801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_chain
     ItemInfo {
         max_stack: 64,
@@ -4331,6 +4811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_chain
     ItemInfo {
         max_stack: 64,
@@ -4340,6 +4821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_chain
     ItemInfo {
         max_stack: 64,
@@ -4349,6 +4831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glass_pane
     ItemInfo {
         max_stack: 64,
@@ -4358,6 +4841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:melon
     ItemInfo {
         max_stack: 64,
@@ -4367,6 +4851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:vine
     ItemInfo {
         max_stack: 64,
@@ -4376,6 +4861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glow_lichen
     ItemInfo {
         max_stack: 64,
@@ -4385,6 +4871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:resin_clump
     ItemInfo {
         max_stack: 64,
@@ -4394,6 +4881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:resin_block
     ItemInfo {
         max_stack: 64,
@@ -4403,6 +4891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:resin_bricks
     ItemInfo {
         max_stack: 64,
@@ -4412,6 +4901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:resin_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -4421,6 +4911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:resin_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -4430,6 +4921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:resin_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4439,6 +4931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_resin_bricks
     ItemInfo {
         max_stack: 64,
@@ -4448,6 +4941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -4457,6 +4951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -4466,6 +4961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mud_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -4475,6 +4971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mycelium
     ItemInfo {
         max_stack: 64,
@@ -4484,6 +4981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lily_pad
     ItemInfo {
         max_stack: 64,
@@ -4493,6 +4991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_bricks
     ItemInfo {
         max_stack: 64,
@@ -4502,6 +5001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cracked_nether_bricks
     ItemInfo {
         max_stack: 64,
@@ -4511,6 +5011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_nether_bricks
     ItemInfo {
         max_stack: 64,
@@ -4520,6 +5021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_brick_fence
     ItemInfo {
         max_stack: 64,
@@ -4529,6 +5031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -4538,6 +5041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sculk
     ItemInfo {
         max_stack: 64,
@@ -4547,6 +5051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sculk_vein
     ItemInfo {
         max_stack: 64,
@@ -4556,6 +5061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sculk_catalyst
     ItemInfo {
         max_stack: 64,
@@ -4565,6 +5071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sculk_shrieker
     ItemInfo {
         max_stack: 64,
@@ -4574,6 +5081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:enchanting_table
     ItemInfo {
         max_stack: 64,
@@ -4583,6 +5091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:end_portal_frame
     ItemInfo {
         max_stack: 64,
@@ -4592,6 +5101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:end_stone
     ItemInfo {
         max_stack: 64,
@@ -4601,6 +5111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:end_stone_bricks
     ItemInfo {
         max_stack: 64,
@@ -4610,6 +5121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dragon_egg
     ItemInfo {
         max_stack: 64,
@@ -4619,6 +5131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sandstone_stairs
     ItemInfo {
         max_stack: 64,
@@ -4628,6 +5141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ender_chest
     ItemInfo {
         max_stack: 64,
@@ -4637,6 +5151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:emerald_block
     ItemInfo {
         max_stack: 64,
@@ -4646,6 +5161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_stairs
     ItemInfo {
         max_stack: 64,
@@ -4655,6 +5171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_stairs
     ItemInfo {
         max_stack: 64,
@@ -4664,6 +5181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_stairs
     ItemInfo {
         max_stack: 64,
@@ -4673,6 +5191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_stairs
     ItemInfo {
         max_stack: 64,
@@ -4682,6 +5201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_stairs
     ItemInfo {
         max_stack: 64,
@@ -4691,6 +5211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_stairs
     ItemInfo {
         max_stack: 64,
@@ -4700,6 +5221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_stairs
     ItemInfo {
         max_stack: 64,
@@ -4709,6 +5231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_stairs
     ItemInfo {
         max_stack: 64,
@@ -4718,6 +5241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_stairs
     ItemInfo {
         max_stack: 64,
@@ -4727,6 +5251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_stairs
     ItemInfo {
         max_stack: 64,
@@ -4736,6 +5261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_stairs
     ItemInfo {
         max_stack: 64,
@@ -4745,6 +5271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_mosaic_stairs
     ItemInfo {
         max_stack: 64,
@@ -4754,6 +5281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_stairs
     ItemInfo {
         max_stack: 64,
@@ -4763,6 +5291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_stairs
     ItemInfo {
         max_stack: 64,
@@ -4772,6 +5301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:command_block
     ItemInfo {
         max_stack: 64,
@@ -4781,6 +5311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:beacon
     ItemInfo {
         max_stack: 64,
@@ -4790,6 +5321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobblestone_wall
     ItemInfo {
         max_stack: 64,
@@ -4799,6 +5331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mossy_cobblestone_wall
     ItemInfo {
         max_stack: 64,
@@ -4808,6 +5341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4817,6 +5351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine_wall
     ItemInfo {
         max_stack: 64,
@@ -4826,6 +5361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_sandstone_wall
     ItemInfo {
         max_stack: 64,
@@ -4835,6 +5371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mossy_stone_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4844,6 +5381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:granite_wall
     ItemInfo {
         max_stack: 64,
@@ -4853,6 +5391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4862,6 +5401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mud_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4871,6 +5411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4880,6 +5421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:andesite_wall
     ItemInfo {
         max_stack: 64,
@@ -4889,6 +5431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_nether_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4898,6 +5441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sandstone_wall
     ItemInfo {
         max_stack: 64,
@@ -4907,6 +5451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:end_stone_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4916,6 +5461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diorite_wall
     ItemInfo {
         max_stack: 64,
@@ -4925,6 +5471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blackstone_wall
     ItemInfo {
         max_stack: 64,
@@ -4934,6 +5481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_wall
     ItemInfo {
         max_stack: 64,
@@ -4943,6 +5491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4952,6 +5501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobbled_deepslate_wall
     ItemInfo {
         max_stack: 64,
@@ -4961,6 +5511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_deepslate_wall
     ItemInfo {
         max_stack: 64,
@@ -4970,6 +5521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_brick_wall
     ItemInfo {
         max_stack: 64,
@@ -4979,6 +5531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_tile_wall
     ItemInfo {
         max_stack: 64,
@@ -4988,6 +5541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:anvil
     ItemInfo {
         max_stack: 64,
@@ -4997,6 +5551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chipped_anvil
     ItemInfo {
         max_stack: 64,
@@ -5006,6 +5561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:damaged_anvil
     ItemInfo {
         max_stack: 64,
@@ -5015,6 +5571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_quartz_block
     ItemInfo {
         max_stack: 64,
@@ -5024,6 +5581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:quartz_block
     ItemInfo {
         max_stack: 64,
@@ -5033,6 +5591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:quartz_bricks
     ItemInfo {
         max_stack: 64,
@@ -5042,6 +5601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:quartz_pillar
     ItemInfo {
         max_stack: 64,
@@ -5051,6 +5611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:quartz_stairs
     ItemInfo {
         max_stack: 64,
@@ -5060,6 +5621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5069,6 +5631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5078,6 +5641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5087,6 +5651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5096,6 +5661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5105,6 +5671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5114,6 +5681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5123,6 +5691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5132,6 +5701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5141,6 +5711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5150,6 +5721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5159,6 +5731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5168,6 +5741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5177,6 +5751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5186,6 +5761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5195,6 +5771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_terracotta
     ItemInfo {
         max_stack: 64,
@@ -5204,6 +5781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:barrier
     ItemInfo {
         max_stack: 64,
@@ -5213,6 +5791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light
     ItemInfo {
         max_stack: 64,
@@ -5222,6 +5801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:hay_block
     ItemInfo {
         max_stack: 64,
@@ -5231,6 +5811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:white_carpet
     ItemInfo {
         max_stack: 64,
@@ -5240,6 +5821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:orange_carpet
     ItemInfo {
         max_stack: 64,
@@ -5249,6 +5831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:magenta_carpet
     ItemInfo {
         max_stack: 64,
@@ -5258,6 +5841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:light_blue_carpet
     ItemInfo {
         max_stack: 64,
@@ -5267,6 +5851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:yellow_carpet
     ItemInfo {
         max_stack: 64,
@@ -5276,6 +5861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:lime_carpet
     ItemInfo {
         max_stack: 64,
@@ -5285,6 +5871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:pink_carpet
     ItemInfo {
         max_stack: 64,
@@ -5294,6 +5881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:gray_carpet
     ItemInfo {
         max_stack: 64,
@@ -5303,6 +5891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:light_gray_carpet
     ItemInfo {
         max_stack: 64,
@@ -5312,6 +5901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:cyan_carpet
     ItemInfo {
         max_stack: 64,
@@ -5321,6 +5911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:purple_carpet
     ItemInfo {
         max_stack: 64,
@@ -5330,6 +5921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:blue_carpet
     ItemInfo {
         max_stack: 64,
@@ -5339,6 +5931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:brown_carpet
     ItemInfo {
         max_stack: 64,
@@ -5348,6 +5941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:green_carpet
     ItemInfo {
         max_stack: 64,
@@ -5357,6 +5951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:red_carpet
     ItemInfo {
         max_stack: 64,
@@ -5366,6 +5961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 67,
     }, // minecraft:black_carpet
     ItemInfo {
         max_stack: 64,
@@ -5375,6 +5971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:terracotta
     ItemInfo {
         max_stack: 64,
@@ -5384,6 +5981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:packed_ice
     ItemInfo {
         max_stack: 64,
@@ -5393,6 +5991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dirt_path
     ItemInfo {
         max_stack: 64,
@@ -5402,6 +6001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sunflower
     ItemInfo {
         max_stack: 64,
@@ -5411,6 +6011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lilac
     ItemInfo {
         max_stack: 64,
@@ -5420,6 +6021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rose_bush
     ItemInfo {
         max_stack: 64,
@@ -5429,6 +6031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:peony
     ItemInfo {
         max_stack: 64,
@@ -5438,6 +6041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tall_grass
     ItemInfo {
         max_stack: 64,
@@ -5447,6 +6051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:large_fern
     ItemInfo {
         max_stack: 64,
@@ -5456,6 +6061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5465,6 +6071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5474,6 +6081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5483,6 +6091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5492,6 +6101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5501,6 +6111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5510,6 +6121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5519,6 +6131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5528,6 +6141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5537,6 +6151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5546,6 +6161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5555,6 +6171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5564,6 +6181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5573,6 +6191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5582,6 +6201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5591,6 +6211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_stained_glass
     ItemInfo {
         max_stack: 64,
@@ -5600,6 +6221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5609,6 +6231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5618,6 +6241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5627,6 +6251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5636,6 +6261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5645,6 +6271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5654,6 +6281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5663,6 +6291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5672,6 +6301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5681,6 +6311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5690,6 +6321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5699,6 +6331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5708,6 +6341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5717,6 +6351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5726,6 +6361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5735,6 +6371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_stained_glass_pane
     ItemInfo {
         max_stack: 64,
@@ -5744,6 +6381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine
     ItemInfo {
         max_stack: 64,
@@ -5753,6 +6391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine_bricks
     ItemInfo {
         max_stack: 64,
@@ -5762,6 +6401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dark_prismarine
     ItemInfo {
         max_stack: 64,
@@ -5771,6 +6411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine_stairs
     ItemInfo {
         max_stack: 64,
@@ -5780,6 +6421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -5789,6 +6431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dark_prismarine_stairs
     ItemInfo {
         max_stack: 64,
@@ -5798,6 +6441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sea_lantern
     ItemInfo {
         max_stack: 64,
@@ -5807,6 +6451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_sandstone
     ItemInfo {
         max_stack: 64,
@@ -5816,6 +6461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_red_sandstone
     ItemInfo {
         max_stack: 64,
@@ -5825,6 +6471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cut_red_sandstone
     ItemInfo {
         max_stack: 64,
@@ -5834,6 +6481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_sandstone_stairs
     ItemInfo {
         max_stack: 64,
@@ -5843,6 +6491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:repeating_command_block
     ItemInfo {
         max_stack: 64,
@@ -5852,6 +6501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chain_command_block
     ItemInfo {
         max_stack: 64,
@@ -5861,6 +6511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magma_block
     ItemInfo {
         max_stack: 64,
@@ -5870,6 +6521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_wart_block
     ItemInfo {
         max_stack: 64,
@@ -5879,6 +6531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_wart_block
     ItemInfo {
         max_stack: 64,
@@ -5888,6 +6541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_nether_bricks
     ItemInfo {
         max_stack: 64,
@@ -5897,6 +6551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bone_block
     ItemInfo {
         max_stack: 64,
@@ -5906,6 +6561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:structure_void
     ItemInfo {
         max_stack: 1,
@@ -5915,6 +6571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5924,6 +6581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5933,6 +6591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5942,6 +6601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5951,6 +6611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5960,6 +6621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5969,6 +6631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5978,6 +6641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5987,6 +6651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -5996,6 +6661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -6005,6 +6671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -6014,6 +6681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -6023,6 +6691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -6032,6 +6701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -6041,6 +6711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -6050,6 +6721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_shulker_box
     ItemInfo {
         max_stack: 1,
@@ -6059,6 +6731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_shulker_box
     ItemInfo {
         max_stack: 64,
@@ -6068,6 +6741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6077,6 +6751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6086,6 +6761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6095,6 +6771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6104,6 +6781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6113,6 +6791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6122,6 +6801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6131,6 +6811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6140,6 +6821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6149,6 +6831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6158,6 +6841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6167,6 +6851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6176,6 +6861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6185,6 +6871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6194,6 +6881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6203,6 +6891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_glazed_terracotta
     ItemInfo {
         max_stack: 64,
@@ -6212,6 +6901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_concrete
     ItemInfo {
         max_stack: 64,
@@ -6221,6 +6911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_concrete
     ItemInfo {
         max_stack: 64,
@@ -6230,6 +6921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_concrete
     ItemInfo {
         max_stack: 64,
@@ -6239,6 +6931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_concrete
     ItemInfo {
         max_stack: 64,
@@ -6248,6 +6941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_concrete
     ItemInfo {
         max_stack: 64,
@@ -6257,6 +6951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_concrete
     ItemInfo {
         max_stack: 64,
@@ -6266,6 +6961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_concrete
     ItemInfo {
         max_stack: 64,
@@ -6275,6 +6971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_concrete
     ItemInfo {
         max_stack: 64,
@@ -6284,6 +6981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_concrete
     ItemInfo {
         max_stack: 64,
@@ -6293,6 +6991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_concrete
     ItemInfo {
         max_stack: 64,
@@ -6302,6 +7001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_concrete
     ItemInfo {
         max_stack: 64,
@@ -6311,6 +7011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_concrete
     ItemInfo {
         max_stack: 64,
@@ -6320,6 +7021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_concrete
     ItemInfo {
         max_stack: 64,
@@ -6329,6 +7031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_concrete
     ItemInfo {
         max_stack: 64,
@@ -6338,6 +7041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_concrete
     ItemInfo {
         max_stack: 64,
@@ -6347,6 +7051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_concrete
     ItemInfo {
         max_stack: 64,
@@ -6356,6 +7061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6365,6 +7071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6374,6 +7081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6383,6 +7091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6392,6 +7101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6401,6 +7111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6410,6 +7121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6419,6 +7131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6428,6 +7141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6437,6 +7151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6446,6 +7161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6455,6 +7171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6464,6 +7181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6473,6 +7191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6482,6 +7201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6491,6 +7211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_concrete_stairs
     ItemInfo {
         max_stack: 64,
@@ -6500,6 +7221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6509,6 +7231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6518,6 +7241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6527,6 +7251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6536,6 +7261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6545,6 +7271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6554,6 +7281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6563,6 +7291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6572,6 +7301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6581,6 +7311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6590,6 +7321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6599,6 +7331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6608,6 +7341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6617,6 +7351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6626,6 +7361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6635,6 +7371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_concrete_slab
     ItemInfo {
         max_stack: 64,
@@ -6644,6 +7381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6653,6 +7391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6662,6 +7401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6671,6 +7411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6680,6 +7421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6689,6 +7431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6698,6 +7441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6707,6 +7451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6716,6 +7461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6725,6 +7471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6734,6 +7481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6743,6 +7491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6752,6 +7501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6761,6 +7511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6770,6 +7521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6779,6 +7531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_concrete_powder
     ItemInfo {
         max_stack: 64,
@@ -6788,6 +7541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:turtle_egg
     ItemInfo {
         max_stack: 64,
@@ -6797,6 +7551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sniffer_egg
     ItemInfo {
         max_stack: 64,
@@ -6806,6 +7561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dried_ghast
     ItemInfo {
         max_stack: 64,
@@ -6815,6 +7571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_tube_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6824,6 +7581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_brain_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6833,6 +7591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_bubble_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6842,6 +7601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_fire_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6851,6 +7611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_horn_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6860,6 +7621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tube_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6869,6 +7631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brain_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6878,6 +7641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bubble_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6887,6 +7651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:fire_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6896,6 +7661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:horn_coral_block
     ItemInfo {
         max_stack: 64,
@@ -6905,6 +7671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tube_coral
     ItemInfo {
         max_stack: 64,
@@ -6914,6 +7681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brain_coral
     ItemInfo {
         max_stack: 64,
@@ -6923,6 +7691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bubble_coral
     ItemInfo {
         max_stack: 64,
@@ -6932,6 +7701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:fire_coral
     ItemInfo {
         max_stack: 64,
@@ -6941,6 +7711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:horn_coral
     ItemInfo {
         max_stack: 64,
@@ -6950,6 +7721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_brain_coral
     ItemInfo {
         max_stack: 64,
@@ -6959,6 +7731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_bubble_coral
     ItemInfo {
         max_stack: 64,
@@ -6968,6 +7741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_fire_coral
     ItemInfo {
         max_stack: 64,
@@ -6977,6 +7751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_horn_coral
     ItemInfo {
         max_stack: 64,
@@ -6986,6 +7761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_tube_coral
     ItemInfo {
         max_stack: 64,
@@ -6995,6 +7771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tube_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7004,6 +7781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brain_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7013,6 +7791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bubble_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7022,6 +7801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:fire_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7031,6 +7811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:horn_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7040,6 +7821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_tube_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7049,6 +7831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_brain_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7058,6 +7841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_bubble_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7067,6 +7851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_fire_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7076,6 +7861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dead_horn_coral_fan
     ItemInfo {
         max_stack: 64,
@@ -7085,6 +7871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_ice
     ItemInfo {
         max_stack: 64,
@@ -7094,6 +7881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:conduit
     ItemInfo {
         max_stack: 64,
@@ -7103,6 +7891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_granite_stairs
     ItemInfo {
         max_stack: 64,
@@ -7112,6 +7901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_red_sandstone_stairs
     ItemInfo {
         max_stack: 64,
@@ -7121,6 +7911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mossy_stone_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -7130,6 +7921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_diorite_stairs
     ItemInfo {
         max_stack: 64,
@@ -7139,6 +7931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mossy_cobblestone_stairs
     ItemInfo {
         max_stack: 64,
@@ -7148,6 +7941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:end_stone_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -7157,6 +7951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone_stairs
     ItemInfo {
         max_stack: 64,
@@ -7166,6 +7961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_sandstone_stairs
     ItemInfo {
         max_stack: 64,
@@ -7175,6 +7971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_quartz_stairs
     ItemInfo {
         max_stack: 64,
@@ -7184,6 +7981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:granite_stairs
     ItemInfo {
         max_stack: 64,
@@ -7193,6 +7991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:andesite_stairs
     ItemInfo {
         max_stack: 64,
@@ -7202,6 +8001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_nether_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -7211,6 +8011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_andesite_stairs
     ItemInfo {
         max_stack: 64,
@@ -7220,6 +8021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diorite_stairs
     ItemInfo {
         max_stack: 64,
@@ -7229,6 +8031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobbled_deepslate_stairs
     ItemInfo {
         max_stack: 64,
@@ -7238,6 +8041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_deepslate_stairs
     ItemInfo {
         max_stack: 64,
@@ -7247,6 +8051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -7256,6 +8061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_tile_stairs
     ItemInfo {
         max_stack: 64,
@@ -7265,6 +8071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_granite_slab
     ItemInfo {
         max_stack: 64,
@@ -7274,6 +8081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_red_sandstone_slab
     ItemInfo {
         max_stack: 64,
@@ -7283,6 +8091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mossy_stone_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -7292,6 +8101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_diorite_slab
     ItemInfo {
         max_stack: 64,
@@ -7301,6 +8111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mossy_cobblestone_slab
     ItemInfo {
         max_stack: 64,
@@ -7310,6 +8121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:end_stone_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -7319,6 +8131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_sandstone_slab
     ItemInfo {
         max_stack: 64,
@@ -7328,6 +8141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smooth_quartz_slab
     ItemInfo {
         max_stack: 64,
@@ -7337,6 +8151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:granite_slab
     ItemInfo {
         max_stack: 64,
@@ -7346,6 +8161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:andesite_slab
     ItemInfo {
         max_stack: 64,
@@ -7355,6 +8171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_nether_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -7364,6 +8181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_andesite_slab
     ItemInfo {
         max_stack: 64,
@@ -7373,6 +8191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diorite_slab
     ItemInfo {
         max_stack: 64,
@@ -7382,6 +8201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cobbled_deepslate_slab
     ItemInfo {
         max_stack: 64,
@@ -7391,6 +8211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_deepslate_slab
     ItemInfo {
         max_stack: 64,
@@ -7400,6 +8221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -7409,6 +8231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:deepslate_tile_slab
     ItemInfo {
         max_stack: 64,
@@ -7418,6 +8241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:scaffolding
     ItemInfo {
         max_stack: 64,
@@ -7427,6 +8251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:redstone
     ItemInfo {
         max_stack: 64,
@@ -7436,6 +8261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:redstone_torch
     ItemInfo {
         max_stack: 64,
@@ -7445,6 +8271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:redstone_block
     ItemInfo {
         max_stack: 64,
@@ -7454,6 +8281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:repeater
     ItemInfo {
         max_stack: 64,
@@ -7463,6 +8291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:comparator
     ItemInfo {
         max_stack: 64,
@@ -7472,6 +8301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:piston
     ItemInfo {
         max_stack: 64,
@@ -7481,6 +8311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sticky_piston
     ItemInfo {
         max_stack: 64,
@@ -7490,6 +8321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:slime_block
     ItemInfo {
         max_stack: 64,
@@ -7499,6 +8331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:honey_block
     ItemInfo {
         max_stack: 64,
@@ -7508,6 +8341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:observer
     ItemInfo {
         max_stack: 64,
@@ -7517,6 +8351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:hopper
     ItemInfo {
         max_stack: 64,
@@ -7526,6 +8361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dispenser
     ItemInfo {
         max_stack: 64,
@@ -7535,6 +8371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dropper
     ItemInfo {
         max_stack: 64,
@@ -7544,6 +8381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:lectern
     ItemInfo {
         max_stack: 64,
@@ -7553,6 +8391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:target
     ItemInfo {
         max_stack: 64,
@@ -7562,6 +8401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lever
     ItemInfo {
         max_stack: 64,
@@ -7571,6 +8411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lightning_rod
     ItemInfo {
         max_stack: 64,
@@ -7580,6 +8421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_lightning_rod
     ItemInfo {
         max_stack: 64,
@@ -7589,6 +8431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_lightning_rod
     ItemInfo {
         max_stack: 64,
@@ -7598,6 +8441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_lightning_rod
     ItemInfo {
         max_stack: 64,
@@ -7607,6 +8451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_lightning_rod
     ItemInfo {
         max_stack: 64,
@@ -7616,6 +8461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_lightning_rod
     ItemInfo {
         max_stack: 64,
@@ -7625,6 +8471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_lightning_rod
     ItemInfo {
         max_stack: 64,
@@ -7634,6 +8481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_lightning_rod
     ItemInfo {
         max_stack: 64,
@@ -7643,6 +8491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:daylight_detector
     ItemInfo {
         max_stack: 64,
@@ -7652,6 +8501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sculk_sensor
     ItemInfo {
         max_stack: 64,
@@ -7661,6 +8511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:calibrated_sculk_sensor
     ItemInfo {
         max_stack: 64,
@@ -7670,6 +8521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tripwire_hook
     ItemInfo {
         max_stack: 64,
@@ -7679,6 +8531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:trapped_chest
     ItemInfo {
         max_stack: 64,
@@ -7688,6 +8541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tnt
     ItemInfo {
         max_stack: 64,
@@ -7697,6 +8551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:redstone_lamp
     ItemInfo {
         max_stack: 64,
@@ -7706,6 +8561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:note_block
     ItemInfo {
         max_stack: 64,
@@ -7715,6 +8571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone_button
     ItemInfo {
         max_stack: 64,
@@ -7724,6 +8581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_button
     ItemInfo {
         max_stack: 64,
@@ -7733,6 +8591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:oak_button
     ItemInfo {
         max_stack: 64,
@@ -7742,6 +8601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:spruce_button
     ItemInfo {
         max_stack: 64,
@@ -7751,6 +8611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:birch_button
     ItemInfo {
         max_stack: 64,
@@ -7760,6 +8621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:jungle_button
     ItemInfo {
         max_stack: 64,
@@ -7769,6 +8631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:acacia_button
     ItemInfo {
         max_stack: 64,
@@ -7778,6 +8641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:cherry_button
     ItemInfo {
         max_stack: 64,
@@ -7787,6 +8651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:dark_oak_button
     ItemInfo {
         max_stack: 64,
@@ -7796,6 +8661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:pale_oak_button
     ItemInfo {
         max_stack: 64,
@@ -7805,6 +8671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:mangrove_button
     ItemInfo {
         max_stack: 64,
@@ -7814,6 +8681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:poplar_button
     ItemInfo {
         max_stack: 64,
@@ -7823,6 +8691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:bamboo_button
     ItemInfo {
         max_stack: 64,
@@ -7832,6 +8701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_button
     ItemInfo {
         max_stack: 64,
@@ -7841,6 +8711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_button
     ItemInfo {
         max_stack: 64,
@@ -7850,6 +8721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stone_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7859,6 +8731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7868,6 +8741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_weighted_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7877,6 +8751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:heavy_weighted_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7886,6 +8761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7895,6 +8771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7904,6 +8781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7913,6 +8791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7922,6 +8801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7931,6 +8811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7940,6 +8821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7949,6 +8831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7958,6 +8841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7967,6 +8851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7976,6 +8861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7985,6 +8871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -7994,6 +8881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_pressure_plate
     ItemInfo {
         max_stack: 64,
@@ -8003,6 +8891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_door
     ItemInfo {
         max_stack: 64,
@@ -8012,6 +8901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:oak_door
     ItemInfo {
         max_stack: 64,
@@ -8021,6 +8911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:spruce_door
     ItemInfo {
         max_stack: 64,
@@ -8030,6 +8921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:birch_door
     ItemInfo {
         max_stack: 64,
@@ -8039,6 +8931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:jungle_door
     ItemInfo {
         max_stack: 64,
@@ -8048,6 +8941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:acacia_door
     ItemInfo {
         max_stack: 64,
@@ -8057,6 +8951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:cherry_door
     ItemInfo {
         max_stack: 64,
@@ -8066,6 +8961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:dark_oak_door
     ItemInfo {
         max_stack: 64,
@@ -8075,6 +8971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:pale_oak_door
     ItemInfo {
         max_stack: 64,
@@ -8084,6 +8981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:mangrove_door
     ItemInfo {
         max_stack: 64,
@@ -8093,6 +8991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:poplar_door
     ItemInfo {
         max_stack: 64,
@@ -8102,6 +9001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:bamboo_door
     ItemInfo {
         max_stack: 64,
@@ -8111,6 +9011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_door
     ItemInfo {
         max_stack: 64,
@@ -8120,6 +9021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_door
     ItemInfo {
         max_stack: 64,
@@ -8129,6 +9031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_door
     ItemInfo {
         max_stack: 64,
@@ -8138,6 +9041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_door
     ItemInfo {
         max_stack: 64,
@@ -8147,6 +9051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_door
     ItemInfo {
         max_stack: 64,
@@ -8156,6 +9061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_door
     ItemInfo {
         max_stack: 64,
@@ -8165,6 +9071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_door
     ItemInfo {
         max_stack: 64,
@@ -8174,6 +9081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_door
     ItemInfo {
         max_stack: 64,
@@ -8183,6 +9091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_door
     ItemInfo {
         max_stack: 64,
@@ -8192,6 +9101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_door
     ItemInfo {
         max_stack: 64,
@@ -8201,6 +9111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8210,6 +9121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8219,6 +9131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8228,6 +9141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8237,6 +9151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8246,6 +9161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8255,6 +9171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8264,6 +9181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8273,6 +9191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8282,6 +9201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8291,6 +9211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8300,6 +9221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8309,6 +9231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8318,6 +9241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8327,6 +9251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8336,6 +9261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8345,6 +9271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8354,6 +9281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8363,6 +9291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8372,6 +9301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8381,6 +9311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8390,6 +9321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_trapdoor
     ItemInfo {
         max_stack: 64,
@@ -8399,6 +9331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:oak_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8408,6 +9341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:spruce_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8417,6 +9351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:birch_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8426,6 +9361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:jungle_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8435,6 +9371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:acacia_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8444,6 +9381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cherry_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8453,6 +9391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:dark_oak_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8462,6 +9401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pale_oak_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8471,6 +9411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:mangrove_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8480,6 +9421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:poplar_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8489,6 +9431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bamboo_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8498,6 +9441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8507,6 +9451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_fence_gate
     ItemInfo {
         max_stack: 64,
@@ -8516,6 +9461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:powered_rail
     ItemInfo {
         max_stack: 64,
@@ -8525,6 +9471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:detector_rail
     ItemInfo {
         max_stack: 64,
@@ -8534,6 +9481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rail
     ItemInfo {
         max_stack: 64,
@@ -8543,6 +9491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:activator_rail
     ItemInfo {
         max_stack: 1,
@@ -8552,6 +9501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:saddle
     ItemInfo {
         max_stack: 1,
@@ -8561,6 +9511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_harness
     ItemInfo {
         max_stack: 1,
@@ -8570,6 +9521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_harness
     ItemInfo {
         max_stack: 1,
@@ -8579,6 +9531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_harness
     ItemInfo {
         max_stack: 1,
@@ -8588,6 +9541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_harness
     ItemInfo {
         max_stack: 1,
@@ -8597,6 +9551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_harness
     ItemInfo {
         max_stack: 1,
@@ -8606,6 +9561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_harness
     ItemInfo {
         max_stack: 1,
@@ -8615,6 +9571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_harness
     ItemInfo {
         max_stack: 1,
@@ -8624,6 +9581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_harness
     ItemInfo {
         max_stack: 1,
@@ -8633,6 +9591,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_harness
     ItemInfo {
         max_stack: 1,
@@ -8642,6 +9601,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_harness
     ItemInfo {
         max_stack: 1,
@@ -8651,6 +9611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_harness
     ItemInfo {
         max_stack: 1,
@@ -8660,6 +9621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_harness
     ItemInfo {
         max_stack: 1,
@@ -8669,6 +9631,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_harness
     ItemInfo {
         max_stack: 1,
@@ -8678,6 +9641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_harness
     ItemInfo {
         max_stack: 1,
@@ -8687,6 +9651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_harness
     ItemInfo {
         max_stack: 1,
@@ -8696,6 +9661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_harness
     ItemInfo {
         max_stack: 1,
@@ -8705,6 +9671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:minecart
     ItemInfo {
         max_stack: 1,
@@ -8714,6 +9681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chest_minecart
     ItemInfo {
         max_stack: 1,
@@ -8723,6 +9691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:furnace_minecart
     ItemInfo {
         max_stack: 1,
@@ -8732,6 +9701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tnt_minecart
     ItemInfo {
         max_stack: 1,
@@ -8741,6 +9711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:hopper_minecart
     ItemInfo {
         max_stack: 1,
@@ -8750,6 +9721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:carrot_on_a_stick
     ItemInfo {
         max_stack: 1,
@@ -8759,6 +9731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_fungus_on_a_stick
     ItemInfo {
         max_stack: 64,
@@ -8768,6 +9741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:phantom_membrane
     ItemInfo {
         max_stack: 1,
@@ -8777,6 +9751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:elytra
     ItemInfo {
         max_stack: 1,
@@ -8786,6 +9761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:oak_boat
     ItemInfo {
         max_stack: 1,
@@ -8795,6 +9771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:oak_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8804,6 +9781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:spruce_boat
     ItemInfo {
         max_stack: 1,
@@ -8813,6 +9791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:spruce_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8822,6 +9801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:birch_boat
     ItemInfo {
         max_stack: 1,
@@ -8831,6 +9811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:birch_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8840,6 +9821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:jungle_boat
     ItemInfo {
         max_stack: 1,
@@ -8849,6 +9831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:jungle_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8858,6 +9841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:acacia_boat
     ItemInfo {
         max_stack: 1,
@@ -8867,6 +9851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:acacia_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8876,6 +9861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:cherry_boat
     ItemInfo {
         max_stack: 1,
@@ -8885,6 +9871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:cherry_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8894,6 +9881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:dark_oak_boat
     ItemInfo {
         max_stack: 1,
@@ -8903,6 +9891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:dark_oak_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8912,6 +9901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:pale_oak_boat
     ItemInfo {
         max_stack: 1,
@@ -8921,6 +9911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:pale_oak_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8930,6 +9921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:mangrove_boat
     ItemInfo {
         max_stack: 1,
@@ -8939,6 +9931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:mangrove_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8948,6 +9941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:poplar_boat
     ItemInfo {
         max_stack: 1,
@@ -8957,6 +9951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:poplar_chest_boat
     ItemInfo {
         max_stack: 1,
@@ -8966,6 +9961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:bamboo_raft
     ItemInfo {
         max_stack: 1,
@@ -8975,6 +9971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1200,
     }, // minecraft:bamboo_chest_raft
     ItemInfo {
         max_stack: 64,
@@ -8984,6 +9981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:structure_block
     ItemInfo {
         max_stack: 64,
@@ -8993,6 +9991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:jigsaw
     ItemInfo {
         max_stack: 64,
@@ -9002,6 +10001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:test_block
     ItemInfo {
         max_stack: 64,
@@ -9011,6 +10011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:test_instance_block
     ItemInfo {
         max_stack: 1,
@@ -9020,6 +10021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:turtle_helmet
     ItemInfo {
         max_stack: 64,
@@ -9029,6 +10031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:turtle_scute
     ItemInfo {
         max_stack: 64,
@@ -9038,6 +10041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:armadillo_scute
     ItemInfo {
         max_stack: 1,
@@ -9047,6 +10051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wolf_armor
     ItemInfo {
         max_stack: 1,
@@ -9056,6 +10061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:flint_and_steel
     ItemInfo {
         max_stack: 64,
@@ -9065,6 +10071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:bowl
     ItemInfo {
         max_stack: 64,
@@ -9079,6 +10086,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:apple
     ItemInfo {
         max_stack: 1,
@@ -9088,6 +10096,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:bow
     ItemInfo {
         max_stack: 64,
@@ -9097,6 +10106,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:arrow
     ItemInfo {
         max_stack: 64,
@@ -9106,6 +10116,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1600,
     }, // minecraft:coal
     ItemInfo {
         max_stack: 64,
@@ -9115,6 +10126,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 1600,
     }, // minecraft:charcoal
     ItemInfo {
         max_stack: 64,
@@ -9124,6 +10136,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond
     ItemInfo {
         max_stack: 64,
@@ -9133,6 +10146,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:emerald
     ItemInfo {
         max_stack: 64,
@@ -9142,6 +10156,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lapis_lazuli
     ItemInfo {
         max_stack: 64,
@@ -9151,6 +10166,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:quartz
     ItemInfo {
         max_stack: 64,
@@ -9160,6 +10176,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:amethyst_shard
     ItemInfo {
         max_stack: 64,
@@ -9169,6 +10186,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:raw_iron
     ItemInfo {
         max_stack: 64,
@@ -9178,6 +10196,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_ingot
     ItemInfo {
         max_stack: 64,
@@ -9187,6 +10206,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:raw_copper
     ItemInfo {
         max_stack: 64,
@@ -9196,6 +10216,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_ingot
     ItemInfo {
         max_stack: 64,
@@ -9205,6 +10226,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:raw_gold
     ItemInfo {
         max_stack: 64,
@@ -9214,6 +10236,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gold_ingot
     ItemInfo {
         max_stack: 64,
@@ -9223,6 +10246,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_ingot
     ItemInfo {
         max_stack: 64,
@@ -9232,6 +10256,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_scrap
     ItemInfo {
         max_stack: 1,
@@ -9262,6 +10287,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 3.0f32,
         attack_speed_modifier: -2.4f32,
+        fuel: 200,
     }, // minecraft:wooden_sword
     ItemInfo {
         max_stack: 1,
@@ -9287,6 +10313,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 1.5f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 200,
     }, // minecraft:wooden_shovel
     ItemInfo {
         max_stack: 1,
@@ -9312,6 +10339,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 1.0f32,
         attack_speed_modifier: -2.8f32,
+        fuel: 200,
     }, // minecraft:wooden_pickaxe
     ItemInfo {
         max_stack: 1,
@@ -9337,6 +10365,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 6.0f32,
         attack_speed_modifier: -3.2f32,
+        fuel: 200,
     }, // minecraft:wooden_axe
     ItemInfo {
         max_stack: 1,
@@ -9362,6 +10391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 200,
     }, // minecraft:wooden_hoe
     ItemInfo {
         max_stack: 1,
@@ -9392,6 +10422,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 4.0f32,
         attack_speed_modifier: -2.4f32,
+        fuel: 0,
     }, // minecraft:copper_sword
     ItemInfo {
         max_stack: 1,
@@ -9417,6 +10448,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 2.5f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:copper_shovel
     ItemInfo {
         max_stack: 1,
@@ -9442,6 +10474,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 2.0f32,
         attack_speed_modifier: -2.8f32,
+        fuel: 0,
     }, // minecraft:copper_pickaxe
     ItemInfo {
         max_stack: 1,
@@ -9467,6 +10500,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 8.0f32,
         attack_speed_modifier: -3.2f32,
+        fuel: 0,
     }, // minecraft:copper_axe
     ItemInfo {
         max_stack: 1,
@@ -9492,6 +10526,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: -2.0f32,
+        fuel: 0,
     }, // minecraft:copper_hoe
     ItemInfo {
         max_stack: 1,
@@ -9522,6 +10557,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 4.0f32,
         attack_speed_modifier: -2.4f32,
+        fuel: 0,
     }, // minecraft:stone_sword
     ItemInfo {
         max_stack: 1,
@@ -9547,6 +10583,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 2.5f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:stone_shovel
     ItemInfo {
         max_stack: 1,
@@ -9572,6 +10609,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 2.0f32,
         attack_speed_modifier: -2.8f32,
+        fuel: 0,
     }, // minecraft:stone_pickaxe
     ItemInfo {
         max_stack: 1,
@@ -9597,6 +10635,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 8.0f32,
         attack_speed_modifier: -3.2f32,
+        fuel: 0,
     }, // minecraft:stone_axe
     ItemInfo {
         max_stack: 1,
@@ -9622,6 +10661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: -2.0f32,
+        fuel: 0,
     }, // minecraft:stone_hoe
     ItemInfo {
         max_stack: 1,
@@ -9652,6 +10692,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 3.0f32,
         attack_speed_modifier: -2.4f32,
+        fuel: 0,
     }, // minecraft:golden_sword
     ItemInfo {
         max_stack: 1,
@@ -9677,6 +10718,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 1.5f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:golden_shovel
     ItemInfo {
         max_stack: 1,
@@ -9702,6 +10744,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 1.0f32,
         attack_speed_modifier: -2.8f32,
+        fuel: 0,
     }, // minecraft:golden_pickaxe
     ItemInfo {
         max_stack: 1,
@@ -9727,6 +10770,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 6.0f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:golden_axe
     ItemInfo {
         max_stack: 1,
@@ -9752,6 +10796,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:golden_hoe
     ItemInfo {
         max_stack: 1,
@@ -9782,6 +10827,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 5.0f32,
         attack_speed_modifier: -2.4f32,
+        fuel: 0,
     }, // minecraft:iron_sword
     ItemInfo {
         max_stack: 1,
@@ -9807,6 +10853,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 3.5f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:iron_shovel
     ItemInfo {
         max_stack: 1,
@@ -9832,6 +10879,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 3.0f32,
         attack_speed_modifier: -2.8f32,
+        fuel: 0,
     }, // minecraft:iron_pickaxe
     ItemInfo {
         max_stack: 1,
@@ -9857,6 +10905,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 8.0f32,
         attack_speed_modifier: -3.1f32,
+        fuel: 0,
     }, // minecraft:iron_axe
     ItemInfo {
         max_stack: 1,
@@ -9882,6 +10931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: -1.0f32,
+        fuel: 0,
     }, // minecraft:iron_hoe
     ItemInfo {
         max_stack: 1,
@@ -9912,6 +10962,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 6.0f32,
         attack_speed_modifier: -2.4f32,
+        fuel: 0,
     }, // minecraft:diamond_sword
     ItemInfo {
         max_stack: 1,
@@ -9937,6 +10988,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 4.5f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:diamond_shovel
     ItemInfo {
         max_stack: 1,
@@ -9962,6 +11014,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 4.0f32,
         attack_speed_modifier: -2.8f32,
+        fuel: 0,
     }, // minecraft:diamond_pickaxe
     ItemInfo {
         max_stack: 1,
@@ -9987,6 +11040,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 8.0f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:diamond_axe
     ItemInfo {
         max_stack: 1,
@@ -10012,6 +11066,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_hoe
     ItemInfo {
         max_stack: 1,
@@ -10042,6 +11097,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 7.0f32,
         attack_speed_modifier: -2.4f32,
+        fuel: 0,
     }, // minecraft:netherite_sword
     ItemInfo {
         max_stack: 1,
@@ -10067,6 +11123,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 5.5f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:netherite_shovel
     ItemInfo {
         max_stack: 1,
@@ -10092,6 +11149,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 5.0f32,
         attack_speed_modifier: -2.8f32,
+        fuel: 0,
     }, // minecraft:netherite_pickaxe
     ItemInfo {
         max_stack: 1,
@@ -10117,6 +11175,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 9.0f32,
         attack_speed_modifier: -3.0f32,
+        fuel: 0,
     }, // minecraft:netherite_axe
     ItemInfo {
         max_stack: 1,
@@ -10142,6 +11201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_hoe
     ItemInfo {
         max_stack: 64,
@@ -10151,6 +11211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 100,
     }, // minecraft:stick
     ItemInfo {
         max_stack: 1,
@@ -10165,6 +11226,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mushroom_stew
     ItemInfo {
         max_stack: 64,
@@ -10174,6 +11236,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:string
     ItemInfo {
         max_stack: 64,
@@ -10183,6 +11246,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:feather
     ItemInfo {
         max_stack: 64,
@@ -10192,6 +11256,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gunpowder
     ItemInfo {
         max_stack: 64,
@@ -10201,6 +11266,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wheat_seeds
     ItemInfo {
         max_stack: 64,
@@ -10210,6 +11276,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wheat
     ItemInfo {
         max_stack: 64,
@@ -10224,6 +11291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bread
     ItemInfo {
         max_stack: 1,
@@ -10233,6 +11301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:leather_helmet
     ItemInfo {
         max_stack: 1,
@@ -10242,6 +11311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:leather_chestplate
     ItemInfo {
         max_stack: 1,
@@ -10251,6 +11321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:leather_leggings
     ItemInfo {
         max_stack: 1,
@@ -10260,6 +11331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:leather_boots
     ItemInfo {
         max_stack: 1,
@@ -10269,6 +11341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_helmet
     ItemInfo {
         max_stack: 1,
@@ -10278,6 +11351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_chestplate
     ItemInfo {
         max_stack: 1,
@@ -10287,6 +11361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_leggings
     ItemInfo {
         max_stack: 1,
@@ -10296,6 +11371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_boots
     ItemInfo {
         max_stack: 1,
@@ -10305,6 +11381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chainmail_helmet
     ItemInfo {
         max_stack: 1,
@@ -10314,6 +11391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chainmail_chestplate
     ItemInfo {
         max_stack: 1,
@@ -10323,6 +11401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chainmail_leggings
     ItemInfo {
         max_stack: 1,
@@ -10332,6 +11411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chainmail_boots
     ItemInfo {
         max_stack: 1,
@@ -10341,6 +11421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_helmet
     ItemInfo {
         max_stack: 1,
@@ -10350,6 +11431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_chestplate
     ItemInfo {
         max_stack: 1,
@@ -10359,6 +11441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_leggings
     ItemInfo {
         max_stack: 1,
@@ -10368,6 +11451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_boots
     ItemInfo {
         max_stack: 1,
@@ -10377,6 +11461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_helmet
     ItemInfo {
         max_stack: 1,
@@ -10386,6 +11471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_chestplate
     ItemInfo {
         max_stack: 1,
@@ -10395,6 +11481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_leggings
     ItemInfo {
         max_stack: 1,
@@ -10404,6 +11491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_boots
     ItemInfo {
         max_stack: 1,
@@ -10413,6 +11501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_helmet
     ItemInfo {
         max_stack: 1,
@@ -10422,6 +11511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_chestplate
     ItemInfo {
         max_stack: 1,
@@ -10431,6 +11521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_leggings
     ItemInfo {
         max_stack: 1,
@@ -10440,6 +11531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_boots
     ItemInfo {
         max_stack: 1,
@@ -10449,6 +11541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_helmet
     ItemInfo {
         max_stack: 1,
@@ -10458,6 +11551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_chestplate
     ItemInfo {
         max_stack: 1,
@@ -10467,6 +11561,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_leggings
     ItemInfo {
         max_stack: 1,
@@ -10476,6 +11571,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_boots
     ItemInfo {
         max_stack: 64,
@@ -10485,6 +11581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:flint
     ItemInfo {
         max_stack: 64,
@@ -10499,6 +11596,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:porkchop
     ItemInfo {
         max_stack: 64,
@@ -10513,6 +11611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cooked_porkchop
     ItemInfo {
         max_stack: 64,
@@ -10522,6 +11621,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:painting
     ItemInfo {
         max_stack: 64,
@@ -10536,6 +11636,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_apple
     ItemInfo {
         max_stack: 64,
@@ -10550,6 +11651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:enchanted_golden_apple
     ItemInfo {
         max_stack: 16,
@@ -10559,6 +11661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:oak_sign
     ItemInfo {
         max_stack: 16,
@@ -10568,6 +11671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:spruce_sign
     ItemInfo {
         max_stack: 16,
@@ -10577,6 +11681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:birch_sign
     ItemInfo {
         max_stack: 16,
@@ -10586,6 +11691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:jungle_sign
     ItemInfo {
         max_stack: 16,
@@ -10595,6 +11701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:acacia_sign
     ItemInfo {
         max_stack: 16,
@@ -10604,6 +11711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:cherry_sign
     ItemInfo {
         max_stack: 16,
@@ -10613,6 +11721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:dark_oak_sign
     ItemInfo {
         max_stack: 16,
@@ -10622,6 +11731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:pale_oak_sign
     ItemInfo {
         max_stack: 16,
@@ -10631,6 +11741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:mangrove_sign
     ItemInfo {
         max_stack: 16,
@@ -10640,6 +11751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:poplar_sign
     ItemInfo {
         max_stack: 16,
@@ -10649,6 +11761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 200,
     }, // minecraft:bamboo_sign
     ItemInfo {
         max_stack: 16,
@@ -10658,6 +11771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_sign
     ItemInfo {
         max_stack: 16,
@@ -10667,6 +11781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_sign
     ItemInfo {
         max_stack: 16,
@@ -10676,6 +11791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:oak_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10685,6 +11801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:spruce_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10694,6 +11811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:birch_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10703,6 +11821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:jungle_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10712,6 +11831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:acacia_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10721,6 +11841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:cherry_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10730,6 +11851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:dark_oak_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10739,6 +11861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:pale_oak_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10748,6 +11871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:mangrove_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10757,6 +11881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:poplar_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10766,6 +11891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 800,
     }, // minecraft:bamboo_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10775,6 +11901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crimson_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10784,6 +11911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warped_hanging_sign
     ItemInfo {
         max_stack: 16,
@@ -10793,6 +11921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bucket
     ItemInfo {
         max_stack: 1,
@@ -10802,6 +11931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:water_bucket
     ItemInfo {
         max_stack: 1,
@@ -10811,6 +11941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 20000,
     }, // minecraft:lava_bucket
     ItemInfo {
         max_stack: 1,
@@ -10820,6 +11951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:powder_snow_bucket
     ItemInfo {
         max_stack: 16,
@@ -10829,6 +11961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:snowball
     ItemInfo {
         max_stack: 64,
@@ -10838,6 +11971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:leather
     ItemInfo {
         max_stack: 1,
@@ -10847,6 +11981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:milk_bucket
     ItemInfo {
         max_stack: 1,
@@ -10861,6 +11996,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pufferfish_bucket
     ItemInfo {
         max_stack: 1,
@@ -10875,6 +12011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:salmon_bucket
     ItemInfo {
         max_stack: 1,
@@ -10889,6 +12026,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cod_bucket
     ItemInfo {
         max_stack: 1,
@@ -10903,6 +12041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tropical_fish_bucket
     ItemInfo {
         max_stack: 1,
@@ -10912,6 +12051,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:axolotl_bucket
     ItemInfo {
         max_stack: 1,
@@ -10921,6 +12061,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_cube_bucket
     ItemInfo {
         max_stack: 1,
@@ -10930,6 +12071,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tadpole_bucket
     ItemInfo {
         max_stack: 64,
@@ -10939,6 +12081,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brick
     ItemInfo {
         max_stack: 64,
@@ -10948,6 +12091,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:clay_ball
     ItemInfo {
         max_stack: 64,
@@ -10957,6 +12101,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 4001,
     }, // minecraft:dried_kelp_block
     ItemInfo {
         max_stack: 64,
@@ -10966,6 +12111,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:paper
     ItemInfo {
         max_stack: 64,
@@ -10975,6 +12121,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:book
     ItemInfo {
         max_stack: 64,
@@ -10984,6 +12131,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:slime_ball
     ItemInfo {
         max_stack: 16,
@@ -10993,6 +12141,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:egg
     ItemInfo {
         max_stack: 16,
@@ -11002,6 +12151,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_egg
     ItemInfo {
         max_stack: 16,
@@ -11011,6 +12161,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_egg
     ItemInfo {
         max_stack: 64,
@@ -11020,6 +12171,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:compass
     ItemInfo {
         max_stack: 64,
@@ -11029,6 +12181,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:recovery_compass
     ItemInfo {
         max_stack: 1,
@@ -11038,6 +12191,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bundle
     ItemInfo {
         max_stack: 1,
@@ -11047,6 +12201,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_bundle
     ItemInfo {
         max_stack: 1,
@@ -11056,6 +12211,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_bundle
     ItemInfo {
         max_stack: 1,
@@ -11065,6 +12221,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_bundle
     ItemInfo {
         max_stack: 1,
@@ -11074,6 +12231,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_bundle
     ItemInfo {
         max_stack: 1,
@@ -11083,6 +12241,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_bundle
     ItemInfo {
         max_stack: 1,
@@ -11092,6 +12251,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_bundle
     ItemInfo {
         max_stack: 1,
@@ -11101,6 +12261,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_bundle
     ItemInfo {
         max_stack: 1,
@@ -11110,6 +12271,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_bundle
     ItemInfo {
         max_stack: 1,
@@ -11119,6 +12281,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_bundle
     ItemInfo {
         max_stack: 1,
@@ -11128,6 +12291,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_bundle
     ItemInfo {
         max_stack: 1,
@@ -11137,6 +12301,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_bundle
     ItemInfo {
         max_stack: 1,
@@ -11146,6 +12311,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_bundle
     ItemInfo {
         max_stack: 1,
@@ -11155,6 +12321,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_bundle
     ItemInfo {
         max_stack: 1,
@@ -11164,6 +12331,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_bundle
     ItemInfo {
         max_stack: 1,
@@ -11173,6 +12341,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_bundle
     ItemInfo {
         max_stack: 1,
@@ -11182,6 +12351,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_bundle
     ItemInfo {
         max_stack: 16,
@@ -11191,6 +12361,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:white_cushion
     ItemInfo {
         max_stack: 16,
@@ -11200,6 +12371,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:orange_cushion
     ItemInfo {
         max_stack: 16,
@@ -11209,6 +12381,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:magenta_cushion
     ItemInfo {
         max_stack: 16,
@@ -11218,6 +12391,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:light_blue_cushion
     ItemInfo {
         max_stack: 16,
@@ -11227,6 +12401,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:yellow_cushion
     ItemInfo {
         max_stack: 16,
@@ -11236,6 +12411,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:lime_cushion
     ItemInfo {
         max_stack: 16,
@@ -11245,6 +12421,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:pink_cushion
     ItemInfo {
         max_stack: 16,
@@ -11254,6 +12431,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:gray_cushion
     ItemInfo {
         max_stack: 16,
@@ -11263,6 +12441,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:light_gray_cushion
     ItemInfo {
         max_stack: 16,
@@ -11272,6 +12451,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:cyan_cushion
     ItemInfo {
         max_stack: 16,
@@ -11281,6 +12461,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:purple_cushion
     ItemInfo {
         max_stack: 16,
@@ -11290,6 +12471,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:blue_cushion
     ItemInfo {
         max_stack: 16,
@@ -11299,6 +12481,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:brown_cushion
     ItemInfo {
         max_stack: 16,
@@ -11308,6 +12491,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:green_cushion
     ItemInfo {
         max_stack: 16,
@@ -11317,6 +12501,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:red_cushion
     ItemInfo {
         max_stack: 16,
@@ -11326,6 +12511,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 50,
     }, // minecraft:black_cushion
     ItemInfo {
         max_stack: 1,
@@ -11335,6 +12521,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:fishing_rod
     ItemInfo {
         max_stack: 64,
@@ -11344,6 +12531,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:clock
     ItemInfo {
         max_stack: 1,
@@ -11353,6 +12541,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:spyglass
     ItemInfo {
         max_stack: 64,
@@ -11362,6 +12551,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glowstone_dust
     ItemInfo {
         max_stack: 64,
@@ -11376,6 +12566,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cod
     ItemInfo {
         max_stack: 64,
@@ -11390,6 +12581,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:salmon
     ItemInfo {
         max_stack: 64,
@@ -11404,6 +12596,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tropical_fish
     ItemInfo {
         max_stack: 64,
@@ -11418,6 +12611,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pufferfish
     ItemInfo {
         max_stack: 64,
@@ -11432,6 +12626,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cooked_cod
     ItemInfo {
         max_stack: 64,
@@ -11446,6 +12641,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cooked_salmon
     ItemInfo {
         max_stack: 64,
@@ -11455,6 +12651,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ink_sac
     ItemInfo {
         max_stack: 64,
@@ -11464,6 +12661,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glow_ink_sac
     ItemInfo {
         max_stack: 64,
@@ -11473,6 +12671,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cocoa_beans
     ItemInfo {
         max_stack: 64,
@@ -11482,6 +12681,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_dye
     ItemInfo {
         max_stack: 64,
@@ -11491,6 +12691,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_dye
     ItemInfo {
         max_stack: 64,
@@ -11500,6 +12701,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_dye
     ItemInfo {
         max_stack: 64,
@@ -11509,6 +12711,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_dye
     ItemInfo {
         max_stack: 64,
@@ -11518,6 +12721,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_dye
     ItemInfo {
         max_stack: 64,
@@ -11527,6 +12731,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_dye
     ItemInfo {
         max_stack: 64,
@@ -11536,6 +12741,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_dye
     ItemInfo {
         max_stack: 64,
@@ -11545,6 +12751,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_dye
     ItemInfo {
         max_stack: 64,
@@ -11554,6 +12761,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_dye
     ItemInfo {
         max_stack: 64,
@@ -11563,6 +12771,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_dye
     ItemInfo {
         max_stack: 64,
@@ -11572,6 +12781,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_dye
     ItemInfo {
         max_stack: 64,
@@ -11581,6 +12791,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_dye
     ItemInfo {
         max_stack: 64,
@@ -11590,6 +12801,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_dye
     ItemInfo {
         max_stack: 64,
@@ -11599,6 +12811,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_dye
     ItemInfo {
         max_stack: 64,
@@ -11608,6 +12821,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_dye
     ItemInfo {
         max_stack: 64,
@@ -11617,6 +12831,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_dye
     ItemInfo {
         max_stack: 64,
@@ -11626,6 +12841,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bone_meal
     ItemInfo {
         max_stack: 64,
@@ -11635,6 +12851,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bone
     ItemInfo {
         max_stack: 64,
@@ -11644,6 +12861,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sugar
     ItemInfo {
         max_stack: 1,
@@ -11653,6 +12871,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cake
     ItemInfo {
         max_stack: 1,
@@ -11662,6 +12881,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_bed
     ItemInfo {
         max_stack: 1,
@@ -11671,6 +12891,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_bed
     ItemInfo {
         max_stack: 1,
@@ -11680,6 +12901,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_bed
     ItemInfo {
         max_stack: 1,
@@ -11689,6 +12911,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_bed
     ItemInfo {
         max_stack: 1,
@@ -11698,6 +12921,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_bed
     ItemInfo {
         max_stack: 1,
@@ -11707,6 +12931,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_bed
     ItemInfo {
         max_stack: 1,
@@ -11716,6 +12941,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_bed
     ItemInfo {
         max_stack: 1,
@@ -11725,6 +12951,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_bed
     ItemInfo {
         max_stack: 1,
@@ -11734,6 +12961,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_bed
     ItemInfo {
         max_stack: 1,
@@ -11743,6 +12971,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_bed
     ItemInfo {
         max_stack: 1,
@@ -11752,6 +12981,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_bed
     ItemInfo {
         max_stack: 1,
@@ -11761,6 +12991,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_bed
     ItemInfo {
         max_stack: 1,
@@ -11770,6 +13001,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_bed
     ItemInfo {
         max_stack: 1,
@@ -11779,6 +13011,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_bed
     ItemInfo {
         max_stack: 1,
@@ -11788,6 +13021,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_bed
     ItemInfo {
         max_stack: 1,
@@ -11797,6 +13031,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_bed
     ItemInfo {
         max_stack: 16,
@@ -11806,6 +13041,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:straw_bed
     ItemInfo {
         max_stack: 64,
@@ -11820,6 +13056,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cookie
     ItemInfo {
         max_stack: 64,
@@ -11829,6 +13066,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crafter
     ItemInfo {
         max_stack: 64,
@@ -11838,6 +13076,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:filled_map
     ItemInfo {
         max_stack: 64,
@@ -11847,6 +13086,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ocean_monument_map
     ItemInfo {
         max_stack: 64,
@@ -11856,6 +13096,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:woodland_mansion_map
     ItemInfo {
         max_stack: 64,
@@ -11865,6 +13106,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:buried_trial_chambers_map
     ItemInfo {
         max_stack: 64,
@@ -11874,6 +13116,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:jungle_pyramid_map
     ItemInfo {
         max_stack: 64,
@@ -11883,6 +13126,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:swamp_hut_map
     ItemInfo {
         max_stack: 64,
@@ -11892,6 +13136,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:desert_village_map
     ItemInfo {
         max_stack: 64,
@@ -11901,6 +13146,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:plains_village_map
     ItemInfo {
         max_stack: 64,
@@ -11910,6 +13156,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:savanna_village_map
     ItemInfo {
         max_stack: 64,
@@ -11919,6 +13166,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:snowy_village_map
     ItemInfo {
         max_stack: 64,
@@ -11928,6 +13176,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:taiga_village_map
     ItemInfo {
         max_stack: 64,
@@ -11937,6 +13186,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:buried_treasure_map
     ItemInfo {
         max_stack: 64,
@@ -11946,6 +13196,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:buried_ancient_city_map
     ItemInfo {
         max_stack: 64,
@@ -11955,6 +13206,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:buried_mineshaft_map
     ItemInfo {
         max_stack: 64,
@@ -11964,6 +13216,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:desert_pyramid_map
     ItemInfo {
         max_stack: 64,
@@ -11973,6 +13226,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:abandoned_camp_map
     ItemInfo {
         max_stack: 64,
@@ -11982,6 +13236,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warm_ocean_ruins_map
     ItemInfo {
         max_stack: 1,
@@ -12017,6 +13272,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shears
     ItemInfo {
         max_stack: 64,
@@ -12031,6 +13287,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:melon_slice
     ItemInfo {
         max_stack: 64,
@@ -12045,6 +13302,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dried_kelp
     ItemInfo {
         max_stack: 64,
@@ -12054,6 +13312,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pumpkin_seeds
     ItemInfo {
         max_stack: 64,
@@ -12063,6 +13322,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:melon_seeds
     ItemInfo {
         max_stack: 64,
@@ -12077,6 +13337,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:beef
     ItemInfo {
         max_stack: 64,
@@ -12091,6 +13352,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cooked_beef
     ItemInfo {
         max_stack: 64,
@@ -12105,6 +13367,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chicken
     ItemInfo {
         max_stack: 64,
@@ -12119,6 +13382,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cooked_chicken
     ItemInfo {
         max_stack: 64,
@@ -12133,6 +13397,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rotten_flesh
     ItemInfo {
         max_stack: 16,
@@ -12142,6 +13407,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ender_pearl
     ItemInfo {
         max_stack: 64,
@@ -12151,6 +13417,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 2400,
     }, // minecraft:blaze_rod
     ItemInfo {
         max_stack: 64,
@@ -12160,6 +13427,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ghast_tear
     ItemInfo {
         max_stack: 64,
@@ -12169,6 +13437,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gold_nugget
     ItemInfo {
         max_stack: 64,
@@ -12178,6 +13447,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_wart
     ItemInfo {
         max_stack: 64,
@@ -12187,6 +13457,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glass_bottle
     ItemInfo {
         max_stack: 1,
@@ -12196,6 +13467,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:potion
     ItemInfo {
         max_stack: 64,
@@ -12210,6 +13482,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:spider_eye
     ItemInfo {
         max_stack: 64,
@@ -12219,6 +13492,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:fermented_spider_eye
     ItemInfo {
         max_stack: 64,
@@ -12228,6 +13502,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blaze_powder
     ItemInfo {
         max_stack: 64,
@@ -12237,6 +13512,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magma_cream
     ItemInfo {
         max_stack: 64,
@@ -12246,6 +13522,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brewing_stand
     ItemInfo {
         max_stack: 64,
@@ -12255,6 +13532,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cauldron
     ItemInfo {
         max_stack: 64,
@@ -12264,6 +13542,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ender_eye
     ItemInfo {
         max_stack: 64,
@@ -12273,6 +13552,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glistering_melon_slice
     ItemInfo {
         max_stack: 64,
@@ -12282,6 +13562,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chicken_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12291,6 +13572,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cow_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12300,6 +13582,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pig_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12309,6 +13592,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sheep_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12318,6 +13602,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:camel_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12327,6 +13612,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:donkey_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12336,6 +13622,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:horse_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12345,6 +13632,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mule_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12354,6 +13642,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cat_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12363,6 +13652,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:parrot_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12372,6 +13662,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wolf_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12381,6 +13672,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:armadillo_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12390,6 +13682,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bat_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12399,6 +13692,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bee_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12408,6 +13702,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:fox_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12417,6 +13712,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:goat_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12426,6 +13722,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:llama_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12435,6 +13732,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ocelot_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12444,6 +13742,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:panda_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12453,6 +13752,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polar_bear_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12462,6 +13762,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rabbit_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12471,6 +13772,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:axolotl_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12480,6 +13782,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cod_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12489,6 +13792,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dolphin_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12498,6 +13802,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:frog_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12507,6 +13812,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glow_squid_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12516,6 +13822,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nautilus_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12525,6 +13832,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pufferfish_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12534,6 +13842,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:salmon_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12543,6 +13852,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:squid_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12552,6 +13862,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tadpole_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12561,6 +13872,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tropical_fish_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12570,6 +13882,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:turtle_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12579,6 +13892,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:allay_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12588,6 +13902,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mooshroom_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12597,6 +13912,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sniffer_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12606,6 +13922,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_cube_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12615,6 +13932,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_golem_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12624,6 +13942,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_golem_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12633,6 +13952,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:snow_golem_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12642,6 +13962,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:trader_llama_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12651,6 +13972,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:villager_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12660,6 +13982,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wandering_trader_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12669,6 +13992,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bogged_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12678,6 +14002,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:camel_husk_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12687,6 +14012,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:drowned_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12696,6 +14022,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:husk_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12705,6 +14032,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:parched_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12714,6 +14042,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:skeleton_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12723,6 +14052,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:skeleton_horse_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12732,6 +14062,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stray_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12741,6 +14072,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wither_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12750,6 +14082,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wither_skeleton_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12759,6 +14092,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:zombie_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12768,6 +14102,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:zombie_horse_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12777,6 +14112,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:zombie_nautilus_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12786,6 +14122,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:zombie_villager_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12795,6 +14132,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cave_spider_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12804,6 +14142,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:spider_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12813,6 +14152,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:breeze_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12822,6 +14162,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:creaking_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12831,6 +14172,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:creeper_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12840,6 +14182,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:elder_guardian_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12849,6 +14192,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:guardian_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12858,6 +14202,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:phantom_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12867,6 +14212,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:silverfish_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12876,6 +14222,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:slime_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12885,6 +14232,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:warden_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12894,6 +14242,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:witch_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12903,6 +14252,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:evoker_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12912,6 +14262,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pillager_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12921,6 +14272,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ravager_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12930,6 +14282,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:vindicator_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12939,6 +14292,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:vex_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12948,6 +14302,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blaze_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12957,6 +14312,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ghast_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12966,6 +14322,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:happy_ghast_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12975,6 +14332,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:hoglin_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12984,6 +14342,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magma_cube_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -12993,6 +14352,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:piglin_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13002,6 +14362,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:piglin_brute_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13011,6 +14372,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:strider_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13020,6 +14382,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:zoglin_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13029,6 +14392,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:zombified_piglin_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13038,6 +14402,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ender_dragon_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13047,6 +14412,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:enderman_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13056,6 +14422,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:endermite_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13065,6 +14432,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shulker_spawn_egg
     ItemInfo {
         max_stack: 64,
@@ -13074,6 +14442,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:experience_bottle
     ItemInfo {
         max_stack: 64,
@@ -13083,6 +14452,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:fire_charge
     ItemInfo {
         max_stack: 64,
@@ -13092,6 +14462,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wind_charge
     ItemInfo {
         max_stack: 1,
@@ -13101,6 +14472,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:writable_book
     ItemInfo {
         max_stack: 16,
@@ -13110,6 +14482,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:written_book
     ItemInfo {
         max_stack: 64,
@@ -13119,6 +14492,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:breeze_rod
     ItemInfo {
         max_stack: 1,
@@ -13133,6 +14507,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 5.0f32,
         attack_speed_modifier: -3.4f32,
+        fuel: 0,
     }, // minecraft:mace
     ItemInfo {
         max_stack: 64,
@@ -13142,6 +14517,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:item_frame
     ItemInfo {
         max_stack: 64,
@@ -13151,6 +14527,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glow_item_frame
     ItemInfo {
         max_stack: 64,
@@ -13160,6 +14537,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:flower_pot
     ItemInfo {
         max_stack: 64,
@@ -13174,6 +14552,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:carrot
     ItemInfo {
         max_stack: 64,
@@ -13188,6 +14567,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:potato
     ItemInfo {
         max_stack: 64,
@@ -13202,6 +14582,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:baked_potato
     ItemInfo {
         max_stack: 64,
@@ -13216,6 +14597,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:poisonous_potato
     ItemInfo {
         max_stack: 64,
@@ -13225,6 +14607,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:map
     ItemInfo {
         max_stack: 64,
@@ -13239,6 +14622,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_carrot
     ItemInfo {
         max_stack: 64,
@@ -13248,6 +14632,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:skeleton_skull
     ItemInfo {
         max_stack: 64,
@@ -13257,6 +14642,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wither_skeleton_skull
     ItemInfo {
         max_stack: 64,
@@ -13266,6 +14652,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:player_head
     ItemInfo {
         max_stack: 64,
@@ -13275,6 +14662,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:zombie_head
     ItemInfo {
         max_stack: 64,
@@ -13284,6 +14672,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:creeper_head
     ItemInfo {
         max_stack: 64,
@@ -13293,6 +14682,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dragon_head
     ItemInfo {
         max_stack: 64,
@@ -13302,6 +14692,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:piglin_head
     ItemInfo {
         max_stack: 64,
@@ -13311,6 +14702,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_star
     ItemInfo {
         max_stack: 64,
@@ -13325,6 +14717,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pumpkin_pie
     ItemInfo {
         max_stack: 64,
@@ -13334,6 +14727,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:firework_rocket
     ItemInfo {
         max_stack: 64,
@@ -13343,6 +14737,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:firework_star
     ItemInfo {
         max_stack: 1,
@@ -13352,6 +14747,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:enchanted_book
     ItemInfo {
         max_stack: 64,
@@ -13361,6 +14757,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nether_brick
     ItemInfo {
         max_stack: 64,
@@ -13370,6 +14767,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:resin_brick
     ItemInfo {
         max_stack: 64,
@@ -13379,6 +14777,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine_shard
     ItemInfo {
         max_stack: 64,
@@ -13388,6 +14787,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prismarine_crystals
     ItemInfo {
         max_stack: 64,
@@ -13402,6 +14802,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rabbit
     ItemInfo {
         max_stack: 64,
@@ -13416,6 +14817,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cooked_rabbit
     ItemInfo {
         max_stack: 1,
@@ -13430,6 +14832,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rabbit_stew
     ItemInfo {
         max_stack: 64,
@@ -13439,6 +14842,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rabbit_foot
     ItemInfo {
         max_stack: 64,
@@ -13448,6 +14852,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rabbit_hide
     ItemInfo {
         max_stack: 16,
@@ -13457,6 +14862,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:armor_stand
     ItemInfo {
         max_stack: 1,
@@ -13466,6 +14872,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_horse_armor
     ItemInfo {
         max_stack: 1,
@@ -13475,6 +14882,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_horse_armor
     ItemInfo {
         max_stack: 1,
@@ -13484,6 +14892,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_horse_armor
     ItemInfo {
         max_stack: 1,
@@ -13493,6 +14902,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_horse_armor
     ItemInfo {
         max_stack: 1,
@@ -13502,6 +14912,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_horse_armor
     ItemInfo {
         max_stack: 1,
@@ -13511,6 +14922,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:leather_horse_armor
     ItemInfo {
         max_stack: 64,
@@ -13520,6 +14932,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lead
     ItemInfo {
         max_stack: 64,
@@ -13529,6 +14942,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:name_tag
     ItemInfo {
         max_stack: 1,
@@ -13538,6 +14952,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:command_block_minecart
     ItemInfo {
         max_stack: 64,
@@ -13552,6 +14967,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mutton
     ItemInfo {
         max_stack: 64,
@@ -13566,6 +14982,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cooked_mutton
     ItemInfo {
         max_stack: 16,
@@ -13575,6 +14992,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:white_banner
     ItemInfo {
         max_stack: 16,
@@ -13584,6 +15002,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:orange_banner
     ItemInfo {
         max_stack: 16,
@@ -13593,6 +15012,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:magenta_banner
     ItemInfo {
         max_stack: 16,
@@ -13602,6 +15022,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:light_blue_banner
     ItemInfo {
         max_stack: 16,
@@ -13611,6 +15032,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:yellow_banner
     ItemInfo {
         max_stack: 16,
@@ -13620,6 +15042,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:lime_banner
     ItemInfo {
         max_stack: 16,
@@ -13629,6 +15052,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:pink_banner
     ItemInfo {
         max_stack: 16,
@@ -13638,6 +15062,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:gray_banner
     ItemInfo {
         max_stack: 16,
@@ -13647,6 +15072,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:light_gray_banner
     ItemInfo {
         max_stack: 16,
@@ -13656,6 +15082,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cyan_banner
     ItemInfo {
         max_stack: 16,
@@ -13665,6 +15092,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:purple_banner
     ItemInfo {
         max_stack: 16,
@@ -13674,6 +15102,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:blue_banner
     ItemInfo {
         max_stack: 16,
@@ -13683,6 +15112,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:brown_banner
     ItemInfo {
         max_stack: 16,
@@ -13692,6 +15122,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:green_banner
     ItemInfo {
         max_stack: 16,
@@ -13701,6 +15132,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:red_banner
     ItemInfo {
         max_stack: 16,
@@ -13710,6 +15142,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:black_banner
     ItemInfo {
         max_stack: 64,
@@ -13719,6 +15152,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:end_crystal
     ItemInfo {
         max_stack: 64,
@@ -13733,6 +15167,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chorus_fruit
     ItemInfo {
         max_stack: 64,
@@ -13742,6 +15177,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:popped_chorus_fruit
     ItemInfo {
         max_stack: 64,
@@ -13751,6 +15187,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:torchflower_seeds
     ItemInfo {
         max_stack: 64,
@@ -13760,6 +15197,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pitcher_pod
     ItemInfo {
         max_stack: 64,
@@ -13774,6 +15212,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:beetroot
     ItemInfo {
         max_stack: 64,
@@ -13783,6 +15222,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:beetroot_seeds
     ItemInfo {
         max_stack: 1,
@@ -13797,6 +15237,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:beetroot_soup
     ItemInfo {
         max_stack: 64,
@@ -13806,6 +15247,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dragon_breath
     ItemInfo {
         max_stack: 1,
@@ -13815,6 +15257,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:splash_potion
     ItemInfo {
         max_stack: 64,
@@ -13824,6 +15267,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:spectral_arrow
     ItemInfo {
         max_stack: 64,
@@ -13833,6 +15277,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tipped_arrow
     ItemInfo {
         max_stack: 1,
@@ -13842,6 +15287,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lingering_potion
     ItemInfo {
         max_stack: 1,
@@ -13851,6 +15297,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shield
     ItemInfo {
         max_stack: 1,
@@ -13860,6 +15307,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: -2.4615383f32,
+        fuel: 200,
     }, // minecraft:wooden_spear
     ItemInfo {
         max_stack: 1,
@@ -13869,6 +15317,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 1.0f32,
         attack_speed_modifier: -2.6666665f32,
+        fuel: 0,
     }, // minecraft:stone_spear
     ItemInfo {
         max_stack: 1,
@@ -13878,6 +15327,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 1.0f32,
         attack_speed_modifier: -2.8235295f32,
+        fuel: 0,
     }, // minecraft:copper_spear
     ItemInfo {
         max_stack: 1,
@@ -13887,6 +15337,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 2.0f32,
         attack_speed_modifier: -2.9473684f32,
+        fuel: 0,
     }, // minecraft:iron_spear
     ItemInfo {
         max_stack: 1,
@@ -13896,6 +15347,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: -2.9473684f32,
+        fuel: 0,
     }, // minecraft:golden_spear
     ItemInfo {
         max_stack: 1,
@@ -13905,6 +15357,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 3.0f32,
         attack_speed_modifier: -3.0476189f32,
+        fuel: 0,
     }, // minecraft:diamond_spear
     ItemInfo {
         max_stack: 1,
@@ -13914,6 +15367,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 4.0f32,
         attack_speed_modifier: -3.1304348f32,
+        fuel: 0,
     }, // minecraft:netherite_spear
     ItemInfo {
         max_stack: 1,
@@ -13923,6 +15377,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:totem_of_undying
     ItemInfo {
         max_stack: 64,
@@ -13932,6 +15387,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shulker_shell
     ItemInfo {
         max_stack: 64,
@@ -13941,6 +15397,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_nugget
     ItemInfo {
         max_stack: 64,
@@ -13950,6 +15407,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_nugget
     ItemInfo {
         max_stack: 1,
@@ -13959,6 +15417,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:knowledge_book
     ItemInfo {
         max_stack: 1,
@@ -13968,6 +15427,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:debug_stick
     ItemInfo {
         max_stack: 1,
@@ -13977,6 +15437,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_13
     ItemInfo {
         max_stack: 1,
@@ -13986,6 +15447,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_cat
     ItemInfo {
         max_stack: 1,
@@ -13995,6 +15457,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_blocks
     ItemInfo {
         max_stack: 1,
@@ -14004,6 +15467,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_bounce
     ItemInfo {
         max_stack: 1,
@@ -14013,6 +15477,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_chirp
     ItemInfo {
         max_stack: 1,
@@ -14022,6 +15487,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_creator
     ItemInfo {
         max_stack: 1,
@@ -14031,6 +15497,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_creator_music_box
     ItemInfo {
         max_stack: 1,
@@ -14040,6 +15507,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_far
     ItemInfo {
         max_stack: 1,
@@ -14049,6 +15517,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_lava_chicken
     ItemInfo {
         max_stack: 1,
@@ -14058,6 +15527,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_mall
     ItemInfo {
         max_stack: 1,
@@ -14067,6 +15537,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_mellohi
     ItemInfo {
         max_stack: 1,
@@ -14076,6 +15547,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_stal
     ItemInfo {
         max_stack: 1,
@@ -14085,6 +15557,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_strad
     ItemInfo {
         max_stack: 1,
@@ -14094,6 +15567,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_ward
     ItemInfo {
         max_stack: 1,
@@ -14103,6 +15577,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_11
     ItemInfo {
         max_stack: 1,
@@ -14112,6 +15587,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_wait
     ItemInfo {
         max_stack: 1,
@@ -14121,6 +15597,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_otherside
     ItemInfo {
         max_stack: 1,
@@ -14130,6 +15607,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_relic
     ItemInfo {
         max_stack: 1,
@@ -14139,6 +15617,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_5
     ItemInfo {
         max_stack: 1,
@@ -14148,6 +15627,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_pigstep
     ItemInfo {
         max_stack: 1,
@@ -14157,6 +15637,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_precipice
     ItemInfo {
         max_stack: 1,
@@ -14166,6 +15647,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:music_disc_tears
     ItemInfo {
         max_stack: 64,
@@ -14175,6 +15657,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:disc_fragment_5
     ItemInfo {
         max_stack: 1,
@@ -14189,6 +15672,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 8.0f32,
         attack_speed_modifier: -2.9f32,
+        fuel: 0,
     }, // minecraft:trident
     ItemInfo {
         max_stack: 64,
@@ -14198,6 +15682,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:nautilus_shell
     ItemInfo {
         max_stack: 1,
@@ -14207,6 +15692,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:iron_nautilus_armor
     ItemInfo {
         max_stack: 1,
@@ -14216,6 +15702,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:golden_nautilus_armor
     ItemInfo {
         max_stack: 1,
@@ -14225,6 +15712,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:diamond_nautilus_armor
     ItemInfo {
         max_stack: 1,
@@ -14234,6 +15722,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_nautilus_armor
     ItemInfo {
         max_stack: 1,
@@ -14243,6 +15732,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_nautilus_armor
     ItemInfo {
         max_stack: 64,
@@ -14252,6 +15742,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:heart_of_the_sea
     ItemInfo {
         max_stack: 1,
@@ -14261,6 +15752,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:crossbow
     ItemInfo {
         max_stack: 1,
@@ -14275,6 +15767,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:suspicious_stew
     ItemInfo {
         max_stack: 64,
@@ -14284,6 +15777,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:loom
     ItemInfo {
         max_stack: 1,
@@ -14293,6 +15787,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:flower_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14302,6 +15797,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:creeper_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14311,6 +15807,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:skull_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14320,6 +15817,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mojang_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14329,6 +15827,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:globe_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14338,6 +15837,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:piglin_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14347,6 +15847,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:flow_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14356,6 +15857,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:guster_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14365,6 +15867,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:field_masoned_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14374,6 +15877,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bordure_indented_banner_pattern
     ItemInfo {
         max_stack: 1,
@@ -14383,6 +15887,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:goat_horn
     ItemInfo {
         max_stack: 64,
@@ -14392,6 +15897,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:composter
     ItemInfo {
         max_stack: 64,
@@ -14401,6 +15907,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:barrel
     ItemInfo {
         max_stack: 64,
@@ -14410,6 +15917,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:smoker
     ItemInfo {
         max_stack: 64,
@@ -14419,6 +15927,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blast_furnace
     ItemInfo {
         max_stack: 64,
@@ -14428,6 +15937,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:cartography_table
     ItemInfo {
         max_stack: 64,
@@ -14437,6 +15947,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:fletching_table
     ItemInfo {
         max_stack: 64,
@@ -14446,6 +15957,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:grindstone
     ItemInfo {
         max_stack: 64,
@@ -14455,6 +15967,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 300,
     }, // minecraft:smithing_table
     ItemInfo {
         max_stack: 64,
@@ -14464,6 +15977,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:stonecutter
     ItemInfo {
         max_stack: 64,
@@ -14473,6 +15987,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bell
     ItemInfo {
         max_stack: 64,
@@ -14482,6 +15997,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lantern
     ItemInfo {
         max_stack: 64,
@@ -14491,6 +16007,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:soul_lantern
     ItemInfo {
         max_stack: 64,
@@ -14500,6 +16017,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_lantern
     ItemInfo {
         max_stack: 64,
@@ -14509,6 +16027,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_lantern
     ItemInfo {
         max_stack: 64,
@@ -14518,6 +16037,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_lantern
     ItemInfo {
         max_stack: 64,
@@ -14527,6 +16047,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_lantern
     ItemInfo {
         max_stack: 64,
@@ -14536,6 +16057,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_lantern
     ItemInfo {
         max_stack: 64,
@@ -14545,6 +16067,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_lantern
     ItemInfo {
         max_stack: 64,
@@ -14554,6 +16077,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_lantern
     ItemInfo {
         max_stack: 64,
@@ -14563,6 +16087,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_lantern
     ItemInfo {
         max_stack: 64,
@@ -14577,6 +16102,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sweet_berries
     ItemInfo {
         max_stack: 64,
@@ -14591,6 +16117,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:glow_berries
     ItemInfo {
         max_stack: 64,
@@ -14600,6 +16127,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:campfire
     ItemInfo {
         max_stack: 64,
@@ -14609,6 +16137,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:soul_campfire
     ItemInfo {
         max_stack: 64,
@@ -14618,6 +16147,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shroomlight
     ItemInfo {
         max_stack: 64,
@@ -14627,6 +16157,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:honeycomb
     ItemInfo {
         max_stack: 64,
@@ -14636,6 +16167,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bee_nest
     ItemInfo {
         max_stack: 64,
@@ -14645,6 +16177,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:beehive
     ItemInfo {
         max_stack: 16,
@@ -14659,6 +16192,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         }),
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:honey_bottle
     ItemInfo {
         max_stack: 64,
@@ -14668,6 +16202,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:honeycomb_block
     ItemInfo {
         max_stack: 64,
@@ -14677,6 +16212,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lodestone
     ItemInfo {
         max_stack: 64,
@@ -14686,6 +16222,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:crying_obsidian
     ItemInfo {
         max_stack: 64,
@@ -14695,6 +16232,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blackstone
     ItemInfo {
         max_stack: 64,
@@ -14704,6 +16242,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blackstone_slab
     ItemInfo {
         max_stack: 64,
@@ -14713,6 +16252,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blackstone_stairs
     ItemInfo {
         max_stack: 64,
@@ -14722,6 +16262,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gilded_blackstone
     ItemInfo {
         max_stack: 64,
@@ -14731,6 +16272,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone
     ItemInfo {
         max_stack: 64,
@@ -14740,6 +16282,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_slab
     ItemInfo {
         max_stack: 64,
@@ -14749,6 +16292,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_stairs
     ItemInfo {
         max_stack: 64,
@@ -14758,6 +16302,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:chiseled_polished_blackstone
     ItemInfo {
         max_stack: 64,
@@ -14767,6 +16312,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_bricks
     ItemInfo {
         max_stack: 64,
@@ -14776,6 +16322,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_brick_slab
     ItemInfo {
         max_stack: 64,
@@ -14785,6 +16332,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:polished_blackstone_brick_stairs
     ItemInfo {
         max_stack: 64,
@@ -14794,6 +16342,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cracked_polished_blackstone_bricks
     ItemInfo {
         max_stack: 64,
@@ -14803,6 +16352,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:respawn_anchor
     ItemInfo {
         max_stack: 64,
@@ -14812,6 +16362,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:candle
     ItemInfo {
         max_stack: 64,
@@ -14821,6 +16372,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:white_candle
     ItemInfo {
         max_stack: 64,
@@ -14830,6 +16382,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:orange_candle
     ItemInfo {
         max_stack: 64,
@@ -14839,6 +16392,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:magenta_candle
     ItemInfo {
         max_stack: 64,
@@ -14848,6 +16402,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_blue_candle
     ItemInfo {
         max_stack: 64,
@@ -14857,6 +16412,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:yellow_candle
     ItemInfo {
         max_stack: 64,
@@ -14866,6 +16422,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:lime_candle
     ItemInfo {
         max_stack: 64,
@@ -14875,6 +16432,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pink_candle
     ItemInfo {
         max_stack: 64,
@@ -14884,6 +16442,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:gray_candle
     ItemInfo {
         max_stack: 64,
@@ -14893,6 +16452,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:light_gray_candle
     ItemInfo {
         max_stack: 64,
@@ -14902,6 +16462,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:cyan_candle
     ItemInfo {
         max_stack: 64,
@@ -14911,6 +16472,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:purple_candle
     ItemInfo {
         max_stack: 64,
@@ -14920,6 +16482,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blue_candle
     ItemInfo {
         max_stack: 64,
@@ -14929,6 +16492,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brown_candle
     ItemInfo {
         max_stack: 64,
@@ -14938,6 +16502,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:green_candle
     ItemInfo {
         max_stack: 64,
@@ -14947,6 +16512,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:red_candle
     ItemInfo {
         max_stack: 64,
@@ -14956,6 +16522,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:black_candle
     ItemInfo {
         max_stack: 64,
@@ -14965,6 +16532,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:small_amethyst_bud
     ItemInfo {
         max_stack: 64,
@@ -14974,6 +16542,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:medium_amethyst_bud
     ItemInfo {
         max_stack: 64,
@@ -14983,6 +16552,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:large_amethyst_bud
     ItemInfo {
         max_stack: 64,
@@ -14992,6 +16562,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:amethyst_cluster
     ItemInfo {
         max_stack: 64,
@@ -15001,6 +16572,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pointed_dripstone
     ItemInfo {
         max_stack: 64,
@@ -15010,6 +16582,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sulfur_spike
     ItemInfo {
         max_stack: 64,
@@ -15019,6 +16592,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ochre_froglight
     ItemInfo {
         max_stack: 64,
@@ -15028,6 +16602,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:verdant_froglight
     ItemInfo {
         max_stack: 64,
@@ -15037,6 +16612,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:pearlescent_froglight
     ItemInfo {
         max_stack: 64,
@@ -15046,6 +16622,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:frogspawn
     ItemInfo {
         max_stack: 64,
@@ -15055,6 +16632,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:echo_shard
     ItemInfo {
         max_stack: 1,
@@ -15064,6 +16642,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brush
     ItemInfo {
         max_stack: 64,
@@ -15073,6 +16652,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:netherite_upgrade_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15082,6 +16662,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sentry_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15091,6 +16672,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:dune_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15100,6 +16682,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:coast_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15109,6 +16692,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wild_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15118,6 +16702,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ward_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15127,6 +16712,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:eye_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15136,6 +16722,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:vex_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15145,6 +16732,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:tide_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15154,6 +16742,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:snout_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15163,6 +16752,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:rib_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15172,6 +16762,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:spire_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15181,6 +16772,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:wayfinder_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15190,6 +16782,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shaper_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15199,6 +16792,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:silence_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15208,6 +16802,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:raiser_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15217,6 +16812,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:host_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15226,6 +16822,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:flow_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15235,6 +16832,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:bolt_armor_trim_smithing_template
     ItemInfo {
         max_stack: 64,
@@ -15244,6 +16842,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:angler_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15253,6 +16852,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:archer_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15262,6 +16862,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:arms_up_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15271,6 +16872,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:blade_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15280,6 +16882,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:brewer_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15289,6 +16892,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:burn_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15298,6 +16902,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:danger_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15307,6 +16912,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:explorer_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15316,6 +16922,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:flow_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15325,6 +16932,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:friend_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15334,6 +16942,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:guster_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15343,6 +16952,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:heart_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15352,6 +16962,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:heartbreak_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15361,6 +16972,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:howl_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15370,6 +16982,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:miner_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15379,6 +16992,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:mourner_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15388,6 +17002,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:plenty_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15397,6 +17012,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:prize_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15406,6 +17022,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:scrape_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15415,6 +17032,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:sheaf_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15424,6 +17042,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:shelter_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15433,6 +17052,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:skull_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15442,6 +17062,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:snort_pottery_sherd
     ItemInfo {
         max_stack: 64,
@@ -15451,6 +17072,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_grate
     ItemInfo {
         max_stack: 64,
@@ -15460,6 +17082,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_grate
     ItemInfo {
         max_stack: 64,
@@ -15469,6 +17092,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_grate
     ItemInfo {
         max_stack: 64,
@@ -15478,6 +17102,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_grate
     ItemInfo {
         max_stack: 64,
@@ -15487,6 +17112,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_grate
     ItemInfo {
         max_stack: 64,
@@ -15496,6 +17122,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_grate
     ItemInfo {
         max_stack: 64,
@@ -15505,6 +17132,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_grate
     ItemInfo {
         max_stack: 64,
@@ -15514,6 +17142,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_grate
     ItemInfo {
         max_stack: 64,
@@ -15523,6 +17152,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_bulb
     ItemInfo {
         max_stack: 64,
@@ -15532,6 +17162,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_bulb
     ItemInfo {
         max_stack: 64,
@@ -15541,6 +17172,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_bulb
     ItemInfo {
         max_stack: 64,
@@ -15550,6 +17182,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_bulb
     ItemInfo {
         max_stack: 64,
@@ -15559,6 +17192,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_bulb
     ItemInfo {
         max_stack: 64,
@@ -15568,6 +17202,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_bulb
     ItemInfo {
         max_stack: 64,
@@ -15577,6 +17212,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_bulb
     ItemInfo {
         max_stack: 64,
@@ -15586,6 +17222,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_bulb
     ItemInfo {
         max_stack: 64,
@@ -15595,6 +17232,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_chest
     ItemInfo {
         max_stack: 64,
@@ -15604,6 +17242,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_chest
     ItemInfo {
         max_stack: 64,
@@ -15613,6 +17252,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_chest
     ItemInfo {
         max_stack: 64,
@@ -15622,6 +17262,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_chest
     ItemInfo {
         max_stack: 64,
@@ -15631,6 +17272,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_chest
     ItemInfo {
         max_stack: 64,
@@ -15640,6 +17282,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_chest
     ItemInfo {
         max_stack: 64,
@@ -15649,6 +17292,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_chest
     ItemInfo {
         max_stack: 64,
@@ -15658,6 +17302,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_chest
     ItemInfo {
         max_stack: 64,
@@ -15667,6 +17312,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:copper_golem_statue
     ItemInfo {
         max_stack: 64,
@@ -15676,6 +17322,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:exposed_copper_golem_statue
     ItemInfo {
         max_stack: 64,
@@ -15685,6 +17332,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:weathered_copper_golem_statue
     ItemInfo {
         max_stack: 64,
@@ -15694,6 +17342,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:oxidized_copper_golem_statue
     ItemInfo {
         max_stack: 64,
@@ -15703,6 +17352,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_copper_golem_statue
     ItemInfo {
         max_stack: 64,
@@ -15712,6 +17362,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_exposed_copper_golem_statue
     ItemInfo {
         max_stack: 64,
@@ -15721,6 +17372,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_weathered_copper_golem_statue
     ItemInfo {
         max_stack: 64,
@@ -15730,6 +17382,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:waxed_oxidized_copper_golem_statue
     ItemInfo {
         max_stack: 64,
@@ -15739,6 +17392,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:trial_spawner
     ItemInfo {
         max_stack: 64,
@@ -15748,6 +17402,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:trial_key
     ItemInfo {
         max_stack: 64,
@@ -15757,6 +17412,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ominous_trial_key
     ItemInfo {
         max_stack: 64,
@@ -15766,6 +17422,7 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:vault
     ItemInfo {
         max_stack: 64,
@@ -15775,5 +17432,10 @@ pub static ITEMS: [ItemInfo; 1658] = [
         food: None,
         attack_damage: 0.0f32,
         attack_speed_modifier: 0.0f32,
+        fuel: 0,
     }, // minecraft:ominous_bottle
 ];
+
+/// `(item, remainder)`, sorted by item id.
+pub static CRAFT_REMAINDERS: [(u16, u16); 5] =
+    [(1129, 1128), (1130, 1128), (1134, 1128), (1441, 1270), (1533, 1270)];

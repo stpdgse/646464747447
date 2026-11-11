@@ -350,3 +350,127 @@ mod tests {
         assert!(n > 1000, "only {n} crafting recipes parsed");
     }
 }
+
+/// The blocks that cook one item at a time.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Cooker {
+    Furnace,
+    BlastFurnace,
+    Smoker,
+    Campfire,
+}
+
+impl Cooker {
+    fn recipe_type(self) -> &'static str {
+        match self {
+            Cooker::Furnace => "minecraft:smelting",
+            Cooker::BlastFurnace => "minecraft:blasting",
+            Cooker::Smoker => "minecraft:smoking",
+            Cooker::Campfire => "minecraft:campfire_cooking",
+        }
+    }
+
+    /// Blast furnaces and smokers cook twice as fast and burn their fuel in half the time
+    /// (`minecraft:block/fast_cooking`).
+    pub fn is_fast(self) -> bool {
+        matches!(self, Cooker::BlastFurnace | Cooker::Smoker)
+    }
+
+    /// How much cooking progress one tick adds.
+    pub fn speed(self) -> u32 {
+        if self.is_fast() { 2 } else { 1 }
+    }
+}
+
+/// A smelting, blasting, smoking or campfire recipe.
+#[derive(Clone, Debug)]
+pub struct Cooking {
+    pub name: &'static str,
+    kind: Cooker,
+    ingredient: Ingredient,
+    pub result: Stack,
+    /// Experience points for the recipe's result.
+    pub experience: f32,
+    /// Ticks of cooking in an ordinary furnace.
+    pub time: u32,
+}
+
+fn cooking_recipes() -> &'static [Cooking] {
+    static ALL: OnceLock<Vec<Cooking>> = OnceLock::new();
+    ALL.get_or_init(|| {
+        ferrite_data::loot::RECIPES
+            .iter()
+            .filter_map(|(name, json)| {
+                let v: Value = serde_json::from_str(json).ok()?;
+                let ty = v["type"].as_str()?;
+                let kind =
+                    [Cooker::Furnace, Cooker::BlastFurnace, Cooker::Smoker, Cooker::Campfire]
+                        .into_iter()
+                        .find(|k| k.recipe_type() == ty)?;
+                let default_time = match kind {
+                    Cooker::Furnace => 200,
+                    Cooker::BlastFurnace | Cooker::Smoker => 100,
+                    Cooker::Campfire => 600,
+                };
+                Some(Cooking {
+                    name,
+                    kind,
+                    ingredient: ingredient(&v["ingredient"])?,
+                    result: result(&v["result"])?,
+                    experience: v.get("experience").and_then(Value::as_f64).unwrap_or(0.0) as f32,
+                    time: v.get("cookingtime").and_then(Value::as_u64).unwrap_or(default_time)
+                        as u32,
+                })
+            })
+            .collect()
+    })
+}
+
+/// The recipe `cooker` follows for `item`, if there is one (the first in registry order).
+pub fn cook(cooker: Cooker, item: i32) -> Option<&'static Cooking> {
+    cooking_recipes().iter().find(|r| r.kind == cooker && r.ingredient.matches(item))
+}
+
+/// The experience of the cooking recipe called `name` (without the namespace).
+pub fn cooking_experience(name: &str) -> Option<f32> {
+    cooking_recipes()
+        .iter()
+        .find(|r| r.name == name || r.name.strip_prefix("minecraft:") == Some(name))
+        .map(|r| r.experience)
+}
+
+#[cfg(test)]
+mod cooking_tests {
+    use super::*;
+
+    fn id(name: &str) -> i32 {
+        item_id(name).expect("an item")
+    }
+
+    #[test]
+    fn furnaces_follow_their_own_recipe_types() {
+        let smelt = cook(Cooker::Furnace, id("minecraft:raw_iron")).expect("smelts");
+        assert_eq!(smelt.result, Stack { item: id("minecraft:iron_ingot"), count: 1 });
+        assert_eq!((smelt.time, smelt.experience), (200, 0.7));
+        let blast = cook(Cooker::BlastFurnace, id("minecraft:raw_iron")).expect("blasts");
+        // The recipe says 200 ticks too; the blast furnace's speed multiplier of 2 halves it.
+        assert_eq!(blast.time, 200);
+        // Food is for the smoker and the campfire, not the blast furnace.
+        assert!(cook(Cooker::BlastFurnace, id("minecraft:beef")).is_none());
+        let steak = cook(Cooker::Smoker, id("minecraft:beef")).expect("smokes");
+        assert_eq!(steak.result.item, id("minecraft:cooked_beef"));
+        assert_eq!(cook(Cooker::Campfire, id("minecraft:beef")).expect("campfire").time, 600);
+        assert!(cook(Cooker::Furnace, id("minecraft:stick")).is_none());
+    }
+
+    #[test]
+    fn tags_work_as_ingredients() {
+        // Any log makes charcoal.
+        for log in ["minecraft:oak_log", "minecraft:birch_log"] {
+            assert_eq!(
+                cook(Cooker::Furnace, id(log)).expect("a log").result.item,
+                id("minecraft:charcoal")
+            );
+        }
+    }
+}
