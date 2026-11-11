@@ -19,12 +19,9 @@ fn crafting_results_match_the_official_server() {
         if cells.len() != 4 {
             continue; // a truncated final line
         }
-        let want = match result.split_once(':') {
-            Some((count, item)) => {
-                Some((item.parse::<i32>().unwrap(), count.parse::<i32>().unwrap()))
-            }
-            None => None,
-        };
+        let want = result
+            .split_once(':')
+            .map(|(count, item)| (item.parse::<i32>().unwrap(), count.parse::<i32>().unwrap()));
         let got = craft(&cells, 2, 2).map(|(_, s)| (s.item, s.count));
         n += 1;
         if got != want {
