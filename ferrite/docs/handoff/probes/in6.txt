@@ -1,0 +1,35 @@
+4 setblock 1 2 3 stone
+4 setblock 1 2 3 stone[
+4 setblock 1 2 3 stone[]
+4 setblock 1 2 3 stone[ ]
+4 setblock 1 2 3 chest[facing=north]
+4 setblock 1 2 3 chest[facing=north,type=left]
+4 setblock 1 2 3 chest[facing=north,facing=south]
+4 setblock 1 2 3 chest[facing=]
+4 setblock 1 2 3 chest[facing]
+4 setblock 1 2 3 chest[facing=north
+4 setblock 1 2 3 chest[facing=north,
+4 setblock 1 2 3 chest[facing=north,]
+4 setblock 1 2 3 chest[=north]
+4 setblock 1 2 3 chest[ facing = north ]
+4 setblock 1 2 3 chest[facing=nope]
+4 setblock 1 2 3 chest[nope=north]
+4 setblock 1 2 3 oak_stairs[half=top,shape=straight]
+4 setblock 1 2 3 stone{}
+4 setblock 1 2 3 chest{Items:[]}
+4 setblock 1 2 3 chest[facing=north]{
+4 setblock 1 2 3 minecraft:stone
+4 setblock 1 2 3 Stone
+4 setblock 1 2 3 #minecraft:logs
+4 setblock 1 2 3 stone[x
+4 setblock 1 2 3 [facing=north]
+4 setblock 1 2 3 chest[waterlogged=true]
+4 setblock 1 2 3 chest[waterlogged=maybe]
+4 fill 1 2 3 4 5 6 stone replace #minecraft:logs
+4 fill 1 2 3 4 5 6 stone replace #foo
+4 fill 1 2 3 4 5 6 stone replace #minecraft:logs[x=1]
+4 fill 1 2 3 4 5 6 stone replace stone[]
+4 fill 1 2 3 4 5 6 stone replace oak_log
+4 fill 1 2 3 4 5 6 stone replace #minecraft:logs{}
+4 fill 1 2 3 4 5 6 stone replace #
+4 fill 1 2 3 4 5 6 stone replace #minecraft:

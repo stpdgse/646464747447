@@ -1,0 +1,46 @@
+2 setblock 1 2 3 chest{a:1}
+2 setblock 1 2 3 chest{}
+2 setblock 1 2 3 chest{a}
+2 setblock 1 2 3 chest{
+2 setblock 1 2 3 chest{a:1
+2 setblock 1 2 3 chest[facing=north]{a:1}
+2 setblock 1 2 3 chest {a:1}
+2 setblock 1 2 3 chest{a:1} replace
+2 setblock 1 2 3 chest{a:1}replace
+2 setblock 1 2 3 chest{a:1}x
+2 setblock 1 2 3 chest{ a : 1 }
+2 setblock 1 2 3 chest{a:bool(1)}
+2 setblock 1 2 3 chest{a:1,}
+2 setblock 1 2 3 stone{a:1}
+2 setblock 1 2 3 chest{"a":'x'}
+2 setblock 1 2 3 chest{a:1}{b:2}
+2 setblock 1 2 3 chest[facing=north{a:1}
+2 fill 1 2 3 4 5 6 chest{a:1}
+2 fill 1 2 3 4 5 6 stone replace chest{a:1}
+2 fill 1 2 3 4 5 6 stone replace #minecraft:logs{a:1}
+2 fill 1 2 3 4 5 6 stone replace chest[facing=north]{a:1}
+2 execute if block 1 2 3 chest{a:1}
+2 execute as @e[nbt={a:1}] run say hi
+2 say @e[nbt={a:1}] x
+2 say @e[nbt={a:1}]
+2 say @e[nbt={a:1}]
+2 say @e[nbt={}]
+2 say @e[nbt=1]
+2 say @e[nbt={a:]
+2 say @e[nbt=!{a:1}]
+2 say @e[nbt= {a:1}]
+2 say @e[nbt={a:1} ]
+2 say @e[nbt={a:1},limit=1]
+2 say @e[nbt={a:1}limit=1]
+2 say @e[nbt={a:1},nbt={b:2}]
+2 say @e[nbt={a:1},nbt=!{b:2}]
+2 say @e[nbt=!{a:1},nbt={a:1}]
+2 say @e[nbt={a}]
+2 say @e[nbt=]
+2 say @e[nbt]
+2 say @e[nbt='{}']
+2 say @e[nbt=[]]
+2 say @e[nbt=a]
+2 say @e[nbt=!]
+2 say @e[nbt=!1]
+2 say @e[nbt=!!{}]
