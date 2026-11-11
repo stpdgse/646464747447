@@ -623,3 +623,47 @@ mod survey {
         eprintln!("{} commands: {}", names.len(), names.join(" "));
     }
 }
+
+#[cfg(test)]
+mod examples {
+    use super::*;
+
+    /// For each argument type, a command line that reaches it (arguments before it are
+    /// `ARG`). Prints one per type; run with `--ignored --nocapture`.
+    #[test]
+    #[ignore]
+    fn print_examples() {
+        let t = Tree::for_level(4);
+        let mut seen = std::collections::BTreeMap::new();
+        let mut stack: Vec<(usize, Vec<String>)> = vec![(t.root, vec![])];
+        let mut visited = std::collections::HashSet::new();
+        while let Some((n, path)) = stack.pop() {
+            if !visited.insert((n, path.len())) || path.len() > 7 {
+                continue;
+            }
+            let node = &t.nodes[n];
+            for &c in &node.children {
+                let child = &t.nodes[c];
+                let mut p = path.clone();
+                match child.kind {
+                    NodeKind::Literal => p.push(child.name.clone()),
+                    _ => p.push(format!("<{}>", child.name)),
+                }
+                if let Some(parser) = &child.parser {
+                    let key = match parser {
+                        Parser::Simple(id) => format!("simple {id}"),
+                        other => format!("{other:?}"),
+                    };
+                    seen.entry(key).or_insert_with(|| p.join(" "));
+                }
+                if let Some(r) = child.redirect {
+                    let _ = r;
+                }
+                stack.push((c, p));
+            }
+        }
+        for (k, v) in seen {
+            eprintln!("{k:60} {v}");
+        }
+    }
+}

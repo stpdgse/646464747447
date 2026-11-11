@@ -120,6 +120,8 @@ struct State {
     has_team_not_equals: bool,
     type_limited: bool,
     type_limited_inversely: bool,
+    /// Entity type tags already named by `type=#...`.
+    type_tags: Vec<String>,
     has_scores: bool,
     has_advancements: bool,
     /// `nbt=` was used and Ferrite cannot parse NBT yet.
@@ -135,7 +137,7 @@ fn err_with(reader: &Reader, key: &str, arg: &str) -> SyntaxError {
 }
 
 /// `Java UUID.fromString`, which is more lenient than the canonical form.
-fn parse_uuid(s: &str) -> Option<u128> {
+pub fn parse_uuid(s: &str) -> Option<u128> {
     let parts: Vec<&str> = s.split('-').collect();
     if parts.len() != 5 {
         return None;
@@ -286,6 +288,9 @@ fn handle_option(
         }
         "team" => {
             let negated = should_invert(reader);
+            if st.has_team_not_equals && !negated {
+                return Err(inapplicable(reader));
+            }
             let s = reader.read_unquoted_string();
             if negated {
                 st.has_team_not_equals = true;
@@ -302,6 +307,10 @@ fn handle_option(
                 st.type_limited_inversely = true;
                 reader.skip();
                 let tag = read_identifier(reader)?;
+                if st.type_tags.contains(&tag) {
+                    return Err(inapplicable(reader));
+                }
+                st.type_tags.push(tag.clone());
                 sel.types.push((negated, TypeFilter::Tag(tag)));
             } else {
                 if st.type_limited_inversely && !negated {
@@ -400,7 +409,10 @@ fn handle_option(
             }
             reader.expect('}')?;
             st.has_advancements = true;
-            sel.includes_entities = false;
+            // Advancements only exist for players.
+            if !sel.advancements.is_empty() {
+                sel.includes_entities = false;
+            }
         }
         _ => unreachable!("checked above"),
     }

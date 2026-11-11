@@ -44,6 +44,22 @@ pub enum Value {
     Resource(String),
     /// An entity selector, player name or UUID.
     Selector(Selector),
+    /// A `message`: the text, with the selectors found in it and where (UTF-16 offsets).
+    Message {
+        text: String,
+        selectors: Vec<(usize, usize, Selector)>,
+    },
+    /// A score holder: a name (`*` for everyone that has a score) or a selector.
+    ScoreHolder(ScoreHolder),
+    Uuid(u128),
+}
+
+/// Who a score belongs to.
+#[derive(Clone, Debug, PartialEq)]
+pub enum ScoreHolder {
+    Name(String),
+    Wildcard,
+    Selector(Selector),
 }
 
 /// Who runs the command (what parsing may depend on).
@@ -291,6 +307,54 @@ impl Parser {
                 selector::parse_entity(reader, *single, *players, source.allow_selectors())
                     .map(Value::Selector)
             }
+            Parser::ScoreHolder { multiple } => {
+                if reader.can_read() && reader.peek() == '@' {
+                    let sel = selector::parse_selector(reader, true)?;
+                    if !*multiple && sel.max_results > 1 {
+                        return Err(reader.error(Message::tr("argument.entity.toomany")));
+                    }
+                    return Ok(Value::ScoreHolder(ScoreHolder::Selector(sel)));
+                }
+                let from = reader.cursor();
+                while reader.can_read() && reader.peek() != ' ' {
+                    reader.skip();
+                }
+                let name = reader.substring(from, reader.cursor());
+                Ok(Value::ScoreHolder(if name == "*" {
+                    ScoreHolder::Wildcard
+                } else {
+                    ScoreHolder::Name(name)
+                }))
+            }
+            Parser::Simple(id::OBJECTIVE | id::TEAM) => {
+                Ok(Value::String(reader.read_unquoted_string()))
+            }
+            Parser::Simple(id::GAME_PROFILE) => {
+                if reader.can_read() && reader.peek() == '@' {
+                    let sel = selector::parse_selector(reader, true)?;
+                    if sel.includes_entities {
+                        return Err(reader.error(Message::tr("argument.player.entities")));
+                    }
+                    return Ok(Value::Selector(sel));
+                }
+                let from = reader.cursor();
+                while reader.can_read() && reader.peek() != ' ' {
+                    reader.skip();
+                }
+                Ok(Value::String(reader.substring(from, reader.cursor())))
+            }
+            Parser::Simple(id::UUID) => {
+                let rest = reader.rest();
+                let len = rest.chars().take_while(|c| c.is_ascii_hexdigit() || *c == '-').count();
+                match selector::parse_uuid(&rest[..len]) {
+                    Some(u) if len > 0 => {
+                        reader.set_cursor(reader.cursor() + len);
+                        Ok(Value::Uuid(u))
+                    }
+                    _ => Err(reader.error(Message::tr("argument.uuid.invalid"))),
+                }
+            }
+            Parser::Simple(id::MESSAGE) => parse_message(reader, source.allow_selectors()),
             Parser::Simple(id::GAMEMODE) => {
                 let word = read_word(reader);
                 match GAME_MODES.iter().position(|m| *m == word) {
@@ -412,6 +476,7 @@ impl Parser {
                 | Parser::String(_)
                 | Parser::Time { .. }
                 | Parser::Entity { .. }
+                | Parser::ScoreHolder { .. }
                 | Parser::Resource { kind: ResourceKind::Resource, .. }
                 | Parser::Simple(
                     id::BLOCK_POS | id::VEC3 | id::COLUMN_POS | id::VEC2 | id::ROTATION | id::ANGLE
@@ -446,5 +511,45 @@ mod tests {
             p.parse(&mut Reader::new("5"), Source { permission_level: 4 }).unwrap(),
             Value::Int(5)
         );
+    }
+}
+
+/// `MessageArgument.parse` for a source that may use selectors: the rest of the line, with the
+/// selectors in it parsed (a lone `@` or an unknown type is plain text).
+fn parse_message(reader: &mut Reader, allow_selectors: bool) -> Result<Value> {
+    let start = reader.cursor();
+    if !allow_selectors {
+        let text = reader.rest();
+        reader.set_cursor(reader.total_length());
+        return Ok(Value::Message { text, selectors: Vec::new() });
+    }
+    let mut selectors = Vec::new();
+    loop {
+        if !reader.can_read() {
+            return Ok(Value::Message {
+                text: reader.substring(start, reader.cursor()),
+                selectors,
+            });
+        }
+        if reader.peek() == '@' {
+            let at = reader.cursor();
+            match selector::parse_selector(reader, true) {
+                Ok(sel) => selectors.push((at - start, reader.cursor() - start, sel)),
+                Err(e) => {
+                    let plain = matches!(
+                        &e.message,
+                        Message::Translatable { key, .. }
+                            if key == "argument.entity.selector.missing"
+                                || key == "argument.entity.selector.unknown"
+                    );
+                    if !plain {
+                        return Err(e);
+                    }
+                    reader.set_cursor(at + 1);
+                }
+            }
+        } else {
+            reader.skip();
+        }
     }
 }

@@ -73,7 +73,10 @@ fn parse_double_coord(reader: &mut Reader, center_correct: bool) -> Result<Coord
 fn parse_local(reader: &mut Reader) -> Result<Coordinates> {
     let start = reader.cursor();
     let next = |reader: &mut Reader| -> Result<f64> {
-        if !reader.can_read() || reader.peek() != '^' {
+        if !reader.can_read() {
+            return Err(reader.error(Message::tr("argument.pos.missing.double")));
+        }
+        if reader.peek() != '^' {
             reader.set_cursor(start);
             return Err(mixed(reader));
         }

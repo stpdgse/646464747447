@@ -312,6 +312,85 @@ fn sample(node: &Node, rng: &mut Rng) -> Option<String> {
             rng.pick(&pool).clone()
         }
         Parser::Entity { .. } => Some(selector_sample(rng))?,
+        Parser::ScoreHolder { .. } => {
+            if rng.chance(40) {
+                selector_sample(rng)
+            } else {
+                pick_str(
+                    rng,
+                    &[
+                        "Steve",
+                        "*",
+                        "",
+                        "a b",
+                        "\"a b\"",
+                        "#fake",
+                        "12345678-1234-1234-1234-123456789abc",
+                        "Steve123456789012345678901",
+                    ],
+                )
+            }
+        }
+        Parser::Simple(id::OBJECTIVE | id::TEAM) => pick_str(
+            rng,
+            &[
+                "abc",
+                "a b",
+                "\"a b\"",
+                "",
+                "a.b",
+                "a:b",
+                "a-b_c+d",
+                "verylongobjectivenamethatisreallyverylongindeed",
+            ],
+        ),
+        Parser::Simple(id::GAME_PROFILE) => {
+            if rng.chance(50) {
+                selector_sample(rng)
+            } else {
+                pick_str(
+                    rng,
+                    &[
+                        "Steve",
+                        "",
+                        "Steve123456789012345678901",
+                        "12345678-1234-1234-1234-123456789abc",
+                        "a b",
+                    ],
+                )
+            }
+        }
+        Parser::Simple(id::UUID) => pick_str(
+            rng,
+            &[
+                "12345678-1234-1234-1234-123456789abc",
+                "x",
+                "",
+                "12345678123412341234123456789abc",
+                "1-2-3-4-5",
+                "12345678-1234-1234-1234-123456789abcdef",
+                "-----",
+            ],
+        ),
+        Parser::Simple(id::MESSAGE) => pick_str(
+            rng,
+            &[
+                "hello",
+                "@a",
+                "@x",
+                "@",
+                "hello @a world",
+                "@e[type=cow",
+                "hi @s[",
+                "@p[limit=2]",
+                "@a[limit=0]",
+                "x @e[type=nope] y",
+                "@@a",
+                "a@b",
+                "@a@e",
+            ],
+        ),
+        Parser::Simple(id::ANGLE) if false => unreachable!(),
         Parser::Simple(id::ANGLE) => {
             rng.pick(&["0", "90", "~", "~10", "-45.5", "x", "", "180f", "1e3"]).to_string()
         }
@@ -426,7 +505,7 @@ fn parsing_agrees_with_the_official_dispatcher() {
     let trees: Vec<Tree> = (0..5).map(Tree::for_level).collect();
     let mut rng = Rng(0x9E37_79B9_7F4A_7C15);
     let count: usize =
-        std::env::var("FERRITE_PARSE_CASES").ok().and_then(|v| v.parse().ok()).unwrap_or(4000);
+        std::env::var("FERRITE_PARSE_CASES").ok().and_then(|v| v.parse().ok()).unwrap_or(20000);
     let mut cases: Vec<(usize, String)> = Vec::new();
     while cases.len() < count {
         let level = match rng.below(10) {
