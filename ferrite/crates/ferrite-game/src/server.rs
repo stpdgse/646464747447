@@ -20,6 +20,7 @@ use ferrite_protocol::types::{Identifier, LenVec, Str, Text};
 use ferrite_world::{Chunk, ChunkPos};
 use uuid::Uuid;
 
+mod containers;
 mod survival;
 
 use crate::chunkenc::{encode_sections, full_bright_light, heightmaps};
@@ -198,6 +199,9 @@ struct Player {
     inv_state: i32,
     /// Dropped items this player has been told about.
     tracked_items: HashSet<i32>,
+    /// The container window the player has open, if any.
+    window: Option<containers::Window>,
+    next_window: u8,
 }
 
 /// The world's random source (splitmix64), for the few placements that roll dice.
@@ -223,6 +227,10 @@ struct Game {
     /// Encoded chunk packets, dropped when a block in the chunk changes.
     chunk_cache: HashMap<(i32, i32), Arc<Vec<u8>>>,
     players: HashMap<PlayerId, Player>,
+    /// Contents of chests and barrels, by position (27 slots each).
+    containers: HashMap<BlockPos, Vec<ItemStack>>,
+    /// How many players have each chest open.
+    viewers: HashMap<BlockPos, u8>,
     /// Dropped items.
     items: std::collections::BTreeMap<i32, crate::items::ItemEntity>,
     /// Join order, for stable iteration.
@@ -249,6 +257,8 @@ impl Game {
             world,
             chunk_cache: HashMap::new(),
             players: HashMap::new(),
+            containers: HashMap::new(),
+            viewers: HashMap::new(),
             items: std::collections::BTreeMap::new(),
             order: Vec::new(),
             next_entity: 1,
@@ -352,6 +362,8 @@ impl Game {
             dig: None,
             inv_state: 1,
             tracked_items: HashSet::new(),
+            window: None,
+            next_window: 0,
         };
         self.players.insert(id, player);
         self.order.push(id);
@@ -389,6 +401,9 @@ impl Game {
     }
 
     fn on_leave(&mut self, id: PlayerId) {
+        if self.players.get(&id).is_some_and(|p| p.window.is_some()) {
+            self.close_window(id);
+        }
         let Some(player) = self.players.remove(&id) else { return };
         self.order.retain(|o| *o != id);
         let gone = PlayerInfoRemove { uuids: LenVec(vec![player.uuid]) };
@@ -711,6 +726,13 @@ impl Game {
                 let p = decode!(ContainerClose);
                 if p.window_id.0 == 0 {
                     self.close_inventory(id);
+                } else if self
+                    .players
+                    .get(&id)
+                    .and_then(|pl| pl.window.as_ref())
+                    .is_some_and(|w| w.id == p.window_id.0)
+                {
+                    self.close_window(id);
                 }
             }
             PlayerAction::ID => {
@@ -794,6 +816,7 @@ impl Game {
                 if !self.in_reach(id, pos) || mode == 2 || mode == 3 {
                     self.resend_block(id, pos);
                 } else if mode == 1 {
+                    self.spill_container(pos);
                     self.world.destroy_block(pos);
                 } else {
                     self.start_dig(id, pos);
@@ -840,6 +863,10 @@ impl Game {
             // A block that reacts to a click (levers, buttons) takes it unless the player sneaks
             // with something in hand.
             let uses_block = !(sneaking && held.count > 0);
+            if uses_block && self.try_open_container(id, target) {
+                self.ack(id, u.sequence);
+                return;
+            }
             if uses_block && self.world.use_block(target) {
                 self.ack(id, u.sequence);
                 return;

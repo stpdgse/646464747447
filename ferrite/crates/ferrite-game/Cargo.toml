@@ -19,9 +19,9 @@ ferrite-world = { path = "../ferrite-world" }
 thiserror.workspace = true
 tracing = "0.1"
 uuid.workspace = true
+ferrite-nbt = { path = "../ferrite-nbt" }
 
 [dev-dependencies]
-ferrite-nbt = { path = "../ferrite-nbt" }
 ferrite-swarm = { path = "../ferrite-swarm" }
 tokio = { version = "1", features = ["full"] }
 

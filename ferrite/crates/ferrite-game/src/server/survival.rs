@@ -209,6 +209,7 @@ impl Game {
             };
             drops = ferrite_loot::block_drops(&ctx, &mut Dice(&mut self.rng));
         }
+        self.spill_container(pos);
         self.world.destroy_block(pos);
         for drop in drops {
             let Some(item) =
@@ -330,6 +331,22 @@ impl Game {
                     item: p.menu.slots[slot],
                 },
             );
+            // An open container window shows the same inventory: keep it in step.
+            if let Some(w) = p.window.as_mut()
+                && let Some(ws) = w.menu.window_slot_of(slot)
+            {
+                w.menu.slots[ws] = p.menu.slots[slot];
+                w.state = (w.state + 1) & 0x7FFF;
+                send(
+                    &p.sink,
+                    &ContainerSetSlot {
+                        window_id: VarInt(w.id),
+                        state_id: VarInt(w.state),
+                        slot: ws as i16,
+                        item: w.menu.slots[ws],
+                    },
+                );
+            }
         }
         let collector = p.entity_id;
         // Everyone who can see the item sees it fly to the collector.
@@ -500,7 +517,7 @@ impl Game {
     pub(super) fn on_container_click(&mut self, id: PlayerId, c: &ContainerClick) {
         use crate::inventory::Input;
         if c.window_id.0 != 0 {
-            return;
+            return self.window_click(id, c);
         }
         let Some(p) = self.players.get_mut(&id) else { return };
         let (Some(input), true) = (Input::from_id(c.click_type.0), p.game_mode != 3) else {

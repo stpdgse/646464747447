@@ -15,6 +15,7 @@
 //!           ground                                 report standing on the ground (the server
 //!                                                  counts a client that never moved as airborne)
 //!           click <slot> <button> <type>           send an inventory click claiming no changes
+//!           close                                  close the open window
 //!           dump                                   print the inventory this client believes in
 //!           quit
 //!   stdout: ready                                  joined and the first chunks have arrived
@@ -29,9 +30,9 @@ use std::time::Duration;
 use clap::Parser;
 use ferrite_protocol::codec::VarInt;
 use ferrite_protocol::packets::play::{
-    BlockChangedAck, ContainerClick, ContainerSetContent, ContainerSetSlot, HashedStack, ItemStack,
-    MovePlayerStatusOnly, PackedPos, PlayerAction, SetCreativeModeSlot, SetCursorItem,
-    SetPlayerInventory, UseItemOn,
+    BlockChangedAck, ContainerClick, ContainerClose, ContainerSetContent, ContainerSetSlot,
+    HashedStack, ItemStack, MovePlayerStatusOnly, OpenScreen, PackedPos, PlayerAction,
+    SetCreativeModeSlot, SetCursorItem, SetPlayerInventory, UseItemOn,
 };
 use ferrite_swarm::PlayBot;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -59,7 +60,8 @@ async fn main() -> anyhow::Result<()> {
     println!("ready");
     let mut teleports = 0u32;
     // The inventory as the server last told this client.
-    let mut slots = [ItemStack::default(); 46];
+    let mut slots = vec![ItemStack::default(); 46];
+    let mut win = 0i32;
     let mut carried = ItemStack::default();
     let mut state_id = 0i32;
     let mut stdin = BufReader::new(tokio::io::stdin()).lines();
@@ -125,7 +127,7 @@ async fn main() -> anyhow::Result<()> {
                     }
                     ["click", slot, button, kind] => {
                         bot.send(&ContainerClick {
-                            window_id: VarInt(0),
+                            window_id: VarInt(win),
                             state_id: VarInt(state_id),
                             slot: slot.parse()?,
                             button: button.parse()?,
@@ -137,6 +139,9 @@ async fn main() -> anyhow::Result<()> {
                         // The client claimed an empty cursor; the server only corrects it if
                         // the cursor really is not empty.
                         carried = ItemStack::default();
+                    }
+                    ["close"] => {
+                        bot.send(&ContainerClose { window_id: VarInt(win) }).await?;
                     }
                     ["dump"] => {
                         let show = |s: &ItemStack| {
@@ -160,19 +165,22 @@ async fn main() -> anyhow::Result<()> {
                         eprintln!("pkt {} {:?}", p.name, p.body);
                     }
                     match p.name {
+                        "open_screen" => {
+                            let o: OpenScreen = ferrite_protocol::codec::decode_exact(&p.body)?;
+                            win = o.container_id.0;
+                        }
+                        "container_close" => win = 0,
                         "container_set_content" => {
                             let c: ContainerSetContent = ferrite_protocol::codec::decode_exact(&p.body)?;
-                            if c.window_id.0 == 0 {
-                                for (i, it) in c.items.0.iter().enumerate().take(46) {
-                                    slots[i] = *it;
-                                }
+                            if c.window_id.0 == win {
+                                slots = c.items.0.clone();
                                 carried = c.carried;
                                 state_id = c.state_id.0;
                             }
                         }
                         "container_set_slot" => {
                             let c: ContainerSetSlot = ferrite_protocol::codec::decode_exact(&p.body)?;
-                            if c.window_id.0 == 0 && (0..46).contains(&c.slot) {
+                            if c.window_id.0 == win && (0..slots.len() as i16).contains(&c.slot) {
                                 slots[c.slot as usize] = c.item;
                                 state_id = c.state_id.0;
                             }

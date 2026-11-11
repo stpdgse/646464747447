@@ -149,6 +149,17 @@ impl Menu {
         m
     }
 
+    /// The slot in this window that shows the player's inventory slot `player_slot` (window-0
+    /// numbering), if it shows it.
+    pub fn window_slot_of(&self, player_slot: usize) -> Option<usize> {
+        let g = self.geo();
+        match player_slot {
+            9..=35 => Some(g.main.start + player_slot - 9),
+            36..=44 => Some(g.hotbar.start + player_slot - 36),
+            _ => None,
+        }
+    }
+
     /// Writes the player's own slots back after clicks in an opened window.
     pub fn write_back(&self, player: &mut Menu) {
         let (g, pg) = (self.geo(), player.geo());
@@ -417,7 +428,9 @@ impl Menu {
                 if g.grid.contains(&slot) {
                     self.move_to(&mut stack, g.main.start, inventory_end, false)
                 } else {
-                    self.move_main_hotbar(&mut stack, slot)
+                    // Items from the inventory go into the crafting grid first.
+                    self.move_to(&mut stack, g.grid.start, g.grid.end, false)
+                        || self.move_main_hotbar(&mut stack, slot)
                 }
             }
             Layout::Player => {

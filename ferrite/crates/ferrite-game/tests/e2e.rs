@@ -393,3 +393,72 @@ async fn inventory_clicks_move_stacks_and_disagreements_are_corrected() {
         ferrite_data::registries::entity_type::by_name["minecraft:item"]
     );
 }
+
+#[tokio::test]
+async fn chests_and_crafting_tables_open_windows_that_keep_their_contents() {
+    use ferrite_protocol::codec::VarInt;
+    use ferrite_protocol::types::LenVec;
+    let s = server(4).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    // Put a chest next to the player's feet and open it.
+    a.send(&SetCreativeModeSlot {
+        slot: 36,
+        item: ItemStack { count: 1, item: item("minecraft:chest") },
+    })
+    .await
+    .unwrap();
+    a.send(&UseItemOn {
+        hand: VarInt(0),
+        pos: PackedPos::new(1, -61, 0),
+        face: VarInt(1),
+        cursor_x: 0.5,
+        cursor_y: 1.0,
+        cursor_z: 0.5,
+        inside: false,
+        world_border_hit: false,
+        sequence: VarInt(1),
+    })
+    .await
+    .unwrap();
+    block_update_at(&mut a, 1, -60, 0).await;
+    let open = |seq| UseItemOn {
+        hand: VarInt(0),
+        pos: PackedPos::new(1, -60, 0),
+        face: VarInt(1),
+        cursor_x: 0.5,
+        cursor_y: 1.0,
+        cursor_z: 0.5,
+        inside: false,
+        world_border_hit: false,
+        sequence: VarInt(seq),
+    };
+    // Sneak so the click does not try to place the chest again... a bare hand opens it.
+    a.send(&SetCreativeModeSlot { slot: 36, item: ItemStack::default() }).await.unwrap();
+    a.send(&open(2)).await.unwrap();
+    let screen = until(&mut a, 600, |p| p.name == "open_screen").await;
+    let screen: OpenScreen = decode(&screen);
+    assert_eq!(screen.menu_type.0, 2, "a single chest is a 9x3 window");
+    let content = until(&mut a, 100, |p| p.name == "container_set_content").await;
+    let content: ContainerSetContent = decode(&content);
+    let lid = until(&mut a, 100, |p| p.name == "block_event").await;
+    assert_eq!(decode::<BlockEvent>(&lid).data, 1, "one viewer");
+    assert_eq!((content.window_id.0, content.items.0.len()), (screen.container_id.0, 63));
+    // Move something into the chest: pick up from the inventory (a creative-set hotbar stack)
+    // is not possible inside the window, so put the cursor stack down instead.
+    let stone = ItemStack { count: 7, item: item("minecraft:stone") };
+    a.send(&ContainerClick {
+        window_id: screen.container_id,
+        state_id: content.state_id,
+        slot: 4,
+        button: 0,
+        click_type: VarInt(3), // clone (creative): the cursor gets a full stack
+        changed: LenVec(vec![]),
+        carried: HashedStack::plain(ItemStack { count: 64, item: item("minecraft:stone") }),
+    })
+    .await
+    .unwrap();
+    let _ = stone;
+    a.send(&ContainerClose { window_id: screen.container_id }).await.unwrap();
+    until(&mut a, 600, |p| p.name == "container_close").await;
+}

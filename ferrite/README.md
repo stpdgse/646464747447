@@ -492,7 +492,14 @@ shapeless ones need a one-to-one assignment. About 520 grids recorded from the o
 crafting table window, remainders (a bucket left over), special recipes (banners, fireworks,
 repair), smelting.
 
-**Not yet:** the crafting table and furnace windows, damage, hunger, item components, the
+Container windows work for crafting tables, chests (single and double, with the lid opening and
+closing as players look inside) and barrels: the window opens over the player's inventory, clicks
+are applied by the server, the contents persist per position and spill out when the block is
+broken, and closing returns the cursor stack and crafting grid to the inventory. 1,290 clicks
+recorded inside such windows on the official server replay identically (this found that
+shift-clicking in a crafting table fills the grid first). Contents are not saved to disk yet.
+
+**Not yet:** furnace, anvil and the other windows, ender chests and shulker boxes, damage, hunger, item components, the
 inventory beyond the hotbar being synchronised from the client, signed chat, commands, persistence of changes, lighting,
 and the io_uring backend's play state.
 

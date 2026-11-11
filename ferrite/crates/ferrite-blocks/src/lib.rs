@@ -24,7 +24,7 @@ pub mod ticks;
 mod wall;
 mod world;
 
-pub use kinds::{Behaviour, Kinds, Piston, Redstone};
+pub use kinds::{Behaviour, Kinds, Piston, Redstone, block_id_of as kinds_block_id};
 pub use level::{BlockAccess, Chunks};
 pub use placement::{Formula, PlaceContext, horizontal_direction, looking_directions};
 pub use pos::{BlockPos, Direction};

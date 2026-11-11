@@ -801,6 +801,26 @@ packet! {
         item: ItemStack,
     }
 
+    /// Opens an inventory window on the client. `menu_type` is the id in the `menu` registry.
+    OpenScreen in Play Clientbound = play::clientbound::OPEN_SCREEN "open_screen" {
+        container_id: VarInt,
+        menu_type: VarInt,
+        title: Text,
+    }
+
+    /// The server closes a window (the same packet name exists serverbound, with another id).
+    CloseContainer in Play Clientbound = play::clientbound::CONTAINER_CLOSE "container_close" {
+        container_id: VarInt,
+    }
+
+    /// A block's animation or state event (chest lids, pistons, bells, note blocks).
+    BlockEvent in Play Clientbound = play::clientbound::BLOCK_EVENT "block_event" {
+        pos: PackedPos,
+        kind: u8,
+        data: u8,
+        block: VarInt,
+    }
+
     /// The stack on the cursor.
     SetCursorItem in Play Clientbound = play::clientbound::SET_CURSOR_ITEM "set_cursor_item" {
         item: ItemStack,
