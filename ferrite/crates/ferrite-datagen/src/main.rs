@@ -19,6 +19,7 @@ mod meta;
 mod packets;
 mod registries;
 mod shapes;
+mod timelines;
 mod util;
 
 use std::path::{Path, PathBuf};
@@ -92,6 +93,7 @@ fn main() -> Result<()> {
         ("registries.rs", registries::generate(&cx, &regs)?),
         ("blocks.rs", blocks::generate(&cx, &regs)?),
         ("shapes.rs", shapes::generate(&cx)?),
+        ("timelines.rs", timelines::generate(&cx)?),
         ("items.rs", items::generate(&cx, &regs)?),
         ("commands.rs", commands::generate(&cx)?),
         ("entities.rs", entities::generate(&cx)?),
@@ -120,7 +122,7 @@ fn main() -> Result<()> {
 
 fn mod_rs(cx: &GenContext) -> String {
     format!(
-        "{}\npub mod blocks;\npub mod commands;\npub mod configuration;\npub mod entities;\npub mod items;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\n",
+        "{}\npub mod blocks;\npub mod commands;\npub mod configuration;\npub mod entities;\npub mod items;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\npub mod timelines;\n",
         cx.header
     )
 }

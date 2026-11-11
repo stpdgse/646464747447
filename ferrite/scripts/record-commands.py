@@ -13,7 +13,7 @@ Needs the local vanilla server (offline, RCON). Local oracle testing only.
 """
 import argparse, os, subprocess, sys, time
 
-WATCH = "player_abilities,game_event,player_info_update,change_difficulty,set_experience,set_health"
+WATCH = "ticking_state,ticking_step,set_time,player_abilities,game_event,player_info_update,change_difficulty,set_experience,set_health"
 sys.path.insert(0, os.path.dirname(__file__))
 
 
@@ -75,6 +75,13 @@ def main():
         # Every scenario starts from the same state: survival mode, peaceful difficulty.
         r.cmd(f"gamemode survival {args.name}")
         r.cmd("difficulty peaceful")
+        r.cmd("time of minecraft:overworld rate 1")
+        r.cmd("time of minecraft:overworld resume")
+        r.cmd("time of minecraft:the_end rate 1")
+        r.cmd("time of minecraft:the_end resume")
+        r.cmd("tick rate 20")
+        r.cmd("tick step stop")
+        r.cmd("tick freeze")
         time.sleep(0.4)
         out.write(f"\nscenario {name}\n")
         # Drain what the join left (until the first mark).
@@ -83,8 +90,12 @@ def main():
             pass
         for line in lines:
             if line.startswith("rcon "):
-                r.cmd(line[5:]); time.sleep(0.2)
+                r.cmd(line[5:]); time.sleep(0.3)
                 out.write(f"rcon {line[5:]}\n")
+                # Its broadcast to the operator is not part of what comes next.
+                bot.stdin.write("mark\n"); bot.stdin.flush()
+                while bot.stdout.readline().strip() != "mark":
+                    pass
                 continue
             bot.stdin.write(f"cmd {line}\n"); bot.stdin.flush()
             time.sleep(0.5)
@@ -100,6 +111,12 @@ def main():
                 # (A list-order update arrives some time after joining; it is not about the command.)
                 if got.startswith("evt player_info_update 10"):
                     continue
+                # (The time sync every 20 ticks carries no clock update; it is not about the command.)
+                if got.startswith("evt set_time ") and got.endswith("00") and len(got.split()[-1]) == 18:
+                    continue
+                # (The game time at the front of a time packet depends on how old the world is.)
+                if got.startswith("evt set_time "):
+                    got = "evt set_time " + got.split()[2][16:]
                 if got.startswith(("sys ", "evt ")):
                     out.write(got + "\n")
         bot.stdin.write("quit\n"); bot.stdin.flush()

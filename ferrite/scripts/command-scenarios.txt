@@ -1,5 +1,7 @@
 # Command scenarios: each `scenario` rejoins; lines are commands run by an operator.
 scenario errors
+rcon tick freeze
+rcon time set 54
 nonsense
 gamemode
 gamemode foo
@@ -31,3 +33,77 @@ difficulty easy
 scenario list
 list
 list uuids
+
+scenario time
+rcon tick freeze
+rcon time set 123
+rcon time of minecraft:the_end set 77
+time query time
+time set noon
+time query time
+time set noon
+time query time
+time set day
+time query time
+time set 1000
+time set 1000
+time set night
+time query time
+time set midnight
+time query time
+time set 0
+time set 0
+time set 24000
+time query time
+time set minecraft:wake_up_from_sleep
+time query time
+time set roll_village_siege
+time query time
+time of minecraft:the_end query time
+time of minecraft:the_end set noon
+time of minecraft:the_end add 5
+time of minecraft:the_end pause
+time of minecraft:the_end resume
+time of minecraft:the_end rate 3
+time query minecraft:moon
+time query minecraft:moon repetition
+time query minecraft:early_game
+time query minecraft:villager_schedule
+time query minecraft:day
+time add 100000
+time query minecraft:day
+time query minecraft:day repetition
+time of foo query time
+time of minecraft:overworld rate 0
+time of minecraft:overworld rate -1
+time of minecraft:overworld rate 100000
+time of minecraft:overworld rate 0.001
+time add 0
+time set -5
+time set abc
+time pause
+time pause
+time resume
+time resume
+time rate 2
+time rate 1
+time add 2147483647
+time query time
+
+scenario tick
+rcon tick freeze
+tick unfreeze
+tick rate 40
+tick rate 20
+tick freeze
+tick freeze
+tick step
+tick step 3
+tick step stop
+tick unfreeze
+tick sprint stop
+tick rate 0.5
+tick rate 10000
+tick rate 1
+tick rate 20.0
+tick freeze

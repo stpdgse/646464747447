@@ -1,6 +1,8 @@
 # Recorded from the official server by scripts/record-commands.py
 
 scenario errors
+rcon tick freeze
+rcon time set 54
 > nonsense
 sys {color:"red",extra:[{translate:"command.unknown.command"}],text:""} 0
 sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/nonsense"},color:"gray",extra:[{color:"red",text:"nonsense",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
@@ -14,6 +16,7 @@ sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/gamemod
 sys {color:"red",extra:[{translate:"command.unknown.argument"}],text:""} 0
 sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/gamemode creative extra extra"},color:"gray",extra:[{"":"..."},{"":"ive extra "},{color:"red",text:"extra",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
 > time set abc
+evt set_time 010036000000003f800000
 sys {color:"red",extra:[{translate:"commands.time.no_time_marker_found",with:["minecraft:abc","minecraft:overworld"]}],text:""} 0
 > say
 sys {color:"red",extra:[{translate:"command.unknown.command"}],text:""} 0
@@ -99,3 +102,185 @@ scenario list
 sys {translate:"commands.list.players",with:[{"":1},{"":4},{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}]} 0
 > list uuids
 sys {translate:"commands.list.players",with:[{"":1},{"":4},{translate:"commands.list.nameAndId",with:["InteractBot","6a88f3a4-7cc9-30ca-a106-0367fa2a73c4"]}]} 0
+
+scenario time
+rcon tick freeze
+rcon time set 123
+rcon time of minecraft:the_end set 77
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":123L}]} 0
+> time set noon
+evt set_time 0100f02e000000003f800000
+sys {translate:"commands.time.set.time_marker",with:["minecraft:overworld","minecraft:noon"]} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":6000L}]} 0
+> time set noon
+evt set_time 0100f02e000000003f800000
+sys {color:"red",extra:[{translate:"commands.time.set.already_at_time_marker",with:["minecraft:overworld","minecraft:noon"]}],text:""} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":6000L}]} 0
+> time set day
+evt set_time 0100a8c301000000003f800000
+sys {translate:"commands.time.set.time_marker",with:["minecraft:overworld","minecraft:day"]} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":25000L}]} 0
+> time set 1000
+evt set_time 0100e807000000003f800000
+sys {translate:"commands.time.set.absolute",with:[{"":"minecraft:overworld"},{"":1000}]} 0
+> time set 1000
+sys {color:"red",extra:[{translate:"commands.time.set.already_at_time",with:[{"":"minecraft:overworld"},{"":1000}]}],text:""} 0
+> time set night
+evt set_time 0100c865000000003f800000
+sys {translate:"commands.time.set.time_marker",with:["minecraft:overworld","minecraft:night"]} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":13000L}]} 0
+> time set midnight
+evt set_time 0100d08c01000000003f800000
+sys {translate:"commands.time.set.time_marker",with:["minecraft:overworld","minecraft:midnight"]} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":18000L}]} 0
+> time set 0
+evt set_time 010000000000003f800000
+sys {translate:"commands.time.set.absolute",with:[{"":"minecraft:overworld"},{"":0}]} 0
+> time set 0
+sys {color:"red",extra:[{translate:"commands.time.set.already_at_time",with:[{"":"minecraft:overworld"},{"":0}]}],text:""} 0
+> time set 24000
+evt set_time 0100c0bb01000000003f800000
+sys {translate:"commands.time.set.absolute",with:[{"":"minecraft:overworld"},{"":24000}]} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":24000L}]} 0
+> time set minecraft:wake_up_from_sleep
+evt set_time 0100c0bb01000000003f800000
+sys {color:"red",extra:[{translate:"commands.time.set.already_at_time_marker",with:["minecraft:overworld","minecraft:wake_up_from_sleep"]}],text:""} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":24000L}]} 0
+> time set roll_village_siege
+evt set_time 010090c802000000003f800000
+sys {translate:"commands.time.set.time_marker",with:["minecraft:overworld","minecraft:roll_village_siege"]} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":42000L}]} 0
+> time of minecraft:the_end query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:the_end"},{"":77L}]} 0
+> time of minecraft:the_end set noon
+evt set_time 01014d000000003f800000
+sys {color:"red",extra:[{translate:"commands.time.no_time_marker_found",with:["minecraft:noon","minecraft:the_end"]}],text:""} 0
+> time of minecraft:the_end add 5
+evt set_time 010152000000003f800000
+sys {translate:"commands.time.set.absolute",with:[{"":"minecraft:the_end"},{"":82L}]} 0
+> time of minecraft:the_end pause
+evt set_time 0101520000000000000000
+sys {translate:"commands.time.pause",with:["minecraft:the_end"]} 0
+> time of minecraft:the_end resume
+evt set_time 010152000000003f800000
+sys {translate:"commands.time.resume",with:["minecraft:the_end"]} 0
+> time of minecraft:the_end rate 3
+evt set_time 0101520000000040400000
+sys {translate:"commands.time.rate",with:[{"":"minecraft:the_end"},{"":3.0f}]} 0
+> time query minecraft:moon
+sys {translate:"commands.time.query.timeline",with:[{"":"minecraft:moon"},{"":42000L}]} 0
+> time query minecraft:moon repetition
+sys {translate:"commands.time.query.timeline.repetitions",with:[{"":"minecraft:moon"},{"":0L}]} 0
+> time query minecraft:early_game
+sys {translate:"commands.time.query.timeline",with:[{"":"minecraft:early_game"},{"":42000L}]} 0
+> time query minecraft:villager_schedule
+sys {translate:"commands.time.query.timeline",with:[{"":"minecraft:villager_schedule"},{"":18000L}]} 0
+> time query minecraft:day
+sys {translate:"commands.time.query.timeline",with:[{"":"minecraft:day"},{"":18000L}]} 0
+> time add 100000
+evt set_time 0100b0d508000000003f800000
+sys {translate:"commands.time.set.absolute",with:[{"":"minecraft:overworld"},{"":142000L}]} 0
+> time query minecraft:day
+sys {translate:"commands.time.query.timeline",with:[{"":"minecraft:day"},{"":22000L}]} 0
+> time query minecraft:day repetition
+sys {translate:"commands.time.query.timeline.repetitions",with:[{"":"minecraft:day"},{"":5L}]} 0
+> time of foo query time
+sys {color:"red",extra:[{translate:"argument.resource.not_found",with:["minecraft:foo","minecraft:world_clock"]}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/time of foo query time"},color:"gray",extra:[{"":"..."},{"":"ime of foo"},{color:"red",text:" query time",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> time of minecraft:overworld rate 0
+sys {color:"red",extra:[{translate:"argument.float.low",with:[9.999999747378752e-6f,0.0f]}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/time of minecraft:overworld rate 0"},color:"gray",extra:[{"":"..."},{"":"orld rate "},{color:"red",text:"0",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> time of minecraft:overworld rate -1
+sys {color:"red",extra:[{translate:"argument.float.low",with:[9.999999747378752e-6f,-1.0f]}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/time of minecraft:overworld rate -1"},color:"gray",extra:[{"":"..."},{"":"orld rate "},{color:"red",text:"-1",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> time of minecraft:overworld rate 100000
+sys {color:"red",extra:[{translate:"argument.float.big",with:[1000.0f,100000.0f]}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/time of minecraft:overworld rate 100000"},color:"gray",extra:[{"":"..."},{"":"orld rate "},{color:"red",text:"100000",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> time of minecraft:overworld rate 0.001
+evt set_time 0100b0d508000000003a83126f
+sys {translate:"commands.time.rate",with:[{"":"minecraft:overworld"},{"":0.0010000000474974513f}]} 0
+> time add 0
+evt set_time 0100b0d508000000003a83126f
+sys {translate:"commands.time.set.absolute",with:[{"":"minecraft:overworld"},{"":142000L}]} 0
+> time set -5
+evt set_time 0100b0d508000000003a83126f
+sys {color:"red",extra:[{translate:"commands.time.no_time_marker_found",with:["minecraft:-5","minecraft:overworld"]}],text:""} 0
+> time set abc
+evt set_time 0100b0d508000000003a83126f
+sys {color:"red",extra:[{translate:"commands.time.no_time_marker_found",with:["minecraft:abc","minecraft:overworld"]}],text:""} 0
+> time pause
+evt set_time 0100b0d5080000000000000000
+sys {translate:"commands.time.pause",with:["minecraft:overworld"]} 0
+> time pause
+sys {color:"red",extra:[{translate:"commands.time.pause.already_paused",with:["minecraft:overworld"]}],text:""} 0
+> time resume
+evt set_time 0100b0d508000000003a83126f
+sys {translate:"commands.time.resume",with:["minecraft:overworld"]} 0
+> time resume
+sys {color:"red",extra:[{translate:"commands.time.pause.already_running",with:["minecraft:overworld"]}],text:""} 0
+> time rate 2
+evt set_time 0100b0d5080000000040000000
+sys {translate:"commands.time.rate",with:[{"":"minecraft:overworld"},{"":2.0f}]} 0
+> time rate 1
+evt set_time 0100b0d508000000003f800000
+sys {translate:"commands.time.rate",with:[{"":"minecraft:overworld"},{"":1.0f}]} 0
+> time add 2147483647
+evt set_time 0100afd5888008000000003f800000
+sys {translate:"commands.time.set.absolute",with:[{"":"minecraft:overworld"},{"":2147625647L}]} 0
+> time query time
+sys {translate:"commands.time.query.absolute",with:[{"":"minecraft:overworld"},{"":2147625647L}]} 0
+
+scenario tick
+rcon tick freeze
+> tick unfreeze
+evt ticking_state 41a0000000
+sys {translate:"commands.tick.status.running"} 0
+> tick rate 40
+evt ticking_state 4220000000
+sys {translate:"commands.tick.rate.success",with:["40.0"]} 0
+> tick rate 20
+evt ticking_state 41a0000000
+sys {translate:"commands.tick.rate.success",with:["20.0"]} 0
+> tick freeze
+evt ticking_state 41a0000001
+sys {translate:"commands.tick.status.frozen"} 0
+> tick freeze
+evt ticking_state 41a0000001
+sys {translate:"commands.tick.status.frozen"} 0
+> tick step
+evt ticking_step 01
+sys {translate:"commands.tick.step.success",with:[1]} 0
+> tick step 3
+evt ticking_step 03
+sys {translate:"commands.tick.step.success",with:[3]} 0
+> tick step stop
+sys {color:"red",extra:[{translate:"commands.tick.step.stop.fail"}],text:""} 0
+> tick unfreeze
+evt ticking_state 41a0000000
+sys {translate:"commands.tick.status.running"} 0
+> tick sprint stop
+sys {color:"red",extra:[{translate:"commands.tick.sprint.stop.fail"}],text:""} 0
+> tick rate 0.5
+sys {color:"red",extra:[{translate:"argument.float.low",with:[1.0f,0.5f]}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/tick rate 0.5"},color:"gray",extra:[{"":"tick rate "},{color:"red",text:"0.5",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> tick rate 10000
+evt ticking_state 461c400000
+sys {translate:"commands.tick.rate.success",with:["10000.0"]} 0
+> tick rate 1
+evt ticking_state 3f80000000
+sys {translate:"commands.tick.rate.success",with:["1.0"]} 0
+> tick rate 20.0
+evt ticking_state 41a0000000
+sys {translate:"commands.tick.rate.success",with:["20.0"]} 0
+> tick freeze
+evt ticking_state 41a0000001
+sys {translate:"commands.tick.status.frozen"} 0

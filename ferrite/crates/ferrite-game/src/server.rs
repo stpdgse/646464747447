@@ -33,7 +33,6 @@ use crate::mobs::Rng;
 use crate::synchronized_id;
 
 pub const TICKS_PER_SECOND: u64 = 20;
-const TICK: Duration = Duration::from_millis(1000 / TICKS_PER_SECOND);
 /// Ticks between autosaves (every 30 seconds).
 const SAVE_EVERY: u64 = 30 * TICKS_PER_SECOND;
 const KEEP_ALIVE_EVERY: u64 = 15 * TICKS_PER_SECOND;
@@ -291,6 +290,39 @@ struct Game {
     tick: u64,
     /// The difficulty: 0 peaceful, 1 easy, 2 normal, 3 hard.
     difficulty: u8,
+    /// How fast the game ticks and whether it is paused, stepping or sprinting.
+    ticking: Ticking,
+    /// The world clocks (one per `world_clock` registry entry).
+    clocks: Vec<Clock>,
+}
+
+/// A world clock: what `/time` sets and the day and night follow.
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct Clock {
+    total_ticks: i64,
+    partial_tick: f32,
+    rate: f32,
+    paused: bool,
+}
+
+/// The tick rate manager: `/tick`.
+#[derive(Debug)]
+struct Ticking {
+    /// Ticks per second.
+    rate: f32,
+    frozen: bool,
+    /// Ticks still to run while frozen (`/tick step`).
+    steps: u32,
+    /// Ticks still to run at full speed (`/tick sprint`), and when it began.
+    sprint: Option<(u32, u32, Instant)>,
+    /// How long the last ticks took, in milliseconds (a ring of 100).
+    durations: Vec<f64>,
+}
+
+impl Ticking {
+    fn new() -> Ticking {
+        Ticking { rate: 20.0, frozen: false, steps: 0, sprint: None, durations: Vec::new() }
+    }
 }
 
 fn send<P: Packet>(sink: &PlayerSink, packet: &P) {
@@ -314,8 +346,9 @@ impl Game {
                     None
                 }
             });
-        if let Some(t) = persist.as_ref().and_then(|p| p.load_time().ok().flatten()) {
-            world.set_time(t);
+        let level = persist.as_ref().and_then(|p| p.load_level().ok().flatten());
+        if let Some(l) = &level {
+            world.set_time(l.game_time);
         }
         let mut restored = std::collections::BTreeMap::new();
         let mut next_entity = 1;
@@ -327,7 +360,34 @@ impl Game {
             restored.insert(next_entity, e);
             next_entity += 1;
         }
-        let difficulty = cfg.difficulty;
+        let difficulty = level.as_ref().map_or(cfg.difficulty, |l| l.difficulty);
+        let mut ticking = Ticking::new();
+        if let Some(l) = &level {
+            ticking.rate = l.tick_rate;
+            ticking.frozen = l.frozen;
+        }
+        let mut clocks = vec![
+            Clock { total_ticks: 0, partial_tick: 0.0, rate: 1.0, paused: false };
+            ferrite_data::configuration::SYNCHRONIZED_REGISTRIES
+                .iter()
+                .find(|r| r.id == "minecraft:world_clock")
+                .map_or(1, |r| r.entries.len())
+        ];
+        match &level {
+            Some(l) if !l.clocks.is_empty() => {
+                for (c, saved) in clocks.iter_mut().zip(&l.clocks) {
+                    *c = Clock {
+                        total_ticks: saved.0,
+                        partial_tick: saved.1,
+                        rate: saved.2,
+                        paused: saved.3,
+                    };
+                }
+            }
+            // A world from before clocks existed: they have run as long as the game.
+            Some(l) => clocks.iter_mut().for_each(|c| c.total_ticks = l.game_time),
+            None => {}
+        }
         Game {
             cfg,
             rng: 0x2545_F491_4F6C_DD1D,
@@ -346,6 +406,8 @@ impl Game {
             next_entity,
             tick: 0,
             difficulty,
+            ticking,
+            clocks,
         }
     }
 
@@ -355,14 +417,41 @@ impl Game {
             while let Ok(event) = self.rx.try_recv() {
                 self.on_event(event);
             }
-            self.tick();
-            next += TICK;
+            let started = Instant::now();
+            let run_world = !self.ticking.frozen || self.ticking.steps > 0;
+            self.tick(run_world);
+            if self.ticking.frozen && self.ticking.steps > 0 {
+                self.ticking.steps -= 1;
+            }
+            self.finish_sprint_if_done();
+            let took = started.elapsed().as_secs_f64() * 1000.0;
+            let d = &mut self.ticking.durations;
+            if d.len() >= 100 {
+                d.remove(0);
+            }
+            d.push(took);
+            // Sprinting runs ticks back to back; otherwise a tick lasts 1/rate seconds.
+            if self.ticking.sprint.is_some() {
+                next = Instant::now();
+                continue;
+            }
+            next += Duration::from_secs_f64(1.0 / f64::from(self.ticking.rate.max(0.001)));
             let now = Instant::now();
-            if next > now {
-                std::thread::sleep(next - now);
-            } else if now - next > Duration::from_secs(1) {
+            if now > next && now - next > Duration::from_secs(1) {
                 // Far behind (a stall): skip the backlog instead of racing to catch up.
                 next = now;
+            }
+            // Wait for the next tick, handling what players send as it arrives.
+            while !stop.load(Ordering::Relaxed) {
+                let now = Instant::now();
+                if now >= next {
+                    break;
+                }
+                match self.rx.recv_timeout((next - now).min(Duration::from_millis(50))) {
+                    Ok(event) => self.on_event(event),
+                    Err(mpsc::RecvTimeoutError::Timeout) => {}
+                    Err(mpsc::RecvTimeoutError::Disconnected) => std::thread::sleep(next - now),
+                }
             }
         }
         self.save_all();
@@ -677,20 +766,57 @@ impl Game {
     }
 
     fn time_packet(&self) -> SetTime {
-        let t = self.world.time();
         SetTime {
-            game_time: t,
+            game_time: self.world.time(),
             clock_updates: LenVec(
-                [0, 1]
+                self.clocks
                     .iter()
-                    .map(|c| ClockUpdate {
-                        clock: VarInt(*c),
-                        total_ticks: VarLong(t),
-                        partial_tick: 0.0,
-                        rate: 1.0,
+                    .enumerate()
+                    .map(|(i, c)| ClockUpdate {
+                        clock: VarInt(i as i32),
+                        total_ticks: VarLong(c.total_ticks),
+                        partial_tick: c.partial_tick,
+                        rate: if c.paused { 0.0 } else { c.rate },
                     })
                     .collect(),
             ),
+        }
+    }
+
+    /// Advances the clocks by one tick.
+    fn tick_clocks(&mut self) {
+        for c in &mut self.clocks {
+            if c.paused {
+                continue;
+            }
+            c.partial_tick += c.rate;
+            let whole = c.partial_tick.floor();
+            c.total_ticks += whole as i64;
+            c.partial_tick -= whole;
+        }
+    }
+
+    /// Tells every player the clock `index` changed.
+    fn broadcast_clock(&self, index: usize) {
+        let c = self.clocks[index];
+        let packet = SetTime {
+            game_time: self.world.time(),
+            clock_updates: LenVec(vec![ClockUpdate {
+                clock: VarInt(index as i32),
+                total_ticks: VarLong(c.total_ticks),
+                partial_tick: c.partial_tick,
+                rate: if c.paused { 0.0 } else { c.rate },
+            }]),
+        };
+        for p in self.players.values() {
+            send(&p.sink, &packet);
+        }
+    }
+
+    fn broadcast_ticking_state(&self) {
+        let packet = TickingState { tick_rate: self.ticking.rate, frozen: self.ticking.frozen };
+        for p in self.players.values() {
+            send(&p.sink, &packet);
         }
     }
 
@@ -1229,16 +1355,21 @@ impl Game {
 
     // ---- ticking --------------------------------------------------------------------------
 
-    fn tick(&mut self) {
+    fn tick(&mut self, run_world: bool) {
         self.tick += 1;
-        self.world.tick();
-        self.tick_vitals();
-        self.tick_attack_cooldowns();
-        self.tick_digging();
-        self.broadcast_block_changes();
-        self.tick_items();
-        self.tick_mobs();
-        self.tick_furnaces();
+        if run_world {
+            self.world.tick();
+            self.tick_clocks();
+            self.tick_vitals();
+            self.tick_attack_cooldowns();
+            self.tick_digging();
+            self.broadcast_block_changes();
+            self.tick_items();
+            self.tick_mobs();
+            self.tick_furnaces();
+        } else {
+            self.broadcast_block_changes();
+        }
         if self.tick.is_multiple_of(SAVE_EVERY) {
             self.save_all();
         }
@@ -1255,8 +1386,9 @@ impl Game {
                 send(&p.sink, &BlockChangedAck { sequence: VarInt(sequence) });
             }
         }
-        if self.tick.is_multiple_of(20) {
-            let t = self.time_packet();
+        if self.tick.is_multiple_of(20) && run_world {
+            // Clients follow the clocks by themselves; the sync only carries the game time.
+            let t = SetTime { game_time: self.world.time(), clock_updates: LenVec(Vec::new()) };
             for p in self.players.values() {
                 send(&p.sink, &t);
             }

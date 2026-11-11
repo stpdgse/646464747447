@@ -603,3 +603,30 @@ server and are checked against it:
 
 Not done yet: experience goes straight to the player instead of through orbs (there are no orb entities
 yet), a furnace's light and smoke, hoppers feeding furnaces, and the recipe book.
+
+## Commands
+
+Players send commands as `/gamemode creative` and the server answers like the official one, down to
+the exact text components:
+
+- **The command tree** is the official server's, dumped from the jar per permission level
+  (`CommandDump.java`); it reaches the client byte for byte and round-trips through `ferrite-commands`.
+- **Parsing** is a port of Brigadier and of Minecraft's argument types (numbers, strings, coordinates,
+  entity selectors with all their options, ranges, game modes, times, registry entries, messages, ...).
+  `scripts/vanilla-commands.sh` feeds tens of thousands of generated lines (valid, invalid, edge cases) to
+  the official dispatcher and to Ferrite and requires the same tree path or the same error at the same
+  position (the oracle found a dozen subtle rules, for example that a tag in `type=` blocks a later
+  type). Argument types not parsed yet (block states, items, SNBT, text components, NBT paths, ...) are
+  skipped by the test and reported to players honestly.
+- **Errors** are shown as the game shows them: the message in red, then the command with the place it
+  went wrong underlined.
+- **Commands** implemented so far: `gamemode`, `difficulty`, `list`, `seed`, `time` (the new clock and
+  timeline based `time`, with markers) and `tick` (rate, freeze, step, sprint, query). Their output is
+  recorded from the official server (`scripts/record-commands.py`) and replayed over a real connection
+  (`tests/commands.rs`), comparing system messages and the packets the commands send, so game mode
+  changes, difficulty broadcasts, clock updates and tick state are checked packet by packet.
+- **Components** (`ferrite-text`) are encoded the way the game writes them: bare strings for plain text,
+  and `{"": x}` wrapping where a list mixes element types.
+
+Permissions: players are level 0 unless `GameConfig::ops` names them. Everything else vanilla has (92
+commands) shows up in the tree; those not implemented say so when run.

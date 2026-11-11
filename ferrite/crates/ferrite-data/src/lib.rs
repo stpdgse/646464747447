@@ -15,6 +15,7 @@ pub mod items;
 pub mod loot;
 pub mod registries;
 pub mod shapes;
+pub mod timelines;
 
 pub use generated::meta::{
     DATA_PACK_MAJOR, DATA_PACK_MINOR, GAME_VERSION, PROTOCOL_VERSION, RESOURCE_PACK_MAJOR,

@@ -408,24 +408,59 @@ impl Persistence {
 
     // ---- the clock ----
 
-    pub fn save_time(&self, game_time: i64) -> Result<(), PersistError> {
-        let mut out = vec![1u8];
-        out.extend_from_slice(&game_time.to_le_bytes());
+    /// Saves the game time and the settings commands change (`level.dat`).
+    pub fn save_level(&self, level: &LevelSave) -> Result<(), PersistError> {
+        let mut out = vec![2u8];
+        out.extend_from_slice(&level.game_time.to_le_bytes());
+        out.push(level.difficulty);
+        out.extend_from_slice(&level.tick_rate.to_le_bytes());
+        out.push(u8::from(level.frozen));
+        out.extend_from_slice(&(level.clocks.len() as u16).to_le_bytes());
+        for c in &level.clocks {
+            out.extend_from_slice(&c.0.to_le_bytes());
+            out.extend_from_slice(&c.1.to_le_bytes());
+            out.extend_from_slice(&c.2.to_le_bytes());
+            out.push(u8::from(c.3));
+        }
         write_atomic(&self.dir.join("level.dat"), &out)
     }
 
-    pub fn load_time(&self) -> Result<Option<i64>, PersistError> {
+    pub fn load_level(&self) -> Result<Option<LevelSave>, PersistError> {
         let bytes = match std::fs::read(self.dir.join("level.dat")) {
             Ok(b) => b,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
             Err(e) => return Err(e.into()),
         };
         let mut r = Reader(&bytes);
-        if r.u8()? != 1 {
+        let version = r.u8()?;
+        if !(1..=2).contains(&version) {
             return Err(PersistError::Corrupt { what: "level", why: "unknown version" });
         }
-        Ok(Some(r.i64()?))
+        let mut level = LevelSave { game_time: r.i64()?, ..LevelSave::default() };
+        if version >= 2 {
+            level.difficulty = r.u8()?;
+            level.tick_rate = r.f32()?;
+            level.frozen = r.u8()? != 0;
+            for _ in 0..r.u16()? {
+                level.clocks.push((r.i64()?, r.f32()?, r.f32()?, r.u8()? != 0));
+            }
+        } else {
+            level.difficulty = 1;
+            level.tick_rate = 20.0;
+        }
+        Ok(Some(level))
     }
+}
+
+/// The world-wide state in `level.dat`.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct LevelSave {
+    pub game_time: i64,
+    pub difficulty: u8,
+    pub tick_rate: f32,
+    pub frozen: bool,
+    /// `(total ticks, partial tick, rate, paused)` of each world clock.
+    pub clocks: Vec<(i64, f32, f32, bool)>,
 }
 
 /// Writes through a temporary file and renames, so a crash leaves the old file or the new one.
@@ -514,8 +549,15 @@ mod tests {
         p.save_items(std::slice::from_ref(&item)).unwrap();
         assert_eq!(p.load_items().unwrap(), vec![item]);
 
-        p.save_time(123_456).unwrap();
-        assert_eq!(p.load_time().unwrap(), Some(123_456));
+        let level = LevelSave {
+            game_time: 123_456,
+            difficulty: 3,
+            tick_rate: 40.0,
+            frozen: true,
+            clocks: vec![(99, 0.25, 2.0, true), (5, 0.0, 1.0, false)],
+        };
+        p.save_level(&level).unwrap();
+        assert_eq!(p.load_level().unwrap(), Some(level));
     }
 
     #[test]

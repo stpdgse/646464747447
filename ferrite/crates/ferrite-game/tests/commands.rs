@@ -13,7 +13,10 @@ use ferrite_protocol::packets::play::{ChatCommand, SystemChat};
 use ferrite_swarm::PlayBot;
 use tokio::net::TcpListener;
 
-const WATCH: [&str; 6] = [
+const WATCH: [&str; 9] = [
+    "ticking_state",
+    "ticking_step",
+    "set_time",
     "player_abilities",
     "game_event",
     "player_info_update",
@@ -49,7 +52,11 @@ async fn start() -> Server {
 /// What the bot receives for a while after something was sent, as recording-format lines.
 async fn collect(bot: &mut PlayBot) -> Vec<String> {
     let mut out = Vec::new();
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(3);
     loop {
+        if tokio::time::Instant::now() > deadline {
+            return out;
+        }
         match tokio::time::timeout(Duration::from_millis(350), bot.next()).await {
             Ok(Ok(p)) => {
                 if p.name == "system_chat" {
@@ -65,6 +72,12 @@ async fn collect(bot: &mut PlayBot) -> Vec<String> {
                     if p.name == "player_info_update" && hex.starts_with("10") {
                         continue;
                     }
+                    // (Nor is the time sync every 20 ticks, which carries no clock update.)
+                    if p.name == "set_time" && hex.len() == 18 && hex.ends_with("00") {
+                        continue;
+                    }
+                    // (The game time at the front of a time packet depends on the world's age.)
+                    let hex = if p.name == "set_time" { hex[16..].to_string() } else { hex };
                     out.push(format!("evt {} {hex}", p.name));
                 }
             }

@@ -29,6 +29,14 @@ pub(super) struct Failure(pub Box<Component>);
 
 pub(super) type CommandResult = std::result::Result<i32, Failure>;
 
+/// The ticks of a `time` argument.
+fn time_arg(args: &Args, name: &str) -> i32 {
+    match args.get(name).map(|a| &a.value) {
+        Some(Value::Time(t)) => *t,
+        _ => 0,
+    }
+}
+
 fn failure(key: &str, args: Vec<Arg>) -> Failure {
     Failure(Box::new(Component::translatable(key, args)))
 }
@@ -138,10 +146,26 @@ impl Game {
         }
     }
 
-    /// Sends a command's success message to the player who ran it.
-    pub(super) fn send_success(&self, id: PlayerId, c: Component) {
-        if let Some(p) = self.players.get(&id) {
-            send(&p.sink, &SystemChat { content: Text(c.to_tag()), overlay: false });
+    /// Sends a command's success message to the player who ran it and, when `admins` is set,
+    /// tells the other operators what was done (`CommandSourceStack.sendSuccess`).
+    pub(super) fn send_success(&self, id: PlayerId, c: Component, admins: bool) {
+        let Some(p) = self.players.get(&id) else { return };
+        send(&p.sink, &SystemChat { content: Text(c.to_tag()), overlay: false });
+        if admins {
+            let who = player_display_name(&p.name, p.uuid);
+            self.tell_admins(Some(id), who, c);
+        }
+    }
+
+    /// `chat.type.admin` to every operator except `except`.
+    pub(super) fn tell_admins(&self, except: Option<PlayerId>, who: Component, c: Component) {
+        let note = Component::translatable("chat.type.admin", vec![who.into(), c.into()])
+            .color(Color::Gray)
+            .italic(true);
+        for (pid, other) in &self.players {
+            if Some(*pid) != except && other.permission_level > 0 {
+                send(&other.sink, &SystemChat { content: Text(note.to_tag()), overlay: false });
+            }
         }
     }
 
@@ -221,6 +245,22 @@ impl Game {
             "list" => self.cmd_list(id, false),
             "list/uuids" => self.cmd_list(id, true),
             "seed" => self.cmd_seed(id),
+            "tick/query" => self.cmd_tick_query(id),
+            "tick/freeze" => self.cmd_tick_freeze(id, true),
+            "tick/unfreeze" => self.cmd_tick_freeze(id, false),
+            "tick/rate/rate" => self.cmd_tick_rate(id, args),
+            "tick/step" => self.cmd_tick_step(id, 1),
+            "tick/step/time" => {
+                let n = time_arg(args, "time");
+                self.cmd_tick_step(id, n)
+            }
+            "tick/step/stop" => self.cmd_tick_step_stop(id),
+            "tick/sprint/time" => {
+                let n = time_arg(args, "time");
+                self.cmd_tick_sprint(id, n)
+            }
+            "tick/sprint/stop" => self.cmd_tick_sprint_stop(id),
+            key if key.starts_with("time/") => self.cmd_time(id, key, args),
             other => Err(Failure(Box::new(Component::literal(format!(
                 "The command /{} is not implemented in Ferrite yet.",
                 other.replace('/', " ")
@@ -263,6 +303,7 @@ impl Game {
             self.send_success(
                 source,
                 Component::translatable("commands.gamemode.success.self", vec![mode_name.into()]),
+                true,
             );
         } else if let Some(t) = self.players.get(&target) {
             send(
@@ -282,6 +323,7 @@ impl Game {
                     "commands.gamemode.success.other",
                     vec![name.into(), mode_name.into()],
                 ),
+                true,
             );
         }
         Ok(1)
@@ -337,6 +379,7 @@ impl Game {
                     .into(),
                 ],
             ),
+            false,
         );
         Ok(i32::from(d))
     }
@@ -356,6 +399,7 @@ impl Game {
         self.send_success(
             id,
             Component::translatable("commands.difficulty.success", vec![name.into()]),
+            true,
         );
         Ok(0)
     }
@@ -384,6 +428,7 @@ impl Game {
                 "commands.list.players",
                 vec![count.into(), max.into(), format_list(names).into()],
             ),
+            false,
         );
         Ok(count)
     }
@@ -402,6 +447,7 @@ impl Game {
         self.send_success(
             id,
             Component::translatable("commands.seed.success", vec![bracketed.into()]),
+            false,
         );
         Ok(1)
     }
@@ -428,6 +474,371 @@ impl Game {
                 .collect(),
             Target::Selector('s') => vec![source],
             Target::Selector(_) => self.order.clone(),
+        }
+    }
+}
+
+/// `String.format("%.1f", x)`.
+fn one_decimal(x: f64) -> String {
+    format!("{x:.1}")
+}
+
+impl Game {
+    fn cmd_tick_query(&mut self, id: PlayerId) -> CommandResult {
+        let t = &self.ticking;
+        let status = if t.sprint.is_some() {
+            "commands.tick.status.sprinting"
+        } else if t.frozen {
+            "commands.tick.status.frozen"
+        } else {
+            "commands.tick.status.running"
+        };
+        let mut sorted = t.durations.clone();
+        sorted.sort_by(f64::total_cmp);
+        let mean =
+            if sorted.is_empty() { 0.0 } else { sorted.iter().sum::<f64>() / sorted.len() as f64 };
+        let pct = |p: f64| -> f64 {
+            if sorted.is_empty() {
+                return 0.0;
+            }
+            sorted[((sorted.len() as f64 * p) as usize).min(sorted.len() - 1)]
+        };
+        let rate = f64::from(t.rate);
+        let count = sorted.len() as i32;
+        let lines = [
+            Component::translatable(status, vec![]),
+            Component::translatable(
+                "commands.tick.query.rate.running",
+                vec![
+                    one_decimal(rate).into(),
+                    one_decimal(mean).into(),
+                    one_decimal(1000.0 / rate).into(),
+                ],
+            ),
+            Component::translatable(
+                "commands.tick.query.percentiles",
+                vec![
+                    one_decimal(pct(0.5)).into(),
+                    one_decimal(pct(0.95)).into(),
+                    one_decimal(pct(0.99)).into(),
+                    count.into(),
+                ],
+            ),
+        ];
+        for l in lines {
+            self.send_success(id, l, false);
+        }
+        Ok(rate as i32)
+    }
+
+    fn cmd_tick_freeze(&mut self, id: PlayerId, frozen: bool) -> CommandResult {
+        self.ticking.frozen = frozen;
+        if !frozen {
+            self.ticking.steps = 0;
+        }
+        self.broadcast_ticking_state();
+        let key =
+            if frozen { "commands.tick.status.frozen" } else { "commands.tick.status.running" };
+        self.send_success(id, Component::translatable(key, vec![]), true);
+        Ok(1)
+    }
+
+    fn cmd_tick_rate(&mut self, id: PlayerId, args: &Args) -> CommandResult {
+        let Some(dispatch::ParsedArgument { value: Value::Float(rate), .. }) = args.get("rate")
+        else {
+            return Err(failure("argument.float.invalid", vec![]));
+        };
+        self.ticking.rate = *rate;
+        self.broadcast_ticking_state();
+        self.send_success(
+            id,
+            Component::translatable(
+                "commands.tick.rate.success",
+                vec![one_decimal(f64::from(*rate)).into()],
+            ),
+            true,
+        );
+        Ok(*rate as i32)
+    }
+
+    fn cmd_tick_step(&mut self, id: PlayerId, n: i32) -> CommandResult {
+        if !self.ticking.frozen {
+            // Stepping needs a frozen game: freeze it first, as the game does.
+            self.ticking.frozen = true;
+            self.broadcast_ticking_state();
+        }
+        self.ticking.steps = n.max(0) as u32;
+        for p in self.players.values() {
+            send(&p.sink, &TickingStep { steps: VarInt(n) });
+        }
+        self.send_success(
+            id,
+            Component::translatable("commands.tick.step.success", vec![n.into()]),
+            true,
+        );
+        Ok(1)
+    }
+
+    fn cmd_tick_step_stop(&mut self, id: PlayerId) -> CommandResult {
+        if self.ticking.steps == 0 {
+            return Err(failure("commands.tick.step.stop.fail", vec![]));
+        }
+        self.ticking.steps = 0;
+        for p in self.players.values() {
+            send(&p.sink, &TickingStep { steps: VarInt(0) });
+        }
+        self.send_success(
+            id,
+            Component::translatable("commands.tick.step.stop.success", vec![]),
+            true,
+        );
+        Ok(1)
+    }
+
+    fn cmd_tick_sprint(&mut self, id: PlayerId, n: i32) -> CommandResult {
+        self.ticking.sprint = Some((n.max(1) as u32, n.max(1) as u32, Instant::now()));
+        self.broadcast_ticking_state();
+        self.send_success(
+            id,
+            Component::translatable("commands.tick.status.sprinting", vec![]),
+            true,
+        );
+        Ok(1)
+    }
+
+    fn cmd_tick_sprint_stop(&mut self, id: PlayerId) -> CommandResult {
+        if self.ticking.sprint.is_none() {
+            return Err(failure("commands.tick.sprint.stop.fail", vec![]));
+        }
+        self.ticking.sprint = None;
+        self.broadcast_ticking_state();
+        self.send_success(
+            id,
+            Component::translatable("commands.tick.sprint.stop.success", vec![]),
+            true,
+        );
+        Ok(1)
+    }
+
+    /// Counts a sprint tick down and reports when it is over.
+    pub(super) fn finish_sprint_if_done(&mut self) {
+        let Some((left, total, started)) = self.ticking.sprint else { return };
+        if left > 1 {
+            self.ticking.sprint = Some((left - 1, total, started));
+            return;
+        }
+        self.ticking.sprint = None;
+        self.broadcast_ticking_state();
+        let secs = started.elapsed().as_secs_f64().max(1e-6);
+        let tps = (f64::from(total) / secs) as i32;
+        let report = Component::translatable(
+            "commands.tick.sprint.report",
+            vec![tps.into(), format!("{:.2}", secs * 1000.0 / f64::from(total)).into()],
+        );
+        self.tell_admins(None, Component::literal("Server"), report);
+    }
+
+    // ---- /time ---------------------------------------------------------------------------
+
+    fn clock_names() -> &'static [&'static str] {
+        ferrite_data::configuration::SYNCHRONIZED_REGISTRIES
+            .iter()
+            .find(|r| r.id == "minecraft:world_clock")
+            .map_or(&[], |r| r.entries)
+    }
+
+    fn cmd_time(&mut self, id: PlayerId, key: &str, args: &Args) -> CommandResult {
+        // `time of <clock> ...` is `time ...` on that clock; the plain forms use the overworld's.
+        let (clock_id, rest) = match key.strip_prefix("time/of/clock/") {
+            Some(rest) => {
+                let name = match args.get("clock").map(|a| &a.value) {
+                    Some(Value::Resource(r)) => r.clone(),
+                    _ => "minecraft:overworld".to_string(),
+                };
+                (name, rest.to_string())
+            }
+            None => {
+                ("minecraft:overworld".to_string(), key.trim_start_matches("time/").to_string())
+            }
+        };
+        let Some(index) = Self::clock_names().iter().position(|n| *n == clock_id) else {
+            return Err(failure(
+                "argument.resource.not_found",
+                vec![clock_id.into(), "minecraft:world_clock".into()],
+            ));
+        };
+        let clock = self.clocks[index];
+        let clock_arg = || -> Arg { clock_id.clone().into() };
+        match rest.as_str() {
+            "set/time" => {
+                let t = i64::from(time_arg(args, "time"));
+                if clock.total_ticks == t {
+                    return Err(failure(
+                        "commands.time.set.already_at_time",
+                        vec![clock_arg(), (t as i32).into()],
+                    ));
+                }
+                self.clocks[index].total_ticks = t;
+                self.clocks[index].partial_tick = 0.0;
+                self.broadcast_clock(index);
+                self.send_success(
+                    id,
+                    Component::translatable(
+                        "commands.time.set.absolute",
+                        vec![clock_arg(), (t as i32).into()],
+                    ),
+                    true,
+                );
+                Ok(t as i32)
+            }
+            "set/timemarker" => {
+                let marker = match args.get("timemarker").map(|a| &a.value) {
+                    Some(Value::Identifier(m)) => m.clone(),
+                    _ => String::new(),
+                };
+                let found = ferrite_data::timelines::TIMELINES
+                    .iter()
+                    .filter(|t| t.clock == clock_id)
+                    .find_map(|t| t.markers.iter().find(|m| m.name == marker).map(|m| (t, m)));
+                let Some((timeline, m)) = found else {
+                    // (The game tells everyone the clock first, even when it cannot do the job.)
+                    self.broadcast_clock(index);
+                    return Err(failure(
+                        "commands.time.no_time_marker_found",
+                        vec![marker.into(), clock_arg()],
+                    ));
+                };
+                let period = timeline.period_ticks.unwrap_or(i64::MAX);
+                let now = clock.total_ticks;
+                if now.rem_euclid(period) == m.ticks.rem_euclid(period) {
+                    self.broadcast_clock(index);
+                    return Err(failure(
+                        "commands.time.set.already_at_time_marker",
+                        vec![clock_arg(), marker.into()],
+                    ));
+                }
+                let base = now - now.rem_euclid(period) + m.ticks;
+                let target = if base <= now { base + period } else { base };
+                self.clocks[index].total_ticks = target;
+                self.clocks[index].partial_tick = 0.0;
+                self.broadcast_clock(index);
+                self.send_success(
+                    id,
+                    Component::translatable(
+                        "commands.time.set.time_marker",
+                        vec![clock_arg(), marker.into()],
+                    ),
+                    true,
+                );
+                Ok(target as i32)
+            }
+            "add/time" => {
+                let t = i64::from(time_arg(args, "time"));
+                let total = clock.total_ticks + t;
+                self.clocks[index].total_ticks = total;
+                self.broadcast_clock(index);
+                self.send_success(
+                    id,
+                    Component::translatable(
+                        "commands.time.set.absolute",
+                        vec![clock_arg(), total.into()],
+                    ),
+                    true,
+                );
+                Ok(total as i32)
+            }
+            "pause" => {
+                if clock.paused {
+                    return Err(failure("commands.time.pause.already_paused", vec![clock_arg()]));
+                }
+                self.clocks[index].paused = true;
+                self.broadcast_clock(index);
+                self.send_success(
+                    id,
+                    Component::translatable("commands.time.pause", vec![clock_arg()]),
+                    true,
+                );
+                Ok(1)
+            }
+            "resume" => {
+                if !clock.paused {
+                    return Err(failure("commands.time.pause.already_running", vec![clock_arg()]));
+                }
+                self.clocks[index].paused = false;
+                self.broadcast_clock(index);
+                self.send_success(
+                    id,
+                    Component::translatable("commands.time.resume", vec![clock_arg()]),
+                    true,
+                );
+                Ok(1)
+            }
+            "rate/rate" => {
+                let Some(dispatch::ParsedArgument { value: Value::Float(r), .. }) =
+                    args.get("rate")
+                else {
+                    return Err(failure("argument.float.invalid", vec![]));
+                };
+                self.clocks[index].rate = *r;
+                self.broadcast_clock(index);
+                self.send_success(
+                    id,
+                    Component::translatable("commands.time.rate", vec![clock_arg(), (*r).into()]),
+                    true,
+                );
+                Ok(*r as i32)
+            }
+            "query/time" => {
+                self.send_success(
+                    id,
+                    Component::translatable(
+                        "commands.time.query.absolute",
+                        vec![clock_arg(), clock.total_ticks.into()],
+                    ),
+                    false,
+                );
+                Ok(clock.total_ticks as i32)
+            }
+            "query/gametime" => {
+                let t = self.world.time();
+                self.send_success(
+                    id,
+                    Component::translatable("commands.time.query.gametime", vec![t.into()]),
+                    false,
+                );
+                Ok(t as i32)
+            }
+            "query/timeline" | "query/timeline/repetition" => {
+                let name = match args.get("timeline").map(|a| &a.value) {
+                    Some(Value::Resource(r)) => r.clone(),
+                    _ => String::new(),
+                };
+                let Some(tl) = ferrite_data::timelines::timeline(&name) else {
+                    return Err(failure(
+                        "argument.resource.not_found",
+                        vec![name.into(), "minecraft:timeline".into()],
+                    ));
+                };
+                let t = clock.total_ticks;
+                let (value, key) = if rest.ends_with("repetition") {
+                    (
+                        tl.period_ticks.map_or(0, |p| t.div_euclid(p)),
+                        "commands.time.query.timeline.repetitions",
+                    )
+                } else {
+                    (tl.period_ticks.map_or(t, |p| t.rem_euclid(p)), "commands.time.query.timeline")
+                };
+                self.send_success(
+                    id,
+                    Component::translatable(key, vec![name.into(), value.into()]),
+                    false,
+                );
+                Ok(value as i32)
+            }
+            other => Err(Failure(Box::new(Component::literal(format!(
+                "The command /time {} is not implemented in Ferrite yet.",
+                other.replace('/', " ")
+            ))))),
         }
     }
 }

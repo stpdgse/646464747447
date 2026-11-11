@@ -380,7 +380,18 @@ impl Game {
         if let Err(e) = persist.save_items(&items) {
             tracing::error!("cannot save dropped items: {e}");
         }
-        if let Err(e) = persist.save_time(self.world.time()) {
+        let level = crate::persist::LevelSave {
+            game_time: self.world.time(),
+            difficulty: self.difficulty,
+            tick_rate: self.ticking.rate,
+            frozen: self.ticking.frozen,
+            clocks: self
+                .clocks
+                .iter()
+                .map(|c| (c.total_ticks, c.partial_tick, c.rate, c.paused))
+                .collect(),
+        };
+        if let Err(e) = persist.save_level(&level) {
             tracing::error!("cannot save the clock: {e}");
         }
         let ids: Vec<PlayerId> = self.order.clone();
