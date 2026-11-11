@@ -42,6 +42,16 @@ pub struct PlayerSave {
     pub slots: Vec<(u8, ItemStack)>,
 }
 
+/// A dropped item as saved.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ItemSave {
+    pub pos: [f64; 3],
+    pub vel: [f64; 3],
+    pub age: u32,
+    pub pickup_delay: u32,
+    pub stack: ItemStack,
+}
+
 #[derive(Debug)]
 pub struct Persistence {
     dir: PathBuf,
@@ -240,6 +250,46 @@ impl Persistence {
         Ok(Some(PlayerSave { pos, yaw, pitch, game_mode, held_slot, slots }))
     }
 
+    // ---- dropped items ----
+
+    /// Saves every dropped item (replacing the previous list).
+    pub fn save_items(&self, items: &[ItemSave]) -> Result<(), PersistError> {
+        let mut out = vec![1u8];
+        out.extend_from_slice(&(items.len() as u32).to_le_bytes());
+        for it in items {
+            for v in it.pos.iter().chain(it.vel.iter()) {
+                out.extend_from_slice(&v.to_le_bytes());
+            }
+            out.extend_from_slice(&it.age.to_le_bytes());
+            out.extend_from_slice(&it.pickup_delay.to_le_bytes());
+            put_stack(&mut out, it.stack);
+        }
+        write_atomic(&self.dir.join("items.dat"), &out)
+    }
+
+    pub fn load_items(&self) -> Result<Vec<ItemSave>, PersistError> {
+        let bytes = match std::fs::read(self.dir.join("items.dat")) {
+            Ok(b) => b,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(e) => return Err(e.into()),
+        };
+        let mut r = Reader(&bytes);
+        if r.u8()? != 1 {
+            return Err(PersistError::Corrupt { what: "items", why: "unknown version" });
+        }
+        let n = r.i32()? as u32;
+        let mut out = Vec::new();
+        for _ in 0..n {
+            let pos = [r.f64()?, r.f64()?, r.f64()?];
+            let vel = [r.f64()?, r.f64()?, r.f64()?];
+            let (age, pickup_delay) = (r.i32()? as u32, r.i32()? as u32);
+            if let Some(stack) = r.stack()? {
+                out.push(ItemSave { pos, vel, age, pickup_delay, stack });
+            }
+        }
+        Ok(out)
+    }
+
     // ---- the clock ----
 
     pub fn save_time(&self, game_time: i64) -> Result<(), PersistError> {
@@ -310,6 +360,16 @@ mod tests {
         p.save_player(uuid, &save).unwrap();
         assert_eq!(p.load_player(uuid).unwrap(), Some(save));
         assert_eq!(p.load_player(Uuid::from_u128(1)).unwrap(), None);
+
+        let item = ItemSave {
+            pos: [1.0, 2.0, 3.0],
+            vel: [0.0, 0.1, 0.0],
+            age: 77,
+            pickup_delay: 5,
+            stack: stack("minecraft:dirt", 3),
+        };
+        p.save_items(std::slice::from_ref(&item)).unwrap();
+        assert_eq!(p.load_items().unwrap(), vec![item]);
 
         p.save_time(123_456).unwrap();
         assert_eq!(p.load_time().unwrap(), Some(123_456));

@@ -507,7 +507,7 @@ into `players/<uuid>.dat` (position, rotation, game mode, hotbar slot, inventory
 atomically) and the clock into `level.dat`. Items are stored by registry name, so a save survives
 registry changes. The world is saved every 30 seconds, when a player leaves and on shutdown; a
 chunk that cannot be read is regenerated with an error in the log rather than stopping the server.
-Not saved yet: dropped items, the day/weather state beyond the clock, entities other than players.
+Dropped items are saved too. Not saved yet: weather and entities other than players and items.
 
 **Not yet:** furnace, anvil and the other windows, ender chests and shulker boxes, damage, hunger, item components, the
 inventory beyond the hotbar being synchronised from the client, signed chat, commands, persistence of changes, lighting,

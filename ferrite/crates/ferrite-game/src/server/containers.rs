@@ -302,6 +302,20 @@ impl Game {
                 tracing::error!("cannot save the containers of chunk {cx},{cz}: {e}");
             }
         }
+        let items: Vec<crate::persist::ItemSave> = self
+            .items
+            .values()
+            .map(|i| crate::persist::ItemSave {
+                pos: i.pos,
+                vel: i.vel,
+                age: i.age,
+                pickup_delay: i.pickup_delay,
+                stack: i.stack,
+            })
+            .collect();
+        if let Err(e) = persist.save_items(&items) {
+            tracing::error!("cannot save dropped items: {e}");
+        }
         if let Err(e) = persist.save_time(self.world.time()) {
             tracing::error!("cannot save the clock: {e}");
         }

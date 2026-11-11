@@ -521,3 +521,75 @@ async fn a_saved_world_comes_back_with_its_blocks_players_and_chests() {
     .await;
     assert!(found, "the dug block is still gone after a restart");
 }
+
+#[tokio::test]
+async fn chest_contents_survive_a_restart() {
+    use ferrite_protocol::codec::VarInt;
+    use ferrite_protocol::types::LenVec;
+    let dir = tempfile::tempdir().unwrap();
+    let cfg = || GameConfig {
+        view_distance: 4,
+        world_dir: Some(dir.path().to_path_buf()),
+        ..GameConfig::default()
+    };
+    let stone = ItemStack { count: 9, item: item("minecraft:stone") };
+    let use_at = |seq| UseItemOn {
+        hand: VarInt(0),
+        pos: PackedPos::new(1, -60, 0),
+        face: VarInt(1),
+        cursor_x: 0.5,
+        cursor_y: 1.0,
+        cursor_z: 0.5,
+        inside: false,
+        world_border_hit: false,
+        sequence: VarInt(seq),
+    };
+    {
+        let s = server_with(cfg()).await;
+        let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+        until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+        a.send(&SetCreativeModeSlot {
+            slot: 36,
+            item: ItemStack { count: 1, item: item("minecraft:chest") },
+        })
+        .await
+        .unwrap();
+        a.send(&UseItemOn { pos: PackedPos::new(1, -61, 0), ..use_at(1) }).await.unwrap();
+        block_update_at(&mut a, 1, -60, 0).await;
+        a.send(&SetCreativeModeSlot { slot: 36, item: stone }).await.unwrap();
+        // With stone in hand a click on the chest would place stone: sneak... use an empty hand.
+        a.send(&SetCreativeModeSlot { slot: 37, item: stone }).await.unwrap();
+        a.send(&SetCreativeModeSlot { slot: 36, item: ItemStack::default() }).await.unwrap();
+        a.send(&use_at(2)).await.unwrap();
+        let screen: OpenScreen = decode(&until(&mut a, 600, |p| p.name == "open_screen").await);
+        let content: ContainerSetContent =
+            decode(&until(&mut a, 100, |p| p.name == "container_set_content").await);
+        let click = |slot: i16, state: i32, carried: ItemStack| ContainerClick {
+            window_id: screen.container_id,
+            state_id: VarInt(state),
+            slot,
+            button: 0,
+            click_type: VarInt(0),
+            changed: LenVec(vec![]),
+            carried: HashedStack::plain(carried),
+        };
+        // Hotbar slot 1 sits at window slot 55; pick it up and drop it into chest slot 0.
+        a.send(&click(55, content.state_id.0, ItemStack::default())).await.unwrap();
+        // The client claimed nothing changed, so the server answers with the real window.
+        let synced: ContainerSetContent =
+            decode(&until(&mut a, 100, |p| p.name == "container_set_content").await);
+        assert_eq!(synced.carried, stone);
+        a.send(&click(0, synced.state_id.0, ItemStack::default())).await.unwrap();
+        a.send(&ContainerClose { window_id: screen.container_id }).await.unwrap();
+        until(&mut a, 600, |p| p.name == "container_close").await;
+        tokio::time::sleep(Duration::from_millis(200)).await;
+    }
+    let s = server_with(cfg()).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    a.send(&use_at(5)).await.unwrap();
+    until(&mut a, 600, |p| p.name == "open_screen").await;
+    let content: ContainerSetContent =
+        decode(&until(&mut a, 100, |p| p.name == "container_set_content").await);
+    assert_eq!(content.items.0[0], stone, "the chest still holds what was put in it");
+}

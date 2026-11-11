@@ -272,6 +272,16 @@ impl Game {
         if let Some(t) = persist.as_ref().and_then(|p| p.load_time().ok().flatten()) {
             world.set_time(t);
         }
+        let mut restored = std::collections::BTreeMap::new();
+        let mut next_entity = 1;
+        for it in persist.as_ref().map(|p| p.load_items().unwrap_or_default()).unwrap_or_default() {
+            let uuid = Uuid::from_u128(u128::from(next_entity as u64) << 64 | u128::from(it.age));
+            let mut e = crate::items::ItemEntity::new(next_entity, uuid, it.pos, it.vel, it.stack);
+            e.age = it.age;
+            e.pickup_delay = it.pickup_delay;
+            restored.insert(next_entity, e);
+            next_entity += 1;
+        }
         Game {
             cfg,
             rng: 0x2545_F491_4F6C_DD1D,
@@ -283,9 +293,9 @@ impl Game {
             dirty: HashSet::new(),
             containers: HashMap::new(),
             viewers: HashMap::new(),
-            items: std::collections::BTreeMap::new(),
+            items: restored,
             order: Vec::new(),
-            next_entity: 1,
+            next_entity,
             tick: 0,
         }
     }
