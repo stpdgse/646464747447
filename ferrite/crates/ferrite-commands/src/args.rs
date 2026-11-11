@@ -59,7 +59,7 @@ pub enum Value {
 pub enum ScoreHolder {
     Name(String),
     Wildcard,
-    Selector(Selector),
+    Selector(Box<Selector>),
 }
 
 /// Who runs the command (what parsing may depend on).
@@ -313,7 +313,7 @@ impl Parser {
                     if !*multiple && sel.max_results > 1 {
                         return Err(reader.error(Message::tr("argument.entity.toomany")));
                     }
-                    return Ok(Value::ScoreHolder(ScoreHolder::Selector(sel)));
+                    return Ok(Value::ScoreHolder(ScoreHolder::Selector(Box::new(sel))));
                 }
                 let from = reader.cursor();
                 while reader.can_read() && reader.peek() != ' ' {
@@ -485,35 +485,6 @@ impl Parser {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn java_number_formatting() {
-        assert_eq!(java_double(0.5), "0.5");
-        assert_eq!(java_double(3.0), "3.0");
-        assert_eq!(java_double(1e7), "1.0E7");
-        assert_eq!(java_double(0.0001), "1.0E-4");
-        assert_eq!(java_float(2.5), "2.5");
-        assert_eq!(java_float(0.1), "0.1");
-        assert_eq!(java_double(-3.0e10), "-3.0E10");
-    }
-
-    #[test]
-    fn integers_enforce_their_bounds() {
-        let p = Parser::Integer { min: Some(1), max: Some(10) };
-        let mut r = Reader::new("11");
-        let e = p.parse(&mut r, Source { permission_level: 4 }).unwrap_err();
-        assert_eq!(e.message.to_json(), r#"{"translate":"argument.integer.big","with":[10,11]}"#);
-        assert_eq!(e.cursor, 0);
-        assert_eq!(
-            p.parse(&mut Reader::new("5"), Source { permission_level: 4 }).unwrap(),
-            Value::Int(5)
-        );
-    }
-}
-
 /// `MessageArgument.parse` for a source that may use selectors: the rest of the line, with the
 /// selectors in it parsed (a lone `@` or an unknown type is plain text).
 fn parse_message(reader: &mut Reader, allow_selectors: bool) -> Result<Value> {
@@ -551,5 +522,34 @@ fn parse_message(reader: &mut Reader, allow_selectors: bool) -> Result<Value> {
         } else {
             reader.skip();
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn java_number_formatting() {
+        assert_eq!(java_double(0.5), "0.5");
+        assert_eq!(java_double(3.0), "3.0");
+        assert_eq!(java_double(1e7), "1.0E7");
+        assert_eq!(java_double(0.0001), "1.0E-4");
+        assert_eq!(java_float(2.5), "2.5");
+        assert_eq!(java_float(0.1), "0.1");
+        assert_eq!(java_double(-3.0e10), "-3.0E10");
+    }
+
+    #[test]
+    fn integers_enforce_their_bounds() {
+        let p = Parser::Integer { min: Some(1), max: Some(10) };
+        let mut r = Reader::new("11");
+        let e = p.parse(&mut r, Source { permission_level: 4 }).unwrap_err();
+        assert_eq!(e.message.to_json(), r#"{"translate":"argument.integer.big","with":[10,11]}"#);
+        assert_eq!(e.cursor, 0);
+        assert_eq!(
+            p.parse(&mut Reader::new("5"), Source { permission_level: 4 }).unwrap(),
+            Value::Int(5)
+        );
     }
 }

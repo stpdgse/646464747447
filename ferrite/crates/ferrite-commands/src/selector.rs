@@ -645,7 +645,7 @@ mod tests {
 
     #[test]
     fn uuids_follow_javas_leniency() {
-        assert_eq!(parse_uuid("12345678-1234-1234-1234-123456789abc").is_some(), true);
+        assert!(parse_uuid("12345678-1234-1234-1234-123456789abc").is_some());
         assert!(parse_uuid("1-2-3-4-5").is_some());
         assert!(parse_uuid("1234").is_none());
     }
