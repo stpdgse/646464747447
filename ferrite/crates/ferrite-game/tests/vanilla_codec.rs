@@ -113,6 +113,46 @@ fn serverbound_samples() -> String {
     s
 }
 
+/// Representatives of the clientbound packets added for survival, windows and vitals.
+fn clientbound_samples() -> String {
+    use ferrite_protocol::types::Text;
+    let mut s = String::new();
+    s += &line(&ContainerSetSlot {
+        window_id: VarInt(0),
+        state_id: VarInt(3),
+        slot: 36,
+        item: ItemStack { count: 5, item: 1 },
+    });
+    s += &line(&TakeItemEntity { collected: VarInt(9), collector: VarInt(3), amount: VarInt(2) });
+    s += &line(&BlockDestruction { id: VarInt(2), pos: PackedPos::new(1, 2, 3), progress: 4 });
+    s += &line(&SetCursorItem { item: ItemStack { count: 3, item: 7 } });
+    s += &line(&SetPlayerInventory { slot: VarInt(4), item: ItemStack { count: 1, item: 9 } });
+    s += &line(&OpenScreen {
+        container_id: VarInt(1),
+        menu_type: VarInt(12),
+        title: Text::plain("Crafting"),
+    });
+    s += &line(&CloseContainer { container_id: VarInt(1) });
+    s += &line(&BlockEvent { pos: PackedPos::new(1, 64, 1), kind: 1, data: 1, block: VarInt(200) });
+    s += &line(&PlayerCombatKill { player_id: VarInt(5), message: Text::plain("died") });
+    s += &line(&DamageEvent {
+        entity_id: VarInt(5),
+        source_type: VarInt(3),
+        source_cause: VarInt(0),
+        source_direct: VarInt(0),
+        source_position: None,
+    });
+    s += &line(&DamageEvent {
+        entity_id: VarInt(5),
+        source_type: VarInt(3),
+        source_cause: VarInt(2),
+        source_direct: VarInt(2),
+        source_position: Some(DamagePosition { x: 1.0, y: 2.0, z: 3.0 }),
+    });
+    s += &line(&EntityEvent { entity_id: 5, event: 3 });
+    s
+}
+
 fn env(name: &str) -> Option<String> {
     std::env::var(name).ok()
 }
@@ -126,7 +166,10 @@ fn run_harness(mode: &str, samples: &str) -> Vec<String> {
     };
     let java = env("FERRITE_JAVA").unwrap_or_else(|| "java".into());
     let javac = env("FERRITE_JAVAC").unwrap_or_else(|| "javac".into());
-    let dir = std::env::temp_dir().join(format!("ferrite-codec-{}-{mode}", std::process::id()));
+    static RUN: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+    let run = RUN.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let dir =
+        std::env::temp_dir().join(format!("ferrite-codec-{}-{mode}-{run}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let samples_path = dir.join("samples.txt");
     std::fs::write(&samples_path, samples).unwrap();
@@ -173,6 +216,24 @@ fn vanilla_decodes_every_serverbound_packet_ferrite_encodes() {
         bad.iter().map(|s| s.as_str()).collect::<Vec<_>>().join("\n")
     );
     assert_eq!(lines.len(), expected, "every sample produced a line");
+}
+
+#[test]
+#[ignore = "needs a JDK and the vanilla server jar (scripts/vanilla-codec.sh)"]
+fn vanilla_decodes_the_clientbound_packets_added_for_survival() {
+    let samples = clientbound_samples();
+    let lines = run_harness("clientbound", &samples);
+    for l in &lines {
+        eprintln!("{l}");
+    }
+    let bad: Vec<_> =
+        lines.iter().filter(|l| l.contains("ERROR") || l.contains("TRAILING")).collect();
+    assert!(
+        bad.is_empty(),
+        "vanilla rejected:\n{}",
+        bad.iter().map(|s| s.as_str()).collect::<Vec<_>>().join("\n")
+    );
+    assert_eq!(lines.len(), samples.lines().count());
 }
 
 #[tokio::test]

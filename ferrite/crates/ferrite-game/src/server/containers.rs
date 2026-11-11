@@ -347,6 +347,9 @@ impl Game {
             game_mode: p.game_mode,
             held_slot: p.held_slot,
             slots,
+            health: p.health,
+            food: p.food,
+            saturation: p.saturation,
         };
         if let Err(e) = persist.save_player(p.uuid, &save) {
             tracing::error!("cannot save player {}: {e}", p.name);

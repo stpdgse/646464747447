@@ -22,6 +22,7 @@ use uuid::Uuid;
 
 mod containers;
 mod survival;
+mod vitals;
 
 use crate::chunkenc::{encode_sections, full_bright_light, heightmaps};
 use crate::flat::FlatGenerator;
@@ -204,6 +205,16 @@ struct Player {
     inv_state: i32,
     /// Dropped items this player has been told about.
     tracked_items: HashSet<i32>,
+    health: f32,
+    food: i32,
+    saturation: f32,
+    exhaustion: f32,
+    food_timer: u32,
+    fall_distance: f64,
+    dead: bool,
+    invulnerable_ticks: u32,
+    last_hurt: f32,
+    eating: Option<vitals::Eating>,
     /// The container window the player has open, if any.
     window: Option<containers::Window>,
     next_window: u8,
@@ -410,6 +421,16 @@ impl Game {
             tracked_items: HashSet::new(),
             window: None,
             next_window: 0,
+            health: saved.as_ref().map_or(20.0, |s| if s.health > 0.0 { s.health } else { 20.0 }),
+            food: saved.as_ref().map_or(20, |s| s.food),
+            saturation: saved.as_ref().map_or(5.0, |s| s.saturation),
+            exhaustion: 0.0,
+            food_timer: 0,
+            fall_distance: 0.0,
+            dead: false,
+            invulnerable_ticks: 0,
+            last_hurt: 0.0,
+            eating: None,
         };
         self.players.insert(id, player);
         self.order.push(id);
@@ -576,7 +597,7 @@ impl Game {
         send(s, &TickingState { tick_rate: TICKS_PER_SECOND as f32, frozen: false });
         send(s, &TickingStep { steps: VarInt(0) });
         send(s, &SetChunkCacheCenter { x: VarInt(p.center.0), z: VarInt(p.center.1) });
-        send(s, &SetHealth { health: 20.0, food: VarInt(20), saturation: 5.0 });
+        send(s, &SetHealth { health: p.health, food: VarInt(p.food), saturation: p.saturation });
         send(s, &SetExperience { progress: 0.0, total: VarInt(0), level: VarInt(0) });
         send(
             s,
@@ -795,6 +816,16 @@ impl Game {
                     self.close_window(id);
                 }
             }
+            ClientCommand::ID => {
+                let p = decode!(ClientCommand);
+                if p.action.0 == 0 {
+                    self.respawn(id);
+                }
+            }
+            UseItem::ID => {
+                let _ = decode!(UseItem);
+                self.use_item(id);
+            }
             PlayerAction::ID => {
                 let p = decode!(PlayerAction);
                 self.on_player_action(id, &p);
@@ -883,6 +914,7 @@ impl Game {
                 }
             }
             1 => self.abort_dig(id),
+            5 => self.stop_eating(id),
             3 | 4 => self.drop_held(id, a.action.0 == 3),
             2 => {
                 if mode == 0 && self.in_reach(id, pos) {
@@ -1054,6 +1086,7 @@ impl Game {
             return;
         }
         let dim = self.cfg.generator.dimension;
+        let mut fall = None;
         if let Some((x, y, z)) = pos {
             let finite = x.is_finite() && y.is_finite() && z.is_finite();
             let in_world = x.abs() < 3.0e7
@@ -1084,9 +1117,11 @@ impl Game {
                 );
                 return;
             }
+            let dy = y - p.y;
             p.x = x;
             p.y = y;
             p.z = z;
+            fall = Some(dy);
         }
         if let Some((yaw, pitch)) = rot
             && yaw.is_finite()
@@ -1097,6 +1132,11 @@ impl Game {
         }
         p.on_ground = on_ground;
         p.moved = true;
+        if let Some(dy) = fall {
+            self.track_fall(id, dy, on_ground);
+        } else if on_ground {
+            self.track_fall(id, 0.0, true);
+        }
     }
 
     // ---- ticking --------------------------------------------------------------------------
@@ -1104,6 +1144,7 @@ impl Game {
     fn tick(&mut self) {
         self.tick += 1;
         self.world.tick();
+        self.tick_vitals();
         self.tick_digging();
         self.broadcast_block_changes();
         self.tick_items();

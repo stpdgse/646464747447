@@ -509,6 +509,20 @@ registry changes. The world is saved every 30 seconds, when a player leaves and 
 chunk that cannot be read is regenerated with an error in the log rather than stopping the server.
 Dropped items are saved too. Not saved yet: weather and entities other than players and items.
 
+### Health and hunger
+
+Players have health, hunger, saturation and exhaustion with vanilla's rules (`server/vitals.rs`):
+exhaustion drains saturation then food, a full-ish food bar regenerates health (fast when
+saturated), an empty one starves down to five hearts on easy, falls cost one point per block
+beyond three (hay and honey 80% less, slime none unless sneaking, beds half; water and ladders
+cancel the fall), invulnerability frames follow a hit, the void kills, foods restore what the
+item data says after their eating time, and dying drops the inventory, shows the death screen and
+respawns on request. The clientbound packets involved are decoded by vanilla's own codecs
+(`scripts/vanilla-codec.sh`). Fall damage and the hunger timings are implemented from the game's
+rules and tested end to end in Ferrite, **not** checked against the official server (the scripted
+client could not get it to accept a sequence of airborne position packets). Armor, enchantments,
+potion effects, drowning, fire and mob damage are not implemented.
+
 **Not yet:** furnace, anvil and the other windows, ender chests and shulker boxes, damage, hunger, item components, the
 inventory beyond the hotbar being synchronised from the client, signed chat, commands, persistence of changes, lighting,
 and the io_uring backend's play state.

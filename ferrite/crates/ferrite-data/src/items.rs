@@ -35,6 +35,17 @@ pub enum EquipSlot {
     Mainhand,
 }
 
+/// What eating an item does.
+#[derive(Clone, Copy, Debug)]
+pub struct FoodInfo {
+    pub nutrition: i32,
+    pub saturation: f32,
+    /// Can be eaten with a full hunger bar (golden apples).
+    pub can_always_eat: bool,
+    /// How long eating takes, in ticks.
+    pub consume_ticks: u32,
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct ItemInfo {
     pub max_stack: u8,
@@ -42,6 +53,7 @@ pub struct ItemInfo {
     pub max_damage: u16,
     pub tool: Option<ToolInfo>,
     pub equip: Option<EquipSlot>,
+    pub food: Option<FoodInfo>,
 }
 
 /// The facts about the item with this protocol id.

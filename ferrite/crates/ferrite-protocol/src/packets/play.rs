@@ -175,6 +175,26 @@ impl<'a> Decode<'a> for ItemStack {
     }
 }
 
+/// Where damage came from, when it came from a point.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct DamagePosition {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+impl Encode for DamagePosition {
+    fn encode<B: bytes::BufMut>(&self, buf: &mut B) -> Result<()> {
+        self.x.encode(buf)?;
+        self.y.encode(buf)?;
+        self.z.encode(buf)
+    }
+}
+impl<'a> Decode<'a> for DamagePosition {
+    fn decode(buf: &mut &'a [u8]) -> Result<Self> {
+        Ok(DamagePosition { x: f64::decode(buf)?, y: f64::decode(buf)?, z: f64::decode(buf)? })
+    }
+}
+
 /// A stack as a client describes it in an inventory click: the components are only hashes, which
 /// the server compares with its own.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -821,6 +841,35 @@ packet! {
         block: VarInt,
     }
 
+    /// The player died: shows the death screen.
+    PlayerCombatKill in Play Clientbound = play::clientbound::PLAYER_COMBAT_KILL "player_combat_kill" {
+        player_id: VarInt,
+        message: Text,
+    }
+
+    /// The player is placed in the world again after dying. `data_to_keep`: bit 0 keeps
+    /// attributes, bit 1 keeps entity data.
+    Respawn in Play Clientbound = play::clientbound::RESPAWN "respawn" {
+        spawn: SpawnInfo,
+        data_to_keep: u8,
+    }
+
+    /// An entity took damage. `source_type` is an id in the `damage_type` registry; the cause
+    /// and direct-entity fields are entity ids plus one (0 = none).
+    DamageEvent in Play Clientbound = play::clientbound::DAMAGE_EVENT "damage_event" {
+        entity_id: VarInt,
+        source_type: VarInt,
+        source_cause: VarInt,
+        source_direct: VarInt,
+        source_position: Option<DamagePosition>,
+    }
+
+    /// A status byte for an entity: 2 hurt, 3 death, and many others.
+    EntityEvent in Play Clientbound = play::clientbound::ENTITY_EVENT "entity_event" {
+        entity_id: i32,
+        event: i8,
+    }
+
     /// The stack on the cursor.
     SetCursorItem in Play Clientbound = play::clientbound::SET_CURSOR_ITEM "set_cursor_item" {
         item: ItemStack,
@@ -1062,6 +1111,11 @@ packet! {
 
     ContainerClose in Play Serverbound = play::serverbound::CONTAINER_CLOSE "container_close" {
         window_id: VarInt,
+    }
+
+    /// `action`: 0 perform respawn, 1 request statistics.
+    ClientCommand in Play Serverbound = play::serverbound::CLIENT_COMMAND "client_command" {
+        action: VarInt,
     }
 
     SetCarriedItem in Play Serverbound = play::serverbound::SET_CARRIED_ITEM "set_carried_item" {

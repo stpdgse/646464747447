@@ -12,6 +12,7 @@
 //!                                                  the given face and cursor position
 //!           dig <start|stop|abort> <x> <y> <z> <face> <sequence>
 //!                                                  send a digging action (survival mining)
+//!           move <x> <y> <z> <ground 0|1>          send a position packet
 //!           ground                                 report standing on the ground (the server
 //!                                                  counts a client that never moved as airborne)
 //!           click <slot> <button> <type>           send an inventory click claiming no changes
@@ -31,8 +32,8 @@ use clap::Parser;
 use ferrite_protocol::codec::VarInt;
 use ferrite_protocol::packets::play::{
     BlockChangedAck, ContainerClick, ContainerClose, ContainerSetContent, ContainerSetSlot,
-    HashedStack, ItemStack, MovePlayerStatusOnly, OpenScreen, PackedPos, PlayerAction,
-    SetCreativeModeSlot, SetCursorItem, SetPlayerInventory, UseItemOn,
+    HashedStack, ItemStack, MovePlayerPos, MovePlayerStatusOnly, OpenScreen, PackedPos,
+    PlayerAction, SetCreativeModeSlot, SetCursorItem, SetPlayerInventory, UseItemOn,
 };
 use ferrite_swarm::PlayBot;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -149,6 +150,15 @@ async fn main() -> anyhow::Result<()> {
                         };
                         let all: Vec<String> = slots.iter().map(show).collect();
                         println!("inv {} {} {}", state_id, show(&carried), all.join(" "));
+                    }
+                    ["move", x, y, z, ground] => {
+                        bot.send(&MovePlayerPos {
+                            x: x.parse()?,
+                            y: y.parse()?,
+                            z: z.parse()?,
+                            flags: u8::from(*ground == "1"),
+                        })
+                        .await?;
                     }
                     ["ground"] => {
                         bot.send(&MovePlayerStatusOnly { flags: 1 }).await?;

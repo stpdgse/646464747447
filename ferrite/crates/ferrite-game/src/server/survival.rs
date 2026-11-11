@@ -209,6 +209,7 @@ impl Game {
             };
             drops = ferrite_loot::block_drops(&ctx, &mut Dice(&mut self.rng));
         }
+        self.add_exhaustion(id, 0.005);
         self.spill_container(pos);
         self.world.destroy_block(pos);
         for drop in drops {

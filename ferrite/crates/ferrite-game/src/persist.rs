@@ -40,6 +40,9 @@ pub struct PlayerSave {
     pub held_slot: u8,
     /// `(slot, stack)` of every non-empty slot except the crafting grid.
     pub slots: Vec<(u8, ItemStack)>,
+    pub health: f32,
+    pub food: i32,
+    pub saturation: f32,
 }
 
 /// A dropped item as saved.
@@ -210,7 +213,7 @@ impl Persistence {
     }
 
     pub fn save_player(&self, uuid: Uuid, p: &PlayerSave) -> Result<(), PersistError> {
-        let mut out = vec![1u8];
+        let mut out = vec![2u8];
         for v in p.pos {
             out.extend_from_slice(&v.to_le_bytes());
         }
@@ -223,6 +226,9 @@ impl Persistence {
             out.push(*slot);
             put_stack(&mut out, *stack);
         }
+        out.extend_from_slice(&p.health.to_le_bytes());
+        out.extend_from_slice(&p.food.to_le_bytes());
+        out.extend_from_slice(&p.saturation.to_le_bytes());
         write_atomic(&self.player_path(uuid), &out)
     }
 
@@ -234,7 +240,8 @@ impl Persistence {
             Err(e) => return Err(e.into()),
         }
         let mut r = Reader(&bytes);
-        if r.u8()? != 1 {
+        let version = r.u8()?;
+        if version != 1 && version != 2 {
             return Err(PersistError::Corrupt { what: "player", why: "unknown version" });
         }
         let pos = [r.f64()?, r.f64()?, r.f64()?];
@@ -247,7 +254,19 @@ impl Persistence {
                 slots.push((slot, stack));
             }
         }
-        Ok(Some(PlayerSave { pos, yaw, pitch, game_mode, held_slot, slots }))
+        let (health, food, saturation) =
+            if version >= 2 { (r.f32()?, r.i32()?, r.f32()?) } else { (20.0, 20, 5.0) };
+        Ok(Some(PlayerSave {
+            pos,
+            yaw,
+            pitch,
+            game_mode,
+            held_slot,
+            slots,
+            health,
+            food,
+            saturation,
+        }))
     }
 
     // ---- dropped items ----
@@ -356,6 +375,9 @@ mod tests {
             game_mode: 0,
             held_slot: 4,
             slots: vec![(36, stack("minecraft:oak_log", 64)), (45, stack("minecraft:shield", 1))],
+            health: 13.5,
+            food: 7,
+            saturation: 2.5,
         };
         p.save_player(uuid, &save).unwrap();
         assert_eq!(p.load_player(uuid).unwrap(), Some(save));

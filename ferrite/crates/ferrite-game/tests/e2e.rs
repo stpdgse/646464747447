@@ -593,3 +593,35 @@ async fn chest_contents_survive_a_restart() {
         decode(&until(&mut a, 100, |p| p.name == "container_set_content").await);
     assert_eq!(content.items.0[0], stone, "the chest still holds what was put in it");
 }
+
+#[tokio::test]
+async fn falling_hurts_and_dying_shows_the_death_screen_then_respawns() {
+    use ferrite_protocol::codec::VarInt;
+    let s =
+        server_with(GameConfig { game_mode: 0, view_distance: 4, ..GameConfig::default() }).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+    // The flat world's floor is at y = -61; the player stands at -60. Climb 10 blocks (the
+    // server accepts the position) and fall back: 7 points of damage.
+    a.send(&MovePlayerPos { x: 0.5, y: -50.0, z: 0.5, flags: 0 }).await.unwrap();
+    a.send(&MovePlayerPos { x: 0.5, y: -60.0, z: 0.5, flags: 1 }).await.unwrap();
+    let set =
+        until(&mut a, 600, |p| p.name == "set_health" && decode::<SetHealth>(p).health < 20.0)
+            .await;
+    assert_eq!(decode::<SetHealth>(&set).health, 13.0, "a 10 block fall costs 7");
+    let hurt = until(&mut a, 100, |p| p.name == "damage_event").await;
+    let _ = decode::<DamageEvent>(&hurt);
+    // Fall again straight away: the invulnerability frames absorb a hit that is not stronger.
+    // Then a lethal fall.
+    tokio::time::sleep(Duration::from_millis(1200)).await;
+    for y in [20.0, 100.0, 20.0] {
+        a.send(&MovePlayerPos { x: 0.5, y, z: 0.5, flags: 0 }).await.unwrap();
+    }
+    a.send(&MovePlayerPos { x: 0.5, y: -60.0, z: 0.5, flags: 1 }).await.unwrap();
+    let kill = until(&mut a, 600, |p| p.name == "player_combat_kill").await;
+    let _ = decode::<PlayerCombatKill>(&kill);
+    a.send(&ClientCommand { action: VarInt(0) }).await.unwrap();
+    until(&mut a, 600, |p| p.name == "respawn").await;
+    let set = until(&mut a, 600, |p| p.name == "set_health").await;
+    assert_eq!(decode::<SetHealth>(&set).health, 20.0);
+}

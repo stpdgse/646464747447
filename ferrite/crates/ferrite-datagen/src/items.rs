@@ -15,7 +15,7 @@ pub fn generate(cx: &GenContext, regs: &[Registry]) -> Result<String> {
     let dir = cx.reports.join("minecraft/components/item");
     let mut out = String::new();
     out.push_str(&cx.header);
-    out.push_str("\nuse crate::items::{EquipSlot, ItemInfo, ToolInfo, ToolRule};\n\n");
+    out.push_str("\nuse crate::items::{EquipSlot, FoodInfo, ItemInfo, ToolInfo, ToolRule};\n\n");
     let _ = writeln!(out, "pub static ITEMS: [ItemInfo; {}] = [", items.names.len());
     for name in &items.names {
         let short = name.strip_prefix("minecraft:").unwrap_or(name);
@@ -80,9 +80,26 @@ pub fn generate(cx: &GenContext, regs: &[Registry]) -> Result<String> {
                 format!("Some(EquipSlot::{variant})")
             }
         };
+        let food = match c.get("minecraft:food") {
+            None => "None".to_string(),
+            Some(f) => {
+                let nutrition = f["nutrition"].as_i64().context("food nutrition")?;
+                let saturation = f["saturation"].as_f64().context("food saturation")? as f32;
+                let always = f.get("can_always_eat").and_then(Value::as_bool).unwrap_or(false);
+                let seconds = c
+                    .get("minecraft:consumable")
+                    .and_then(|k| k.get("consume_seconds"))
+                    .and_then(Value::as_f64)
+                    .unwrap_or(1.6);
+                let ticks = (seconds * 20.0) as u32;
+                format!(
+                    "Some(FoodInfo {{ nutrition: {nutrition}, saturation: {saturation:?}f32, can_always_eat: {always}, consume_ticks: {ticks} }})"
+                )
+            }
+        };
         let _ = writeln!(
             out,
-            "    ItemInfo {{ max_stack: {max_stack}, max_damage: {max_damage}, tool: {tool}, equip: {equip} }}, // {name}"
+            "    ItemInfo {{ max_stack: {max_stack}, max_damage: {max_damage}, tool: {tool}, equip: {equip}, food: {food} }}, // {name}"
         );
     }
     out.push_str("];\n");
