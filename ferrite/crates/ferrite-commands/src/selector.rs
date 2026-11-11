@@ -67,6 +67,8 @@ pub struct Selector {
     /// `advancements={id=true}` or `{id={criterion=true}}`.
     pub advancements: Vec<(String, AdvancementTest)>,
     pub predicates: Vec<(bool, String)>,
+    /// `nbt=` filters (negated?, compound).
+    pub nbt: Vec<(bool, ferrite_nbt::Compound)>,
 }
 
 /// What a selector asks of one advancement.
@@ -103,6 +105,7 @@ impl Selector {
             scores: Vec::new(),
             advancements: Vec::new(),
             predicates: Vec::new(),
+            nbt: Vec::new(),
         }
     }
 }
@@ -124,8 +127,6 @@ struct State {
     type_tags: Vec<String>,
     has_scores: bool,
     has_advancements: bool,
-    /// `nbt=` was used and Ferrite cannot parse NBT yet.
-    unsupported: bool,
 }
 
 fn err(reader: &Reader, key: &str) -> SyntaxError {
@@ -345,9 +346,9 @@ fn handle_option(
             sel.predicates.push((negated, id));
         }
         "nbt" => {
-            // NBT needs the SNBT parser, which Ferrite does not have yet.
-            st.unsupported = true;
-            return Err(crate::args::unsupported(reader));
+            let negated = should_invert(reader);
+            let tag = crate::nbt::read_compound(reader)?;
+            sel.nbt.push((negated, tag));
         }
         "scores" => {
             reader.expect('{')?;

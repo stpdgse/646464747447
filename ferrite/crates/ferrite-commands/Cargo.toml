@@ -9,6 +9,7 @@ publish.workspace = true
 
 [dependencies]
 ferrite-data.workspace = true
+ferrite-nbt = { version = "0.1.0", path = "../ferrite-nbt" }
 thiserror.workspace = true
 
 [lints]

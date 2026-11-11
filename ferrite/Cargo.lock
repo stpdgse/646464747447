@@ -920,6 +920,7 @@ name = "ferrite-commands"
 version = "0.1.0"
 dependencies = [
  "ferrite-data",
+ "ferrite-nbt",
  "thiserror",
 ]
 

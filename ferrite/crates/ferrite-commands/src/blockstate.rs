@@ -14,6 +14,8 @@ pub struct BlockSpec {
     /// The block's registry name (empty for tags).
     pub block: String,
     pub properties: Vec<(String, String)>,
+    /// Block entity data (`chest{Lock:"x"}`).
+    pub nbt: Option<ferrite_nbt::Compound>,
 }
 
 fn err(reader: &Reader, key: &str, args: Vec<Arg>) -> SyntaxError {
@@ -37,10 +39,8 @@ pub fn parse_block(reader: &mut Reader, allow_tags: bool) -> Result<BlockSpec> {
             reader.skip();
             read_loose_properties(reader, &mut properties)?;
         }
-        if reader.can_read() && reader.peek() == '{' {
-            return Err(crate::args::unsupported(reader));
-        }
-        return Ok(BlockSpec { tag: Some(tag), block: String::new(), properties });
+        let nbt = read_block_nbt(reader)?;
+        return Ok(BlockSpec { tag: Some(tag), block: String::new(), properties, nbt });
     }
     let id_start = reader.cursor();
     let id = read_identifier(reader)?;
@@ -103,10 +103,16 @@ pub fn parse_block(reader: &mut Reader, allow_tags: bool) -> Result<BlockSpec> {
             return Err(err(reader, "argument.block.property.unclosed", vec![]));
         }
     }
+    let nbt = read_block_nbt(reader)?;
+    Ok(BlockSpec { tag: None, block: id, properties, nbt })
+}
+
+fn read_block_nbt(reader: &mut Reader) -> Result<Option<ferrite_nbt::Compound>> {
     if reader.can_read() && reader.peek() == '{' {
-        return Err(crate::args::unsupported(reader));
+        crate::nbt::read_compound(reader).map(Some)
+    } else {
+        Ok(None)
     }
-    Ok(BlockSpec { tag: None, block: id, properties })
 }
 
 /// Tag properties are not checked against any block.

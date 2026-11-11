@@ -98,6 +98,17 @@ fn selector_sample(rng: &mut Rng) -> String {
     out.push(*rng.pick(&['a', 'e', 'p', 'r', 's', 'n', 'a', 'e']));
     if rng.chance(70) {
         let options = [
+            "nbt={}",
+            "nbt={a:1}",
+            "nbt=!{a:1b,b:[1,2]}",
+            "nbt=1",
+            "nbt={a}",
+            "nbt=",
+            "nbt={a:",
+            "nbt= {a:'x'}",
+            "nbt=!1",
+            "nbt=[]",
+            "nbt={a:1L}x",
             "limit=1",
             "limit=0",
             "limit=x",
@@ -387,6 +398,35 @@ fn sample(node: &Node, rng: &mut Rng) -> Option<String> {
                 "@a@e",
             ],
         ),
+        Parser::Simple(id::NBT_COMPOUND_TAG | id::NBT_TAG) => pick_str(
+            rng,
+            &[
+                "{}",
+                "{a:1}",
+                "{a:1b,b:[1,2],c:{d:\"x\"}}",
+                "{ a : 1 }",
+                "1",
+                "[1]",
+                "\"x\"",
+                "x",
+                "{a}",
+                "{a:",
+                "{a:1}x",
+                "{a:1} x",
+                "",
+                " {a:1}",
+                "{a:0x1F}",
+                "{a:1_0}",
+                "{a:1.5e3f}",
+                "{\"k y\":[B;1,2]}",
+                "[I;1]",
+                "bool(1)",
+                "1b",
+                "{a:uuid(\"0-0-0-0-1\")}",
+                "-",
+                "{a:1,}",
+            ],
+        ),
         Parser::Simple(id::BLOCK_STATE | id::BLOCK_PREDICATE) => {
             let blocks = ferrite_data::blocks::BLOCKS;
             let b = &blocks[rng.below(blocks.len())];
@@ -421,6 +461,9 @@ fn sample(node: &Node, rng: &mut Rng) -> Option<String> {
                 if rng.chance(90) {
                     out.push(']');
                 }
+            }
+            if rng.chance(12) {
+                out.push_str(rng.pick(&["{}", "{a:1}", "{a", "{a:1,b:[1]}", "{ x : 'y' }", "{1}"]));
             }
             out
         }

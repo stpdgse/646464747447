@@ -11,6 +11,7 @@ pub mod blockstate;
 pub mod coordinates;
 pub mod dispatch;
 pub mod identifier;
+pub mod nbt;
 pub mod range;
 pub mod reader;
 pub mod selector;
