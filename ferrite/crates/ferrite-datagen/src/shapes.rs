@@ -26,6 +26,8 @@ struct Row {
     occlusion: u32,
     face_occlusion: [u32; 6],
     sturdy: u32,
+    destroy_bits: u32,
+    needs_tool: bool,
 }
 
 fn parse_boxes(line: &str) -> Result<Vec<Box6>> {
@@ -78,7 +80,7 @@ pub fn generate(cx: &GenContext) -> Result<String> {
             .split(' ')
             .map(|x| x.parse::<u32>().with_context(|| format!("bad field {x:?} in {line:?}")))
             .collect::<Result<_>>()?;
-        ensure!(v.len() == 19, "state row has {} fields, want 19: {line:?}", v.len());
+        ensure!(v.len() == 21, "state row has {} fields, want 21: {line:?}", v.len());
         ensure!(v[0] as usize == expect, "state ids are not sequential at {expect}");
         let row = Row {
             flags: v[1],
@@ -93,6 +95,8 @@ pub fn generate(cx: &GenContext) -> Result<String> {
             occlusion: v[11],
             face_occlusion: [v[12], v[13], v[14], v[15], v[16], v[17]],
             sturdy: v[18],
+            destroy_bits: v[19],
+            needs_tool: v[20] != 0,
         };
         for s in [row.collision, row.shape, row.occlusion].into_iter().chain(row.face_occlusion) {
             ensure!((s as usize) < shapes.len(), "shape id {s} out of range");
@@ -145,6 +149,14 @@ pub fn generate(cx: &GenContext) -> Result<String> {
             r.face_occlusion[5],
             r.sturdy
         );
+    }
+    out.push_str("];\n\n");
+    out.push_str(
+        "/// Per state: `(destroy speed bits as an f32, requires the correct tool for drops)`.\n",
+    );
+    let _ = writeln!(out, "pub static STATE_DESTROY: [(u32, bool); {}] = [", rows.len());
+    for r in &rows {
+        let _ = writeln!(out, "    ({}, {}),", r.destroy_bits, r.needs_tool);
     }
     out.push_str("];\n");
     Ok(out)

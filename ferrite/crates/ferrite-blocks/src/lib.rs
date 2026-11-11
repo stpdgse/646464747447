@@ -7,6 +7,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod dig;
 pub mod fluid;
 mod generated_placement;
 mod kinds;

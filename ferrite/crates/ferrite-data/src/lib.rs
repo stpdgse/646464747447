@@ -10,6 +10,8 @@ pub mod blocks;
 pub mod configuration;
 #[allow(clippy::all, missing_docs, non_upper_case_globals)]
 pub mod generated;
+pub mod items;
+pub mod loot;
 pub mod registries;
 pub mod shapes;
 

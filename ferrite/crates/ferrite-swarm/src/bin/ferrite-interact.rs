@@ -10,6 +10,10 @@
 //!                                                  put <item> (e.g. minecraft:stone) in the first
 //!                                                  hotbar slot (creative) and right-click x y z at
 //!                                                  the given face and cursor position
+//!           dig <start|stop|abort> <x> <y> <z> <face> <sequence>
+//!                                                  send a digging action (survival mining)
+//!           ground                                 report standing on the ground (the server
+//!                                                  counts a client that never moved as airborne)
 //!           quit
 //!   stdout: ready                                  joined and the first chunks have arrived
 //!           ack <sequence>                         the server acknowledged that click
@@ -23,7 +27,8 @@ use std::time::Duration;
 use clap::Parser;
 use ferrite_protocol::codec::VarInt;
 use ferrite_protocol::packets::play::{
-    BlockChangedAck, ItemStack, PackedPos, SetCreativeModeSlot, UseItemOn,
+    BlockChangedAck, ItemStack, MovePlayerStatusOnly, PackedPos, PlayerAction, SetCreativeModeSlot,
+    UseItemOn,
 };
 use ferrite_swarm::PlayBot;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -95,6 +100,25 @@ async fn main() -> anyhow::Result<()> {
                         })
                         .await?;
                     }
+                    ["dig", what, x, y, z, face, seq] => {
+                        let action = match *what {
+                            "start" => 0,
+                            "abort" => 1,
+                            "stop" => 2,
+                            n if n.parse::<i32>().is_ok() => n.parse()?,
+                            other => anyhow::bail!("unknown dig action {other}"),
+                        };
+                        bot.send(&PlayerAction {
+                            action: VarInt(action),
+                            pos: PackedPos::new(x.parse()?, y.parse()?, z.parse()?),
+                            face: face.parse()?,
+                            sequence: VarInt(seq.parse()?),
+                        })
+                        .await?;
+                    }
+                    ["ground"] => {
+                        bot.send(&MovePlayerStatusOnly { flags: 1 }).await?;
+                    }
                     ["quit"] => break,
                     _ => eprintln!("unknown command: {line}"),
                 }
@@ -103,6 +127,9 @@ async fn main() -> anyhow::Result<()> {
                 // Keep answering keep-alives and report acknowledgements.
                 if let Ok(p) = packet {
                     let p = p?;
+                    if std::env::var_os("FERRITE_INTERACT_TRACE").is_some() {
+                        eprintln!("pkt {} {:?}", p.name, p.body);
+                    }
                     if p.name == "player_position" {
                         teleports += 1;
                         println!("tp {teleports}");

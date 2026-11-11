@@ -2,6 +2,8 @@
 
 pub mod blocks;
 pub mod configuration;
+pub mod items;
+pub mod loot;
 pub mod meta;
 pub mod packets;
 pub mod registries;

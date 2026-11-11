@@ -123,6 +123,8 @@ public final class ShapeDump {
                 }
             }
             sb.append(' ').append(sturdy);
+            sb.append(' ').append(Float.floatToIntBits(s.getDestroySpeed(g, p)) & 0xFFFFFFFFL);
+            sb.append(' ').append(s.requiresCorrectToolForDrops() ? 1 : 0);
             rows.add(sb.toString());
         }
         try (PrintWriter w = new PrintWriter(args[0], StandardCharsets.UTF_8)) {

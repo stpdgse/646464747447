@@ -966,6 +966,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ferrite-loot"
+version = "0.1.0"
+dependencies = [
+ "ferrite-data",
+ "serde_json",
+]
+
+[[package]]
 name = "ferrite-nbt"
 version = "0.1.0"
 dependencies = [

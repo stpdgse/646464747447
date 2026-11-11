@@ -6,7 +6,14 @@
 //!
 //! Face order everywhere is `down, up, north, south, west, east`.
 
-pub use crate::generated::shapes::{SHAPES, STATE_FACTS};
+pub use crate::generated::shapes::{SHAPES, STATE_DESTROY, STATE_FACTS};
+
+/// How long a block takes to break by hand (vanilla's `destroy speed`, -1 = unbreakable) and
+/// whether its drops need the right tool.
+pub fn destroy_info(state: u16) -> (f32, bool) {
+    let (bits, needs_tool) = STATE_DESTROY[usize::from(state)];
+    (f32::from_bits(bits), needs_tool)
+}
 
 /// An axis-aligned box in block-local coordinates (collision boxes may extend past 1.0, e.g. fences): `[min_x, min_y, min_z, max_x, max_y, max_z]`.
 pub type Box6 = [f64; 6];

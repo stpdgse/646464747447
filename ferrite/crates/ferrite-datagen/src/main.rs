@@ -11,6 +11,8 @@
 
 mod blocks;
 mod configuration;
+mod items;
+mod loot;
 mod meta;
 mod packets;
 mod registries;
@@ -88,6 +90,8 @@ fn main() -> Result<()> {
         ("registries.rs", registries::generate(&cx, &regs)?),
         ("blocks.rs", blocks::generate(&cx, &regs)?),
         ("shapes.rs", shapes::generate(&cx)?),
+        ("items.rs", items::generate(&cx, &regs)?),
+        ("loot.rs", loot::generate(&cx)?),
         ("configuration.rs", configuration::generate(&cx, &regs)?),
         ("mod.rs", mod_rs(&cx)),
     ];
@@ -112,7 +116,7 @@ fn main() -> Result<()> {
 
 fn mod_rs(cx: &GenContext) -> String {
     format!(
-        "{}\npub mod blocks;\npub mod configuration;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\n",
+        "{}\npub mod blocks;\npub mod configuration;\npub mod items;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\n",
         cx.header
     )
 }
