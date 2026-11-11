@@ -26,6 +26,9 @@
 //!           ack <sequence>                         the server acknowledged that click
 //!           evt <name> <hex>                       a packet named in FERRITE_INTERACT_WATCH
 //!                                                  (comma separated), body as hex
+//!           chat <message> <chat type> <sender> <target|->
+//!                                                  a disguised chat message (/say, /me, /msg), text
+//!                                                  components as text
 //!           sys <snbt> <0|1>                       a system message (text component, overlay)
 //!           tp <n>                                 the n-th teleport was confirmed (the server
 //!                                                  ignores clicks until the previous one is)
@@ -38,9 +41,9 @@ use clap::Parser;
 use ferrite_protocol::codec::VarInt;
 use ferrite_protocol::packets::play::{
     BlockChangedAck, ChatCommand, ContainerClick, ContainerClose, ContainerSetContent,
-    ContainerSetSlot, HashedStack, ItemStack, MovePlayerPos, MovePlayerStatusOnly, OpenScreen,
-    PackedPos, PlayerAction, SetCreativeModeSlot, SetCursorItem, SetPlayerInventory, SystemChat,
-    UseItemOn,
+    ContainerSetSlot, DisguisedChat, HashedStack, ItemStack, MovePlayerPos, MovePlayerStatusOnly,
+    OpenScreen, PackedPos, PlayerAction, SetCreativeModeSlot, SetCursorItem, SetPlayerInventory,
+    SystemChat, UseItemOn,
 };
 use ferrite_swarm::PlayBot;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -249,6 +252,18 @@ async fn main() -> anyhow::Result<()> {
                     if watch.iter().any(|w| w == p.name) {
                         let hex: String = p.body.iter().map(|b| format!("{b:02x}")).collect();
                         println!("evt {} {hex}", p.name);
+                    }
+                    if p.name == "disguised_chat" {
+                        let c: DisguisedChat = ferrite_protocol::codec::decode_exact(&p.body)?;
+                        println!(
+                            "chat {} {} {} {}",
+                            ferrite_nbt::snbt::to_sorted_snbt(&c.message.0),
+                            c.chat_type.0,
+                            ferrite_nbt::snbt::to_sorted_snbt(&c.name.0),
+                            c.target_name
+                                .as_ref()
+                                .map_or("-".to_string(), |t| ferrite_nbt::snbt::to_sorted_snbt(&t.0)),
+                        );
                     }
                     if p.name == "system_chat" {
                         let c: SystemChat = ferrite_protocol::codec::decode_exact(&p.body)?;

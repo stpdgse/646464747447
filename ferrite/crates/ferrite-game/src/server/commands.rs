@@ -245,6 +245,11 @@ impl Game {
             "list" => self.cmd_list(id, false),
             "list/uuids" => self.cmd_list(id, true),
             "seed" => self.cmd_seed(id),
+            "say/message" => self.cmd_say(id, args, "minecraft:say_command", "message"),
+            "me/action" => self.cmd_say(id, args, "minecraft:emote_command", "action"),
+            "msg/targets/message" => self.cmd_msg(id, args),
+            // (Teams do not exist yet, so nobody is ever on one.)
+            "teammsg/message" => Err(failure("commands.teammsg.failed.noteam", vec![])),
             "tick/query" => self.cmd_tick_query(id),
             "tick/freeze" => self.cmd_tick_freeze(id, true),
             "tick/unfreeze" => self.cmd_tick_freeze(id, false),
@@ -271,14 +276,15 @@ impl Game {
     /// The players a selector argument names (entities that are not players are not handled
     /// yet).
     fn players_from(
-        &self,
+        &mut self,
         source: PlayerId,
         arg: Option<&dispatch::ParsedArgument>,
     ) -> std::result::Result<Vec<PlayerId>, Failure> {
         let Some(dispatch::ParsedArgument { value: Value::Selector(sel), .. }) = arg else {
             return Err(failure("argument.entity.invalid", vec![]));
         };
-        let found = self.select_players(source, sel);
+        let sel = sel.clone();
+        let found = self.select_players(source, &sel);
         if found.is_empty() {
             return Err(failure("argument.entity.notfound.player", vec![]));
         }
@@ -452,14 +458,15 @@ impl Game {
         Ok(1)
     }
 
-    /// Players a selector picks (names, UUIDs and the player-only selector types for now).
+    /// Players a selector picks: names and UUIDs, `@a @p @r @s @e` with their options
+    /// (entities that are not players are not handled yet).
     pub(super) fn select_players(
-        &self,
+        &mut self,
         source: PlayerId,
         sel: &ferrite_commands::selector::Selector,
     ) -> Vec<PlayerId> {
-        use ferrite_commands::selector::Target;
-        match &sel.target {
+        use ferrite_commands::selector::{Order, Target};
+        let found: Vec<PlayerId> = match &sel.target {
             Target::Name(n) => self
                 .order
                 .iter()
@@ -472,9 +479,219 @@ impl Game {
                 .copied()
                 .filter(|i| self.players.get(i).is_some_and(|p| p.uuid.as_u128() == *u))
                 .collect(),
-            Target::Selector('s') => vec![source],
+            Target::Selector('s') => {
+                if self.players.contains_key(&source) {
+                    vec![source]
+                } else {
+                    Vec::new()
+                }
+            }
             Target::Selector(_) => self.order.clone(),
+        };
+        let Some(src) = self.players.get(&source) else { return Vec::new() };
+        let origin = [sel.x.unwrap_or(src.x), sel.y.unwrap_or(src.y), sel.z.unwrap_or(src.z)];
+        let mut matches: Vec<(PlayerId, f64)> = Vec::new();
+        for id in found {
+            let Some(p) = self.players.get(&id) else { continue };
+            let d2 =
+                (p.x - origin[0]).powi(2) + (p.y - origin[1]).powi(2) + (p.z - origin[2]).powi(2);
+            if let Some(r) = &sel.distance
+                && !range_has(r.min.map(|m| m * m), r.max.map(|m| m * m), d2)
+            {
+                continue;
+            }
+            // A volume: the player's feet must lie in the box that starts at the origin.
+            if sel.dx.is_some() || sel.dy.is_some() || sel.dz.is_some() {
+                let inside = |v: f64, o: f64, d: Option<f64>| match d {
+                    Some(d) => (v >= o.min(o + d)) && (v <= o.max(o + d)),
+                    None => true,
+                };
+                if !(inside(p.x, origin[0], sel.dx)
+                    && inside(p.y, origin[1], sel.dy)
+                    && inside(p.z, origin[2], sel.dz))
+                {
+                    continue;
+                }
+            }
+            if let Some(r) = &sel.level
+                && !range_has(r.min.map(f64::from), r.max.map(f64::from), f64::from(p.xp_level))
+            {
+                continue;
+            }
+            if let Some(r) = &sel.x_rotation
+                && !range_has(r.min, r.max, wrap_degrees(f64::from(p.pitch)))
+            {
+                continue;
+            }
+            if let Some(r) = &sel.y_rotation
+                && !range_has(r.min, r.max, wrap_degrees(f64::from(p.yaw)))
+            {
+                continue;
+            }
+            if sel.game_modes.iter().any(|(negated, m)| (p.game_mode == *m) == *negated) {
+                continue;
+            }
+            if sel.names.iter().any(|(negated, n)| (p.name == *n) == *negated) {
+                continue;
+            }
+            // Players are not on teams or tagged yet, and have no scores.
+            if sel.tags.iter().any(|(negated, t)| !t.is_empty() && !*negated)
+                || sel.teams.iter().any(|(negated, _)| !*negated)
+                || !sel.scores.is_empty()
+            {
+                continue;
+            }
+            let player_type = "minecraft:player";
+            if sel.types.iter().any(|(negated, t)| match t {
+                ferrite_commands::selector::TypeFilter::Type(n) => (n == player_type) == *negated,
+                ferrite_commands::selector::TypeFilter::Tag(_) => !*negated,
+            }) {
+                continue;
+            }
+            matches.push((id, d2));
         }
+        match sel.order {
+            Order::Nearest => matches.sort_by(|a, b| a.1.total_cmp(&b.1)),
+            Order::Furthest => matches.sort_by(|a, b| b.1.total_cmp(&a.1)),
+            Order::Random => {
+                // A shuffle from the game's own dice.
+                let mut dice = self.mob_dice();
+                for i in (1..matches.len()).rev() {
+                    let j = dice.below(i as u32 + 1) as usize;
+                    matches.swap(i, j);
+                }
+            }
+            Order::Arbitrary => {}
+        }
+        matches.truncate(usize::try_from(sel.max_results).unwrap_or(usize::MAX));
+        matches.into_iter().map(|(id, _)| id).collect()
+    }
+}
+
+/// Whether `v` lies within the bounds (either may be missing).
+fn range_has(min: Option<f64>, max: Option<f64>, v: f64) -> bool {
+    min.is_none_or(|m| v >= m) && max.is_none_or(|m| v <= m)
+}
+
+fn wrap_degrees(d: f64) -> f64 {
+    let mut r = d % 360.0;
+    if r >= 180.0 {
+        r -= 360.0;
+    }
+    if r < -180.0 {
+        r += 360.0;
+    }
+    r
+}
+
+const CHAT_TYPES: &str = "minecraft:chat_type";
+
+/// The wire id of a chat type: its index in the `chat_type` registry plus one.
+fn chat_type_id(name: &str) -> i32 {
+    ferrite_data::configuration::SYNCHRONIZED_REGISTRIES
+        .iter()
+        .find(|r| r.id == CHAT_TYPES)
+        .and_then(|r| r.entries.iter().position(|e| *e == name))
+        .map_or(0, |i| i as i32 + 1)
+}
+
+impl Game {
+    /// A message argument as the text sent: selectors in it are replaced by the names of what
+    /// they pick (`MessageArgument.Message.toComponent`).
+    fn resolve_message(
+        &mut self,
+        source: PlayerId,
+        text: &str,
+        selectors: &[(usize, usize, ferrite_commands::selector::Selector)],
+    ) -> Component {
+        let permitted = self.players.get(&source).is_some_and(|p| p.permission_level >= 2);
+        if selectors.is_empty() || !permitted {
+            return Component::literal(text);
+        }
+        let units: Vec<u16> = text.encode_utf16().collect();
+        let piece = |from: usize, to: usize| String::from_utf16_lossy(&units[from..to]);
+        let mut out = Component::literal(piece(0, selectors[0].0));
+        let mut i = selectors[0].0;
+        for (start, end, sel) in selectors {
+            let picked = self.select_players(source, sel);
+            let names: Vec<Component> = picked
+                .iter()
+                .filter_map(|id| self.players.get(id))
+                .map(|p| player_display_name(&p.name, p.uuid))
+                .collect();
+            if i < *start {
+                out = out.append(Component::literal(piece(i, *start)));
+            }
+            if !names.is_empty() {
+                out = out.append(format_list(names));
+            }
+            i = *end;
+        }
+        if i < units.len() {
+            out = out.append(Component::literal(piece(i, units.len())));
+        }
+        out
+    }
+
+    fn send_disguised(
+        &self,
+        to: PlayerId,
+        message: &Component,
+        chat_type: &str,
+        name: &Component,
+        target: Option<&Component>,
+    ) {
+        if let Some(p) = self.players.get(&to) {
+            send(
+                &p.sink,
+                &DisguisedChat {
+                    message: Text(message.to_tag()),
+                    chat_type: VarInt(chat_type_id(chat_type)),
+                    name: Text(name.to_tag()),
+                    target_name: target.map(|t| Text(t.to_tag())),
+                },
+            );
+        }
+    }
+
+    fn message_arg(&mut self, id: PlayerId, args: &Args, key: &str) -> Component {
+        match args.get(key).map(|a| &a.value) {
+            Some(Value::Message { text, selectors }) => {
+                let (text, selectors) = (text.clone(), selectors.clone());
+                self.resolve_message(id, &text, &selectors)
+            }
+            _ => Component::empty(),
+        }
+    }
+
+    fn cmd_say(&mut self, id: PlayerId, args: &Args, chat_type: &str, key: &str) -> CommandResult {
+        let message = self.message_arg(id, args, key);
+        let Some(src) = self.players.get(&id) else { return Ok(0) };
+        let name = player_display_name(&src.name, src.uuid);
+        for to in self.order.clone() {
+            self.send_disguised(to, &message, chat_type, &name, None);
+        }
+        Ok(1)
+    }
+
+    fn cmd_msg(&mut self, id: PlayerId, args: &Args) -> CommandResult {
+        let targets = self.players_from(id, args.get("targets"))?;
+        let message = self.message_arg(id, args, "message");
+        let Some(src) = self.players.get(&id) else { return Ok(0) };
+        let name = player_display_name(&src.name, src.uuid);
+        for t in &targets {
+            let Some(p) = self.players.get(t) else { continue };
+            let target_name = player_display_name(&p.name, p.uuid);
+            self.send_disguised(
+                id,
+                &message,
+                "minecraft:msg_command_outgoing",
+                &name,
+                Some(&target_name),
+            );
+            self.send_disguised(*t, &message, "minecraft:msg_command_incoming", &name, None);
+        }
+        Ok(targets.len() as i32)
     }
 }
 

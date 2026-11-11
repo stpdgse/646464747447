@@ -9,7 +9,7 @@ use std::time::Duration;
 
 use ferrite_game::{GameConfig, GameThread};
 use ferrite_net::{Lobby, LobbyConfig, tokio_backend};
-use ferrite_protocol::packets::play::{ChatCommand, SystemChat};
+use ferrite_protocol::packets::play::{ChatCommand, DisguisedChat, SystemChat};
 use ferrite_swarm::PlayBot;
 use tokio::net::TcpListener;
 
@@ -65,6 +65,17 @@ async fn collect(bot: &mut PlayBot) -> Vec<String> {
                         "sys {} {}",
                         ferrite_nbt::snbt::to_sorted_snbt(&c.content.0),
                         u8::from(c.overlay)
+                    ));
+                } else if p.name == "disguised_chat" {
+                    let c: DisguisedChat = ferrite_protocol::codec::decode_exact(&p.body).unwrap();
+                    out.push(format!(
+                        "chat {} {} {} {}",
+                        ferrite_nbt::snbt::to_sorted_snbt(&c.message.0),
+                        c.chat_type.0,
+                        ferrite_nbt::snbt::to_sorted_snbt(&c.name.0),
+                        c.target_name
+                            .as_ref()
+                            .map_or("-".to_string(), |t| ferrite_nbt::snbt::to_sorted_snbt(&t.0)),
                     ));
                 } else if WATCH.contains(&p.name) {
                     let hex: String = p.body.iter().map(|b| format!("{b:02x}")).collect();

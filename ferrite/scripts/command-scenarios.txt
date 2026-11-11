@@ -107,3 +107,21 @@ tick rate 10000
 tick rate 1
 tick rate 20.0
 tick freeze
+
+scenario chat
+say hello
+say hello world
+me waves
+msg InteractBot hi there
+tell InteractBot hello
+w InteractBot x
+msg Nobody hi
+msg @a hi
+msg @e hi
+say @s
+say @a hello @p
+say hi @x
+say @a[limit=0]
+say x @s y @s z
+teammsg hello
+tm hello

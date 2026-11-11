@@ -284,3 +284,43 @@ sys {translate:"commands.tick.rate.success",with:["20.0"]} 0
 > tick freeze
 evt ticking_state 41a0000001
 sys {translate:"commands.tick.status.frozen"} 0
+
+scenario chat
+> say hello
+chat "hello" 5 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> say hello world
+chat "hello world" 5 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> me waves
+chat "waves" 2 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> msg InteractBot hi there
+chat "hi there" 4 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}
+chat "hi there" 3 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> tell InteractBot hello
+chat "hello" 4 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}
+chat "hello" 3 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> w InteractBot x
+chat "x" 4 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}
+chat "x" 3 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> msg Nobody hi
+sys {color:"red",extra:[{translate:"argument.entity.notfound.player"}],text:""} 0
+> msg @a hi
+chat "hi" 4 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}
+chat "hi" 3 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> msg @e hi
+sys {color:"red",extra:[{translate:"argument.player.entities"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/msg @e hi"},color:"gray",extra:[{color:"red",text:"msg @e hi",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> say @s
+chat {extra:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}],text:""} 5 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> say @a hello @p
+chat {extra:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":" hello "},{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"}],text:""} 5 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> say hi @x
+chat "hi @x" 5 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> say @a[limit=0]
+sys {color:"red",extra:[{translate:"argument.entity.options.limit.toosmall"}],text:""} 0
+sys {color:"red",extra:[{click_event:{action:"suggest_command",command:"/say @a[limit=0]"},color:"gray",extra:[{"":"..."},{"":" @a[limit="},{color:"red",text:"0]",underlined:1b},{color:"red",italic:1b,translate:"command.context.here"}],text:""}],text:""} 0
+> say x @s y @s z
+chat {extra:[{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":" y "},{click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"},{"":" z"}],text:"x "} 5 {click_event:{action:"suggest_command",command:"/tell InteractBot "},hover_event:{action:"show_entity",id:"minecraft:player",name:"InteractBot",uuid:[I;1787360164,2093560010,-1593441433,-97881148]},insertion:"InteractBot",text:"InteractBot"} -
+> teammsg hello
+sys {color:"red",extra:[{translate:"commands.teammsg.failed.noteam"}],text:""} 0
+> tm hello
+sys {color:"red",extra:[{translate:"commands.teammsg.failed.noteam"}],text:""} 0

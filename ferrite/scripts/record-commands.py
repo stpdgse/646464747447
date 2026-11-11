@@ -13,7 +13,7 @@ Needs the local vanilla server (offline, RCON). Local oracle testing only.
 """
 import argparse, os, subprocess, sys, time
 
-WATCH = "ticking_state,ticking_step,set_time,player_abilities,game_event,player_info_update,change_difficulty,set_experience,set_health"
+WATCH = "player_chat,ticking_state,ticking_step,set_time,player_abilities,game_event,player_info_update,change_difficulty,set_experience,set_health"
 sys.path.insert(0, os.path.dirname(__file__))
 
 
@@ -117,7 +117,7 @@ def main():
                 # (The game time at the front of a time packet depends on how old the world is.)
                 if got.startswith("evt set_time "):
                     got = "evt set_time " + got.split()[2][16:]
-                if got.startswith(("sys ", "evt ")):
+                if got.startswith(("sys ", "evt ", "chat ")):
                     out.write(got + "\n")
         bot.stdin.write("quit\n"); bot.stdin.flush()
         bot.wait(timeout=10)
