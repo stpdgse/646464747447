@@ -42,16 +42,120 @@ struct Drag {
     slots: Vec<usize>,
 }
 
+/// Which window a [`Menu`] is.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Layout {
+    /// The player's own inventory (window 0).
+    Player,
+    /// A crafting table.
+    Crafting,
+    /// A chest-like container with this many rows of nine slots.
+    Generic(usize),
+}
+
+/// Where the parts of a window sit.
+#[derive(Clone, Debug)]
+struct Geometry {
+    result: Option<usize>,
+    grid: std::ops::Range<usize>,
+    grid_width: usize,
+    armor: std::ops::Range<usize>,
+    main: std::ops::Range<usize>,
+    hotbar: std::ops::Range<usize>,
+    offhand: Option<usize>,
+}
+
+impl Layout {
+    fn geometry(self) -> Geometry {
+        match self {
+            Layout::Player => Geometry {
+                result: Some(0),
+                grid: 1..5,
+                grid_width: 2,
+                armor: 5..9,
+                main: 9..36,
+                hotbar: 36..45,
+                offhand: Some(45),
+            },
+            Layout::Crafting => Geometry {
+                result: Some(0),
+                grid: 1..10,
+                grid_width: 3,
+                armor: 0..0,
+                main: 10..37,
+                hotbar: 37..46,
+                offhand: None,
+            },
+            Layout::Generic(rows) => Geometry {
+                result: None,
+                grid: 0..0,
+                grid_width: 0,
+                armor: 0..0,
+                main: 9 * rows..9 * rows + 27,
+                hotbar: 9 * rows + 27..9 * rows + 36,
+                offhand: None,
+            },
+        }
+    }
+
+    pub fn slot_count(self) -> usize {
+        match self {
+            Layout::Player | Layout::Crafting => 46,
+            Layout::Generic(rows) => 9 * rows + 36,
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Menu {
-    pub slots: [ItemStack; SLOTS],
+    pub layout: Layout,
+    pub slots: Vec<ItemStack>,
     pub carried: ItemStack,
+    /// The player's off-hand item, which number-key swaps can reach even when the window has no
+    /// off-hand slot.
+    pub offhand: ItemStack,
     drag: Option<Drag>,
 }
 
 impl Default for Menu {
     fn default() -> Self {
-        Menu { slots: [ItemStack::default(); SLOTS], carried: ItemStack::default(), drag: None }
+        Menu::new(Layout::Player)
+    }
+}
+
+impl Menu {
+    pub fn new(layout: Layout) -> Self {
+        Menu {
+            layout,
+            slots: vec![ItemStack::default(); layout.slot_count()],
+            carried: ItemStack::default(),
+            offhand: ItemStack::default(),
+            drag: None,
+        }
+    }
+
+    fn geo(&self) -> Geometry {
+        self.layout.geometry()
+    }
+
+    /// Opens `layout` over the player's inventory: its main and hotbar slots are copied in.
+    pub fn opened_over(layout: Layout, player: &Menu) -> Menu {
+        let mut m = Menu::new(layout);
+        let (g, pg) = (m.geo(), player.geo());
+        for (to, from) in g.main.clone().chain(g.hotbar.clone()).zip(pg.main.chain(pg.hotbar)) {
+            m.slots[to] = player.slots[from];
+        }
+        m.offhand = player.slots[45];
+        m
+    }
+
+    /// Writes the player's own slots back after clicks in an opened window.
+    pub fn write_back(&self, player: &mut Menu) {
+        let (g, pg) = (self.geo(), player.geo());
+        for (from, to) in g.main.clone().chain(g.hotbar.clone()).zip(pg.main.chain(pg.hotbar)) {
+            player.slots[to] = self.slots[from];
+        }
+        player.slots[45] = self.offhand;
     }
 }
 
@@ -90,11 +194,14 @@ fn armor_slot(item: i32) -> Option<usize> {
 
 impl Menu {
     fn may_place(&self, slot: usize, stack: ItemStack) -> bool {
-        match slot {
-            0 => false,
-            5..=8 => armor_slot(stack.item) == Some(slot),
-            _ => true,
+        let g = self.geo();
+        if g.result == Some(slot) {
+            return false;
         }
+        if g.armor.contains(&slot) {
+            return armor_slot(stack.item) == Some(slot);
+        }
+        true
     }
 
     fn may_pickup(&self, _slot: usize) -> bool {
@@ -102,16 +209,18 @@ impl Menu {
     }
 
     fn slot_max(&self, slot: usize, item: i32) -> i32 {
-        if (5..=8).contains(&slot) { 1 } else { max_stack(item) }
+        if self.geo().armor.contains(&slot) { 1 } else { max_stack(item) }
     }
 
     /// Recomputes the crafting result from the 2x2 grid.
     pub fn refresh_result(&mut self) {
-        let grid: Vec<ferrite_crafting::Stack> = self.slots[1..=4]
+        let g = self.geo();
+        let Some(result) = g.result else { return };
+        let grid: Vec<ferrite_crafting::Stack> = self.slots[g.grid.clone()]
             .iter()
             .map(|s| ferrite_crafting::Stack { item: s.item, count: s.count })
             .collect();
-        self.slots[0] = match ferrite_crafting::craft(&grid, 2, 2) {
+        self.slots[result] = match ferrite_crafting::craft(&grid, g.grid_width, g.grid_width) {
             Some((_, out)) => ItemStack { count: out.count, item: out.item },
             None => ItemStack::default(),
         };
@@ -119,7 +228,8 @@ impl Menu {
 
     /// Takes one craft's worth out of the grid (the game's `ResultSlot.onTake`).
     fn consume_ingredients(&mut self) {
-        for cell in &mut self.slots[1..=4] {
+        let grid = self.geo().grid;
+        for cell in &mut self.slots[grid] {
             if !empty(*cell) {
                 cell.count -= 1;
                 if cell.count <= 0 {
@@ -159,7 +269,7 @@ impl Menu {
             Input::Pickup => self.pickup(slot, button, &mut drops),
             Input::QuickMove => {
                 if let Ok(s) = usize::try_from(slot)
-                    && s < SLOTS
+                    && s < self.slots.len()
                 {
                     let item = self.slots[s].item;
                     let mut moved = self.quick_move(s);
@@ -170,7 +280,7 @@ impl Menu {
             }
             Input::Swap => {
                 if let Ok(s) = usize::try_from(slot)
-                    && s < SLOTS
+                    && s < self.slots.len()
                     && (0..9).contains(&button) | (button == 40)
                 {
                     self.swap(s, button, &mut drops);
@@ -180,7 +290,7 @@ impl Menu {
                 if creative
                     && empty(self.carried)
                     && let Ok(s) = usize::try_from(slot)
-                    && s < SLOTS
+                    && s < self.slots.len()
                     && !empty(self.slots[s])
                 {
                     let item = self.slots[s].item;
@@ -190,7 +300,7 @@ impl Menu {
             Input::Throw => {
                 if empty(self.carried)
                     && let Ok(s) = usize::try_from(slot)
-                    && s < SLOTS
+                    && s < self.slots.len()
                     && !empty(self.slots[s])
                     && self.may_pickup(s)
                 {
@@ -216,10 +326,10 @@ impl Menu {
             return;
         }
         let Ok(s) = usize::try_from(slot) else { return };
-        if s >= SLOTS {
+        if s >= self.slots.len() {
             return;
         }
-        if s == 0 {
+        if self.geo().result == Some(s) {
             return self.pickup_result(button);
         }
         let (a, c) = (self.slots[s], self.carried);
@@ -258,7 +368,8 @@ impl Menu {
     /// A click on the crafting result: it can only be taken whole, onto an empty cursor or one
     /// holding the same item with room for all of it.
     fn pickup_result(&mut self, button: i32) {
-        let (a, c) = (self.slots[0], self.carried);
+        let Some(result) = self.geo().result else { return };
+        let (a, c) = (self.slots[result], self.carried);
         if empty(a) {
             return;
         }
@@ -275,14 +386,16 @@ impl Menu {
     /// Moves stack `slot` to where shift-click sends it; returns what was moved (empty if
     /// nothing).
     fn quick_move(&mut self, slot: usize) -> ItemStack {
-        if slot == 0 || empty(self.slots[slot]) {
+        if empty(self.slots[slot]) {
             return ItemStack::default();
         }
+        let g = self.geo();
         let original = self.slots[slot];
         let mut stack = original;
-        if slot == 0 {
+        let inventory_end = g.hotbar.end;
+        if g.result == Some(slot) {
             // Craft into the inventory (preferring the hotbar's end), consuming one craft.
-            if !self.move_to(&mut stack, 9, 45, true) {
+            if !self.move_to(&mut stack, g.main.start, inventory_end, true) {
                 return ItemStack::default();
             }
             if stack.count == original.count {
@@ -292,17 +405,37 @@ impl Menu {
             self.refresh_result();
             return original;
         }
-        let moved = if (1..=4).contains(&slot) || (5..=8).contains(&slot) || slot == 45 {
-            self.move_to(&mut stack, 9, 45, false)
-        } else if let Some(armor) = armor_slot(stack.item).filter(|a| empty(self.slots[*a])) {
-            let m = self.move_to(&mut stack, armor, armor + 1, false);
-            m || self.move_main_hotbar(&mut stack, slot)
-        } else if item_info(stack.item).and_then(|i| i.equip) == Some(EquipSlot::Offhand)
-            && empty(self.slots[45])
-        {
-            self.move_to(&mut stack, 45, 46, false) || self.move_main_hotbar(&mut stack, slot)
-        } else {
-            self.move_main_hotbar(&mut stack, slot)
+        let moved = match self.layout {
+            Layout::Generic(rows) => {
+                if slot < 9 * rows {
+                    self.move_to(&mut stack, g.main.start, inventory_end, true)
+                } else {
+                    self.move_to(&mut stack, 0, 9 * rows, false)
+                }
+            }
+            Layout::Crafting => {
+                if g.grid.contains(&slot) {
+                    self.move_to(&mut stack, g.main.start, inventory_end, false)
+                } else {
+                    self.move_main_hotbar(&mut stack, slot)
+                }
+            }
+            Layout::Player => {
+                if g.grid.contains(&slot) || g.armor.contains(&slot) || g.offhand == Some(slot) {
+                    self.move_to(&mut stack, g.main.start, inventory_end, false)
+                } else if let Some(armor) = armor_slot(stack.item).filter(|a| empty(self.slots[*a]))
+                {
+                    let m = self.move_to(&mut stack, armor, armor + 1, false);
+                    m || self.move_main_hotbar(&mut stack, slot)
+                } else if item_info(stack.item).and_then(|i| i.equip) == Some(EquipSlot::Offhand)
+                    && empty(self.slots[45])
+                {
+                    self.move_to(&mut stack, 45, 46, false)
+                        || self.move_main_hotbar(&mut stack, slot)
+                } else {
+                    self.move_main_hotbar(&mut stack, slot)
+                }
+            }
         };
         if !moved {
             return ItemStack::default();
@@ -311,13 +444,15 @@ impl Menu {
         original
     }
 
+    /// Main inventory to hotbar and back (any other slot goes to either).
     fn move_main_hotbar(&mut self, stack: &mut ItemStack, slot: usize) -> bool {
-        if (9..36).contains(&slot) {
-            self.move_to(stack, 36, 45, false)
-        } else if (36..45).contains(&slot) {
-            self.move_to(stack, 9, 36, false)
+        let g = self.geo();
+        if g.main.contains(&slot) {
+            self.move_to(stack, g.hotbar.start, g.hotbar.end, false)
+        } else if g.hotbar.contains(&slot) {
+            self.move_to(stack, g.main.start, g.main.end, false)
         } else {
-            self.move_to(stack, 9, 45, false)
+            self.move_to(stack, g.main.start, g.hotbar.end, false)
         }
     }
 
@@ -359,7 +494,11 @@ impl Menu {
     }
 
     fn swap(&mut self, slot: usize, button: i32, drops: &mut Vec<ItemStack>) {
-        let other = if button == 40 { 45 } else { 36 + button as usize };
+        let g = self.geo();
+        if button == 40 && g.offhand.is_none() {
+            return self.swap_offhand(slot, drops);
+        }
+        let other = if button == 40 { 45 } else { g.hotbar.start + button as usize };
         if other == slot {
             return;
         }
@@ -397,25 +536,70 @@ impl Menu {
         }
     }
 
+    /// Number-key 40 in a window that has no off-hand slot: swaps with the player's off hand.
+    fn swap_offhand(&mut self, slot: usize, drops: &mut Vec<ItemStack>) {
+        let (a, b) = (self.slots[slot], self.offhand);
+        if empty(a) && empty(b) {
+            return;
+        }
+        if empty(b) {
+            self.offhand = a;
+            self.slots[slot] = ItemStack::default();
+        } else if empty(a) {
+            if self.may_place(slot, b) {
+                let m = self.slot_max(slot, b.item);
+                let mut rest = b;
+                self.slots[slot] = split(&mut rest, m);
+                self.offhand = rest;
+            }
+        } else if self.may_place(slot, b) {
+            let m = self.slot_max(slot, b.item);
+            if b.count > m {
+                let mut rest = b;
+                self.slots[slot] = split(&mut rest, m);
+                self.offhand = rest;
+                let mut a = a;
+                if !self.add_anywhere(&mut a) {
+                    drops.push(a);
+                }
+            } else {
+                self.offhand = a;
+                self.slots[slot] = b;
+            }
+        }
+    }
+
     /// Adds to the main inventory and hotbar (hotbar first), as `Inventory.add` does.
     fn add_anywhere(&mut self, stack: &mut ItemStack) -> bool {
-        let mut inv = [ItemStack::default(); SLOTS];
-        inv.copy_from_slice(&self.slots);
+        let g = self.geo();
+        // Gather the player's slots in the add() layout, add, and put them back.
+        let mut inv = [ItemStack::default(); 46];
+        for (i, s) in g.main.clone().enumerate() {
+            inv[9 + i] = self.slots[s];
+        }
+        for (i, s) in g.hotbar.clone().enumerate() {
+            inv[36 + i] = self.slots[s];
+        }
         crate::items::add_to_inventory(&mut inv, 0, stack);
-        self.slots = inv;
+        for (i, s) in g.main.clone().enumerate() {
+            self.slots[s] = inv[9 + i];
+        }
+        for (i, s) in g.hotbar.clone().enumerate() {
+            self.slots[s] = inv[36 + i];
+        }
         stack.count <= 0
     }
 
     fn pickup_all(&mut self, slot: i32, button: i32) {
         let Ok(s) = usize::try_from(slot) else { return };
-        if s >= SLOTS || empty(self.carried) {
+        if s >= self.slots.len() || empty(self.carried) {
             return;
         }
         if !(empty(self.slots[s]) || !self.may_pickup(s)) {
             return;
         }
-        let order: Vec<usize> =
-            if button == 0 { (0..SLOTS).collect() } else { (0..SLOTS).rev().collect() };
+        let n = self.slots.len();
+        let order: Vec<usize> = if button == 0 { (0..n).collect() } else { (0..n).rev().collect() };
         let max = max_stack(self.carried.item);
         for pass in 0..2 {
             for &i in &order {
@@ -423,7 +607,7 @@ impl Menu {
                     return;
                 }
                 let cur = self.slots[i];
-                if i == 0 || !same(cur, self.carried) || !self.may_pickup(i) {
+                if self.geo().result == Some(i) || !same(cur, self.carried) || !self.may_pickup(i) {
                     continue;
                 }
                 if pass == 0 && cur.count == max_stack(cur.item) {
@@ -445,12 +629,12 @@ impl Menu {
             }
             1 => {
                 let Ok(s) = usize::try_from(slot) else { return };
-                if s >= SLOTS {
+                if s >= self.slots.len() {
                     return;
                 }
                 let (carried, cur) = (self.carried, self.slots[s]);
                 let fits = empty(cur) || same(cur, carried);
-                let placeable = s != 0 && self.may_place(s, carried);
+                let placeable = self.geo().result != Some(s) && self.may_place(s, carried);
                 let Some(drag) = self.drag.as_mut() else { return };
                 if !empty(carried)
                     && fits

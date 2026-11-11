@@ -121,12 +121,12 @@ pub fn container_slot(internal: usize) -> usize {
 /// first if they can take more, then any partial stack, then the first free slot (hotbar before
 /// main inventory). Returns the container slots that changed; `stack.count` is what is left.
 pub fn add_to_inventory(
-    inventory: &mut [ItemStack; 46],
+    inventory: &mut [ItemStack],
     held: usize,
     stack: &mut ItemStack,
 ) -> Vec<usize> {
     let mut changed = Vec::new();
-    let room = |inv: &[ItemStack; 46], slot: usize, s: &ItemStack| {
+    let room = |inv: &[ItemStack], slot: usize, s: &ItemStack| {
         let cur = inv[slot];
         cur.count > 0 && cur.item == s.item && cur.count < max_stack(s.item)
     };
