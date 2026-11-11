@@ -7,8 +7,12 @@
 #![forbid(unsafe_code)]
 
 pub mod args;
+pub mod coordinates;
 pub mod dispatch;
+pub mod identifier;
+pub mod range;
 pub mod reader;
+pub mod selector;
 pub mod tree;
 
 pub use reader::{Message, Reader, SyntaxError};

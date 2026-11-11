@@ -93,8 +93,8 @@ impl fmt::Display for Message {
 #[derive(Clone, Debug, PartialEq)]
 pub struct SyntaxError {
     pub message: Message,
-    /// Offset in characters from the start of the input.
-    pub cursor: usize,
+    /// Offset in UTF-16 units from the start of the input; -1 for errors raised without a position.
+    pub cursor: i64,
 }
 
 impl fmt::Display for SyntaxError {
@@ -215,8 +215,13 @@ impl Reader {
         self.substring(self.cursor, self.units.len())
     }
 
+    /// An error that carries no position (Brigadier's `create()`).
+    pub fn error_without_position(&self, message: Message) -> SyntaxError {
+        SyntaxError { message, cursor: -1 }
+    }
+
     pub fn error(&self, message: Message) -> SyntaxError {
-        SyntaxError { message, cursor: self.cursor }
+        SyntaxError { message, cursor: self.cursor as i64 }
     }
 
     pub fn read_int(&mut self) -> Result<i32> {

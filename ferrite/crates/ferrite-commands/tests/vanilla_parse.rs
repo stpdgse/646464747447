@@ -8,8 +8,9 @@ use std::fmt::Write as _;
 use std::path::PathBuf;
 use std::process::Command;
 
+use ferrite_commands::args::Source;
 use ferrite_commands::dispatch::{parse, parse_error};
-use ferrite_commands::tree::{Node, NodeKind, Parser, StringKind, Tree};
+use ferrite_commands::tree::{Node, NodeKind, Parser, ResourceKind, StringKind, Tree, id};
 
 struct Rng(u64);
 
@@ -72,6 +73,112 @@ fn numbers(min: Option<f64>, max: Option<f64>, int: bool, rng: &mut Rng) -> Stri
 }
 
 /// A word for an argument; `None` for argument types the parser does not handle yet.
+fn selector_sample(rng: &mut Rng) -> String {
+    if rng.chance(30) {
+        return pick_str(
+            rng,
+            &[
+                "Steve",
+                "steve",
+                "Steve_1",
+                "\"Steve\"",
+                "12345678-1234-1234-1234-123456789abc",
+                "1-2-3-4-5",
+                "1234",
+                "",
+                "Steve123456789012345678901",
+                "a b",
+                "@",
+                "@x",
+                "@A",
+            ],
+        );
+    }
+    let mut out = String::from("@");
+    out.push(*rng.pick(&['a', 'e', 'p', 'r', 's', 'n', 'a', 'e']));
+    if rng.chance(70) {
+        let options = [
+            "limit=1",
+            "limit=0",
+            "limit=x",
+            "limit=3",
+            "type=cow",
+            "type=!cow",
+            "type=pig",
+            "type=player",
+            "type=nope",
+            "type=#minecraft:skeletons",
+            "type=#foo",
+            "type=!pig",
+            "name=Steve",
+            "name=!Steve",
+            "name=\"a b\"",
+            "name=",
+            "distance=..5",
+            "distance=-1..5",
+            "distance=1.5",
+            "distance=5..1",
+            "level=1..5",
+            "level=1.5",
+            "level=..3",
+            "x=1",
+            "x=1.5",
+            "x=a",
+            "y=64",
+            "z=-3",
+            "dx=1",
+            "dy=2",
+            "dz=a",
+            "gamemode=creative",
+            "gamemode=!survival",
+            "gamemode=foo",
+            "gamemode=",
+            "team=red",
+            "team=!red",
+            "team=",
+            "tag=foo",
+            "tag=!foo",
+            "tag=",
+            "sort=nearest",
+            "sort=random",
+            "sort=foo",
+            "sort=furthest",
+            "x_rotation=0..90",
+            "y_rotation=..90",
+            "x_rotation=a",
+            "scores={a=1}",
+            "scores={a=1..5,b=..3}",
+            "scores={a=}",
+            "scores={}",
+            "scores=1",
+            "scores={a=1",
+            "advancements={a=true}",
+            "advancements={a={b=true}}",
+            "advancements={}",
+            "advancements={a=maybe}",
+            "predicate=foo",
+            "predicate=!foo",
+            "foo=bar",
+            "foo",
+            "limit",
+            "",
+            " limit=1 ",
+        ];
+        let n = 1 + rng.below(3);
+        let list: Vec<String> = (0..n).map(|_| rng.pick(&options).to_string()).collect();
+        out.push('[');
+        out.push_str(&list.join(","));
+        if !rng.chance(8) {
+            out.push(']');
+        }
+    }
+    out
+}
+
+fn pick_str(rng: &mut Rng, pool: &[&str]) -> String {
+    rng.pick(pool).to_string()
+}
+
 fn sample(node: &Node, rng: &mut Rng) -> Option<String> {
     let parser = node.parser.as_ref()?;
     if !parser.is_supported() {
@@ -101,6 +208,112 @@ fn sample(node: &Node, rng: &mut Rng) -> Option<String> {
             .to_string(),
         Parser::String(StringKind::Greedy) => {
             rng.pick(&["hello world", "x", "  spaced  out ", "\"quoted\" text"]).to_string()
+        }
+        Parser::Simple(id::BLOCK_POS | id::VEC3 | id::COLUMN_POS | id::VEC2 | id::ROTATION) => {
+            let one = |rng: &mut Rng| -> String {
+                rng.pick(&[
+                    "0", "1", "-5", "~", "~1", "~-2.5", "1.5", "^", "^2", "x", "~x", "", ".", "3.",
+                    "0.5",
+                ])
+                .to_string()
+            };
+            let n = if matches!(parser, Parser::Simple(id::BLOCK_POS | id::VEC3)) { 3 } else { 2 };
+            let count = if rng.chance(15) { rng.below(4) } else { n };
+            (0..count).map(|_| one(rng)).collect::<Vec<_>>().join(" ")
+        }
+        Parser::Simple(id::GAMEMODE) => pick_str(
+            rng,
+            &["survival", "creative", "adventure", "spectator", "Creative", "foo", "", "s"],
+        ),
+        Parser::Time { .. } => pick_str(
+            rng,
+            &["5", "5d", "5s", "5t", "1.5s", "-3", "0", "5q", "abc", "", "1h", "0.5d", "100000d"],
+        ),
+        Parser::Simple(id::RESOURCE_LOCATION | id::DIMENSION) => pick_str(
+            rng,
+            &[
+                "minecraft:overworld",
+                "overworld",
+                "foo:bar",
+                "a:b:c",
+                "Foo",
+                "",
+                ":x",
+                "x/y",
+                "a/b:c",
+                "the_nether",
+            ],
+        ),
+        Parser::Simple(id::ENTITY_ANCHOR) => pick_str(rng, &["feet", "eyes", "foot", "Eyes", ""]),
+        Parser::Simple(id::TEAM_COLOR) => pick_str(
+            rng,
+            &["red", "dark_red", "DARK_RED", "reset", "bold", "gold", "", "white", "nope"],
+        ),
+        Parser::Simple(id::OPERATION) => {
+            pick_str(rng, &["=", "+=", "-=", "*=", "/=", "%=", "<", ">", "><", "?=", "", "=="])
+        }
+        Parser::Simple(id::SWIZZLE) => {
+            pick_str(rng, &["x", "y", "z", "xy", "xyz", "xx", "w", "", "xzy", "yz"])
+        }
+        Parser::Simple(id::HEIGHTMAP) => pick_str(
+            rng,
+            &[
+                "world_surface",
+                "ocean_floor",
+                "motion_blocking",
+                "motion_blocking_no_leaves",
+                "foo",
+                "world_surface_wg",
+            ],
+        ),
+        Parser::Simple(id::TEMPLATE_MIRROR) => {
+            pick_str(rng, &["none", "left_right", "front_back", "left", "x"])
+        }
+        Parser::Simple(id::TEMPLATE_ROTATION) => {
+            pick_str(rng, &["none", "clockwise_90", "180", "counterclockwise_90", "90", "flip"])
+        }
+        Parser::Simple(id::SCOREBOARD_SLOT) => pick_str(
+            rng,
+            &[
+                "list",
+                "sidebar",
+                "below_name",
+                "sidebar.team.red",
+                "sidebar.team.reset",
+                "sidebar.team.bold",
+                "foo",
+                "SIDEBAR",
+            ],
+        ),
+        Parser::Simple(id::INT_RANGE | id::FLOAT_RANGE) => pick_str(
+            rng,
+            &[
+                "1..5", "..5", "1..", "5", "-3..-1", "1.5", "a", "5..1", "..", "1...", "..-1", "",
+                "--1", "1.5..2.5", ".5..", "1e3", "3..3",
+            ],
+        ),
+        Parser::Resource { kind: ResourceKind::Resource, registry } => {
+            let mut pool: Vec<String> =
+                vec!["foo".into(), "minecraft:foo".into(), "".into(), "Cow".into(), "a:b".into()];
+            if let Some(r) = ferrite_data::registries::Registry::find(registry) {
+                for _ in 0..4 {
+                    let e = r.entries[rng.below(r.entries.len())];
+                    pool.push(e.to_string());
+                    pool.push(e.trim_start_matches("minecraft:").to_string());
+                }
+            } else if let Some(r) = ferrite_data::configuration::SYNCHRONIZED_REGISTRIES
+                .iter()
+                .find(|r| r.id == registry)
+            {
+                for _ in 0..4 {
+                    pool.push(r.entries[rng.below(r.entries.len())].to_string());
+                }
+            }
+            rng.pick(&pool).clone()
+        }
+        Parser::Entity { .. } => Some(selector_sample(rng))?,
+        Parser::Simple(id::ANGLE) => {
+            rng.pick(&["0", "90", "~", "~10", "-45.5", "x", "", "180f", "1e3"]).to_string()
         }
         _ => return None,
     })
@@ -146,8 +359,8 @@ fn generate(tree: &Tree, rng: &mut Rng) -> String {
     line
 }
 
-fn ours(tree: &Tree, line: &str) -> Option<String> {
-    let results = parse(tree, line);
+fn ours(tree: &Tree, level: usize, line: &str) -> Option<String> {
+    let results = parse(tree, line, Source { permission_level: level as u8 });
     if results.unsupported {
         return None;
     }
@@ -242,7 +455,7 @@ fn parsing_agrees_with_the_official_dispatcher() {
     );
     let (mut compared, mut skipped, mut bad) = (0, 0, Vec::new());
     for ((level, line), want) in cases.iter().zip(&theirs) {
-        let Some(got) = ours(&trees[*level], line) else {
+        let Some(got) = ours(&trees[*level], *level, line) else {
             skipped += 1;
             continue;
         };

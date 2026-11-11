@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::args::Value;
+use crate::args::{Source, Value};
 use crate::reader::{Arg, Message, Reader, SyntaxError};
 use crate::tree::{NodeKind, Tree};
 
@@ -84,6 +84,7 @@ fn relevant_nodes(tree: &Tree, node: usize, reader: &Reader) -> Vec<usize> {
 
 fn parse_node(
     tree: &Tree,
+    source: Source,
     node: usize,
     reader: &mut Reader,
     context: &mut Context,
@@ -117,7 +118,7 @@ fn parse_node(
                 ))));
             }
             let parser = n.parser.as_ref().expect("an argument has a parser");
-            let value = parser.parse(reader)?;
+            let value = parser.parse(reader, source)?;
             let range = (start, reader.cursor());
             context.arguments.insert(n.name.clone(), ParsedArgument { range, value });
             context.nodes.push((node, range));
@@ -127,7 +128,13 @@ fn parse_node(
     }
 }
 
-fn parse_nodes(tree: &Tree, node: usize, original: &Reader, so_far: &Context) -> ParseResults {
+fn parse_nodes(
+    tree: &Tree,
+    source: Source,
+    node: usize,
+    original: &Reader,
+    so_far: &Context,
+) -> ParseResults {
     let mut errors: Vec<(usize, SyntaxError)> = Vec::new();
     let mut potentials: Vec<ParseResults> = Vec::new();
     let mut unsupported = false;
@@ -136,7 +143,7 @@ fn parse_nodes(tree: &Tree, node: usize, original: &Reader, so_far: &Context) ->
         let mut context = so_far.clone();
         let mut reader = original.clone();
         unsupported |= unsupported_is_error(tree, child);
-        let outcome = parse_node(tree, child, &mut reader, &mut context).and_then(|()| {
+        let outcome = parse_node(tree, source, child, &mut reader, &mut context).and_then(|()| {
             if reader.can_read() && reader.peek() != ' ' {
                 Err(reader.error(Message::tr("command.expected.separator")))
             } else {
@@ -144,6 +151,7 @@ fn parse_nodes(tree: &Tree, node: usize, original: &Reader, so_far: &Context) ->
             }
         });
         if let Err(e) = outcome {
+            unsupported |= crate::selector::is_unsupported(&e);
             errors.push((child, e));
             reader.set_cursor(cursor);
             continue;
@@ -155,7 +163,7 @@ fn parse_nodes(tree: &Tree, node: usize, original: &Reader, so_far: &Context) ->
             reader.skip();
             if let Some(target) = c.redirect {
                 let child_context = Context::default();
-                let parse = parse_nodes(tree, target, &reader, &child_context);
+                let parse = parse_nodes(tree, source, target, &reader, &child_context);
                 context.child = Some(Box::new(parse.context));
                 return ParseResults {
                     context,
@@ -164,7 +172,7 @@ fn parse_nodes(tree: &Tree, node: usize, original: &Reader, so_far: &Context) ->
                     unsupported: unsupported | parse.unsupported,
                 };
             }
-            potentials.push(parse_nodes(tree, child, &reader, &context));
+            potentials.push(parse_nodes(tree, source, child, &reader, &context));
         } else {
             potentials.push(ParseResults {
                 context,
@@ -196,9 +204,9 @@ fn parse_nodes(tree: &Tree, node: usize, original: &Reader, so_far: &Context) ->
 }
 
 /// Parses `input` (without the leading `/`).
-pub fn parse(tree: &Tree, input: &str) -> ParseResults {
+pub fn parse(tree: &Tree, input: &str, source: Source) -> ParseResults {
     let reader = Reader::new(input);
-    parse_nodes(tree, tree.root, &reader, &Context::default())
+    parse_nodes(tree, source, tree.root, &reader, &Context::default())
 }
 
 /// What the official server makes of a parse that cannot run: the error, if any.
@@ -230,8 +238,9 @@ mod tests {
         Tree::for_level(4)
     }
 
-    fn error(line: &str) -> Option<(String, usize)> {
-        parse_error(&parse(&tree(), line)).map(|e| (e.message.to_json(), e.cursor))
+    fn error(line: &str) -> Option<(String, i64)> {
+        parse_error(&parse(&tree(), line, Source { permission_level: 4 }))
+            .map(|e| (e.message.to_json(), e.cursor))
     }
 
     #[test]
