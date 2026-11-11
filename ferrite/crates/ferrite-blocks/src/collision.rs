@@ -62,6 +62,58 @@ impl<A: BlockAccess> World<A> {
         out
     }
 
+    /// `move_box`, plus walking up steps of at most `step_height` (vanilla's `Entity.collide`):
+    /// when a horizontal move is blocked and the entity stands on the ground (or lands), it tries
+    /// the same move raised by the step and keeps that if it gets further.
+    pub fn move_box_stepping(
+        &self,
+        bbox: &Aabb,
+        delta: [f64; 3],
+        step_height: f64,
+        on_ground: bool,
+    ) -> Moved {
+        let base = self.move_box(bbox, delta);
+        let horizontal_blocked = base.blocked[0] || base.blocked[2];
+        let lands = on_ground || (base.blocked[1] && delta[1] < 0.0);
+        if step_height <= 0.0 || !lands || !horizontal_blocked {
+            return base;
+        }
+        let raised = self.move_box(bbox, [delta[0], step_height, delta[2]]);
+        let mut best = raised.delta;
+        let up = self.move_box(bbox, [0.0, step_height, 0.0]).delta[1];
+        if up < step_height {
+            let lifted = [bbox[0], bbox[1] + up, bbox[2], bbox[3], bbox[4] + up, bbox[5]];
+            let h = self.move_box(&lifted, [delta[0], 0.0, delta[2]]).delta;
+            let alt = [h[0], up, h[2]];
+            if alt[0] * alt[0] + alt[2] * alt[2] > best[0] * best[0] + best[2] * best[2] {
+                best = alt;
+            }
+        }
+        let base_h = base.delta[0] * base.delta[0] + base.delta[2] * base.delta[2];
+        if best[0] * best[0] + best[2] * best[2] <= base_h {
+            return base;
+        }
+        // Come back down to where the original vertical move would have ended.
+        let stepped = [
+            bbox[0] + best[0],
+            bbox[1] + best[1],
+            bbox[2] + best[2],
+            bbox[3] + best[0],
+            bbox[4] + best[1],
+            bbox[5] + best[2],
+        ];
+        let down = self.move_box(&stepped, [0.0, -best[1] + delta[1], 0.0]);
+        let out = [best[0], best[1] + down.delta[1], best[2]];
+        Moved {
+            delta: out,
+            blocked: [
+                (out[0] - delta[0]).abs() > EPS,
+                (out[1] - delta[1]).abs() > EPS,
+                (out[2] - delta[2]).abs() > EPS,
+            ],
+        }
+    }
+
     /// Moves `bbox` by `delta` until it hits something: vertical first, then the longer of the
     /// two horizontal axes, as the game does.
     pub fn move_box(&self, bbox: &Aabb, delta: [f64; 3]) -> Moved {

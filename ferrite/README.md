@@ -568,3 +568,14 @@ One pull request per subsystem.
 ## License
 
 MIT OR Apache-2.0, at your option.
+
+## Mobs
+
+Passive animals (sheep, pigs, chickens, cows) come with newly generated chunks (a tenth of them get a
+herd), wander, flee when hurt, and are announced to players inside their tracking range. They walk with
+the vanilla `LivingEntity.travel` maths (friction, gravity, step height) and follow A* paths over
+standable cells. Players hit them with `Attack`: damage is `1 + weapon damage` scaled by the swing's
+charge, reduced by armor with vanilla's formula, with knockback, invulnerability frames, a death animation
+and loot from the generated entity loot tables. Honest status: the movement constants and the damage formula
+come from the vanilla source and are unit tested; mob behaviour is not yet compared against the official
+server, and hostile mobs, breeding and mob persistence are not done.

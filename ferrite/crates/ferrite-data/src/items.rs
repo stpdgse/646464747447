@@ -54,6 +54,10 @@ pub struct ItemInfo {
     pub tool: Option<ToolInfo>,
     pub equip: Option<EquipSlot>,
     pub food: Option<FoodInfo>,
+    /// Attack damage the item adds to a bare hand's 1.
+    pub attack_damage: f32,
+    /// Change to the base attack speed of 4 (a sword's is -2.4).
+    pub attack_speed_modifier: f32,
 }
 
 /// The facts about the item with this protocol id.

@@ -97,9 +97,25 @@ pub fn generate(cx: &GenContext, regs: &[Registry]) -> Result<String> {
                 )
             }
         };
+        // Melee: extra attack damage and attack speed change from the item's modifiers.
+        let (mut damage, mut speed) = (0.0f64, 0.0f64);
+        for m in c
+            .get("minecraft:attribute_modifiers")
+            .and_then(Value::as_array)
+            .map(Vec::as_slice)
+            .unwrap_or_default()
+        {
+            let amount = m["amount"].as_f64().unwrap_or(0.0);
+            match m["type"].as_str() {
+                Some("minecraft:attack_damage") => damage += amount,
+                Some("minecraft:attack_speed") => speed += amount,
+                _ => {}
+            }
+        }
         let _ = writeln!(
             out,
-            "    ItemInfo {{ max_stack: {max_stack}, max_damage: {max_damage}, tool: {tool}, equip: {equip}, food: {food} }}, // {name}"
+            "    ItemInfo {{ max_stack: {max_stack}, max_damage: {max_damage}, tool: {tool}, equip: {equip}, food: {food}, attack_damage: {:?}f32, attack_speed_modifier: {:?}f32 }}, // {name}",
+            damage as f32, speed as f32
         );
     }
     out.push_str("];\n");

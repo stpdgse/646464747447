@@ -249,7 +249,7 @@ impl Eval<'_, '_> {
                 let key = format!("table:{short}");
                 let found = cached(&key, || {
                     ferrite_data::loot::ENTITY_LOOT
-                        .binary_search_by(|(n, _)| (*n).cmp(&format!("minecraft:{short}").as_str()))
+                        .binary_search_by(|(n, _)| (*n).cmp(format!("minecraft:{short}").as_str()))
                         .ok()
                         .map(|i| ferrite_data::loot::ENTITY_LOOT[i].1)
                 });

@@ -21,11 +21,13 @@ use ferrite_world::{Chunk, ChunkPos};
 use uuid::Uuid;
 
 mod containers;
+mod mobs;
 mod survival;
 mod vitals;
 
 use crate::chunkenc::{encode_sections, full_bright_light, heightmaps};
 use crate::flat::FlatGenerator;
+use crate::mobs::Rng;
 use crate::synchronized_id;
 
 pub const TICKS_PER_SECOND: u64 = 20;
@@ -56,6 +58,8 @@ pub struct GameConfig {
     pub generator: FlatGenerator,
     /// Where to save the world; `None` keeps everything in memory.
     pub world_dir: Option<std::path::PathBuf>,
+    /// The chance that a newly generated chunk comes with a herd of animals.
+    pub animal_chance: f64,
 }
 
 impl Default for GameConfig {
@@ -70,6 +74,7 @@ impl Default for GameConfig {
             online_mode: false,
             generator: FlatGenerator::overworld(),
             world_dir: None,
+            animal_chance: 0.1,
         }
     }
 }
@@ -205,6 +210,10 @@ struct Player {
     inv_state: i32,
     /// Dropped items this player has been told about.
     tracked_items: HashSet<i32>,
+    /// Mobs this player has been told about.
+    tracked_mobs: HashSet<i32>,
+    /// Ticks since the last attack (the swing's charge).
+    attack_ticker: u32,
     health: f32,
     food: i32,
     saturation: f32,
@@ -251,6 +260,8 @@ struct Game {
     containers: HashMap<BlockPos, Vec<ItemStack>>,
     /// How many players have each chest open.
     viewers: HashMap<BlockPos, u8>,
+    /// Mobs.
+    mobs: std::collections::BTreeMap<i32, crate::mobs::Mob>,
     /// Dropped items.
     items: std::collections::BTreeMap<i32, crate::items::ItemEntity>,
     /// Join order, for stable iteration.
@@ -304,6 +315,7 @@ impl Game {
             dirty: HashSet::new(),
             containers: HashMap::new(),
             viewers: HashMap::new(),
+            mobs: std::collections::BTreeMap::new(),
             items: restored,
             order: Vec::new(),
             next_entity,
@@ -421,6 +433,8 @@ impl Game {
             tracked_items: HashSet::new(),
             window: None,
             next_window: 0,
+            tracked_mobs: HashSet::new(),
+            attack_ticker: 100,
             health: saved.as_ref().map_or(20.0, |s| if s.health > 0.0 { s.health } else { 20.0 }),
             food: saved.as_ref().map_or(20, |s| s.food),
             saturation: saved.as_ref().map_or(5.0, |s| s.saturation),
@@ -680,8 +694,12 @@ impl Game {
                     None
                 }
             });
+            let fresh = saved.is_none();
             let chunk: Chunk = saved.unwrap_or_else(|| self.cfg.generator.generate());
             self.world.blocks.insert(pos, chunk);
+            if fresh {
+                self.spawn_chunk_animals(cx, cz);
+            }
             if let Some(p) = &self.persist {
                 match p.load_containers(pos) {
                     Ok(found) => self.containers.extend(found),
@@ -815,6 +833,10 @@ impl Game {
                 {
                     self.close_window(id);
                 }
+            }
+            Attack::ID => {
+                let p = decode!(Attack);
+                self.attack_entity(id, p.entity_id.0);
             }
             ClientCommand::ID => {
                 let p = decode!(ClientCommand);
@@ -1145,9 +1167,11 @@ impl Game {
         self.tick += 1;
         self.world.tick();
         self.tick_vitals();
+        self.tick_attack_cooldowns();
         self.tick_digging();
         self.broadcast_block_changes();
         self.tick_items();
+        self.tick_mobs();
         if self.tick.is_multiple_of(SAVE_EVERY) {
             self.save_all();
         }

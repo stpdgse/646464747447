@@ -625,3 +625,76 @@ async fn falling_hurts_and_dying_shows_the_death_screen_then_respawns() {
     let set = until(&mut a, 600, |p| p.name == "set_health").await;
     assert_eq!(decode::<SetHealth>(&set).health, 20.0);
 }
+
+#[tokio::test]
+async fn animals_spawn_with_chunks_move_and_can_be_killed_for_their_drops() {
+    use ferrite_protocol::codec::VarInt;
+    let s = server_with(GameConfig {
+        game_mode: 0,
+        view_distance: 3,
+        animal_chance: 1.0,
+        ..GameConfig::default()
+    })
+    .await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    // Every chunk comes with a herd, so animals are announced while the world streams in.
+    let add = until(&mut a, 3000, |p| p.name == "add_entity").await;
+    let animal = decode::<AddEntity>(&add);
+    assert!(
+        [
+            ferrite_data::entities::entity_by_name("minecraft:sheep"),
+            ferrite_data::entities::entity_by_name("minecraft:pig"),
+            ferrite_data::entities::entity_by_name("minecraft:chicken"),
+            ferrite_data::entities::entity_by_name("minecraft:cow"),
+        ]
+        .iter()
+        .flatten()
+        .any(|(kind, _)| *kind as i32 == animal.kind.0),
+        "a passive animal"
+    );
+    let (id, mut pos) = (animal.id.0, [animal.x, animal.y, animal.z]);
+    // Stand next to it and keep hitting it, following it as it moves, until it dies.
+    let mut died = false;
+    let mut drops = false;
+    for _ in 0..80 {
+        a.send(&MovePlayerPos { x: pos[0] + 1.0, y: pos[1], z: pos[2], flags: 1 }).await.unwrap();
+        a.send(&Attack { entity_id: VarInt(id) }).await.unwrap();
+        let deadline = tokio::time::Instant::now() + Duration::from_millis(600);
+        while let Ok(Ok(p)) = tokio::time::timeout_at(deadline, a.next()).await {
+            match p.name {
+                "move_entity_pos" => {
+                    let m = decode::<MoveEntityPos>(&p);
+                    if m.id.0 == id {
+                        pos[0] += f64::from(m.dx) / 4096.0;
+                        pos[1] += f64::from(m.dy) / 4096.0;
+                        pos[2] += f64::from(m.dz) / 4096.0;
+                    }
+                }
+                "move_entity_pos_rot" => {
+                    let m = decode::<MoveEntityPosRot>(&p);
+                    if m.id.0 == id {
+                        pos[0] += f64::from(m.dx) / 4096.0;
+                        pos[1] += f64::from(m.dy) / 4096.0;
+                        pos[2] += f64::from(m.dz) / 4096.0;
+                    }
+                }
+                "entity_event" => {
+                    let e = decode::<EntityEvent>(&p);
+                    if e.entity_id == id && e.event == 3 {
+                        died = true;
+                    }
+                }
+                "add_entity" if died => {
+                    let _ = decode::<AddEntity>(&p);
+                    drops = true;
+                }
+                _ => {}
+            }
+        }
+        if died {
+            break;
+        }
+    }
+    assert!(died, "the animal dies from repeated blows");
+    assert!(drops, "its loot drops as item entities");
+}

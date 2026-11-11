@@ -1113,6 +1113,11 @@ packet! {
         window_id: VarInt,
     }
 
+    /// The player attacks an entity.
+    Attack in Play Serverbound = play::serverbound::ATTACK "attack" {
+        entity_id: VarInt,
+    }
+
     /// `action`: 0 perform respawn, 1 request statistics.
     ClientCommand in Play Serverbound = play::serverbound::CLIENT_COMMAND "client_command" {
         action: VarInt,
