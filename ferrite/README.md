@@ -447,13 +447,13 @@ A placed block takes the state vanilla gives it for that click: facing from the 
 (`ferrite-blocks::placement`, with the game's exact float and sine-table arithmetic, so even
 diagonal ties match), slab halves and stair shapes, wall versions of torches, signs, banners, heads
 and coral fans, two-block beds, doors and tall plants (hinge included), trapdoors, buttons, bells,
-lanterns, vines, scaffolding, dripstone, walls (low/tall arms and posts), and support rules for
+stair corners, lanterns, vines, scaffolding, dripstone, walls (low/tall arms and posts), and support rules for
 plants, signs, candles, rails and more (the plant ground sets are the game's own `supports_*`
-tags). `tests/placement.rs` replays about 21,000 recorded vanilla placements (every block item
-clicked on stone, plus ~160 blocks clicked on 15 other supports, plus exact yaw/pitch ties) and
+tags). `tests/placement.rs` replays about 31,000 recorded vanilla placements (every block item
+clicked on stone, plus ~160 blocks clicked on 36 other supports, plus exact yaw/pitch ties) and
 requires identical results.
 
-Known gaps: a vine clicked on the underside of farmland (vanilla refuses it, rule unknown);
+Known gaps: the vine and lichen attachment rules are fitted to the recordings rather than derived;
 the light-dependent mushroom rule treats everything as fully lit until there is a lighting engine;
 lily pads and frogspawn (placed by `use_item` on water) and merging placements (extra candles,
 slab pairs, snow layers) are not covered yet.

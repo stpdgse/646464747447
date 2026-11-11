@@ -16,6 +16,7 @@ mod placement;
 mod pos;
 mod redstone;
 pub mod shape;
+mod stairs;
 mod survival;
 pub mod ticks;
 mod wall;

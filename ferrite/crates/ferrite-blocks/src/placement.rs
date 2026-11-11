@@ -277,7 +277,8 @@ impl<A: BlockAccess> World<A> {
     }
 
     fn is_replaceable_at(&self, pos: BlockPos) -> bool {
-        self.block(pos).is_some_and(|s| facts(s).has(flag::REPLACEABLE))
+        // As for any block that is not snow: only a single snow layer gives way.
+        self.block(pos).is_some_and(|s| self.replaces_clicked(s, "", Direction::Up))
     }
 
     /// Sets `waterlogged` from the fluid at `pos`, for blocks that have the property.
@@ -721,6 +722,52 @@ impl<A: BlockAccess> World<A> {
         self.can_survive(state, pos).then_some(state)
     }
 
+    /// Whether the block `neighbor` beside a vine or lichen in direction `dir` can hold it.
+    pub(crate) fn multiface_holds(state: u16, dir: Direction, neighbor: u16) -> bool {
+        let vine =
+            crate::kinds::block_id_of(state) == block_by_name("vine").map_or(u16::MAX, |b| b.id);
+        let sturdy = facts(neighbor)
+            .is_face_sturdy(dir.opposite().index(), ferrite_data::shapes::Support::Full);
+        if vine {
+            // Observed: under a block, vines refuse the shortened full-width blocks (farmland,
+            // paths); on a side they take any sturdy face.
+            let under_ok =
+                !(dir == Direction::Up && facts(neighbor).has(flag::SHAPE_FOR_LIGHT_OCCLUSION));
+            (sturdy && under_ok) || facts(neighbor).has(flag::FULL_COLLISION_BLOCK)
+        } else {
+            sturdy || facts(neighbor).has(flag::FULL_COLLISION_BLOCK)
+        }
+    }
+
+    /// A vine or lichen after its neighbour in `dir` changed: faces without a holder drop away,
+    /// and with no face left the block goes.
+    pub(crate) fn multiface_update(
+        &self,
+        state: u16,
+        dir: Direction,
+        neighbor_state: u16,
+        pos: BlockPos,
+    ) -> u16 {
+        let kinds = Kinds::get();
+        let mut state = state;
+        if kinds.property(state, dir.name()) == Some("true") {
+            let vine = crate::kinds::block_id_of(state)
+                == block_by_name("vine").map_or(u16::MAX, |b| b.id);
+            let hangs = vine
+                && dir != Direction::Up
+                && self.block(pos.above()).is_some_and(|s| {
+                    crate::kinds::block_id_of(s) == crate::kinds::block_id_of(state)
+                        && kinds.property(s, dir.name()) == Some("true")
+                });
+            if !Self::multiface_holds(state, dir, neighbor_state) && !hangs {
+                state = kinds.with_property(state, dir.name(), "false").unwrap_or(state);
+            }
+        }
+        let any =
+            Direction::ALL.into_iter().any(|d| kinds.property(state, d.name()) == Some("true"));
+        if any { state } else { kinds.air }
+    }
+
     fn multiface_state(
         &self,
         block: &str,
@@ -733,11 +780,7 @@ impl<A: BlockAccess> World<A> {
             let at = pos.offset(dir);
             let holds = self.block(at).is_some_and(|s| {
                 facts(s).is_face_sturdy(dir.opposite().index(), ferrite_data::shapes::Support::Full)
-                    || crate::shape::merged_face_occludes(
-                        facts(s).collision_shape(),
-                        &[],
-                        dir.opposite(),
-                    )
+                    || facts(s).has(flag::FULL_COLLISION_BLOCK)
             });
             if holds {
                 let state = self.waterlog(self.make(block, &[])?, pos);
@@ -757,8 +800,7 @@ impl<A: BlockAccess> World<A> {
             let at = pos.offset(dir);
             // Vines hold on to sturdy faces and to full cubes that are not sturdy (leaves).
             let holds = self.block(at).is_some_and(|s| {
-                facts(s).is_face_sturdy(dir.opposite().index(), ferrite_data::shapes::Support::Full)
-                    || facts(s).has(flag::FULL_COLLISION_BLOCK)
+                Self::multiface_holds(self.make("vine", &[]).unwrap_or(0), dir, s)
             });
             let hangs = dir != Direction::Up
                 && self.block(pos.above()).is_some_and(|s| {
@@ -894,6 +936,18 @@ impl<A: BlockAccess> World<A> {
         Direction::ALL.into_iter().all(|d| self.survives(state, d, pos))
     }
 
+    /// Whether clicking `clicked` with `block` in hand places into it rather than next to it.
+    fn replaces_clicked(&self, clicked: u16, block: &str, face: Direction) -> bool {
+        let kinds = Kinds::get();
+        if kinds.of_state(clicked).support == Some(crate::kinds::Support::SnowLayer) {
+            // A snow layer gives way only when it is a single layer (or to more snow on top).
+            let layers: u8 =
+                kinds.property(clicked, "layers").and_then(|l| l.parse().ok()).unwrap_or(1);
+            return if block == "snow" && layers < 8 { face == Direction::Up } else { layers == 1 };
+        }
+        facts(clicked).has(flag::REPLACEABLE)
+    }
+
     /// Places the block called `block` (an item's block, e.g. `oak_stairs`) the way a player's
     /// click does. `obstructed` says whether the new state at the position would overlap an
     /// entity. Returns where it was placed.
@@ -906,7 +960,7 @@ impl<A: BlockAccess> World<A> {
     ) -> Option<BlockPos> {
         let clicked_state = self.block(ctx.clicked)?;
         // Clicking something replaceable places into it, otherwise next to it.
-        let replacing = facts(clicked_state).has(flag::REPLACEABLE);
+        let replacing = self.replaces_clicked(clicked_state, block, ctx.face);
         let pos = if replacing { ctx.clicked } else { ctx.clicked.offset(ctx.face) };
         if !self.is_replaceable_at(pos) {
             return None;

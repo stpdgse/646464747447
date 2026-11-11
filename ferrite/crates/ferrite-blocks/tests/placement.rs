@@ -12,11 +12,6 @@ use ferrite_world::{Chunk, ChunkPos, Dimension};
 /// `use_item`, not by clicking a block); the recordings show them placing nothing.
 const NOT_BLOCK_ITEMS: [&str; 3] = ["wheat", "lily_pad", "frogspawn"];
 
-/// Recorded behaviour Ferrite does not reproduce yet: `(item, clicked block, face)`.
-/// A vine clicked on the underside of farmland is refused by the game although farmland's
-/// bottom face is as full as soul sand's, which accepts it; the rule behind it is not known.
-const KNOWN_GAPS: [(&str, &str, usize); 1] = [("vine", "farmland", 0)];
-
 const TARGET: (i32, i32, i32) = (8, 101, 8);
 const WINDOW: ((i32, i32, i32), (i32, i32, i32)) = ((5, 99, 5), (11, 105, 11));
 
@@ -210,11 +205,6 @@ fn placement_matches_every_recording() {
     let mut ran = 0;
     for c in &cases {
         if !c.item.starts_with(&only) || NOT_BLOCK_ITEMS.contains(&c.item.as_str()) {
-            continue;
-        }
-        if KNOWN_GAPS.iter().any(|(i, sup, f)| {
-            *i == c.item && state_name(c.support).starts_with(sup) && *f == c.face
-        }) {
             continue;
         }
         ran += 1;

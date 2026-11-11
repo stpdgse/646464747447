@@ -727,7 +727,23 @@ impl<A: BlockAccess> World<A> {
         } else {
             state
         };
-        if self.survives(state, dir, pos) { state } else { kinds.air }
+        let state = if dir.is_horizontal() && Self::is_stair_state(state) {
+            self.stairs_shape(state, pos)
+        } else {
+            state
+        };
+        if kinds.of_state(state).support == Some(Support::Multiface) {
+            return self.multiface_update(state, dir, neighbor_state, pos);
+        }
+        // These plants only schedule a tick when they lose their support (and so can sit in the
+        // air until it runs); everything else goes at once.
+        let ticks_later = match kinds.of_state(state).support {
+            Some(Support::Cactus | Support::Growing { .. } | Support::Spike) => true,
+            Some(Support::FullAbove) => ferrite_data::blocks::block_of_state(state)
+                .is_some_and(|b| b.name.ends_with("hanging_moss")),
+            _ => false,
+        };
+        if ticks_later || self.survives(state, dir, pos) { state } else { kinds.air }
     }
 
     /// Panes and fences: the arm toward `dir` follows what the neighbour there offers.
