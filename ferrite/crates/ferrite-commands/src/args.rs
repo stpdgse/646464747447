@@ -43,7 +43,7 @@ pub enum Value {
     /// A resource of a registry, by its full id.
     Resource(String),
     /// An entity selector, player name or UUID.
-    Selector(Selector),
+    Selector(Box<Selector>),
     /// A `message`: the text, with the selectors found in it and where (UTF-16 offsets).
     Message {
         text: String,
@@ -305,7 +305,7 @@ impl Parser {
                 .map(|(relative, degrees)| Value::Angle { relative, degrees }),
             Parser::Entity { single, players } => {
                 selector::parse_entity(reader, *single, *players, source.allow_selectors())
-                    .map(Value::Selector)
+                    .map(|s| Value::Selector(Box::new(s)))
             }
             Parser::ScoreHolder { multiple } => {
                 if reader.can_read() && reader.peek() == '@' {
@@ -335,7 +335,7 @@ impl Parser {
                     if sel.includes_entities {
                         return Err(reader.error(Message::tr("argument.player.entities")));
                     }
-                    return Ok(Value::Selector(sel));
+                    return Ok(Value::Selector(Box::new(sel)));
                 }
                 let from = reader.cursor();
                 while reader.can_read() && reader.peek() != ' ' {
