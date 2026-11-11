@@ -7,6 +7,7 @@
 #![forbid(unsafe_code)]
 
 pub mod args;
+pub mod blockstate;
 pub mod coordinates;
 pub mod dispatch;
 pub mod identifier;

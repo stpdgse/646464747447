@@ -387,6 +387,43 @@ fn sample(node: &Node, rng: &mut Rng) -> Option<String> {
                 "@a@e",
             ],
         ),
+        Parser::Simple(id::BLOCK_STATE | id::BLOCK_PREDICATE) => {
+            let blocks = ferrite_data::blocks::BLOCKS;
+            let b = &blocks[rng.below(blocks.len())];
+            let mut out = if rng.chance(8) {
+                "#minecraft:logs".to_string()
+            } else if rng.chance(5) {
+                "nope".to_string()
+            } else {
+                b.name.to_string()
+            };
+            if rng.chance(60) {
+                out.push('[');
+                let n = rng.below(3);
+                let mut parts = Vec::new();
+                for _ in 0..n {
+                    if b.properties.is_empty() || rng.chance(15) {
+                        parts.push(pick_str(
+                            rng,
+                            &["x=1", "facing=north", "facing", "=1", "", "waterlogged=maybe"],
+                        ));
+                    } else {
+                        let p = &b.properties[rng.below(b.properties.len())];
+                        let v = if rng.chance(15) {
+                            "zzz"
+                        } else {
+                            p.values[rng.below(p.values.len())]
+                        };
+                        parts.push(format!("{}={}", p.name, v));
+                    }
+                }
+                out.push_str(&parts.join(if rng.chance(90) { "," } else { " " }));
+                if rng.chance(90) {
+                    out.push(']');
+                }
+            }
+            out
+        }
         Parser::Simple(id::ANGLE) if false => unreachable!(),
         Parser::Simple(id::ANGLE) => {
             rng.pick(&["0", "90", "~", "~10", "-45.5", "x", "", "180f", "1e3"]).to_string()

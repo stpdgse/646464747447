@@ -52,6 +52,8 @@ pub enum Value {
     /// A score holder: a name (`*` for everyone that has a score) or a selector.
     ScoreHolder(ScoreHolder),
     Uuid(u128),
+    /// A block state or block predicate.
+    Block(crate::blockstate::BlockSpec),
 }
 
 /// Who a score belongs to.
@@ -363,6 +365,12 @@ impl Parser {
                     }
                     _ => Err(reader.error(Message::tr("argument.uuid.invalid"))),
                 }
+            }
+            Parser::Simple(id::BLOCK_STATE) => {
+                crate::blockstate::parse_block(reader, false).map(Value::Block)
+            }
+            Parser::Simple(id::BLOCK_PREDICATE) => {
+                crate::blockstate::parse_block(reader, true).map(Value::Block)
             }
             Parser::Simple(id::MESSAGE) => parse_message(reader, source.allow_selectors()),
             Parser::Simple(id::GAMEMODE) => {
