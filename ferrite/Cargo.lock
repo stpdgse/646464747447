@@ -916,6 +916,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ferrite-commands"
+version = "0.1.0"
+dependencies = [
+ "ferrite-data",
+ "thiserror",
+]
+
+[[package]]
 name = "ferrite-crafting"
 version = "0.1.0"
 dependencies = [

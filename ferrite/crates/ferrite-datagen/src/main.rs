@@ -10,6 +10,7 @@
 //! and block-state layouts.
 
 mod blocks;
+mod commands;
 mod configuration;
 mod entities;
 mod items;
@@ -92,6 +93,7 @@ fn main() -> Result<()> {
         ("blocks.rs", blocks::generate(&cx, &regs)?),
         ("shapes.rs", shapes::generate(&cx)?),
         ("items.rs", items::generate(&cx, &regs)?),
+        ("commands.rs", commands::generate(&cx)?),
         ("entities.rs", entities::generate(&cx)?),
         ("loot.rs", loot::generate(&cx)?),
         ("configuration.rs", configuration::generate(&cx, &regs)?),
@@ -118,7 +120,7 @@ fn main() -> Result<()> {
 
 fn mod_rs(cx: &GenContext) -> String {
     format!(
-        "{}\npub mod blocks;\npub mod configuration;\npub mod entities;\npub mod items;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\n",
+        "{}\npub mod blocks;\npub mod commands;\npub mod configuration;\npub mod entities;\npub mod items;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\n",
         cx.header
     )
 }
@@ -147,6 +149,7 @@ fn run_generator(java: &Path, jar: &Path, work: &Path) -> Result<PathBuf> {
     run_shape_dump(java, &work, &out)?;
     run_dump(java, &work, &out, "EntityDump", "entities.txt")?;
     run_dump(java, &work, &out, "ItemDump", "item_remainders.txt")?;
+    run_dump(java, &work, &out, "CommandDump", "commands.txt")?;
     Ok(out)
 }
 
