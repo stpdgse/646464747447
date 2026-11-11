@@ -14,6 +14,7 @@ mod commands;
 mod configuration;
 mod entities;
 mod items;
+mod lang;
 mod loot;
 mod meta;
 mod packets;
@@ -96,6 +97,7 @@ fn main() -> Result<()> {
         ("timelines.rs", timelines::generate(&cx)?),
         ("items.rs", items::generate(&cx, &regs)?),
         ("commands.rs", commands::generate(&cx)?),
+        ("lang.rs", lang::generate(&cx, &jar_bytes)?),
         ("entities.rs", entities::generate(&cx)?),
         ("loot.rs", loot::generate(&cx)?),
         ("configuration.rs", configuration::generate(&cx, &regs)?),
@@ -122,7 +124,7 @@ fn main() -> Result<()> {
 
 fn mod_rs(cx: &GenContext) -> String {
     format!(
-        "{}\npub mod blocks;\npub mod commands;\npub mod configuration;\npub mod entities;\npub mod items;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\npub mod timelines;\n",
+        "{}\npub mod blocks;\npub mod commands;\npub mod configuration;\npub mod entities;\npub mod items;\npub mod lang;\npub mod loot;\npub mod meta;\npub mod packets;\npub mod registries;\npub mod shapes;\npub mod timelines;\n",
         cx.header
     )
 }

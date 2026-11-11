@@ -398,6 +398,79 @@ fn sample(node: &Node, rng: &mut Rng) -> Option<String> {
                 "@a@e",
             ],
         ),
+        Parser::Simple(id::ITEM_STACK) => {
+            let items = ferrite_data::registries::Registry::find("minecraft:item")
+                .expect("item registry")
+                .entries;
+            let mut out = if rng.chance(6) {
+                pick_str(rng, &["nope", "minecraft:", "stone ", "#minecraft:logs", "Stone", "a:b"])
+            } else {
+                items[rng.below(items.len())].to_string()
+            };
+            if rng.chance(55) {
+                out.push('[');
+                let validated = ferrite_commands::components::VALIDATED;
+                let all = ferrite_data::registries::Registry::find("minecraft:data_component_type")
+                    .expect("component registry");
+                let mut parts: Vec<String> = Vec::new();
+                for _ in 0..rng.below(4) {
+                    let name = if rng.chance(75) {
+                        validated[rng.below(validated.len())].to_string()
+                    } else if rng.chance(70) {
+                        let n = rng.below(all.entries.len());
+                        all.entries[n].to_string()
+                    } else {
+                        pick_str(rng, &["nope", "minecraft:nope", "", "Damage", "x:y"])
+                    };
+                    let part = if rng.chance(15) {
+                        format!("!{name}")
+                    } else if rng.chance(8) {
+                        name
+                    } else if validated.contains(&name.as_str()) {
+                        let v = pick_str(
+                            rng,
+                            &[
+                                "1",
+                                "0",
+                                "-1",
+                                "99",
+                                "100",
+                                "1.5",
+                                "2b",
+                                "true",
+                                "\"x\"",
+                                "[1]",
+                                "{}",
+                                "{a:1}",
+                                "common",
+                                "epic",
+                                "rare",
+                                "nope",
+                                "'{a:1}'",
+                                "'x'",
+                                "",
+                                "5L",
+                                "1e3",
+                                "abc",
+                                "100000000000",
+                            ],
+                        );
+                        format!("{name}={v}")
+                    } else if rng.chance(50) {
+                        // The value of a component that is not checked yet is only read.
+                        name.clone()
+                    } else {
+                        format!("{name}=")
+                    };
+                    parts.push(part);
+                }
+                out.push_str(&parts.join(if rng.chance(90) { "," } else { " , " }));
+                if rng.chance(92) {
+                    out.push(']');
+                }
+            }
+            out
+        }
         Parser::Simple(id::NBT_COMPOUND_TAG | id::NBT_TAG) => pick_str(
             rng,
             &[

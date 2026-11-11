@@ -5,6 +5,7 @@ pub mod commands;
 pub mod configuration;
 pub mod entities;
 pub mod items;
+pub mod lang;
 pub mod loot;
 pub mod meta;
 pub mod packets;

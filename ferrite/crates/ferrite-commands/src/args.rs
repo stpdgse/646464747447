@@ -55,6 +55,7 @@ pub enum Value {
     /// A block state or block predicate.
     Block(crate::blockstate::BlockSpec),
     Nbt(ferrite_nbt::Tag),
+    Item(crate::item::ItemSpec),
 }
 
 /// Who a score belongs to.
@@ -468,6 +469,9 @@ impl Parser {
                 } else {
                     Err(invalid(reader, "argument.scoreboardDisplaySlot.invalid", &word))
                 }
+            }
+            Parser::Simple(id::ITEM_STACK) => {
+                crate::item::parse_item_stack(reader).map(Value::Item)
             }
             Parser::Simple(id::NBT_COMPOUND_TAG) => {
                 crate::nbt::read_compound(reader).map(|c| Value::Nbt(ferrite_nbt::Tag::Compound(c)))

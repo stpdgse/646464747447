@@ -12,6 +12,7 @@ pub mod entities;
 #[allow(clippy::all, missing_docs, non_upper_case_globals)]
 pub mod generated;
 pub mod items;
+pub mod lang;
 pub mod loot;
 pub mod registries;
 pub mod shapes;

@@ -8,9 +8,11 @@
 
 pub mod args;
 pub mod blockstate;
+pub mod components;
 pub mod coordinates;
 pub mod dispatch;
 pub mod identifier;
+pub mod item;
 pub mod nbt;
 pub mod range;
 pub mod reader;
