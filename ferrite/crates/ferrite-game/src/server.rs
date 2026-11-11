@@ -29,6 +29,8 @@ use crate::synchronized_id;
 
 pub const TICKS_PER_SECOND: u64 = 20;
 const TICK: Duration = Duration::from_millis(1000 / TICKS_PER_SECOND);
+/// Ticks between autosaves (every 30 seconds).
+const SAVE_EVERY: u64 = 30 * TICKS_PER_SECOND;
 const KEEP_ALIVE_EVERY: u64 = 15 * TICKS_PER_SECOND;
 const KEEP_ALIVE_TIMEOUT: u64 = 30 * TICKS_PER_SECOND;
 /// Chunks sent to one player per tick.
@@ -51,6 +53,8 @@ pub struct GameConfig {
     pub seed: i64,
     pub online_mode: bool,
     pub generator: FlatGenerator,
+    /// Where to save the world; `None` keeps everything in memory.
+    pub world_dir: Option<std::path::PathBuf>,
 }
 
 impl Default for GameConfig {
@@ -64,6 +68,7 @@ impl Default for GameConfig {
             seed: 0,
             online_mode: false,
             generator: FlatGenerator::overworld(),
+            world_dir: None,
         }
     }
 }
@@ -227,6 +232,10 @@ struct Game {
     /// Encoded chunk packets, dropped when a block in the chunk changes.
     chunk_cache: HashMap<(i32, i32), Arc<Vec<u8>>>,
     players: HashMap<PlayerId, Player>,
+    /// The save directory, if the world is persistent.
+    persist: Option<crate::persist::Persistence>,
+    /// Chunks changed since they were last saved.
+    dirty: HashSet<(i32, i32)>,
     /// Contents of chests and barrels, by position (27 slots each).
     containers: HashMap<BlockPos, Vec<ItemStack>>,
     /// How many players have each chest open.
@@ -250,6 +259,19 @@ impl Game {
     fn new(cfg: GameConfig, rx: Receiver<Event>) -> Self {
         let mut world = World::new(Chunks::new(cfg.generator.dimension), Rules::default());
         world.track_changes(true);
+        let persist =
+            cfg.world_dir.as_ref().and_then(|dir| match crate::persist::Persistence::open(dir) {
+                Ok(p) => Some(p),
+                Err(e) => {
+                    tracing::error!(
+                        "cannot open the world at {dir:?}: {e}; running without saving"
+                    );
+                    None
+                }
+            });
+        if let Some(t) = persist.as_ref().and_then(|p| p.load_time().ok().flatten()) {
+            world.set_time(t);
+        }
         Game {
             cfg,
             rng: 0x2545_F491_4F6C_DD1D,
@@ -257,6 +279,8 @@ impl Game {
             world,
             chunk_cache: HashMap::new(),
             players: HashMap::new(),
+            persist,
+            dirty: HashSet::new(),
             containers: HashMap::new(),
             viewers: HashMap::new(),
             items: std::collections::BTreeMap::new(),
@@ -282,6 +306,7 @@ impl Game {
                 next = now;
             }
         }
+        self.save_all();
         for p in self.players.values() {
             send(&p.sink, &Disconnect { reason: Text::plain("Server closed") });
             p.sink.close();
@@ -316,7 +341,9 @@ impl Game {
             self.on_leave(old);
         }
         let name = start.profile.name.0.clone();
-        let (x, y, z) = self.spawn_point();
+        let saved = self.persist.as_ref().and_then(|p| p.load_player(uuid).ok().flatten());
+        let (x, y, z) =
+            saved.as_ref().map_or_else(|| self.spawn_point(), |s| (s.pos[0], s.pos[1], s.pos[2]));
         let view = start
             .client
             .as_ref()
@@ -334,8 +361,8 @@ impl Game {
             x,
             y,
             z,
-            yaw: 0.0,
-            pitch: 0.0,
+            yaw: saved.as_ref().map_or(0.0, |s| s.yaw),
+            pitch: saved.as_ref().map_or(0.0, |s| s.pitch),
             on_ground: true,
             view_distance: view.max(2),
             center: (x.floor() as i32 >> 4, z.floor() as i32 >> 4),
@@ -353,11 +380,20 @@ impl Game {
                 head: 0,
             },
             moved: false,
-            held_slot: 0,
-            menu: crate::inventory::Menu::default(),
+            held_slot: saved.as_ref().map_or(0, |s| s.held_slot.min(8)),
+            menu: {
+                let mut menu = crate::inventory::Menu::default();
+                for (slot, stack) in saved.iter().flat_map(|s| s.slots.iter()) {
+                    if let Some(cell) = menu.slots.get_mut(usize::from(*slot)) {
+                        *cell = *stack;
+                    }
+                }
+                menu.refresh_result();
+                menu
+            },
             sneaking: false,
             ack: None,
-            game_mode: self.cfg.game_mode,
+            game_mode: saved.as_ref().map_or(self.cfg.game_mode, |s| s.game_mode),
             joined: self.tick,
             dig: None,
             inv_state: 1,
@@ -404,6 +440,7 @@ impl Game {
         if self.players.get(&id).is_some_and(|p| p.window.is_some()) {
             self.close_window(id);
         }
+        self.save_player(id);
         let Some(player) = self.players.remove(&id) else { return };
         self.order.retain(|o| *o != id);
         let gone = PlayerInfoRemove { uuids: LenVec(vec![player.uuid]) };
@@ -484,7 +521,7 @@ impl Game {
             s,
             &PlayerAbilities { flags: abilities_for(gm), flying_speed: 0.05, walking_speed: 0.1 },
         );
-        send(s, &SetHeldSlot { slot: VarInt(0) });
+        send(s, &SetHeldSlot { slot: VarInt(i32::from(p.held_slot)) });
         send(s, &Commands { nodes: LenVec(vec![CommandNode::default()]), root: VarInt(0) });
         send(
             s,
@@ -496,8 +533,8 @@ impl Game {
                 dx: 0.0,
                 dy: 0.0,
                 dz: 0.0,
-                y_rot: 0.0,
-                x_rot: 0.0,
+                y_rot: p.yaw,
+                x_rot: p.pitch,
                 relative: 0,
             },
         );
@@ -536,7 +573,7 @@ impl Game {
             &ContainerSetContent {
                 window_id: VarInt(0),
                 state_id: VarInt(1),
-                items: LenVec(vec![ItemStack::default(); 46]),
+                items: LenVec(p.menu.slots.clone()),
                 carried: ItemStack::default(),
             },
         );
@@ -605,8 +642,21 @@ impl Game {
         }
         let pos = ChunkPos::new(cx, cz);
         if !self.world.blocks.is_loaded(pos) {
-            let chunk: Chunk = self.cfg.generator.generate();
+            let saved = self.persist.as_ref().and_then(|p| match p.load_chunk(pos) {
+                Ok(c) => c,
+                Err(e) => {
+                    tracing::error!("chunk {cx},{cz} on disk is unreadable ({e}); regenerating it");
+                    None
+                }
+            });
+            let chunk: Chunk = saved.unwrap_or_else(|| self.cfg.generator.generate());
             self.world.blocks.insert(pos, chunk);
+            if let Some(p) = &self.persist {
+                match p.load_containers(pos) {
+                    Ok(found) => self.containers.extend(found),
+                    Err(e) => tracing::error!("containers of chunk {cx},{cz} are unreadable: {e}"),
+                }
+            }
         }
         let chunk = self.world.blocks.get(pos).expect("just ensured");
         let packet = LevelChunkWithLight {
@@ -1047,6 +1097,9 @@ impl Game {
         self.tick_digging();
         self.broadcast_block_changes();
         self.tick_items();
+        if self.tick.is_multiple_of(SAVE_EVERY) {
+            self.save_all();
+        }
         let ids: Vec<PlayerId> = self.order.clone();
         for id in &ids {
             self.keep_alive(*id);
@@ -1100,6 +1153,7 @@ impl Game {
         for pos in changed {
             let Some(state) = self.world.block(pos) else { continue };
             let chunk = (pos.x >> 4, pos.z >> 4);
+            self.dirty.insert(chunk);
             self.chunk_cache.remove(&chunk);
             let update = BlockUpdate {
                 pos: PackedPos::new(pos.x, pos.y, pos.z),

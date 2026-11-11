@@ -203,6 +203,7 @@ impl Game {
             if let Some(stored) = self.containers.get_mut(pos) {
                 stored.copy_from_slice(&w.menu.slots[i * 27..(i + 1) * 27]);
             }
+            self.dirty.insert((pos.x >> 4, pos.z >> 4));
         }
     }
 
@@ -280,9 +281,68 @@ impl Game {
         }
     }
 
+    /// Saves everything that changed: dirty chunks with their containers, every player, the clock.
+    pub(super) fn save_all(&mut self) {
+        let Some(persist) = &self.persist else { return };
+        let dirty: Vec<(i32, i32)> = self.dirty.drain().collect();
+        for (cx, cz) in dirty {
+            let pos = ferrite_world::ChunkPos::new(cx, cz);
+            if let Some(chunk) = self.world.blocks.get(pos)
+                && let Err(e) = persist.save_chunk(pos, chunk)
+            {
+                tracing::error!("cannot save chunk {cx},{cz}: {e}");
+            }
+            let inside: Vec<(BlockPos, &[ItemStack])> = self
+                .containers
+                .iter()
+                .filter(|(p, _)| (p.x >> 4, p.z >> 4) == (cx, cz))
+                .map(|(p, v)| (*p, v.as_slice()))
+                .collect();
+            if let Err(e) = persist.save_containers(pos, &inside) {
+                tracing::error!("cannot save the containers of chunk {cx},{cz}: {e}");
+            }
+        }
+        if let Err(e) = persist.save_time(self.world.time()) {
+            tracing::error!("cannot save the clock: {e}");
+        }
+        let ids: Vec<PlayerId> = self.order.clone();
+        for id in ids {
+            self.save_player(id);
+        }
+        if let Some(persist) = &self.persist
+            && let Err(e) = persist.sync()
+        {
+            tracing::error!("cannot sync the world: {e}");
+        }
+    }
+
+    pub(super) fn save_player(&self, id: PlayerId) {
+        let (Some(persist), Some(p)) = (&self.persist, self.players.get(&id)) else { return };
+        let slots = p
+            .menu
+            .slots
+            .iter()
+            .enumerate()
+            .filter(|(i, s)| *i >= 5 && s.count > 0)
+            .map(|(i, s)| (i as u8, *s))
+            .collect();
+        let save = crate::persist::PlayerSave {
+            pos: [p.x, p.y, p.z],
+            yaw: p.yaw,
+            pitch: p.pitch,
+            game_mode: p.game_mode,
+            held_slot: p.held_slot,
+            slots,
+        };
+        if let Err(e) = persist.save_player(p.uuid, &save) {
+            tracing::error!("cannot save player {}: {e}", p.name);
+        }
+    }
+
     /// What was inside a container that is gone: it spills out as items.
     pub(super) fn spill_container(&mut self, pos: BlockPos) {
         let Some(items) = self.containers.remove(&pos) else { return };
+        self.dirty.insert((pos.x >> 4, pos.z >> 4));
         for stack in items.into_iter().filter(|s| s.count > 0) {
             self.drop_item(pos, stack);
         }

@@ -154,6 +154,11 @@ impl<A: BlockAccess> World<A> {
         self.time
     }
 
+    /// Restores the game clock (loading a saved world).
+    pub fn set_time(&mut self, time: i64) {
+        self.time = time;
+    }
+
     #[inline]
     pub fn block(&self, pos: BlockPos) -> Option<u16> {
         self.blocks.block(pos)

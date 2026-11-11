@@ -22,6 +22,7 @@ uuid.workspace = true
 ferrite-nbt = { path = "../ferrite-nbt" }
 
 [dev-dependencies]
+tempfile.workspace = true
 ferrite-swarm = { path = "../ferrite-swarm" }
 tokio = { version = "1", features = ["full"] }
 

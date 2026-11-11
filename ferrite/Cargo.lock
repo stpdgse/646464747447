@@ -969,6 +969,7 @@ dependencies = [
  "ferrite-protocol",
  "ferrite-swarm",
  "ferrite-world",
+ "tempfile",
  "thiserror",
  "tokio",
  "tracing",

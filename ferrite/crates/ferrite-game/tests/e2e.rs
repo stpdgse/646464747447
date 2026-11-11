@@ -462,3 +462,62 @@ async fn chests_and_crafting_tables_open_windows_that_keep_their_contents() {
     a.send(&ContainerClose { window_id: screen.container_id }).await.unwrap();
     until(&mut a, 600, |p| p.name == "container_close").await;
 }
+
+#[tokio::test]
+async fn a_saved_world_comes_back_with_its_blocks_players_and_chests() {
+    use ferrite_protocol::codec::VarInt;
+    let dir = tempfile::tempdir().unwrap();
+    let cfg = || GameConfig {
+        view_distance: 4,
+        world_dir: Some(dir.path().to_path_buf()),
+        ..GameConfig::default()
+    };
+    {
+        let s = server_with(cfg()).await;
+        let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+        until(&mut a, 600, |p| p.name == "chunk_batch_finished").await;
+        a.send(&SetCreativeModeSlot {
+            slot: 37,
+            item: ItemStack { count: 7, item: item("minecraft:stone") },
+        })
+        .await
+        .unwrap();
+        a.send(&PlayerAction {
+            action: VarInt(0),
+            pos: PackedPos::new(2, -61, 2),
+            face: 1,
+            sequence: VarInt(1),
+        })
+        .await
+        .unwrap();
+        assert_eq!(block_update_at(&mut a, 2, -61, 2).await.state.0, state("air"));
+        a.send(&MovePlayerPos { x: 5.5, y: -60.0, z: 3.5, flags: 1 }).await.unwrap();
+        // Give the server a moment to take the move, then leave.
+        tokio::time::sleep(Duration::from_millis(300)).await;
+        drop(a);
+        tokio::time::sleep(Duration::from_millis(300)).await;
+    } // the server stops and saves
+    let s = server_with(cfg()).await;
+    let mut a = PlayBot::join(s.addr, "Alice").await.unwrap();
+    let pos = until(&mut a, 600, |p| p.name == "player_position").await;
+    let pos: PlayerPosition = decode(&pos);
+    assert_eq!((pos.x, pos.z), (5.5, 3.5), "the player is where they left");
+    let content = until(&mut a, 600, |p| p.name == "container_set_content").await;
+    let content: ContainerSetContent = decode(&content);
+    assert_eq!(content.items.0[37], ItemStack { count: 7, item: item("minecraft:stone") });
+    let mut found = false;
+    until(&mut a, 600, |p| {
+        if p.name == "level_chunk_with_light" {
+            let c: LevelChunkWithLight = decode(p);
+            if (c.x, c.z) == (0, 0) {
+                let d = decode_sections(&c.buffer.0, Dimension::OVERWORLD).unwrap();
+                let air = state("air") as u16;
+                found = d.block(2, -61, 2) == Some(air);
+                return true;
+            }
+        }
+        false
+    })
+    .await;
+    assert!(found, "the dug block is still gone after a restart");
+}

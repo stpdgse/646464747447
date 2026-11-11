@@ -497,7 +497,17 @@ closing as players look inside) and barrels: the window opens over the player's 
 are applied by the server, the contents persist per position and spill out when the block is
 broken, and closing returns the cursor stack and crafting grid to the inventory. 1,290 clicks
 recorded inside such windows on the official server replay identically (this found that
-shift-clicking in a crafting table fills the grid first). Contents are not saved to disk yet.
+shift-clicking in a crafting table fills the grid first). 
+
+### Saving
+
+`ferrite-server --world <dir>` keeps the world on disk (`ferrite-game::persist`): changed chunks go
+into the crash-safe chunk store, chest contents into a second store keyed by chunk, each player
+into `players/<uuid>.dat` (position, rotation, game mode, hotbar slot, inventory; written
+atomically) and the clock into `level.dat`. Items are stored by registry name, so a save survives
+registry changes. The world is saved every 30 seconds, when a player leaves and on shutdown; a
+chunk that cannot be read is regenerated with an error in the log rather than stopping the server.
+Not saved yet: dropped items, the day/weather state beyond the clock, entities other than players.
 
 **Not yet:** furnace, anvil and the other windows, ender chests and shulker boxes, damage, hunger, item components, the
 inventory beyond the hotbar being synchronised from the client, signed chat, commands, persistence of changes, lighting,

@@ -50,6 +50,10 @@ struct Args {
     /// Game mode for new players: 0 survival, 1 creative, 2 adventure, 3 spectator.
     #[arg(long, default_value_t = 1)]
     game_mode: u8,
+    /// Directory to save the world, players and containers in (created if missing). Without
+    /// it the world lives in memory and is lost when the server stops.
+    #[arg(long)]
+    world: Option<std::path::PathBuf>,
     /// Seconds of silence after which a connection is dropped.
     #[arg(long, default_value_t = 15)]
     read_timeout: u64,
@@ -131,6 +135,7 @@ fn main() -> std::io::Result<()> {
             view_distance: args.view_distance.clamp(2, 32),
             simulation_distance: args.view_distance.clamp(2, 32),
             game_mode: args.game_mode.min(3),
+            world_dir: args.world.clone(),
             online_mode: args.online_mode,
             ..ferrite_game::GameConfig::default()
         });
