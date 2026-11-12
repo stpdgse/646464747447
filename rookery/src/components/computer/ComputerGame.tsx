@@ -240,9 +240,10 @@ export function ComputerGame() {
       Termination: end ? HOW[end.how] : undefined,
     });
   };
-  const analyse = () => {
+  const analyse = (review = false) => {
     try {
       window.sessionStorage.setItem("rookery.import", pgn());
+      if (review) window.sessionStorage.setItem("rookery.review", "1");
     } catch {
       /* storage blocked: the analysis board will simply open empty */
     }
@@ -378,7 +379,8 @@ export function ComputerGame() {
         {end ? (
           <div className="flex flex-wrap gap-2">
             <button className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-brand-ink hover:bg-brand-hi" onClick={() => start({ ...setup, botId: game.bot.id, color: game.player === "white" ? "black" : "white" })}>Rematch (swap colours)</button>
-            <button className={btn} onClick={analyse}>Analyse</button>
+            {plyCount >= 2 && <button className={btn} onClick={() => analyse(true)}>Review with engine</button>}
+            <button className={btn} onClick={() => analyse(false)}>Analyse</button>
             <button className={btn} onClick={download}>Download PGN</button>
             <button className={btn} onClick={() => setGame(null)}>New opponent</button>
           </div>

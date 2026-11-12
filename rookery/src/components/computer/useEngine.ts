@@ -9,10 +9,11 @@ export type EngineState =
   | { status: "error"; message: string };
 
 /** Starts Stockfish in a Web Worker for the lifetime of the component. */
-export function useEngine(): EngineState {
+export function useEngine(enabled = true): EngineState {
   const [state, setState] = useState<EngineState>({ status: "loading" });
 
   useEffect(() => {
+    if (!enabled) return;
     let dead = false;
     let engine: UciEngine | null = null;
     const fail = (message: string) => queueMicrotask(() => !dead && setState({ status: "error", message }));
@@ -32,7 +33,7 @@ export function useEngine(): EngineState {
       dead = true;
       engine?.terminate();
     };
-  }, []);
+  }, [enabled]);
 
-  return state;
+  return enabled ? state : { status: "loading" };
 }

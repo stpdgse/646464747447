@@ -130,14 +130,27 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
       TimeControl: row.mode === "daily" ? `1/${(row.days_per_move ?? 1) * 86400}` : `${row.time_initial_ms / 1000}+${row.time_inc_ms / 1000}`,
       Termination: row.reason ?? undefined,
     });
-  const analyse = () => {
+  const analyse = (review = false) => {
     try {
       window.sessionStorage.setItem("rookery.import", pgn());
+      if (review) window.sessionStorage.setItem("rookery.review", "1");
     } catch {
       /* storage blocked */
     }
     router.push("/play/board");
   };
+
+  // The opening's name (the list of openings is loaded on demand).
+  const [openingName, setOpeningName] = useState<string | null>(null);
+  useEffect(() => {
+    let dead = false;
+    import("@/lib/openings").then((lib) => {
+      if (dead) return;
+      const hit = lib.openingAt(recordOf(row));
+      setOpeningName(hit ? lib.describeOpening(hit.opening) : null);
+    });
+    return () => { dead = true; };
+  }, [row]);
   const download = () => {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([pgn()], { type: "application/x-chess-pgn" }));
@@ -244,6 +257,8 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
           </div>
         )}
 
+        {openingName && <p className="text-sm text-dim" aria-label="Opening"><span className="font-semibold text-ink">Opening:</span> {openingName}</p>}
+
         <section className="rounded-xl border border-line bg-surface" aria-label="Move list">
           <MoveList sans={view.sans} ply={view.sans.length} />
         </section>
@@ -283,7 +298,8 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
                 {rematchSent ? "Rematch offered" : "Offer rematch"}
               </button>
             )}
-            <button className={btn} onClick={analyse}>Analyse</button>
+            {row.moves.length >= 2 && <button className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-brand-ink hover:bg-brand-hi" onClick={() => analyse(true)}>Review with engine</button>}
+            <button className={btn} onClick={() => analyse(false)}>Analyse</button>
             <button className={btn} onClick={download}>Download PGN</button>
             <Link href={isDaily ? "/play/daily" : "/play/online"} className={`${btn} inline-block`}>Back to lobby</Link>
           </div>

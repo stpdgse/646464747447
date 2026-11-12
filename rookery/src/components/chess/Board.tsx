@@ -25,6 +25,8 @@ export type BoardProps = {
   /** Return true if the move was accepted. A rejected move snaps the piece back. */
   onMove: (from: Square, to: Square, promotion?: PromotionRole) => boolean;
   className?: string;
+  /** Arrows to draw (for example the engine's best move). */
+  shapes?: { orig: Square; dest?: Square; brush?: "green" | "blue" | "red" | "yellow" }[];
 };
 
 const PROMOTION_CHOICES: { role: PromotionRole; letter: string; label: string }[] = [
@@ -34,7 +36,7 @@ const PROMOTION_CHOICES: { role: PromotionRole; letter: string; label: string }[
   { role: "knight", letter: "N", label: "Knight" },
 ];
 
-export function Board({ view, variant, orientation, movable, settings, isPromotion, onMove, className }: BoardProps) {
+export function Board({ view, variant, orientation, movable, settings, isPromotion, onMove, className, shapes }: BoardProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<Api | null>(null);
   const [pending, setPending] = useState<{ from: Square; to: Square } | null>(null);
@@ -66,9 +68,9 @@ export function Board({ view, variant, orientation, movable, settings, isPromoti
       draggable: { enabled: true, showGhost: true },
       selectable: { enabled: true },
       premovable: { enabled: false },
-      drawable: { enabled: true, visible: true },
+      drawable: { enabled: true, visible: true, autoShapes: shapes ?? [] },
     }),
-    [view, orientation, movable, settings, variant],
+    [view, orientation, movable, settings, variant, shapes],
   );
 
   // Create once.

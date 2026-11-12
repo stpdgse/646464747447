@@ -14,6 +14,9 @@ import {
   type PromotionRole,
 } from "@/lib/chess/game";
 import { VARIANTS, VARIANT_IDS, randomChess960Id, type Variant } from "@/lib/chess/variants";
+import { EvalBar } from "@/components/analysis/EvalBar";
+import { AnnotatedMoves, LiveLines, ReviewGraph, ReviewSummary } from "@/components/analysis/ReviewPanels";
+import { useAnalysis } from "@/components/analysis/useAnalysis";
 import { Board } from "./Board";
 import { BoardSettingsPanel } from "./BoardSettingsPanel";
 import { MoveList } from "./MoveList";
@@ -35,6 +38,7 @@ const field =
 
 export function Workspace() {
   const [settings, updateSettings] = useBoardSettings();
+  const [openingName, setOpeningName] = useState<string | null>(null);
   const [record, setRecord] = useState<GameRecord>(() => newRecord("standard"));
   const [ply, setPly] = useState(0);
   const [orientation, setOrientation] = useState<"white" | "black">("white");
@@ -49,6 +53,8 @@ export function Workspace() {
   const view = useMemo(() => viewAt(record, ply), [record, ply]);
   const atEnd = ply === record.moves.length;
   const live = useMemo(() => viewAt(record), [record]);
+  const analysis = useAnalysis({ record, ply });
+  const { requestReview } = analysis;
 
   const branch = useCallback((): GameRecord => ({ ...record, moves: record.moves.slice(0, ply) }), [record, ply]);
 
@@ -103,11 +109,26 @@ export function Workspace() {
         setVariant(r.variant);
         setPly(r.moves.length);
         setNotice({ kind: "info", text: `Loaded your game (${r.moves.length} moves). Use the arrow keys to step through it.` });
+        if (window.sessionStorage.getItem("rookery.review")) {
+          window.sessionStorage.removeItem("rookery.review");
+          if (r.moves.length >= 2) requestReview();
+        }
       } catch {
         /* ignore a bad hand-off */
       }
     });
-  }, []);
+  }, [requestReview]);
+
+  // The opening's name for the position on the board (the opening list is loaded on demand).
+  useEffect(() => {
+    let dead = false;
+    import("@/lib/openings").then((lib) => {
+      if (dead) return;
+      const hit = lib.openingAt(record, ply);
+      setOpeningName(hit ? lib.describeOpening(hit.opening) : null);
+    });
+    return () => { dead = true; };
+  }, [record, ply]);
 
   // Keyboard navigation (ignored while typing in a field).
   const rootRef = useRef<HTMLDivElement>(null);
@@ -182,15 +203,21 @@ export function Workspace() {
   return (
     <div ref={rootRef} className="grid gap-6 lg:grid-cols-[minmax(0,640px)_minmax(0,1fr)]">
       <div className="grid min-w-0 grid-cols-1 content-start gap-3">
-        <Board
-          view={view}
-          variant={record.variant}
-          orientation={orientation}
-          movable="both"
-          settings={settings}
-          isPromotion={isPromotion}
-          onMove={onMove}
-        />
+        <div className="flex gap-2">
+          {(analysis.engineOn || analysis.review) && <EvalBar cp={analysis.evalNow?.cp ?? null} mate={analysis.evalNow?.mate ?? null} orientation={orientation} />}
+          <div className="min-w-0 flex-1">
+            <Board
+              view={view}
+              variant={record.variant}
+              orientation={orientation}
+              movable="both"
+              settings={settings}
+              isPromotion={isPromotion}
+              onMove={onMove}
+              shapes={analysis.shapes}
+            />
+          </div>
+        </div>
         <div className="flex flex-wrap items-center gap-2" role="toolbar" aria-label="Board controls">
           <button className={btn} onClick={() => setPly(0)} disabled={ply === 0} aria-label="First move">«</button>
           <button className={btn} onClick={() => setPly((p) => Math.max(0, p - 1))} disabled={ply === 0} aria-label="Previous move">‹</button>
@@ -220,8 +247,44 @@ export function Workspace() {
           </p>
         )}
 
+        {openingName && <p className="text-sm text-dim" aria-label="Opening"><span className="font-semibold text-ink">Opening:</span> {openingName}</p>}
+
+        <section className="grid gap-2 rounded-xl border border-line bg-surface" aria-label="Engine analysis">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3">
+            <label className="flex items-center gap-2 text-sm font-semibold">
+              <input type="checkbox" checked={analysis.engineOn} onChange={(e) => analysis.setEngineOn(e.target.checked)} className="size-4 accent-[var(--brand)]" />
+              Engine (Stockfish)
+            </label>
+            <div className="flex items-center gap-2">
+              {analysis.progress ? (
+                <button className={btn} onClick={analysis.cancelReview}>Cancel review</button>
+              ) : (
+                <button className={btn} onClick={analysis.requestReview} disabled={record.moves.length < 2}>Review game</button>
+              )}
+              {analysis.review && <button className={btn} onClick={analysis.hideReview}>Hide review</button>}
+            </div>
+          </div>
+          {analysis.engineError && <p role="alert" className="px-3 pb-3 text-sm text-danger">{analysis.engineError}</p>}
+          {analysis.error && <p role="alert" className="px-3 pb-3 text-sm text-danger">{analysis.error}</p>}
+          {analysis.progress && (
+            <div className="px-3 pb-3" role="status" aria-live="polite">
+              <div className="h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-brand transition-[width]" style={{ width: `${(analysis.progress.done / analysis.progress.total) * 100}%` }} /></div>
+              <p className="mt-1 text-xs text-dim">Analysing position {analysis.progress.done} of {analysis.progress.total}…</p>
+            </div>
+          )}
+          {!analysis.progress && analysis.engineOn && analysis.engineStatus === "loading" && <p className="px-3 pb-3 text-sm text-dim">Loading the engine…</p>}
+          {!analysis.progress && analysis.engineOn && analysis.engineStatus === "ready" && <LiveLines lines={analysis.lines} />}
+        </section>
+
+        {analysis.review && (
+          <div className="grid min-w-0 grid-cols-1 gap-3">
+            <ReviewSummary review={analysis.review} />
+            <ReviewGraph review={analysis.review} ply={ply} onSelect={setPly} />
+          </div>
+        )}
+
         <section className="rounded-xl border border-line bg-surface" aria-label="Move list">
-          <MoveList sans={live.sans} ply={ply} onSelect={setPly} />
+          {analysis.review ? <AnnotatedMoves review={analysis.review} ply={ply} onSelect={setPly} /> : <MoveList sans={live.sans} ply={ply} onSelect={setPly} />}
         </section>
 
         <form onSubmit={submitText} className="flex gap-2">

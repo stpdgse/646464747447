@@ -64,8 +64,8 @@ export function RatingChart({ points, title }: { points: ChartPoint[]; title: st
   };
 
   return (
-    <figure className="grid gap-2" aria-label={`${title} over ${plural(n - 1, "game")}`}>
-      <div ref={wrapRef} className="relative">
+    <figure className="grid min-w-0 grid-cols-1 gap-2" aria-label={`${title} over ${plural(n - 1, "game")}`}>
+      <div ref={wrapRef} className="relative min-w-0">
         <svg
           width={width}
           height={H}

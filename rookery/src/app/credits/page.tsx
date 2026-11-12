@@ -8,6 +8,7 @@ const LIBS = [
   { name: "Chessground", by: "Lichess", license: "GPL-3.0+", url: "https://github.com/lichess-org/chessground", what: "the board" },
   { name: "chessops", by: "Niklas Fiekas", license: "GPL-3.0+", url: "https://github.com/niklasf/chessops", what: "chess rules, Chess960, PGN and FEN" },
   { name: "Stockfish", by: "The Stockfish developers", license: "GPL-3.0", url: "https://stockfishchess.org", what: "the computer opponent and analysis" },
+  { name: "Lichess chess-openings", by: "Lichess contributors", license: "CC0", url: "https://github.com/lichess-org/chess-openings", what: "opening names and the opening book" },
   { name: "Lichess puzzle database", by: "Lichess contributors", license: "CC0", url: "https://database.lichess.org/#puzzles", what: "the puzzles" },
   { name: "Glicko-2", by: "Mark Glickman", license: "public algorithm", url: "http://www.glicko.net/glicko.html", what: "player ratings" },
 ];

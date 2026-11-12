@@ -49,8 +49,8 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 - [x] **M5 Ratings**: Glicko-2 in SQL (cross-checked against the glicko2 library), rated/casual pairing, rating shown in games, leaderboard per rating type, stats profile with rating graph, PGN export
 - [x] **M6 Daily games**: days per move, offers and challenges, deadlines, in-app notification bell, timeout claims plus a pg_cron sweep every 10 minutes, a separate Daily rating
 - [x] **M7 Puzzles**: 11,258 puzzles sampled from the Lichess database (CC0), rated Glicko-2 puzzle rating, theme filter, daily puzzle, Puzzle Rush with server-verified runs
-- [ ] **M8 Analysis**: engine eval bar, best-move arrows, accuracy score, blunder labels, game review
-- [ ] **M9 Openings**: ECO names, move-tree explorer from site games
+- [x] **M8 Analysis**: live Stockfish lines and best-move arrows, eval bar, full-game review with accuracy, inaccuracy/mistake/blunder marks and an evaluation graph; "Review with engine" on finished games
+- [x] **M9 Openings**: 3,865 named openings (ECO), opening names on games and the board, opening explorer with an offline book plus what the class played (`opening_stats`)
 - [ ] **M10 Social**: friends, in-game chat, presence, spectator view, notifications
 - [ ] **M11 Clubs and forum**: clubs/teams, club chat, forum categories/threads/posts
 - [ ] **M12 Admin and fair play**: moderation panel, bans/mutes/reports, accuracy flags
