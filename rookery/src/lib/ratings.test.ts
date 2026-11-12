@@ -18,6 +18,13 @@ describe("perfOf (must agree with private.perf_of in SQL)", () => {
   });
 });
 
+describe("perfOf for daily games", () => {
+  it("all daily games share one rating", () => {
+    expect(perfOf("standard", 0, 0, "daily")).toBe("daily");
+    expect(perfOf("chess960", 0, 0, "daily")).toBe("daily");
+  });
+});
+
 describe("rating display", () => {
   it("marks ratings with high uncertainty as provisional", () => {
     expect(isProvisional(350)).toBe(true);

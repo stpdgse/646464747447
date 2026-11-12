@@ -6,7 +6,7 @@ import { RatingPanel } from "@/components/ratings/RatingPanel";
 import type { ChartPoint } from "@/components/ratings/RatingChart";
 import type { Profile } from "@/lib/auth";
 import { VARIANTS, type Variant } from "@/lib/chess/variants";
-import { categoryOf, describeTimeControl } from "@/lib/live/timecontrols";
+import { describeGameTime } from "@/lib/live/timecontrols";
 import { PERFS, formatRating, perfLabel, plural, tally, type HistoryPoint, type RatingRow } from "@/lib/ratings";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,7 +25,7 @@ export default function ProfilePage({ params }: PageProps<"/u/[username]">) {
 
 type RecentGame = {
   id: string; variant: Variant; result: string | null; reason: string | null; rated: boolean; moves: string[];
-  white_id: string; black_id: string; time_initial_ms: number; time_inc_ms: number; ended_at: string | null;
+  white_id: string; black_id: string; time_initial_ms: number; time_inc_ms: number; mode: "live" | "daily"; days_per_move: number | null; ended_at: string | null;
   white: { username: string } | null; black: { username: string } | null;
 };
 
@@ -36,16 +36,17 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
   if (!data) notFound();
   const p = data as Profile;
 
-  const [ratingsRes, historyRes, gamesRes] = await Promise.all([
+  const [ratingsRes, historyRes, gamesRes, puzzleRes] = await Promise.all([
     supabase.from("ratings").select("user_id, perf, rating, rd, games").eq("user_id", p.id),
     supabase.from("rating_history").select("game_id, perf, rating_before, rating_after, created_at").eq("user_id", p.id).order("created_at", { ascending: true }).limit(2000),
     supabase
       .from("games")
-      .select("id, variant, result, reason, rated, moves, white_id, black_id, time_initial_ms, time_inc_ms, ended_at, white:profiles!games_white_id_fkey(username), black:profiles!games_black_id_fkey(username)")
+      .select("id, variant, result, reason, rated, moves, white_id, black_id, time_initial_ms, time_inc_ms, mode, days_per_move, ended_at, white:profiles!games_white_id_fkey(username), black:profiles!games_black_id_fkey(username)")
       .eq("status", "finished")
       .or(`white_id.eq.${p.id},black_id.eq.${p.id}`)
       .order("ended_at", { ascending: false })
       .limit(500),
+    supabase.from("puzzle_attempts").select("rating_before, rating_after, created_at").eq("user_id", p.id).order("created_at", { ascending: true }).limit(2000),
   ]);
 
   const ratings = ((ratingsRes.data ?? []) as RatingRow[]).sort((a, b) => PERFS.findIndex((x) => x.id === a.perf) - PERFS.findIndex((x) => x.id === b.perf));
@@ -61,6 +62,14 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
     series[perf] = [
       { rating: rows[0].rating_before, delta: 0, created_at: rows[0].created_at },
       ...rows.map((h) => ({ rating: h.rating_after, delta: h.rating_after - h.rating_before, created_at: h.created_at })),
+    ];
+  }
+
+  const attempts = (puzzleRes.data ?? []) as { rating_before: number; rating_after: number; created_at: string }[];
+  if (attempts.length > 0) {
+    series.puzzle = [
+      { rating: attempts[0].rating_before, delta: 0, created_at: attempts[0].created_at },
+      ...attempts.map((a) => ({ rating: a.rating_after, delta: a.rating_after - a.rating_before, created_at: a.created_at })),
     ];
   }
 
@@ -140,7 +149,7 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
                       <span>vs <strong>{opp?.username ?? "?"}</strong></span>
                     </span>
                     <span className="text-sm text-dim">
-                      {categoryOf(g.time_initial_ms, g.time_inc_ms)} {describeTimeControl(g.time_initial_ms, g.time_inc_ms)} · {VARIANTS[g.variant].label} · {g.rated ? "Rated" : "Casual"} · {plural(Math.ceil(g.moves.length / 2), "move")}
+                      {describeGameTime(g)} · {VARIANTS[g.variant].label} · {g.rated ? "Rated" : "Casual"} · {plural(Math.ceil(g.moves.length / 2), "move")}
                     </span>
                   </Link>
                 </li>

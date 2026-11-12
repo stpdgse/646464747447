@@ -32,7 +32,7 @@ export async function GET(_req: Request, ctx: RouteContext<"/u/[username]/pgn">)
         Result: g.result ?? "*",
         WhiteElo: g.white_rating ? String(g.white_rating) : undefined,
         BlackElo: g.black_rating ? String(g.black_rating) : undefined,
-        TimeControl: `${g.time_initial_ms / 1000}+${g.time_inc_ms / 1000}`,
+        TimeControl: g.mode === "daily" ? `1/${(g.days_per_move ?? 1) * 86400}` : `${g.time_initial_ms / 1000}+${g.time_inc_ms / 1000}`,
         Termination: g.reason ?? undefined,
       }),
     )

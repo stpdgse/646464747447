@@ -11,8 +11,8 @@ import { MoveList } from "@/components/chess/MoveList";
 import { useBoardSettings } from "@/components/chess/settings";
 import { needsPromotion, toPgn, tryMove, viewAt, type GameRecord, type PromotionRole } from "@/lib/chess/game";
 import { VARIANTS } from "@/lib/chess/variants";
-import { categoryOf, describeTimeControl } from "@/lib/live/timecontrols";
-import { clockLeft, needsTimeoutCheck, recordOf, sideOf, type GameRow, type Names, type Side } from "@/lib/live/types";
+import { categoryOf, describeGameTime, formatDuration } from "@/lib/live/timecontrols";
+import { clockLeft, deadlineLeft, needsTimeoutCheck, recordOf, sideOf, type GameRow, type Names, type Side } from "@/lib/live/types";
 import { createClient } from "@/lib/supabase/client";
 import { signed } from "@/lib/ratings";
 import { useLiveGame } from "./useLiveGame";
@@ -121,13 +121,13 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
 
   const pgn = () =>
     toPgn(recordOf(row), {
-      Event: `Rookery ${categoryOf(row.time_initial_ms, row.time_inc_ms)} game`,
+      Event: `Rookery ${row.mode === "daily" ? "daily" : categoryOf(row.time_initial_ms, row.time_inc_ms)} game`,
       Site: "Rookery",
       Date: row.created_at.slice(0, 10).replaceAll("-", "."),
       White: names.white,
       Black: names.black,
       Result: row.result ?? "*",
-      TimeControl: `${row.time_initial_ms / 1000}+${row.time_inc_ms / 1000}`,
+      TimeControl: row.mode === "daily" ? `1/${(row.days_per_move ?? 1) * 86400}` : `${row.time_initial_ms / 1000}+${row.time_inc_ms / 1000}`,
       Termination: row.reason ?? undefined,
     });
   const analyse = () => {
@@ -159,7 +159,10 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
     return c ? `${nameOf(s)}: ${c.before} → ${c.after} (${signed(c.after - c.before)})` : null;
   };
   const leftOf = (s: Side) => (s === "white" ? whiteLeft : blackLeft);
-  const category = categoryOf(row.time_initial_ms, row.time_inc_ms);
+  const timeLabel = describeGameTime(row);
+  const isDaily = row.mode === "daily";
+  const left = deadlineLeft(row, serverNow);
+  const noteFor = (s: Side) => (isDaily && playing && view.turn === s && left !== null ? (left <= 0 ? "overdue" : `${formatDuration(left)} left`) : undefined);
 
   const winnerSide = row.result === "1-0" ? "white" : row.result === "0-1" ? "black" : null;
   const headline =
@@ -178,7 +181,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,640px)_minmax(0,1fr)]">
       <div className="grid min-w-0 grid-cols-1 content-start gap-3">
-        <ClockBar label={labelOf(topSide)} ms={leftOf(topSide)} active={playing && view.turn === topSide} timed thinking={false} />
+        <ClockBar label={labelOf(topSide)} ms={leftOf(topSide)} active={playing && view.turn === topSide} timed={!isDaily} note={noteFor(topSide)} thinking={false} />
         <Board
           view={view}
           variant={row.variant}
@@ -188,7 +191,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
           isPromotion={isPromotion}
           onMove={onMove}
         />
-        <ClockBar label={labelOf(bottomSide)} ms={leftOf(bottomSide)} active={playing && view.turn === bottomSide} timed />
+        <ClockBar label={labelOf(bottomSide)} ms={leftOf(bottomSide)} active={playing && view.turn === bottomSide} timed={!isDaily} note={noteFor(bottomSide)} />
         <div className="flex flex-wrap gap-2">
           <button className={btn} onClick={() => setFlipped((f) => !f)}>Flip</button>
           <button className={btn} onClick={() => setShowSettings((s) => !s)} aria-expanded={showSettings}>Appearance</button>
@@ -205,7 +208,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
                 {view.check ? " (check)" : ""}
               </p>
               <p className="text-xs text-dim">
-                {category} {describeTimeControl(row.time_initial_ms, row.time_inc_ms)} · {VARIANTS[row.variant].label} · {row.rated ? "Rated" : "Casual"}
+                {timeLabel} · {VARIANTS[row.variant].label} · {row.rated ? "Rated" : "Casual"}
                 {!side && " · you are watching"}
               </p>
             </div>
@@ -215,7 +218,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
                 {headline} <span className="font-normal text-dim">{row.reason ? REASONS[row.reason] ?? "" : ""}</span>
               </p>
               <p className="text-xs text-dim">
-                {row.result ? `${row.result} · ` : ""}{category} {describeTimeControl(row.time_initial_ms, row.time_inc_ms)} · {VARIANTS[row.variant].label} · {row.rated ? "Rated" : "Casual"}
+                {row.result ? `${row.result} · ` : ""}{timeLabel} · {VARIANTS[row.variant].label} · {row.rated ? "Rated" : "Casual"}
               </p>
               {row.rated && row.status === "finished" && (
                 <ul className="text-sm" aria-label="Rating changes">
@@ -282,7 +285,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
             )}
             <button className={btn} onClick={analyse}>Analyse</button>
             <button className={btn} onClick={download}>Download PGN</button>
-            <Link href="/play/online" className={`${btn} inline-block`}>Back to lobby</Link>
+            <Link href={isDaily ? "/play/daily" : "/play/online"} className={`${btn} inline-block`}>Back to lobby</Link>
           </div>
         )}
       </div>

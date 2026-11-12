@@ -32,6 +32,7 @@ export function Lobby({ me }: { me: Me }) {
     const { data } = await supabase
       .from("seeks")
       .select("*, user:profiles!seeks_user_id_fkey(username), target:profiles!seeks_target_id_fkey(username)")
+      .eq("mode", "live")
       .order("created_at", { ascending: true });
     setSeeks((data as SeekWithNames[] | null) ?? []);
     if (me) {
@@ -39,6 +40,7 @@ export function Lobby({ me }: { me: Me }) {
         .from("games")
         .select("id")
         .eq("status", "started")
+        .eq("mode", "live")
         .or(`white_id.eq.${me.id},black_id.eq.${me.id}`)
         .limit(1);
       setActiveGame(games?.[0]?.id ?? null);

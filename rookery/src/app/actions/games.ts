@@ -4,7 +4,7 @@ import { z } from "zod";
 import { requireProfile } from "@/lib/auth";
 import { cannotMate, tryMove, viewAt, type PromotionRole } from "@/lib/chess/game";
 import { VARIANT_IDS, startFen, type Variant } from "@/lib/chess/variants";
-import { getLiveTimeControl } from "@/lib/live/timecontrols";
+import { DAILY_DAYS, getLiveTimeControl } from "@/lib/live/timecontrols";
 import { recordOf, type GameRow, type SeekRow } from "@/lib/live/types";
 import { createClient } from "@/lib/supabase/server";
 import { usernameSchema } from "@/lib/validation";
@@ -28,6 +28,7 @@ const MESSAGES: Record<string, string> = {
   not_signed_in: "Please log in first.",
   not_found: "Game not found.",
   bad_move: "That move isn't valid.",
+  too_many_daily: "One of you already has the maximum number of daily games.",
 };
 
 function explain(message: string | undefined): string {
@@ -100,22 +101,47 @@ export async function cancelSeek(seekId: string): Promise<{ ok: true } | Failure
 const challengeSchema = z.object({
   username: usernameSchema,
   variant: variantSchema,
-  timeId: z.string(),
+  timeId: z.string().optional(),
   color: z.enum(["white", "black", "random"]),
   rated: z.boolean(),
+  mode: z.enum(["live", "daily"]).default("live"),
+  days: z.number().int().optional(),
 });
+
+/** What the database stores for a time setting: live games use the preset, daily games use days per move. */
+function timeFields(mode: "live" | "daily", timeId?: string, days?: number) {
+  if (mode === "daily") {
+    if (!days || !(DAILY_DAYS as readonly number[]).includes(days)) return null;
+    return { mode, days_per_move: days, time_initial_ms: 0, time_inc_ms: 0 };
+  }
+  const tc = timeId ? getLiveTimeControl(timeId) : undefined;
+  return tc ? { mode, days_per_move: null, time_initial_ms: tc.ms, time_inc_ms: tc.inc } : null;
+}
 
 export async function createChallenge(input: z.input<typeof challengeSchema>): Promise<{ ok: true } | Failure> {
   const me = await requireProfile();
   const parsed = challengeSchema.safeParse(input);
-  const tc = parsed.success ? getLiveTimeControl(parsed.data.timeId) : undefined;
-  if (!parsed.success || !tc) return { ok: false, error: "Check the username and options." };
+  const time = parsed.success ? timeFields(parsed.data.mode, parsed.data.timeId, parsed.data.days) : null;
+  if (!parsed.success || !time) return { ok: false, error: "Check the username and options." };
   const supabase = await createClient();
   const { data: target } = await supabase.from("profiles").select("id, username").eq("username", parsed.data.username).maybeSingle();
   if (!target) return { ok: false, error: "No player has that username." };
   if (target.id === me.id) return { ok: false, error: "You can't challenge yourself." };
   const { error } = await supabase.from("seeks").insert({
-    user_id: me.id, target_id: target.id, variant: parsed.data.variant, time_initial_ms: tc.ms, time_inc_ms: tc.inc, color: parsed.data.color, rated: parsed.data.rated,
+    user_id: me.id, target_id: target.id, variant: parsed.data.variant, color: parsed.data.color, rated: parsed.data.rated, ...time,
+  });
+  return error ? { ok: false, error: explain(error.message) } : { ok: true };
+}
+
+/** An open offer for a daily game: anyone can accept it from the Daily page. */
+export async function createDailySeek(input: { variant: string; days: number; rated: boolean; color?: "white" | "black" | "random" }): Promise<{ ok: true } | Failure> {
+  const me = await requireProfile();
+  const variant = variantSchema.safeParse(input.variant);
+  const time = timeFields("daily", undefined, input.days);
+  if (!variant.success || !time) return { ok: false, error: "Pick a game type and days per move." };
+  const supabase = await createClient();
+  const { error } = await supabase.from("seeks").insert({
+    user_id: me.id, variant: variant.data, color: input.color ?? "random", rated: input.rated === true, ...time,
   });
   return error ? { ok: false, error: explain(error.message) } : { ok: true };
 }
@@ -203,6 +229,8 @@ export async function rematch(gameId: string): Promise<{ ok: true } | Failure> {
     user_id: me.id,
     target_id: mine === "white" ? row.black_id : row.white_id,
     variant: row.variant,
+    mode: row.mode,
+    days_per_move: row.days_per_move,
     time_initial_ms: row.time_initial_ms,
     time_inc_ms: row.time_inc_ms,
     color: mine === "white" ? "black" : "white",

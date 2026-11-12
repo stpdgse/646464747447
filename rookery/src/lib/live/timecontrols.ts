@@ -21,3 +21,20 @@ export function categoryOf(ms: number, inc: number): "Bullet" | "Blitz" | "Rapid
   const total = ms / 1000 + 40 * (inc / 1000);
   return total < 180 ? "Bullet" : total < 480 ? "Blitz" : "Rapid";
 }
+
+export const DAILY_DAYS = [1, 2, 3, 5, 7] as const;
+
+/** "2d 4h", "5h 12m", "3m 10s". */
+export function formatDuration(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const d = Math.floor(total / 86400), h = Math.floor((total % 86400) / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m ${String(s).padStart(2, "0")}s`;
+}
+
+/** "Blitz 3 + 2" for live games, "Daily, 3 days per move" for correspondence games. */
+export function describeGameTime(g: { mode: "live" | "daily"; days_per_move: number | null; time_initial_ms: number; time_inc_ms: number }): string {
+  if (g.mode === "daily") return `Daily, ${g.days_per_move} ${g.days_per_move === 1 ? "day" : "days"} per move`;
+  return `${categoryOf(g.time_initial_ms, g.time_inc_ms)} ${describeTimeControl(g.time_initial_ms, g.time_inc_ms)}`;
+}

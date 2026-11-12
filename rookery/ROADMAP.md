@@ -47,8 +47,8 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 - [x] **M3 Vs computer**: Stockfish 19 (lite, single-thread WASM, no special headers) in a Web Worker, 8 personality bots, clocks, takebacks, resign/draw, Chess960, hand-off to analysis. Saving games to the database arrives with M4's `games` table
 - [x] **M4 Live games**: quick pairing, open games, challenges, rematch, DB-clock timing, flag-fall, resign/abort/draw, realtime with polling fallback, spectating, Watch page. Rated games arrive with M5
 - [x] **M5 Ratings**: Glicko-2 in SQL (cross-checked against the glicko2 library), rated/casual pairing, rating shown in games, leaderboard per rating type, stats profile with rating graph, PGN export
-- [ ] **M6 Daily games**: correspondence with days-per-move, notifications, timeout sweep
-- [ ] **M7 Puzzles**: Lichess puzzle DB import, rated puzzles, puzzle rush, daily puzzle
+- [~] **M6 Daily games**: built and tested locally (days per move, deadlines, in-app notifications, scheduled timeout sweep); waiting for the migration to be applied to the hosted project
+- [~] **M7 Puzzles**: built (11,258 puzzles from the Lichess database, rated Glicko-2 puzzle rating, themes, daily puzzle, Puzzle Rush); signed-out play verified in the browser; rated play waiting for the migration
 - [ ] **M8 Analysis**: engine eval bar, best-move arrows, accuracy score, blunder labels, game review
 - [ ] **M9 Openings**: ECO names, move-tree explorer from site games
 - [ ] **M10 Social**: friends, in-game chat, presence, spectator view, notifications

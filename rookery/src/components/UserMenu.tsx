@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/auth";
 import { logout } from "@/app/actions/auth";
+import { NotificationBell } from "@/components/live/NotificationBell";
 
 /** Reads the session, so it must render inside <Suspense> (see SiteHeader). */
 export async function UserMenu() {
@@ -24,6 +25,7 @@ export async function UserMenu() {
 
   return (
     <>
+      <NotificationBell userId={profile.id} />
       <Link href={`/u/${profile.username}`} className="rounded-md px-3 py-1.5 text-sm font-semibold hover:bg-surface-2">
         {profile.username}
       </Link>

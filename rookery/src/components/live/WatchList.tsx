@@ -3,16 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { VARIANTS, type Variant } from "@/lib/chess/variants";
-import { categoryOf, describeTimeControl } from "@/lib/live/timecontrols";
+import { describeGameTime } from "@/lib/live/timecontrols";
 import { plural } from "@/lib/ratings";
 import { createClient } from "@/lib/supabase/client";
 
 type Item = {
-  id: string; variant: Variant; status: string; result: string | null; moves: string[]; time_initial_ms: number; time_inc_ms: number;
+  id: string; variant: Variant; status: string; result: string | null; moves: string[]; time_initial_ms: number; time_inc_ms: number; mode: "live" | "daily"; days_per_move: number | null;
   white: { username: string } | null; black: { username: string } | null;
 };
 
-const SELECT = "id, variant, status, result, moves, time_initial_ms, time_inc_ms, white:profiles!games_white_id_fkey(username), black:profiles!games_black_id_fkey(username)";
+const SELECT = "id, variant, status, result, moves, time_initial_ms, time_inc_ms, mode, days_per_move, white:profiles!games_white_id_fkey(username), black:profiles!games_black_id_fkey(username)";
 
 export function WatchList() {
   const [live, setLive] = useState<Item[] | null>(null);
@@ -23,7 +23,7 @@ export function WatchList() {
     let dead = false;
     const load = async () => {
       const [a, b] = await Promise.all([
-        supabase.from("games").select(SELECT).eq("status", "started").order("created_at", { ascending: false }).limit(30),
+        supabase.from("games").select(SELECT).eq("status", "started").eq("mode", "live").order("created_at", { ascending: false }).limit(30),
         supabase.from("games").select(SELECT).eq("status", "finished").order("ended_at", { ascending: false }).limit(10),
       ]);
       if (dead) return;
@@ -43,7 +43,7 @@ export function WatchList() {
       <Link href={`/game/${g.id}`} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-surface px-4 py-3 transition hover:border-brand">
         <span className="font-semibold">{g.white?.username ?? "?"} <span className="font-normal text-dim">vs</span> {g.black?.username ?? "?"}</span>
         <span className="text-sm text-dim">
-          {categoryOf(g.time_initial_ms, g.time_inc_ms)} {describeTimeControl(g.time_initial_ms, g.time_inc_ms)} · {VARIANTS[g.variant].label} · {plural(Math.ceil(g.moves.length / 2), "move")}{g.result ? ` · ${g.result}` : ""}
+          {describeGameTime(g)} · {VARIANTS[g.variant].label} · {plural(Math.ceil(g.moves.length / 2), "move")}{g.result ? ` · ${g.result}` : ""}
         </span>
       </Link>
     </li>

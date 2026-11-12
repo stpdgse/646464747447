@@ -34,12 +34,12 @@ select t.check_glicko(1200, 350, 0.06, 2100, 50, 0,    1195.941, 346.116, 0.06, 
 select t.check_glicko(2400, 60, 0.07, 2300, 110, 0.5,  2397.366, 60.447,  0.069996, 'strong player draws');
 
 -- ============================================================ perf mapping
-select t.ok(private.perf_of('standard', 60000, 0) = 'bullet', '1+0 is bullet');
-select t.ok(private.perf_of('standard', 180000, 0) = 'blitz', '3+0 is blitz');
-select t.ok(private.perf_of('standard', 180000, 2000) = 'blitz', '3+2 is blitz');
-select t.ok(private.perf_of('standard', 120000, 1000) = 'bullet', '2+1 is bullet');
-select t.ok(private.perf_of('standard', 600000, 0) = 'rapid', '10+0 is rapid');
-select t.ok(private.perf_of('chess960', 60000, 0) = 'chess960', 'variants have their own rating');
+select t.ok(private.perf_of('standard', 60000, 0, 'live') = 'bullet', '1+0 is bullet');
+select t.ok(private.perf_of('standard', 180000, 0, 'live') = 'blitz', '3+0 is blitz');
+select t.ok(private.perf_of('standard', 180000, 2000, 'live') = 'blitz', '3+2 is blitz');
+select t.ok(private.perf_of('standard', 120000, 1000, 'live') = 'bullet', '2+1 is bullet');
+select t.ok(private.perf_of('standard', 600000, 0, 'live') = 'rapid', '10+0 is rapid');
+select t.ok(private.perf_of('chess960', 60000, 0, 'live') = 'chess960', 'variants have their own rating');
 
 -- ============================================================ rated flow through the real functions
 set role authenticated; select t.as_user(:'erin');

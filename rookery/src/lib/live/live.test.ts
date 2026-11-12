@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { categoryOf, describeTimeControl, getLiveTimeControl, LIVE_TIME_CONTROLS } from "./timecontrols";
-import { clockLeft, isNewer, needsTimeoutCheck, sideOf, type GameRow } from "./types";
+import { clockLeft, deadlineLeft, isNewer, needsTimeoutCheck, sideOf, type GameRow } from "./types";
 
 const base: GameRow = {
   id: "g", variant: "standard", initial_fen: "x", moves: [], white_id: "w", black_id: "b", status: "started", result: null,
   reason: null, time_initial_ms: 180000, time_inc_ms: 2000, white_clock_ms: 180000, black_clock_ms: 180000,
-  clock_updated_at: new Date(1_000_000).toISOString(), draw_offer_by: null, rated: false, white_rating: 1500, black_rating: 1500, created_at: "", ended_at: null,
+  clock_updated_at: new Date(1_000_000).toISOString(), draw_offer_by: null, rated: false, white_rating: 1500, black_rating: 1500, mode: "live", days_per_move: null, move_deadline: null, created_at: "", ended_at: null,
 };
 const row = (patch: Partial<GameRow>): GameRow => ({ ...base, ...patch });
 
@@ -37,6 +37,20 @@ describe("needsTimeoutCheck", () => {
     expect(needsTimeoutCheck(row({ moves: [] }), 1_061_000)).toBe(true);
     expect(needsTimeoutCheck(row({ moves: [] }), 1_030_000)).toBe(false);
     expect(needsTimeoutCheck(row({ status: "finished", moves: [] }), 9_999_999)).toBe(false);
+  });
+});
+
+describe("daily deadlines", () => {
+  const daily = (patch: Partial<GameRow> = {}) => row({ mode: "daily", days_per_move: 3, time_initial_ms: 0, time_inc_ms: 0, white_clock_ms: 0, black_clock_ms: 0, moves: ["a", "b"], move_deadline: new Date(2_000_000).toISOString(), ...patch });
+  it("counts down to the deadline and flags overdue games", () => {
+    expect(deadlineLeft(daily(), 1_500_000)).toBe(500_000);
+    expect(deadlineLeft(daily(), 2_500_000)).toBe(-500_000);
+    expect(needsTimeoutCheck(daily(), 1_500_000)).toBe(false);
+    expect(needsTimeoutCheck(daily(), 2_000_001)).toBe(true);
+  });
+  it("ignores finished games and live games", () => {
+    expect(needsTimeoutCheck(daily({ status: "finished" }), 9_999_999)).toBe(false);
+    expect(deadlineLeft(row({}), 5)).toBeNull();
   });
 });
 

@@ -23,6 +23,9 @@ export type GameRow = {
   rated: boolean;
   white_rating: number | null;
   black_rating: number | null;
+  mode: "live" | "daily";
+  days_per_move: number | null;
+  move_deadline: string | null;
   created_at: string;
   ended_at: string | null;
 };
@@ -36,6 +39,8 @@ export type SeekRow = {
   time_inc_ms: number;
   color: "white" | "black" | "random";
   rated: boolean;
+  mode: "live" | "daily";
+  days_per_move: number | null;
   created_at: string;
   expires_at: string;
 };
@@ -72,9 +77,16 @@ export function clockLeft(row: GameRow, side: Side, serverNow: number): number {
   return Math.max(0, base - Math.max(0, serverNow - Date.parse(row.clock_updated_at)));
 }
 
-/** Has the game stalled? (flag fell, or nobody made the first move in time) */
+/** Daily games: milliseconds until the side to move must have moved (negative once overdue). */
+export function deadlineLeft(row: GameRow, serverNow: number): number | null {
+  if (row.mode !== "daily" || row.status !== "started" || !row.move_deadline) return null;
+  return Date.parse(row.move_deadline) - serverNow;
+}
+
+/** Has the game stalled? (flag fell, deadline passed, or nobody made the first move in time) */
 export function needsTimeoutCheck(row: GameRow, serverNow: number): boolean {
   if (row.status !== "started") return false;
+  if (row.mode === "daily") return (deadlineLeft(row, serverNow) ?? 1) <= 0;
   const ply = row.moves.length;
   if (ply < 2) return serverNow - Date.parse(row.clock_updated_at) > FIRST_MOVE_DEADLINE_MS;
   const turn: Side = ply % 2 === 0 ? "white" : "black";

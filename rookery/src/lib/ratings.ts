@@ -1,21 +1,24 @@
 import type { Variant } from "@/lib/chess/variants";
 import { categoryOf } from "@/lib/live/timecontrols";
 
-export type Perf = "bullet" | "blitz" | "rapid" | "chess960" | "kingOfTheHill" | "threeCheck";
+export type Perf = "bullet" | "blitz" | "rapid" | "daily" | "chess960" | "kingOfTheHill" | "threeCheck" | "puzzle";
 
 export const PERFS: { id: Perf; label: string }[] = [
   { id: "bullet", label: "Bullet" },
   { id: "blitz", label: "Blitz" },
   { id: "rapid", label: "Rapid" },
+  { id: "daily", label: "Daily" },
   { id: "chess960", label: "Chess960" },
   { id: "kingOfTheHill", label: "King of the Hill" },
   { id: "threeCheck", label: "Three-check" },
+  { id: "puzzle", label: "Puzzles" },
 ];
 
 export const perfLabel = (p: string) => PERFS.find((x) => x.id === p)?.label ?? p;
 
 /** Which rating a game counts towards. Mirrors private.perf_of in the database. */
-export function perfOf(variant: Variant, timeMs: number, incMs: number): Perf {
+export function perfOf(variant: Variant, timeMs: number, incMs: number, mode: "live" | "daily" = "live"): Perf {
+  if (mode === "daily") return "daily";
   if (variant !== "standard") return variant;
   return categoryOf(timeMs, incMs).toLowerCase() as Perf;
 }
