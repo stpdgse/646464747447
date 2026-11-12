@@ -39,7 +39,8 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
   const orientation: Side = (side ?? "white") === "white" ? (flipped ? "black" : "white") : flipped ? "white" : "black";
 
   // The board shows our own just-played move straight away; the server's row replaces it when it arrives.
-  const record = useMemo(() => (pending && pending.moves.length > row.moves.length ? pending : recordOf(row)), [pending, row]);
+  const waitingForServer = pending !== null && pending.moves.length > row.moves.length;
+  const record = useMemo(() => (waitingForServer && pending ? pending : recordOf(row)), [waitingForServer, pending, row]);
   const view = useMemo(() => viewAt(record), [record]);
   const playing = row.status === "started";
 
@@ -70,7 +71,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
   // ---- actions ------------------------------------------------------------------------------------
   const onMove = useCallback(
     (from: string, to: string, promotion?: PromotionRole) => {
-      if (!side || !playing || pending) return false;
+      if (!side || !playing || waitingForServer) return false;
       const base = recordOf(row);
       if (viewAt(base).turn !== side) return false;
       const attempt = tryMove(base, from as never, to as never, promotion);
@@ -86,7 +87,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
       });
       return true;
     },
-    [side, playing, pending, row, merge],
+    [side, playing, waitingForServer, row, merge],
   );
   const isPromotion = useCallback((from: string, to: string) => needsPromotion(record, from as never, to as never), [record]);
 

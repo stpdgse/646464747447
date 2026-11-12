@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { acceptSeek, cancelSeek, createChallenge, quickPair } from "@/app/actions/games";
 import { VARIANTS, VARIANT_IDS, type Variant } from "@/lib/chess/variants";
 import { categoryOf, describeTimeControl, getLiveTimeControl, LIVE_TIME_CONTROLS } from "@/lib/live/timecontrols";
@@ -59,10 +59,20 @@ export function Lobby({ me }: { me: Me }) {
     };
   }, [refresh]);
 
-  // Matched while waiting in the queue: jump into the game.
+  // Matched while waiting in the queue, or someone accepted our challenge: jump into the game.
+  // The "expecting" flag is latched, because the seek disappears a moment before the new game shows up.
+  const expecting = useRef(false);
+  const open = seeks.filter((s) => s.target_id === null);
+  const incoming = me ? seeks.filter((s) => s.target_id === me.id) : [];
+  const outgoing = me ? seeks.filter((s) => s.user_id === me.id && s.target_id) : [];
+  const hasMyOpenSeek = me ? open.some((s) => s.user_id === me.id) : false;
   useEffect(() => {
-    if (waiting && activeGame) router.push(`/game/${activeGame}`);
-  }, [waiting, activeGame, router]);
+    if (waiting || outgoing.length > 0 || hasMyOpenSeek) expecting.current = true;
+    if (expecting.current && activeGame) {
+      expecting.current = false;
+      router.push(`/game/${activeGame}`);
+    }
+  }, [waiting, outgoing.length, hasMyOpenSeek, activeGame, router]);
 
   const act = async <T extends { ok: boolean }>(fn: () => Promise<T | { ok: false; error: string }>): Promise<T | null> => {
     setError(null);
@@ -91,10 +101,6 @@ export function Lobby({ me }: { me: Me }) {
       refresh();
     }
   };
-
-  const open = seeks.filter((s) => s.target_id === null);
-  const incoming = me ? seeks.filter((s) => s.target_id === me.id) : [];
-  const outgoing = me ? seeks.filter((s) => s.user_id === me.id && s.target_id) : [];
 
   return (
     <div className="grid gap-8">

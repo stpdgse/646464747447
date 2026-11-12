@@ -16,6 +16,7 @@ and allow access to the `stpdgse/646464747447` repository.
    |---|---|
    | `NEXT_PUBLIC_SUPABASE_URL` | `https://ultpyrvfzdqamprglnxd.supabase.co` |
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_qb3qtdDNm_6apNtC37vQ_Q_bfgzVwy7` |
+   | `GAME_SERVER_SECRET` | a long random string (Sensitive). Register its SHA-256 in Supabase, see README. |
 
    Both are public by design (they ship to the browser). Row Level Security is what protects the data.
 5. Click **Deploy**.
