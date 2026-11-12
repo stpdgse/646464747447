@@ -54,7 +54,7 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 - [x] **M10 Social**: friends and requests, blocking, online dots (heartbeat table, works behind school filters), in-game chat (players and spectators rooms), friends playing now, bell notifications
 - [x] **M11 Clubs and forum**: clubs (open or by request, invites, roles, club chat), forum with categories, threads, replies, edit/delete, lock and pin
 - [x] **M12 Admin and fair play**: reports queue, mute/ban, moderator role, audit log, fair-play watchlist plus in-browser Stockfish accuracy check with recorded flags
-- [ ] **M13 Polish**: PWA, sounds, themes, accessibility, performance, load test
+- [x] **M13 Polish**: installable PWA (manifest, icons, offline page, service worker), synthesised move/capture/check/end/notification sounds, dark/light/system theme with no flash, skip link, focus rings, reduced motion, axe-core audit on 17 pages in both themes, 30-user load test, foreign-key indexes
 
 ## Notes
 
@@ -65,5 +65,7 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 ## Testing
 
 - `node e2e/social.cjs setup|run`: friends, chat, clubs, forum, reports and moderation (needs one account made moderator, see file header).
+- `node e2e/a11y.cjs`: axe-core accessibility audit (both themes), theme/sound toggles, skip link, PWA manifest and offline page.
+- `SUPABASE_URL=... SUPABASE_KEY=... node e2e/load.cjs 30`: page throughput plus 30 users chatting over Realtime.
 - `npm test`: unit tests (validation, chess rules, Chess960, PGN).
 - `node e2e/board.cjs <screenshot-dir>`: browser test of the board against a running server (see the file header).

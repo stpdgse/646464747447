@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { play } from "@/lib/sounds";
 import { createClient } from "@/lib/supabase/client";
 
 type Item = {
@@ -57,6 +58,11 @@ export function NotificationBell({ userId }: { userId: string }) {
       : i.game_id ? `/game/${i.game_id}` : "/play/daily";
 
   const unread = items.filter((i) => !i.read_at).length;
+  const prevUnread = useRef<number | null>(null);
+  useEffect(() => {
+    if (prevUnread.current !== null && unread > prevUnread.current) play("notify");
+    prevUnread.current = unread;
+  }, [unread]);
 
   const toggle = async () => {
     const next = !open;

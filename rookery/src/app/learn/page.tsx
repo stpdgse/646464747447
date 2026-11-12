@@ -22,7 +22,7 @@ export default function LearnPage() {
               <p className="mt-1 text-sm text-dim">{m.body}</p>
             </Link>
           ) : (
-            <div key={m.title} className="rounded-xl border border-line bg-surface p-5 opacity-70">
+            <div key={m.title} className="rounded-xl border border-dashed border-line bg-surface p-5">
               <h2 className="text-lg font-bold">{m.title}</h2>
               <p className="mt-1 text-sm text-dim">{m.body}</p>
               <p className="mt-2 text-xs font-semibold text-dim">Coming later</p>

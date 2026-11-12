@@ -86,3 +86,8 @@ against the real solution on the server, and Puzzle Rush runs are verified (at l
 Make the first admin by signing up, then running in the Supabase SQL editor:
 `update public.profiles set is_admin = true where username = 'YOURNAME';`
 Admins can make moderators from /admin (Users tab). Moderators mute, hide and review reports; only admins ban.
+
+## Install as an app, sounds, themes
+
+On a phone or laptop, use "Install" or "Add to Home Screen" in the browser menu. The service worker only caches static files (engine, pieces, icons) and shows an offline page; games and data always come from the network.
+The header has a theme button (device / dark / light) and a sound switch. Sounds are generated in the browser, so there are no audio files. Regenerate icons with `node scripts/make-icons.cjs`.

@@ -20,7 +20,10 @@ import {
 import { BOTS, candidatesFor, chooseMove, getBot, type Bot } from "@/lib/engine/bots";
 import { ClockBar } from "@/components/chess/ClockBar";
 import { afterMove, clocksRunning, remaining, TIME_CONTROLS, type Clocks, type Side, type TimeControl } from "./clock";
+import { useMoveSounds } from "@/components/useMoveSounds";
 import { useEngine } from "./useEngine";
+
+const EMPTY_SANS: string[] = [];
 
 type Setup = { botId: string; color: Side | "random"; variant: "standard" | "chess960"; timeId: string; takebacks: boolean };
 type End = { result: Result; how: "checkmate" | "stalemate" | "insufficient" | "fifty" | "threefold" | "variant" | "resignation" | "timeout" | "agreement" };
@@ -68,6 +71,7 @@ export function ComputerGame() {
   const engine = engineState.status === "ready" ? engineState.engine : null;
 
   const view = useMemo(() => (game ? viewAt(game.record) : null), [game]);
+  useMoveSounds(view?.sans ?? EMPTY_SANS, !!game?.end || !!view?.outcome);
   const plyCount = game?.record.moves.length ?? 0;
   const end = useMemo<End | null>(
     () => game?.end ?? (view?.outcome ? { result: view.outcome.result, how: view.outcome.reason } : null),

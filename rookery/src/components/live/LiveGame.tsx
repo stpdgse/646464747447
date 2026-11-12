@@ -15,6 +15,7 @@ import { categoryOf, describeGameTime, formatDuration } from "@/lib/live/timecon
 import { clockLeft, deadlineLeft, needsTimeoutCheck, recordOf, sideOf, type GameRow, type Names, type Side } from "@/lib/live/types";
 import { createClient } from "@/lib/supabase/client";
 import { signed } from "@/lib/ratings";
+import { useMoveSounds } from "@/components/useMoveSounds";
 import { ChatBox } from "@/components/social/ChatBox";
 import { ReportButton } from "@/components/social/ReportButton";
 import { useLiveGame } from "./useLiveGame";
@@ -48,6 +49,7 @@ export function LiveGame({ initial, names, viewerId, isMod = false }: { initial:
   const record = useMemo(() => (waitingForServer && pending ? pending : recordOf(row)), [waitingForServer, pending, row]);
   const view = useMemo(() => viewAt(record), [record]);
   const playing = row.status === "started";
+  useMoveSounds(view.sans, row.status !== "started");
 
   // ---- rating changes, shown once a rated game has finished -------------------------------------
   const finishedRated = row.status === "finished" && row.rated;

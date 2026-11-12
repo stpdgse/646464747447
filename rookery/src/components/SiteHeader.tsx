@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { PrefsButtons } from "@/components/PrefsButtons";
 import { UserMenu, UserMenuFallback } from "@/components/UserMenu";
 import { NAV, SITE } from "@/lib/site";
 
@@ -22,7 +23,8 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1 sm:gap-2">
+          <PrefsButtons />
           <Suspense fallback={<UserMenuFallback />}>
             <UserMenu />
           </Suspense>
