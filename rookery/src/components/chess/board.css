@@ -1,0 +1,82 @@
+@import "@lichess-org/chessground/assets/chessground.base.css";
+@import "./pieces.css";
+
+/* Board colours come from CSS variables set on the wrapper (see Board.tsx), so themes switch instantly. */
+.rk-board cg-board {
+  background-color: var(--sq-light);
+  background-image: conic-gradient(
+    var(--sq-dark) 90deg,
+    var(--sq-light) 0 180deg,
+    var(--sq-dark) 0 270deg,
+    var(--sq-light) 0
+  );
+  background-size: 25% 25%;
+}
+
+.rk-board cg-board square.move-dest {
+  background: radial-gradient(rgba(20, 85, 30, 0.5) 22%, transparent 24%);
+}
+.rk-board cg-board square.oc.move-dest {
+  background: radial-gradient(transparent 0%, transparent 80%, rgba(20, 85, 0, 0.45) 80%);
+}
+.rk-board cg-board square.move-dest:hover {
+  background: rgba(20, 85, 30, 0.35);
+}
+.rk-board cg-board square.last-move {
+  background-color: rgba(155, 199, 0, 0.41);
+}
+.rk-board cg-board square.selected {
+  background-color: rgba(20, 85, 30, 0.5);
+}
+.rk-board cg-board square.check {
+  background: radial-gradient(ellipse at center, #ff0000 0%, #e70000 25%, rgba(169, 0, 0, 0) 89%);
+}
+
+/* Edge coordinates: ranks down the right edge, files along the bottom, each coloured as the opposite square colour. */
+.rk-board coords {
+  font-size: clamp(9px, 1.5vw, 13px);
+  font-weight: 700;
+  opacity: 0.95;
+}
+.rk-board coords.ranks {
+  top: 0;
+  right: 4px;
+  left: auto;
+  height: 100%;
+  width: auto;
+  align-items: flex-end;
+}
+.rk-board coords.ranks coord {
+  flex: 1 1 0;
+  transform: none;
+  padding-top: 2px;
+}
+.rk-board coords.files {
+  left: 0;
+  bottom: 2px;
+  width: 100%;
+  height: auto;
+  text-transform: none;
+}
+.rk-board coords.files coord {
+  flex: 1 1 0;
+  text-align: left;
+  padding-left: 4px;
+}
+.rk-board .orientation-white .ranks :nth-child(odd),
+.rk-board .orientation-white .files :nth-child(even),
+.rk-board .orientation-black .ranks :nth-child(even),
+.rk-board .orientation-black .files :nth-child(odd) {
+  color: var(--sq-dark);
+}
+.rk-board .orientation-white .ranks :nth-child(even),
+.rk-board .orientation-white .files :nth-child(odd),
+.rk-board .orientation-black .ranks :nth-child(odd),
+.rk-board .orientation-black .files :nth-child(even) {
+  color: var(--sq-light);
+}
+
+.rk-board piece {
+  background-size: 100%;
+  background-repeat: no-repeat;
+}

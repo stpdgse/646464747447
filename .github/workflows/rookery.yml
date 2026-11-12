@@ -1,0 +1,30 @@
+name: Rookery CI
+
+on:
+  push:
+    paths: ["rookery/**", ".github/workflows/rookery.yml"]
+  pull_request:
+    paths: ["rookery/**", ".github/workflows/rookery.yml"]
+
+defaults:
+  run:
+    working-directory: rookery
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ultpyrvfzdqamprglnxd.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_qb3qtdDNm_6apNtC37vQ_Q_bfgzVwy7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: rookery/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build

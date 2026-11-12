@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/* Rookery design tokens: dark and green. Light mode swaps the surface/ink scale only. */
+:root {
+  --bg: #161512;
+  --surface: #262421;
+  --surface-2: #302e2b;
+  --line: #3d3a36;
+  --ink: #e8e6e3;
+  --ink-dim: #a9a6a0;
+  --brand: #7fa650;
+  --brand-hi: #95bb4a;
+  --brand-ink: #10140a;
+  --danger: #d9534f;
+  --warn: #e6a23c;
+  --board-light: #eeeed2;
+  --board-dark: #769656;
+}
+
+[data-theme="light"] {
+  --bg: #f3f1ed;
+  --surface: #ffffff;
+  --surface-2: #ebe8e2;
+  --line: #d6d2c9;
+  --ink: #1f1d1a;
+  --ink-dim: #5c5851;
+  --brand: #3f6a1b;
+  --brand-hi: #335714;
+  --brand-ink: #ffffff;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-dim: var(--ink-dim);
+  --color-brand: var(--brand);
+  --color-brand-hi: var(--brand-hi);
+  --color-brand-ink: var(--brand-ink);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html {
+  color-scheme: dark;
+}
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-hi);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Accessibility: visible keyboard focus everywhere, and respect "reduce motion". */
+:focus-visible {
+  outline: 2px solid var(--brand-hi);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

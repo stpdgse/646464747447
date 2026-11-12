@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "gbc")(type "KiCad")(uri "${KIPRJMOD}/../gbc.pretty")(options "")(descr "GBC handheld project footprints"))
+)
