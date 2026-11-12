@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { VARIANTS, type Variant } from "@/lib/chess/variants";
 import { categoryOf, describeTimeControl } from "@/lib/live/timecontrols";
+import { plural } from "@/lib/ratings";
 import { createClient } from "@/lib/supabase/client";
 
 type Item = {
@@ -42,7 +43,7 @@ export function WatchList() {
       <Link href={`/game/${g.id}`} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-surface px-4 py-3 transition hover:border-brand">
         <span className="font-semibold">{g.white?.username ?? "?"} <span className="font-normal text-dim">vs</span> {g.black?.username ?? "?"}</span>
         <span className="text-sm text-dim">
-          {categoryOf(g.time_initial_ms, g.time_inc_ms)} {describeTimeControl(g.time_initial_ms, g.time_inc_ms)} · {VARIANTS[g.variant].label} · {Math.ceil(g.moves.length / 2)} moves{g.result ? ` · ${g.result}` : ""}
+          {categoryOf(g.time_initial_ms, g.time_inc_ms)} {describeTimeControl(g.time_initial_ms, g.time_inc_ms)} · {VARIANTS[g.variant].label} · {plural(Math.ceil(g.moves.length / 2), "move")}{g.result ? ` · ${g.result}` : ""}
         </span>
       </Link>
     </li>

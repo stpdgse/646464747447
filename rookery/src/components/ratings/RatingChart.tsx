@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { signed } from "@/lib/ratings";
+import { plural, signed } from "@/lib/ratings";
 
 export type ChartPoint = { rating: number; delta: number; created_at: string };
 
@@ -47,7 +47,7 @@ export function RatingChart({ points, title }: { points: ChartPoint[]; title: st
   }, [points, width, n]);
 
   if (n < 2) {
-    return <p className="rounded-xl border border-line bg-surface px-4 py-6 text-center text-sm text-dim">Play at least two rated games to see a rating graph.</p>;
+    return <p className="rounded-xl border border-line bg-surface px-4 py-6 text-center text-sm text-dim">Play at least one rated game in this category to see a rating graph.</p>;
   }
 
   const shown = active ?? n - 1;
@@ -64,14 +64,14 @@ export function RatingChart({ points, title }: { points: ChartPoint[]; title: st
   };
 
   return (
-    <figure className="grid gap-2" aria-label={`${title} over ${n} games`}>
+    <figure className="grid gap-2" aria-label={`${title} over ${plural(n - 1, "game")}`}>
       <div ref={wrapRef} className="relative">
         <svg
           width={width}
           height={H}
           role="img"
           tabIndex={0}
-          aria-label={`${title}: ${Math.round(first.rating)} to ${Math.round(last.rating)} over ${n} games. Use the left and right arrow keys to inspect games.`}
+          aria-label={`${title}: ${Math.round(first.rating)} to ${Math.round(last.rating)} over ${plural(n - 1, "game")}. Use the left and right arrow keys to inspect games.`}
           className="block overflow-visible rounded-md outline-offset-4"
           onPointerMove={(e) => onMove(e.clientX, e.currentTarget.getBoundingClientRect())}
           onPointerLeave={() => setActive(null)}
@@ -90,8 +90,8 @@ export function RatingChart({ points, title }: { points: ChartPoint[]; title: st
               <text x={M.l - 8} y={geo.y(t)} textAnchor="end" dominantBaseline="middle" fontSize={11} fill="var(--ink-dim)">{t}</text>
             </g>
           ))}
-          <text x={M.l} y={H - 6} fontSize={11} fill="var(--ink-dim)">Game 1</text>
-          <text x={width - M.r} y={H - 6} textAnchor="end" fontSize={11} fill="var(--ink-dim)">Game {n}</text>
+          <text x={M.l} y={H - 6} fontSize={11} fill="var(--ink-dim)">Start</text>
+          <text x={width - M.r} y={H - 6} textAnchor="end" fontSize={11} fill="var(--ink-dim)">Game {n - 1}</text>
 
           <path d={geo.area} fill="var(--brand)" opacity={0.1} />
           <path d={geo.line} fill="none" stroke="var(--brand-hi)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
@@ -118,7 +118,7 @@ export function RatingChart({ points, title }: { points: ChartPoint[]; title: st
               <span className="text-base font-bold text-ink">{Math.round(p.rating)}</span>
             </div>
             <div className="text-dim">
-              Game {shown + 1}{shown > 0 ? ` · ${signed(Math.round(p.rating) - Math.round(points[shown - 1].rating))}` : ""}
+              {shown === 0 ? "Starting rating" : `Game ${shown} · ${signed(Math.round(p.rating) - Math.round(points[shown - 1].rating))}`}
             </div>
           </div>
         )}
@@ -132,7 +132,7 @@ export function RatingChart({ points, title }: { points: ChartPoint[]; title: st
             <tbody>
               {points.map((pt, i) => (
                 <tr key={i} className="border-t border-line">
-                  <td className="px-3 py-1">{i + 1}</td>
+                  <td className="px-3 py-1">{i === 0 ? "Start" : i}</td>
                   <td className="px-3 py-1 font-semibold">{Math.round(pt.rating)}</td>
                   <td className="px-3 py-1 text-dim">{pt.delta === 0 ? "±0" : signed(pt.delta)}</td>
                 </tr>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatRating, isProvisional, perfOf, signed, tally } from "./ratings";
+import { formatRating, isProvisional, perfOf, plural, signed, tally } from "./ratings";
 
 describe("perfOf (must agree with private.perf_of in SQL)", () => {
   it.each([
@@ -43,5 +43,14 @@ describe("tally", () => {
   it("counts results from the player's side and ignores unfinished games", () => {
     expect(tally(games, "a")).toEqual({ wins: 2, draws: 1, losses: 1, total: 4 });
     expect(tally(games, "b")).toEqual({ wins: 1, draws: 1, losses: 2, total: 4 });
+  });
+});
+
+describe("plural", () => {
+  it("agrees with the number", () => {
+    expect(plural(1, "win")).toBe("1 win");
+    expect(plural(0, "win")).toBe("0 wins");
+    expect(plural(2, "loss", "losses")).toBe("2 losses");
+    expect(plural(1, "loss", "losses")).toBe("1 loss");
   });
 });

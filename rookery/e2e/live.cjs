@@ -112,6 +112,11 @@ const status = async (p) => (await p.locator('[aria-live=polite]').first().textC
   await Promise.all([W2.waitForSelector('text=You lose', { timeout: 10000 }), B2.waitForSelector('text=You win', { timeout: 10000 })]);
   assert.match(await W2.locator('[aria-live=polite]').first().textContent(), /by checkmate/); ok("fool's mate: checkmate decided on the server, both see the result");
   await W2.screenshot({ path: SP + '/live-mate.png' });
+  const chg = async (p) => { await p.waitForSelector('[aria-label="Rating changes"] li', { timeout: 10000 }); return (await p.locator('[aria-label="Rating changes"]').textContent()).trim(); };
+  const loserTxt = await chg(W2), winnerTxt = await chg(B2);
+  assert.match(winnerTxt, /1500 \u2192 1\d\d\d \(\+\d+\)/); assert.match(loserTxt, /1500 \u2192 1\d\d\d \(\u2212\d+\)/);
+  ok('rating change shown after a rated game: winner "' + winnerTxt + '", loser "' + loserTxt + '"');
+  assert.match(await W2.locator('[aria-live=polite]').first().textContent(), /Rated/); ok('game is labelled Rated');
 
   // ---------------------------------------------------------------- game 3: rematch (1+0, colours swapped), flag fall, spectator
   await W2.click('button:text-is("Offer rematch")');
@@ -134,6 +139,31 @@ const status = async (p) => (await p.locator('[aria-live=polite]').first().textC
   await Promise.all([W3.waitForSelector('text=on time', { timeout: 90000 }), B3.waitForSelector('text=on time', { timeout: 90000 })]);
   assert.match(await B3.locator('[aria-live=polite]').first().textContent(), /You win/); ok('flag fall: white loses on time, server decided it');
   await spec.screenshot({ path: SP + '/live-watch.png' });
+
+  // ---------------------------------------------------------------- ratings pages (signed out)
+  await spec.goto(B + '/leaderboard'); await spec.waitForSelector('[role=tablist]');
+  await spec.click('button[role=tab]:text-is("Bullet")');
+  await spec.waitForSelector(`table >> text=${A}`, { timeout: 10000 });
+  assert.ok((await spec.locator('table').textContent()).includes(Bn)); ok('leaderboard lists both players under Bullet');
+  await spec.click('button[role=tab]:text-is("Rapid")');
+  await spec.waitForSelector('text=Nobody is rated here yet'); ok('empty leaderboard tab has a friendly message');
+  await spec.screenshot({ path: SP + '/live-leaderboard.png' });
+
+  await spec.goto(B + '/u/' + A);
+  await spec.waitForSelector('h2:text-is("Ratings")');
+  assert.ok(await spec.locator('text=Bullet').first().isVisible()); ok('profile shows rating cards');
+  assert.match(await spec.locator('#record').locator('xpath=..').textContent(), /1 win · 1 draw · 1 loss \(3 games\)/); ok('profile record counts wins, draws and losses');
+  const chart = spec.locator('svg[role=img]'); await chart.waitFor({ timeout: 10000 });
+  const box = await chart.boundingBox(); await spec.mouse.move(box.x + box.width * 0.5, box.y + 60);
+  await spec.waitForSelector('[role=status]:has-text("Game")'); ok('rating graph shows a hover tooltip');
+  await chart.focus(); await spec.keyboard.press('ArrowLeft');
+  assert.ok(await spec.locator('details summary:text-is("Show as table")').count() === 1); ok('graph has a keyboard path and a table view');
+  await spec.screenshot({ path: SP + '/live-profile.png', fullPage: true });
+  const pgnRes = await spec.request.get(B + '/u/' + A + '/pgn');
+  assert.equal(pgnRes.status(), 200);
+  const pgnText = await pgnRes.text();
+  assert.ok((pgnText.match(/\[Event /g) || []).length === 3 && pgnText.includes('[WhiteElo "1500"]')); ok('PGN download contains all 3 games with ratings');
+  assert.equal((await spec.request.get(B + '/u/nobody_here_xyz/pgn')).status(), 404); ok('PGN for an unknown player is a 404');
 
   const real = errors.filter((e) => !/Failed to load resource.*(40[0-9]|net::)/i.test(e));
   assert.equal(real.length, 0, 'console errors: ' + real.join(' | ')); ok('no console errors');

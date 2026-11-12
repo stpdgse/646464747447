@@ -46,7 +46,7 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 - [x] **M2 Board**: Chessground board, chessops rules (replaces chess.js, which lacks Chess960), Chess960, King of the Hill, Three-check, PGN/FEN, move list, 6 board themes, 8 piece sets
 - [x] **M3 Vs computer**: Stockfish 19 (lite, single-thread WASM, no special headers) in a Web Worker, 8 personality bots, clocks, takebacks, resign/draw, Chess960, hand-off to analysis. Saving games to the database arrives with M4's `games` table
 - [x] **M4 Live games**: quick pairing, open games, challenges, rematch, DB-clock timing, flag-fall, resign/abort/draw, realtime with polling fallback, spectating, Watch page. Rated games arrive with M5
-- [~] **M5 Ratings**: built and tested locally (Glicko-2 in SQL cross-checked against the glicko2 library, rated pairing, leaderboard, stats profile, rating graph, PGN download); waiting for the migration to be applied to the hosted project
+- [x] **M5 Ratings**: Glicko-2 in SQL (cross-checked against the glicko2 library), rated/casual pairing, rating shown in games, leaderboard per rating type, stats profile with rating graph, PGN export
 - [ ] **M6 Daily games**: correspondence with days-per-move, notifications, timeout sweep
 - [ ] **M7 Puzzles**: Lichess puzzle DB import, rated puzzles, puzzle rush, daily puzzle
 - [ ] **M8 Analysis**: engine eval bar, best-move arrows, accuracy score, blunder labels, game review

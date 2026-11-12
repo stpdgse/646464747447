@@ -214,7 +214,9 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
               <p className="text-lg font-bold">
                 {headline} <span className="font-normal text-dim">{row.reason ? REASONS[row.reason] ?? "" : ""}</span>
               </p>
-              {row.result && <p className="text-sm text-dim">{row.result}</p>}
+              <p className="text-xs text-dim">
+                {row.result ? `${row.result} · ` : ""}{category} {describeTimeControl(row.time_initial_ms, row.time_inc_ms)} · {VARIANTS[row.variant].label} · {row.rated ? "Rated" : "Casual"}
+              </p>
               {row.rated && row.status === "finished" && (
                 <ul className="text-sm" aria-label="Rating changes">
                   {(side ? [side] : (["white", "black"] as Side[])).map((s) => changeLine(s) && <li key={s}>{changeLine(s)}</li>)}

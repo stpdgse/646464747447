@@ -7,7 +7,7 @@ import type { ChartPoint } from "@/components/ratings/RatingChart";
 import type { Profile } from "@/lib/auth";
 import { VARIANTS, type Variant } from "@/lib/chess/variants";
 import { categoryOf, describeTimeControl } from "@/lib/live/timecontrols";
-import { PERFS, formatRating, perfLabel, tally, type HistoryPoint, type RatingRow } from "@/lib/ratings";
+import { PERFS, formatRating, perfLabel, plural, tally, type HistoryPoint, type RatingRow } from "@/lib/ratings";
 import { createClient } from "@/lib/supabase/server";
 
 export async function generateMetadata({ params }: PageProps<"/u/[username]">): Promise<Metadata> {
@@ -89,7 +89,7 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
               <div key={r.perf} className="rounded-xl border border-line bg-surface p-4">
                 <p className="text-xs font-semibold text-dim">{perfLabel(r.perf)}</p>
                 <p className="text-2xl font-extrabold tabular-nums">{formatRating(r.rating, r.rd)}</p>
-                <p className="text-xs text-dim">{r.games} {r.games === 1 ? "game" : "games"}</p>
+                <p className="text-xs text-dim">{plural(r.games, "game")}</p>
               </div>
             ))}
           </div>
@@ -107,12 +107,12 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
           <p className="text-sm text-dim">No finished games yet.</p>
         ) : (
           <div className="grid gap-2">
-            <div className="flex h-3 overflow-hidden rounded-full bg-surface-2" role="img" aria-label={`${record.wins} wins, ${record.draws} draws, ${record.losses} losses`}>
+            <div className="flex h-3 overflow-hidden rounded-full bg-surface-2" role="img" aria-label={`${plural(record.wins, "win")}, ${plural(record.draws, "draw")}, ${plural(record.losses, "loss", "losses")}`}>
               <div style={{ width: `${pct(record.wins)}%`, background: "var(--brand-hi)" }} />
               <div style={{ width: `${pct(record.draws)}%`, background: "var(--ink-dim)", marginLeft: 2 }} />
               <div style={{ width: `${pct(record.losses)}%`, background: "var(--danger)", marginLeft: 2 }} />
             </div>
-            <p className="text-sm text-dim"><strong className="text-ink">{record.wins}</strong> wins · <strong className="text-ink">{record.draws}</strong> draws · <strong className="text-ink">{record.losses}</strong> losses ({record.total} games)</p>
+            <p className="text-sm text-dim"><strong className="text-ink">{plural(record.wins, "win")}</strong> · <strong className="text-ink">{plural(record.draws, "draw")}</strong> · <strong className="text-ink">{plural(record.losses, "loss", "losses")}</strong> ({plural(record.total, "game")})</p>
           </div>
         )}
       </section>
@@ -140,7 +140,7 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
                       <span>vs <strong>{opp?.username ?? "?"}</strong></span>
                     </span>
                     <span className="text-sm text-dim">
-                      {categoryOf(g.time_initial_ms, g.time_inc_ms)} {describeTimeControl(g.time_initial_ms, g.time_inc_ms)} · {VARIANTS[g.variant].label} · {g.rated ? "Rated" : "Casual"} · {Math.ceil(g.moves.length / 2)} moves
+                      {categoryOf(g.time_initial_ms, g.time_inc_ms)} {describeTimeControl(g.time_initial_ms, g.time_inc_ms)} · {VARIANTS[g.variant].label} · {g.rated ? "Rated" : "Casual"} · {plural(Math.ceil(g.moves.length / 2), "move")}
                     </span>
                   </Link>
                 </li>

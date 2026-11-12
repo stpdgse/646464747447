@@ -41,3 +41,6 @@ export function tally(games: { white_id: string; black_id: string; result: strin
   }
   return { wins, draws, losses, total: wins + draws + losses };
 }
+
+/** "1 win", "2 wins". */
+export const plural = (n: number, one: string, many: string = `${one}s`) => `${n} ${n === 1 ? one : many}`;
