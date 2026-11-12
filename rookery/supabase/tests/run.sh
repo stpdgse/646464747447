@@ -19,3 +19,4 @@ for f in "$HERE"/../migrations/*.sql; do echo "-- applying $(basename "$f")"; "$
 "${PSQL[@]}" -f "$HERE/ratings.sql" 2>&1 | grep -E "^(psql:|NOTICE:  ok|NOTICE:  FAILED|ERROR|ALL )|FAILED" | sed -e "s/^NOTICE:  //" -e "s/^psql:[^ ]* //"
 "${PSQL[@]}" -f "$HERE/daily_puzzles.sql" 2>&1 | grep -E "^(psql:|NOTICE:  ok|NOTICE:  FAILED|ERROR|ALL )|FAILED" | sed -e "s/^NOTICE:  //" -e "s/^psql:[^ ]* //"
 "${PSQL[@]}" -f "$HERE/openings.sql" 2>&1 | grep -E "^(psql:|NOTICE:  ok|NOTICE:  FAILED|ERROR|ALL )|FAILED" | sed -e "s/^NOTICE:  //" -e "s/^psql:[^ ]* //"
+"${PSQL[@]}" -f "$HERE/social.sql" 2>&1 | grep -E "^(psql:|NOTICE:  ok|NOTICE:  FAILED|ERROR|ALL )|FAILED" | sed -e "s/^NOTICE:  //" -e "s/^psql:[^ ]* //"
