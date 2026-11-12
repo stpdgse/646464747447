@@ -13,6 +13,8 @@ import { needsPromotion, toPgn, tryMove, viewAt, type GameRecord, type Promotion
 import { VARIANTS } from "@/lib/chess/variants";
 import { categoryOf, describeTimeControl } from "@/lib/live/timecontrols";
 import { clockLeft, needsTimeoutCheck, recordOf, sideOf, type GameRow, type Names, type Side } from "@/lib/live/types";
+import { createClient } from "@/lib/supabase/client";
+import { signed } from "@/lib/ratings";
 import { useLiveGame } from "./useLiveGame";
 
 const REASONS: Record<string, string> = {
@@ -35,6 +37,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
   const [showSettings, setShowSettings] = useState(false);
   const [rematchSent, setRematchSent] = useState(false);
   const [now, setNow] = useState(0);
+  const [changes, setChanges] = useState<Record<string, { before: number; after: number }>>({});
 
   const orientation: Side = (side ?? "white") === "white" ? (flipped ? "black" : "white") : flipped ? "white" : "black";
 
@@ -43,6 +46,24 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
   const record = useMemo(() => (waitingForServer && pending ? pending : recordOf(row)), [waitingForServer, pending, row]);
   const view = useMemo(() => viewAt(record), [record]);
   const playing = row.status === "started";
+
+  // ---- rating changes, shown once a rated game has finished -------------------------------------
+  const finishedRated = row.status === "finished" && row.rated;
+  useEffect(() => {
+    if (!finishedRated) return;
+    let dead = false;
+    createClient()
+      .from("rating_history")
+      .select("user_id, rating_before, rating_after")
+      .eq("game_id", row.id)
+      .then(({ data }) => {
+        if (dead || !data) return;
+        setChanges(Object.fromEntries(data.map((d) => [d.user_id, { before: d.rating_before, after: d.rating_after }])));
+      });
+    return () => {
+      dead = true;
+    };
+  }, [finishedRated, row.id]);
 
   // ---- clocks and flag-fall -----------------------------------------------------------------------
   const latest = useRef({ row, offset, viewerId });
@@ -129,7 +150,14 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
   const other: Side | null = side ? (side === "white" ? "black" : "white") : null;
   const topSide: Side = orientation === "white" ? "black" : "white";
   const bottomSide: Side = orientation;
+  const ratingOf = (s: Side) => (s === "white" ? row.white_rating : row.black_rating);
   const nameOf = (s: Side) => (s === "white" ? names.white : names.black);
+  const labelOf = (s: Side) => `${nameOf(s)}${ratingOf(s) ? ` (${ratingOf(s)})` : ""}`;
+  const changeLine = (s: Side) => {
+    const id = s === "white" ? row.white_id : row.black_id;
+    const c = changes[id];
+    return c ? `${nameOf(s)}: ${c.before} → ${c.after} (${signed(c.after - c.before)})` : null;
+  };
   const leftOf = (s: Side) => (s === "white" ? whiteLeft : blackLeft);
   const category = categoryOf(row.time_initial_ms, row.time_inc_ms);
 
@@ -150,7 +178,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,640px)_minmax(0,1fr)]">
       <div className="grid min-w-0 grid-cols-1 content-start gap-3">
-        <ClockBar label={nameOf(topSide)} ms={leftOf(topSide)} active={playing && view.turn === topSide} timed thinking={false} />
+        <ClockBar label={labelOf(topSide)} ms={leftOf(topSide)} active={playing && view.turn === topSide} timed thinking={false} />
         <Board
           view={view}
           variant={row.variant}
@@ -160,7 +188,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
           isPromotion={isPromotion}
           onMove={onMove}
         />
-        <ClockBar label={nameOf(bottomSide)} ms={leftOf(bottomSide)} active={playing && view.turn === bottomSide} timed />
+        <ClockBar label={labelOf(bottomSide)} ms={leftOf(bottomSide)} active={playing && view.turn === bottomSide} timed />
         <div className="flex flex-wrap gap-2">
           <button className={btn} onClick={() => setFlipped((f) => !f)}>Flip</button>
           <button className={btn} onClick={() => setShowSettings((s) => !s)} aria-expanded={showSettings}>Appearance</button>
@@ -177,7 +205,7 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
                 {view.check ? " (check)" : ""}
               </p>
               <p className="text-xs text-dim">
-                {category} {describeTimeControl(row.time_initial_ms, row.time_inc_ms)} · {VARIANTS[row.variant].label}
+                {category} {describeTimeControl(row.time_initial_ms, row.time_inc_ms)} · {VARIANTS[row.variant].label} · {row.rated ? "Rated" : "Casual"}
                 {!side && " · you are watching"}
               </p>
             </div>
@@ -187,6 +215,11 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
                 {headline} <span className="font-normal text-dim">{row.reason ? REASONS[row.reason] ?? "" : ""}</span>
               </p>
               {row.result && <p className="text-sm text-dim">{row.result}</p>}
+              {row.rated && row.status === "finished" && (
+                <ul className="text-sm" aria-label="Rating changes">
+                  {(side ? [side] : (["white", "black"] as Side[])).map((s) => changeLine(s) && <li key={s}>{changeLine(s)}</li>)}
+                </ul>
+              )}
             </div>
           )}
         </div>

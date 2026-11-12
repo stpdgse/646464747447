@@ -5,7 +5,7 @@ import { clockLeft, isNewer, needsTimeoutCheck, sideOf, type GameRow } from "./t
 const base: GameRow = {
   id: "g", variant: "standard", initial_fen: "x", moves: [], white_id: "w", black_id: "b", status: "started", result: null,
   reason: null, time_initial_ms: 180000, time_inc_ms: 2000, white_clock_ms: 180000, black_clock_ms: 180000,
-  clock_updated_at: new Date(1_000_000).toISOString(), draw_offer_by: null, rated: false, created_at: "", ended_at: null,
+  clock_updated_at: new Date(1_000_000).toISOString(), draw_offer_by: null, rated: false, white_rating: 1500, black_rating: 1500, created_at: "", ended_at: null,
 };
 const row = (patch: Partial<GameRow>): GameRow => ({ ...base, ...patch });
 

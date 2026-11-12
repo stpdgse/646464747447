@@ -55,7 +55,7 @@ async function loadGame(gameId: string): Promise<GameRow | null> {
 
 export type PairResult = { ok: true; gameId: string } | { ok: true; waiting: true; seekId: string } | Failure;
 
-export async function quickPair(variantIn: string, timeId: string): Promise<PairResult> {
+export async function quickPair(variantIn: string, timeId: string, rated: boolean): Promise<PairResult> {
   await requireProfile();
   const s = secret();
   if (!s) return NOT_CONFIGURED;
@@ -65,7 +65,7 @@ export async function quickPair(variantIn: string, timeId: string): Promise<Pair
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("server_quick_pair", {
-    p_secret: s, p_variant: variant.data, p_time_ms: tc.ms, p_inc_ms: tc.inc, p_initial_fen: startFen(variant.data),
+    p_secret: s, p_variant: variant.data, p_time_ms: tc.ms, p_inc_ms: tc.inc, p_initial_fen: startFen(variant.data), p_rated: rated === true,
   });
   if (error) return { ok: false, error: explain(error.message) };
   const out = data as { game?: GameRow; seek?: SeekRow };
@@ -102,6 +102,7 @@ const challengeSchema = z.object({
   variant: variantSchema,
   timeId: z.string(),
   color: z.enum(["white", "black", "random"]),
+  rated: z.boolean(),
 });
 
 export async function createChallenge(input: z.input<typeof challengeSchema>): Promise<{ ok: true } | Failure> {
@@ -114,7 +115,7 @@ export async function createChallenge(input: z.input<typeof challengeSchema>): P
   if (!target) return { ok: false, error: "No player has that username." };
   if (target.id === me.id) return { ok: false, error: "You can't challenge yourself." };
   const { error } = await supabase.from("seeks").insert({
-    user_id: me.id, target_id: target.id, variant: parsed.data.variant, time_initial_ms: tc.ms, time_inc_ms: tc.inc, color: parsed.data.color,
+    user_id: me.id, target_id: target.id, variant: parsed.data.variant, time_initial_ms: tc.ms, time_inc_ms: tc.inc, color: parsed.data.color, rated: parsed.data.rated,
   });
   return error ? { ok: false, error: explain(error.message) } : { ok: true };
 }
@@ -205,6 +206,7 @@ export async function rematch(gameId: string): Promise<{ ok: true } | Failure> {
     time_initial_ms: row.time_initial_ms,
     time_inc_ms: row.time_inc_ms,
     color: mine === "white" ? "black" : "white",
+    rated: row.rated,
   });
   return error ? { ok: false, error: error.message.includes("duplicate") ? "Rematch already offered." : explain(error.message) } : { ok: true };
 }

@@ -18,6 +18,7 @@ const field = "rounded-md border border-line bg-bg px-3 py-2 text-sm text-ink fo
 export function Lobby({ me }: { me: Me }) {
   const router = useRouter();
   const [variant, setVariant] = useState<Variant>("standard");
+  const [rated, setRated] = useState(true);
   const [seeks, setSeeks] = useState<SeekWithNames[]>([]);
   const [activeGame, setActiveGame] = useState<string | null>(null);
   const [waiting, setWaiting] = useState<{ seekId: string; label: string } | null>(null);
@@ -93,11 +94,11 @@ export function Lobby({ me }: { me: Me }) {
   const play = async (timeId: string) => {
     const tc = getLiveTimeControl(timeId);
     if (!tc) return;
-    const res = await act(() => quickPair(variant, timeId));
+    const res = await act(() => quickPair(variant, timeId, rated));
     if (!res) return;
     if ("gameId" in res) router.push(`/game/${res.gameId}`);
     else if ("waiting" in res) {
-      setWaiting({ seekId: res.seekId, label: `${tc.label} ${VARIANTS[variant].label}` });
+      setWaiting({ seekId: res.seekId, label: `${tc.label} ${VARIANTS[variant].label}, ${rated ? "rated" : "casual"}` });
       refresh();
     }
   };
@@ -128,6 +129,15 @@ export function Lobby({ me }: { me: Me }) {
             </button>
           ))}
         </div>
+        <div role="radiogroup" aria-label="Rated or casual" className="flex flex-wrap items-center gap-2">
+          {([true, false] as const).map((r) => (
+            <button key={String(r)} role="radio" aria-checked={rated === r} onClick={() => setRated(r)}
+              className={`rounded-full border px-3 py-1 text-sm font-medium ${rated === r ? "border-brand bg-brand/15" : "border-line bg-surface hover:bg-surface-2"}`}>
+              {r ? "Rated" : "Casual"}
+            </button>
+          ))}
+          <span className="text-xs text-dim">{rated ? "Counts towards your rating." : "For fun: no rating change."}</span>
+        </div>
         {waiting ? (
           <div role="status" className="flex flex-wrap items-center gap-3 rounded-xl border border-brand bg-brand/10 px-4 py-4">
             <span className="size-3 animate-pulse rounded-full bg-brand" aria-hidden />
@@ -156,7 +166,7 @@ export function Lobby({ me }: { me: Me }) {
           <h2 id="inc" className="text-xl font-bold">Challenges for you</h2>
           {incoming.map((s) => (
             <div key={s.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-brand bg-surface px-4 py-3">
-              <span><strong>{s.user?.username}</strong> challenges you · {describeTimeControl(s.time_initial_ms, s.time_inc_ms)} {categoryOf(s.time_initial_ms, s.time_inc_ms)} · {VARIANTS[s.variant].label}</span>
+              <span><strong>{s.user?.username}</strong> challenges you · {describeTimeControl(s.time_initial_ms, s.time_inc_ms)} {categoryOf(s.time_initial_ms, s.time_inc_ms)} · {VARIANTS[s.variant].label} · {s.rated ? "Rated" : "Casual"}</span>
               <span className="flex gap-2">
                 <button className="rounded-md bg-brand px-3 py-1.5 text-sm font-semibold text-brand-ink hover:bg-brand-hi disabled:opacity-50" disabled={busy || !!activeGame}
                   onClick={async () => { const r = await act(() => acceptSeek(s.id)); if (r && "gameId" in r) router.push(`/game/${r.gameId}`); }}>Accept</button>
@@ -175,7 +185,7 @@ export function Lobby({ me }: { me: Me }) {
           <ul className="grid gap-2">
             {open.map((s) => (
               <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-surface px-4 py-3">
-                <span><strong>{s.user?.username ?? "Someone"}</strong> · {describeTimeControl(s.time_initial_ms, s.time_inc_ms)} {categoryOf(s.time_initial_ms, s.time_inc_ms)} · {VARIANTS[s.variant].label}</span>
+                <span><strong>{s.user?.username ?? "Someone"}</strong> · {describeTimeControl(s.time_initial_ms, s.time_inc_ms)} {categoryOf(s.time_initial_ms, s.time_inc_ms)} · {VARIANTS[s.variant].label} · {s.rated ? "Rated" : "Casual"}</span>
                 {me && s.user_id === me.id ? (
                   <button className={btn} onClick={async () => { await cancelSeek(s.id); setWaiting(null); refresh(); }}>Cancel</button>
                 ) : (
@@ -194,7 +204,7 @@ export function Lobby({ me }: { me: Me }) {
           <form className="grid gap-3 sm:grid-cols-2"
             onSubmit={async (e) => {
               e.preventDefault();
-              const r = await act(() => createChallenge({ username: challenge.username, variant, timeId: challenge.timeId, color: challenge.color }));
+              const r = await act(() => createChallenge({ username: challenge.username, variant, timeId: challenge.timeId, color: challenge.color, rated }));
               if (r) { setInfo(`Challenge sent to ${challenge.username}. They'll see it in their lobby.`); setChallenge({ ...challenge, username: "" }); refresh(); }
             }}>
             <label className="grid gap-1 text-sm font-medium sm:col-span-2">Username
@@ -210,7 +220,7 @@ export function Lobby({ me }: { me: Me }) {
                 <option value="random">Random</option><option value="white">White</option><option value="black">Black</option>
               </select>
             </label>
-            <p className="text-xs text-dim sm:col-span-2">Game type: {VARIANTS[variant].label} (change it above).</p>
+            <p className="text-xs text-dim sm:col-span-2">Game type: {VARIANTS[variant].label}, {rated ? "rated" : "casual"} (change both above).</p>
             <button disabled={busy || !challenge.username.trim()} className="justify-self-start rounded-md bg-brand px-4 py-2 text-sm font-semibold text-brand-ink hover:bg-brand-hi disabled:opacity-50">Send challenge</button>
           </form>
           {outgoing.length > 0 && (

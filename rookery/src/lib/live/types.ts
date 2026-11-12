@@ -21,6 +21,8 @@ export type GameRow = {
   clock_updated_at: string;
   draw_offer_by: "white" | "black" | null;
   rated: boolean;
+  white_rating: number | null;
+  black_rating: number | null;
   created_at: string;
   ended_at: string | null;
 };
@@ -33,6 +35,7 @@ export type SeekRow = {
   time_initial_ms: number;
   time_inc_ms: number;
   color: "white" | "black" | "random";
+  rated: boolean;
   created_at: string;
   expires_at: string;
 };
