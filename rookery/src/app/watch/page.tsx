@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/ComingSoon";
-export const metadata: Metadata = { title: "Watch" };
-export default function Page() {
-  return <ComingSoon title="Watch" blurb="Spectate live games between your classmates." milestone="M4 and M10" />;
+import { WatchList } from "@/components/live/WatchList";
+
+export const metadata: Metadata = { title: "Watch", description: "Watch live games between classmates." };
+
+export default function WatchPage() {
+  return (
+    <div className="grid gap-4">
+      <h1 className="text-3xl font-extrabold tracking-tight">Watch</h1>
+      <WatchList />
+    </div>
+  );
 }

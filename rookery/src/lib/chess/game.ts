@@ -219,6 +219,16 @@ export function describeMoves(
   return out;
 }
 
+/** True if `side` has too little material to ever checkmate (used to turn a timeout into a draw). */
+export function cannotMate(record: GameRecord, side: "white" | "black"): boolean {
+  const pos = startPosition(record);
+  for (const uci of record.moves) {
+    const m = parseUci(uci);
+    if (m) pos.play(normalizeMove(pos, m));
+  }
+  return pos.hasInsufficientMaterial(side);
+}
+
 export function promotionFromChar(ch: string): PromotionRole | undefined {
   const role = ROLE_BY_CHAR[ch.toLowerCase()];
   return role as PromotionRole | undefined;

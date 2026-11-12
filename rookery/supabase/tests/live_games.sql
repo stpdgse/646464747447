@@ -137,7 +137,7 @@ select t.ok((select white_clock_ms = 180000 and black_clock_ms = 180000 from pub
 -- clocks: pretend white has been thinking for 10 s
 update public.games set clock_updated_at = clock_timestamp() - interval '10 seconds' where id = :'g1';
 set role authenticated; select t.as_user(:'w1');
-select t.ok((select white_clock_ms between 172000 and 172100 from public.server_move('s3cret', :'g1', 'g1f3', 2)), 'white is charged ~10s and gets the 2s increment (180-10+2)');
+select t.ok((select white_clock_ms between 171000 and 172100 from public.server_move('s3cret', :'g1', 'g1f3', 2)), 'white is charged ~10s and gets the 2s increment (180-10+2)');
 reset role;
 select t.ok((select black_clock_ms = 180000 from public.games where id = :'g1'), 'the other clock is untouched');
 

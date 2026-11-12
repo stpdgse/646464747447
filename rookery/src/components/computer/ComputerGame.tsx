@@ -18,7 +18,8 @@ import {
   type Result,
 } from "@/lib/chess/game";
 import { BOTS, candidatesFor, chooseMove, getBot, type Bot } from "@/lib/engine/bots";
-import { afterMove, clocksRunning, formatClock, remaining, TIME_CONTROLS, type Clocks, type Side, type TimeControl } from "./clock";
+import { ClockBar } from "@/components/chess/ClockBar";
+import { afterMove, clocksRunning, remaining, TIME_CONTROLS, type Clocks, type Side, type TimeControl } from "./clock";
 import { useEngine } from "./useEngine";
 
 type Setup = { botId: string; color: Side | "random"; variant: "standard" | "chess960"; timeId: string; takebacks: boolean };
@@ -385,19 +386,6 @@ export function ComputerGame() {
           <p className="text-xs text-dim">Playing {game.record.variant === "chess960" ? "Chess960" : "standard chess"} against {game.bot.name} (≈ {game.bot.rating}).</p>
         )}
       </div>
-    </div>
-  );
-}
-
-function ClockBar({ label, avatar, ms, active, timed, thinking }: { label: string; avatar?: string; ms: number; active: boolean; timed: boolean; thinking?: boolean }) {
-  return (
-    <div className={`flex items-center justify-between rounded-lg border px-3 py-2 ${active ? "border-brand bg-brand/10" : "border-line bg-surface"}`}>
-      <span className="flex items-center gap-2 font-semibold">
-        {avatar && <span aria-hidden className="text-xl">{avatar}</span>}
-        {label}
-        {thinking && <span className="text-xs font-normal text-dim" role="status">thinking…</span>}
-      </span>
-      {timed && <span className={`font-mono text-xl tabular-nums ${ms < 10_000 ? "text-danger" : ""}`} aria-label={`${label} clock`}>{formatClock(ms)}</span>}
     </div>
   );
 }
