@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { UserMenu, UserMenuFallback } from "@/components/UserMenu";
 import { NAV, SITE } from "@/lib/site";
 
 export function SiteHeader() {
@@ -21,18 +23,9 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <Link
-            href="/login"
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-dim hover:text-ink"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="rounded-md bg-brand px-3.5 py-1.5 text-sm font-semibold text-brand-ink hover:bg-brand-hi"
-          >
-            Sign up
-          </Link>
+          <Suspense fallback={<UserMenuFallback />}>
+            <UserMenu />
+          </Suspense>
         </div>
       </div>
     </header>

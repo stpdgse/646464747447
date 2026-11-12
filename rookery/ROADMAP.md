@@ -34,8 +34,8 @@ Real server-side app: **Next.js (App Router) + TypeScript** on **Vercel**, with 
 
 Each milestone ends with tests passing, a verified browser run, and a check-in.
 
-- [ ] **M0 Foundation**: scaffold, design system, site shell, Supabase project + migrations, CI, deploy
-- [ ] **M1 Accounts**: sign up / in / out, profiles, username rules, sessions, password reset
+- [~] **M0 Foundation**: scaffold, design system, site shell, Supabase project + migrations, CI done; Vercel deploy pending
+- [~] **M1 Accounts**: sign up / in / out, profiles, settings, RLS done; needs "Confirm email" off in Supabase dashboard; password reset pending (no email, so admin-assisted reset)
 - [ ] **M2 Board**: Chessground board, chess.js rules, Chess960, PGN/FEN, move list, themes
 - [ ] **M3 Vs computer**: Stockfish worker, strength levels, personality bots, takebacks, save games
 - [ ] **M4 Live games**: lobby, quick pairing, challenges, server clocks, resign/draw/abort, reconnect, spectate
