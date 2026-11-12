@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Board } from "@/components/chess/Board";
 import { BoardSettingsPanel } from "@/components/chess/BoardSettingsPanel";
+import { ScreenshotKey } from "@/components/chess/ScreenshotKey";
 import { MoveList } from "@/components/chess/MoveList";
 import { useBoardSettings } from "@/components/chess/settings";
 import {
@@ -379,6 +380,7 @@ export function ComputerGame() {
         <section className="rounded-xl border border-line bg-surface" aria-label="Move list">
           <MoveList sans={view.sans} ply={view.sans.length} />
         </section>
+        <ScreenshotKey />
 
         {end ? (
           <div className="flex flex-wrap gap-2">
