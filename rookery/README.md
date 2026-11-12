@@ -20,7 +20,9 @@ npm run build && npm start -- -p 3111
 node e2e/board.cjs /tmp        # browser tests (need Playwright and a running server)
 node e2e/computer.cjs /tmp
 node e2e/live.cjs /tmp         # two players, real Supabase, ~2.5 min (creates e2ea*/e2eb* accounts)
-supabase/tests/run.sh          # database tests on a scratch local Postgres
+node e2e/daily-puzzles.mjs /tmp  # daily games, notifications, rated puzzles, Rush (real Supabase)
+node e2e/puzzles-anon.mjs /tmp   # signed-out puzzles and Rush
+supabase/tests/run.sh          # database tests on a scratch local Postgres (187 checks)
 ```
 
 ## Layout
@@ -60,3 +62,12 @@ Remove the accounts the browser tests create (SQL editor; this also removes thei
 ```sql
 delete from auth.users where email like 'e2e%@rookery.example';
 ```
+
+## Puzzles
+
+`src/data/puzzles.json` holds 11,258 puzzles sampled from the Lichess puzzle database (CC0): popular, well-played,
+low-uncertainty puzzles, 450 per 100-point rating band (400 to 2900). It was built from `lichess_db_puzzle.csv.zst`
+(6.2 million puzzles); to rebuild it, download that file from https://database.lichess.org and rerun a sampler with the
+same filters (popularity >= 90, plays >= 500, rating deviation <= 90, 2-16 moves).
+Solutions are sent to the browser, so a determined classmate could read them. Puzzle results are still checked
+against the real solution on the server, and Puzzle Rush runs are verified (at least one second per solved puzzle).
