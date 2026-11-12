@@ -10,6 +10,7 @@ export type Profile = {
   bio: string;
   country: string | null;
   is_admin: boolean;
+  is_moderator: boolean;
   muted_until: string | null;
   banned_until: string | null;
   settings: Record<string, unknown>;

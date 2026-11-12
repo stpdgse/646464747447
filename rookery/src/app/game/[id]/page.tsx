@@ -30,5 +30,5 @@ async function Game({ params }: { params: PageProps<"/game/[id]">["params"] }) {
   if (!data) notFound();
   const { white, black, ...row } = data as GameRow & { white: { username: string }; black: { username: string } };
   const me = await getCurrentProfile();
-  return <LiveGame initial={row} names={{ white: white.username, black: black.username }} viewerId={me?.id ?? null} />;
+  return <LiveGame initial={row} names={{ white: white.username, black: black.username }} viewerId={me?.id ?? null} isMod={!!me && (me.is_admin || me.is_moderator)} />;
 }

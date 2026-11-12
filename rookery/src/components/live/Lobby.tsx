@@ -15,7 +15,7 @@ type Me = { id: string; username: string } | null;
 const btn = "rounded-md border border-line bg-surface px-3 py-1.5 text-sm font-medium hover:bg-surface-2 disabled:opacity-40";
 const field = "rounded-md border border-line bg-bg px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none";
 
-export function Lobby({ me }: { me: Me }) {
+export function Lobby({ me, challengeUser = "" }: { me: Me; challengeUser?: string }) {
   const router = useRouter();
   const [variant, setVariant] = useState<Variant>("standard");
   const [rated, setRated] = useState(true);
@@ -25,7 +25,7 @@ export function Lobby({ me }: { me: Me }) {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [challenge, setChallenge] = useState({ username: "", timeId: "5+0", color: "random" as "white" | "black" | "random" });
+  const [challenge, setChallenge] = useState({ username: challengeUser, timeId: "5+0", color: "random" as "white" | "black" | "random" });
 
   const refresh = useCallback(async () => {
     const supabase = createClient();

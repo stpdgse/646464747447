@@ -15,6 +15,8 @@ import { categoryOf, describeGameTime, formatDuration } from "@/lib/live/timecon
 import { clockLeft, deadlineLeft, needsTimeoutCheck, recordOf, sideOf, type GameRow, type Names, type Side } from "@/lib/live/types";
 import { createClient } from "@/lib/supabase/client";
 import { signed } from "@/lib/ratings";
+import { ChatBox } from "@/components/social/ChatBox";
+import { ReportButton } from "@/components/social/ReportButton";
 import { useLiveGame } from "./useLiveGame";
 
 const REASONS: Record<string, string> = {
@@ -25,7 +27,7 @@ const REASONS: Record<string, string> = {
 
 const btn = "rounded-md border border-line bg-surface px-3 py-1.5 text-sm font-medium hover:bg-surface-2 disabled:opacity-40 disabled:hover:bg-surface";
 
-export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names: Names; viewerId: string | null }) {
+export function LiveGame({ initial, names, viewerId, isMod = false }: { initial: GameRow; names: Names; viewerId: string | null; isMod?: boolean }) {
   const { row, merge, offset, connection } = useLiveGame(initial);
   const router = useRouter();
   const [settings, updateSettings] = useBoardSettings();
@@ -304,6 +306,21 @@ export function LiveGame({ initial, names, viewerId }: { initial: GameRow; names
             <Link href={isDaily ? "/play/daily" : "/play/online"} className={`${btn} inline-block`}>Back to lobby</Link>
           </div>
         )}
+
+        {viewerId && (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {side && (
+              <ReportButton viewerId={viewerId} kind="game" refId={row.id} targetUser={side === "white" ? row.black_id : row.white_id}
+                label="Report opponent" defaultReason="cheating" />
+            )}
+            {isMod && row.status === "finished" && (
+              <Link href={`/admin?tab=fairplay&game=${row.id}`} className="text-xs text-dim underline hover:text-ink">Fair-play check</Link>
+            )}
+          </div>
+        )}
+
+        <ChatBox table="game_messages" scopeColumn="game_id" scopeId={row.id} room={side ? "players" : "spectators"} viewerId={viewerId} isMod={isMod}
+          title={side ? "Chat with your opponent" : "Spectator chat"} maxLength={200} height="h-40" />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/auth";
 import { logout } from "@/app/actions/auth";
+import { PresenceBeat } from "@/components/social/PresenceBeat";
 import { NotificationBell } from "@/components/live/NotificationBell";
 
 /** Reads the session, so it must render inside <Suspense> (see SiteHeader). */
@@ -25,7 +26,11 @@ export async function UserMenu() {
 
   return (
     <>
+      <PresenceBeat userId={profile.id} />
       <NotificationBell userId={profile.id} />
+      {(profile.is_admin || profile.is_moderator) && (
+        <Link href="/admin" className="rounded-md px-3 py-1.5 text-sm font-semibold text-brand hover:bg-surface-2">Admin</Link>
+      )}
       <Link href={`/u/${profile.username}`} className="rounded-md px-3 py-1.5 text-sm font-semibold hover:bg-surface-2">
         {profile.username}
       </Link>

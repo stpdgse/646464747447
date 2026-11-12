@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { RatingPanel } from "@/components/ratings/RatingPanel";
 import type { ChartPoint } from "@/components/ratings/RatingChart";
-import type { Profile } from "@/lib/auth";
+import { FriendActions } from "@/components/social/FriendActions";
+import { getCurrentProfile, type Profile } from "@/lib/auth";
 import { VARIANTS, type Variant } from "@/lib/chess/variants";
 import { describeGameTime } from "@/lib/live/timecontrols";
 import { PERFS, formatRating, perfLabel, plural, tally, type HistoryPoint, type RatingRow } from "@/lib/ratings";
@@ -35,6 +36,7 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
   const { data } = await supabase.from("profiles").select("*").eq("username", username).maybeSingle();
   if (!data) notFound();
   const p = data as Profile;
+  const viewer = await getCurrentProfile();
 
   const [ratingsRes, historyRes, gamesRes, puzzleRes] = await Promise.all([
     supabase.from("ratings").select("user_id, perf, rating, rd, games").eq("user_id", p.id),
@@ -86,6 +88,11 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
           </p>
         </header>
         {p.bio && <p className="whitespace-pre-line">{p.bio}</p>}
+        {(p.is_admin || p.is_moderator) && <p className="text-xs font-semibold text-brand">{p.is_admin ? "Admin" : "Moderator"}</p>}
+        <FriendActions viewerId={viewer?.id ?? null} targetId={p.id} targetName={p.username} />
+        {(viewer?.is_admin || viewer?.is_moderator) && viewer.id !== p.id && (
+          <a href={`/admin?tab=users&user=${p.username}`} className="justify-self-start text-xs text-dim underline hover:text-ink">Moderate this account</a>
+        )}
       </article>
 
       <section aria-labelledby="ratings" className="grid gap-3">

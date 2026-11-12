@@ -5,7 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type Item = {
-  id: number; kind: "your_turn" | "game_over"; game_id: string | null; created_at: string; read_at: string | null;
+  id: number; kind: "your_turn" | "game_over" | "friend_request" | "friend_accepted" | "club_invite"; game_id: string | null; created_at: string; read_at: string | null;
+  actor: { username: string } | null; club: { slug: string; name: string } | null;
   game: { white_id: string; black_id: string; white: { username: string } | null; black: { username: string } | null } | null;
 };
 
@@ -18,7 +19,7 @@ export function NotificationBell({ userId }: { userId: string }) {
   const load = useCallback(async () => {
     const { data } = await createClient()
       .from("notifications")
-      .select("id, kind, game_id, created_at, read_at, game:games(white_id, black_id, white:profiles!games_white_id_fkey(username), black:profiles!games_black_id_fkey(username))")
+      .select("id, kind, game_id, created_at, read_at, actor:profiles!notifications_actor_id_fkey(username), club:clubs(slug, name), game:games(white_id, black_id, white:profiles!games_white_id_fkey(username), black:profiles!games_black_id_fkey(username))")
       .order("created_at", { ascending: false })
       .limit(15);
     setItems((data as unknown as Item[] | null) ?? []);
@@ -50,6 +51,11 @@ export function NotificationBell({ userId }: { userId: string }) {
     };
   }, [open]);
 
+  const hrefOf = (i: Item) =>
+    i.kind === "friend_request" || i.kind === "friend_accepted" ? "/community/friends"
+      : i.kind === "club_invite" ? (i.club ? `/clubs/${i.club.slug}` : "/clubs")
+      : i.game_id ? `/game/${i.game_id}` : "/play/daily";
+
   const unread = items.filter((i) => !i.read_at).length;
 
   const toggle = async () => {
@@ -63,6 +69,10 @@ export function NotificationBell({ userId }: { userId: string }) {
   };
 
   const text = (i: Item) => {
+    const who = i.actor?.username ?? "Someone";
+    if (i.kind === "friend_request") return `${who} sent you a friend request`;
+    if (i.kind === "friend_accepted") return `${who} accepted your friend request`;
+    if (i.kind === "club_invite") return `${who} invited you to ${i.club?.name ?? "a club"}`;
     const opp = i.game ? (i.game.white_id === userId ? i.game.black?.username : i.game.white?.username) : null;
     return i.kind === "your_turn" ? `Your move against ${opp ?? "your opponent"}` : `Game over against ${opp ?? "your opponent"}`;
   };
@@ -84,7 +94,7 @@ export function NotificationBell({ userId }: { userId: string }) {
             <ul className="max-h-80 overflow-auto">
               {items.map((i) => (
                 <li key={i.id} className="border-b border-line last:border-0">
-                  <Link href={i.game_id ? `/game/${i.game_id}` : "/play/daily"} onClick={() => setOpen(false)} className={`block px-4 py-3 text-sm hover:bg-surface-2 ${i.read_at ? "text-dim" : "font-semibold"}`}>
+                  <Link href={hrefOf(i)} onClick={() => setOpen(false)} className={`block px-4 py-3 text-sm hover:bg-surface-2 ${i.read_at ? "text-dim" : "font-semibold"}`}>
                     {text(i)}
                     <span className="block text-xs font-normal text-dim">{new Date(i.created_at).toLocaleString("en", { dateStyle: "medium", timeStyle: "short" })}</span>
                   </Link>
