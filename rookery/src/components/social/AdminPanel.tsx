@@ -100,9 +100,9 @@ function Reports({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const link = (r: Report) =>
-    r.kind === "user" ? <Link className="text-brand hover:underline" href={`/u/${r.target?.username ?? ""}`}>profile</Link>
-      : r.kind === "game" ? <Link className="text-brand hover:underline" href={`/game/${r.ref_id}`}>game</Link>
-      : r.kind === "forum_thread" ? <Link className="text-brand hover:underline" href={`/forum/thread/${r.ref_id}`}>thread</Link>
+    r.kind === "user" ? <Link className="text-brand underline" href={`/u/${r.target?.username ?? ""}`}>profile</Link>
+      : r.kind === "game" ? <Link className="text-brand underline" href={`/game/${r.ref_id}`}>game</Link>
+      : r.kind === "forum_thread" ? <Link className="text-brand underline" href={`/forum/thread/${r.ref_id}`}>thread</Link>
       : null;
 
   return (

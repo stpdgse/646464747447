@@ -108,7 +108,7 @@ export function OpeningExplorer() {
                 <tbody>
                   {book.slice(0, 12).map((m) => (
                     <tr key={m.uci} className="border-t border-line">
-                      <td className="px-3 py-1.5"><button className="font-bold text-brand hover:underline" onClick={() => playUci(m.uci)}>{san(m.uci)}</button></td>
+                      <td className="px-3 py-1.5"><button className="font-bold text-brand underline" onClick={() => playUci(m.uci)}>{san(m.uci)}</button></td>
                       <td className="px-3 py-1.5 text-dim">{m.reaches ? m.reaches.name : m.leadsTo ? `leads to ${m.leadsTo.name}` : ""}</td>
                       <td className="px-3 py-1.5 text-right tabular-nums text-dim">{m.lines}</td>
                     </tr>
@@ -134,7 +134,7 @@ export function OpeningExplorer() {
                 <tbody>
                   {classRows.map((r) => (
                     <tr key={r.move} className="border-t border-line">
-                      <td className="px-3 py-1.5"><button className="font-bold text-brand hover:underline" onClick={() => playUci(r.move)}>{san(r.move)}</button></td>
+                      <td className="px-3 py-1.5"><button className="font-bold text-brand underline" onClick={() => playUci(r.move)}>{san(r.move)}</button></td>
                       <td className="px-3 py-1.5 tabular-nums">{r.games} <span className="text-xs text-dim">({Math.round((r.games / totalClass) * 100)}%)</span></td>
                       <td className="px-3 py-1.5">
                         <div className="flex h-3 w-full min-w-24 overflow-hidden rounded-full" role="img"

@@ -25,7 +25,7 @@ export default function CreditsPage() {
         <ul className="grid gap-2">
           {LIBS.map((l) => (
             <li key={l.name} className="rounded-lg border border-line bg-surface p-3 text-sm">
-              <a href={l.url} className="font-semibold text-brand hover:underline">{l.name}</a> by {l.by} ({l.license}): {l.what}.
+              <a href={l.url} className="font-semibold text-brand underline">{l.name}</a> by {l.by} ({l.license}): {l.what}.
             </li>
           ))}
         </ul>
@@ -38,7 +38,7 @@ export default function CreditsPage() {
               {/* eslint-disable-next-line @next/next/no-img-element -- tiny local SVGs */}
               <img src={`/pieces/${p.id}/wN.svg`} alt="" className="size-10 shrink-0 rounded bg-surface-2" />
               <span>
-                <strong>{p.label}</strong> by <a href={p.source} className="text-brand hover:underline">{p.author}</a> ({p.license})
+                <strong>{p.label}</strong> by <a href={p.source} className="text-brand underline">{p.author}</a> ({p.license})
               </span>
             </li>
           ))}

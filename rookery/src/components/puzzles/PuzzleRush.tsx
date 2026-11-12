@@ -177,7 +177,7 @@ export function PuzzleRush({ signedIn, best }: { signedIn: boolean; best: number
             {phase === "over" && outcome && (
               <p role="status" className="rounded-xl border border-brand bg-brand/10 px-4 py-3 text-sm">
                 {outcome.kind === "saved" && <>Score saved. Your best is <strong>{outcome.best}</strong>.</>}
-                {outcome.kind === "anonymous" && <><Link href="/login" className="font-semibold text-brand hover:underline">Log in</Link> to save scores to the leaderboard.</>}
+                {outcome.kind === "anonymous" && <><Link href="/login" className="font-semibold text-brand underline">Log in</Link> to save scores to the leaderboard.</>}
                 {outcome.kind === "rejected" && <>That run could not be verified, so it wasn&apos;t saved.</>}
                 {outcome.kind === "error" && <>{outcome.text}</>}
               </p>

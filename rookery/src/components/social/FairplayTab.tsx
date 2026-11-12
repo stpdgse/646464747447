@@ -148,7 +148,7 @@ export function FairplayTab({ initialGame }: { initialGame: string }) {
               <li key={f.id} className="grid gap-1 rounded-xl border border-line bg-surface px-4 py-3 text-sm">
                 <span className="flex flex-wrap items-center gap-x-3">
                   <Link href={`/u/${f.user?.username}`} className="font-semibold hover:underline">{f.user?.username}</Link>
-                  <Link href={`/game/${f.game_id}`} className="text-brand hover:underline">game</Link>
+                  <Link href={`/game/${f.game_id}`} className="text-brand underline">game</Link>
                   <span className="text-dim">{f.accuracy.toFixed(1)}% accuracy · {Math.round(f.best_match * 100)}% top moves · {f.moves} moves · {fmtDate(f.created_at)}</span>
                   <span className={`ml-auto rounded px-2 text-xs font-semibold ${f.status === "confirmed" ? "bg-danger/15 text-danger" : f.status === "cleared" ? "bg-brand/15 text-brand" : "bg-surface-2"}`}>{f.status}</span>
                 </span>

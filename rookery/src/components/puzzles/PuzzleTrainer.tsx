@@ -178,7 +178,7 @@ export function PuzzleTrainer({ mode }: { mode: "train" | "daily" }) {
                 <p className="text-sm" aria-label="Rating change">Puzzle rating {result.before} → {result.after} ({signed(result.after - result.before)})</p>
               )}
               {result?.repeat && <p className="text-sm text-dim">You have done this puzzle before, so your rating didn&apos;t change.</p>}
-              {!rated && <p className="text-sm text-dim"><Link href="/login" className="font-semibold text-brand hover:underline">Log in</Link> to rate your puzzles.</p>}
+              {!rated && <p className="text-sm text-dim"><Link href="/login" className="font-semibold text-brand underline">Log in</Link> to rate your puzzles.</p>}
               {puzzle && <p className="text-xs text-dim">Puzzle rating {puzzle.rating} · {puzzle.themes.filter((t) => t in THEME_LABEL && t !== "").slice(0, 4).map(humanTheme).join(", ") || "tactics"}</p>}
             </div>
           )}

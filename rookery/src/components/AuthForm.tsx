@@ -50,9 +50,9 @@ export function AuthForm({ mode, action }: Props) {
       </button>
       <p className="text-center text-sm text-dim">
         {signup ? (
-          <>Already have an account? <Link href="/login" className="text-brand hover:underline">Log in</Link></>
+          <>Already have an account? <Link href="/login" className="text-brand underline">Log in</Link></>
         ) : (
-          <>New here? <Link href="/signup" className="text-brand hover:underline">Create an account</Link></>
+          <>New here? <Link href="/signup" className="text-brand underline">Create an account</Link></>
         )}
       </p>
     </form>

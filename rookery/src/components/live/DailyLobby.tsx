@@ -87,7 +87,7 @@ export function DailyLobby({ me }: { me: Me }) {
       {info && <p role="status" className="rounded-md border border-line bg-surface px-3 py-2 text-sm text-dim">{info}</p>}
       {!me && (
         <p className="rounded-md border border-line bg-surface px-3 py-2 text-sm text-dim">
-          <Link href="/login" className="font-semibold text-brand hover:underline">Log in</Link> or <Link href="/signup" className="font-semibold text-brand hover:underline">create an account</Link> to play daily games.
+          <Link href="/login" className="font-semibold text-brand underline">Log in</Link> or <Link href="/signup" className="font-semibold text-brand underline">create an account</Link> to play daily games.
         </p>
       )}
 

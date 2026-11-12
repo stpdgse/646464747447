@@ -57,7 +57,7 @@ async function Progress() {
       <section aria-labelledby="mine" className="grid content-start gap-3">
         <h2 id="mine" className="text-xl font-bold">Your puzzles</h2>
         {!me ? (
-          <p className="text-sm text-dim"><Link href="/login" className="font-semibold text-brand hover:underline">Log in</Link> to get a puzzle rating and track your progress.</p>
+          <p className="text-sm text-dim"><Link href="/login" className="font-semibold text-brand underline">Log in</Link> to get a puzzle rating and track your progress.</p>
         ) : !r ? (
           <p className="text-sm text-dim">Solve your first rated puzzle to get a rating.</p>
         ) : (
@@ -78,12 +78,12 @@ async function Progress() {
       <section aria-labelledby="rush" className="grid content-start gap-3">
         <h2 id="rush" className="text-xl font-bold">Puzzle Rush: best scores</h2>
         {top.length === 0 ? (
-          <p className="text-sm text-dim">No scores yet. <Link href="/puzzles/rush" className="font-semibold text-brand hover:underline">Be the first.</Link></p>
+          <p className="text-sm text-dim">No scores yet. <Link href="/puzzles/rush" className="font-semibold text-brand underline">Be the first.</Link></p>
         ) : (
           <ol className="grid gap-1.5">
             {top.map((t, i) => (
               <li key={t.username} className="flex items-center justify-between rounded-lg border border-line bg-surface px-3 py-2 text-sm">
-                <span><span className="mr-3 text-dim">{i + 1}</span><Link href={`/u/${t.username}`} className="font-semibold hover:text-brand hover:underline">{t.username}</Link></span>
+                <span><span className="mr-3 text-dim">{i + 1}</span><Link href={`/u/${t.username}`} className="font-semibold hover:text-brand underline">{t.username}</Link></span>
                 <span className="font-bold tabular-nums">{t.score}</span>
               </li>
             ))}

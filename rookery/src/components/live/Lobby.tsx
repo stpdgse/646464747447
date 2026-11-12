@@ -120,7 +120,7 @@ export function Lobby({ me, challengeUser = "" }: { me: Me; challengeUser?: stri
         <h2 id="quick" className="text-xl font-bold">Quick play</h2>
         {!me && (
           <p className="rounded-md border border-line bg-surface px-3 py-2 text-sm text-dim">
-            <Link href="/login" className="font-semibold text-brand hover:underline">Log in</Link> or <Link href="/signup" className="font-semibold text-brand hover:underline">create an account</Link> to play. You can already watch games.
+            <Link href="/login" className="font-semibold text-brand underline">Log in</Link> or <Link href="/signup" className="font-semibold text-brand underline">create an account</Link> to play. You can already watch games.
           </p>
         )}
         <div role="radiogroup" aria-label="Game type" className="flex flex-wrap gap-2">

@@ -54,7 +54,7 @@ export function WatchList() {
       <section aria-labelledby="live" className="grid gap-3">
         <h2 id="live" className="text-xl font-bold">Live now</h2>
         {live === null ? <div className="h-20 animate-pulse rounded-xl bg-surface" /> : live.length === 0 ? (
-          <p className="text-sm text-dim">No games are being played right now. <Link href="/play/online" className="font-semibold text-brand hover:underline">Start one</Link>.</p>
+          <p className="text-sm text-dim">No games are being played right now. <Link href="/play/online" className="font-semibold text-brand underline">Start one</Link>.</p>
         ) : <ul className="grid gap-2">{live.map(row)}</ul>}
       </section>
       {recent.length > 0 && (
