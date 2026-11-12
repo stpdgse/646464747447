@@ -44,7 +44,7 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 - [x] **M0 Foundation**: scaffold, design system, site shell, Supabase project + migrations, CI, Vercel deploy (live: https://rookery-sable.vercel.app)
 - [x] **M1 Accounts**: sign up / in / out, profiles, settings, RLS (password reset will be admin-assisted, since there are no real emails)
 - [x] **M2 Board**: Chessground board, chessops rules (replaces chess.js, which lacks Chess960), Chess960, King of the Hill, Three-check, PGN/FEN, move list, 6 board themes, 8 piece sets
-- [ ] **M3 Vs computer**: Stockfish worker, strength levels, personality bots, takebacks, save games
+- [x] **M3 Vs computer**: Stockfish 19 (lite, single-thread WASM, no special headers) in a Web Worker, 8 personality bots, clocks, takebacks, resign/draw, Chess960, hand-off to analysis. Saving games to the database arrives with M4's `games` table
 - [ ] **M4 Live games**: lobby, quick pairing, challenges, server clocks, resign/draw/abort, reconnect, spectate
 - [ ] **M5 Ratings**: Glicko-2 per time control, leaderboards, stats profile, rating graph, PGN download
 - [ ] **M6 Daily games**: correspondence with days-per-move, notifications, timeout sweep

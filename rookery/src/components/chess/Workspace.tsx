@@ -86,6 +86,29 @@ export function Workspace() {
     } else start(variant);
   };
 
+  // A game sent over from another page (for example "Analyse" after playing the computer).
+  useEffect(() => {
+    queueMicrotask(() => {
+      let pgn: string | null = null;
+      try {
+        pgn = window.sessionStorage.getItem("rookery.import");
+        if (pgn) window.sessionStorage.removeItem("rookery.import");
+      } catch {
+        return;
+      }
+      if (!pgn) return;
+      try {
+        const { record: r } = fromPgn(pgn);
+        setRecord(r);
+        setVariant(r.variant);
+        setPly(r.moves.length);
+        setNotice({ kind: "info", text: `Loaded your game (${r.moves.length} moves). Use the arrow keys to step through it.` });
+      } catch {
+        /* ignore a bad hand-off */
+      }
+    });
+  }, []);
+
   // Keyboard navigation (ignored while typing in a field).
   const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-export function MoveList({ sans, ply, onSelect }: { sans: string[]; ply: number; onSelect: (ply: number) => void }) {
+export function MoveList({ sans, ply, onSelect }: { sans: string[]; ply: number; onSelect?: (ply: number) => void }) {
   const activeRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     activeRef.current?.scrollIntoView({ block: "nearest" });
@@ -16,7 +16,8 @@ export function MoveList({ sans, ply, onSelect }: { sans: string[]; ply: number;
       <button
         type="button"
         ref={ply === idx ? activeRef : undefined}
-        onClick={() => onSelect(idx)}
+        disabled={!onSelect}
+        onClick={() => onSelect?.(idx)}
         aria-current={ply === idx ? "step" : undefined}
         className={`rounded px-2 py-1 text-left font-medium hover:bg-surface-2 ${ply === idx ? "bg-brand/30 text-ink" : "text-ink"}`}
       >

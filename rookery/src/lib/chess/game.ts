@@ -192,6 +192,33 @@ export function tryText(record: GameRecord, text: string): MoveAttempt | { ok: f
   return tryUci(record, makeUci(move));
 }
 
+/** Capture / check / promotion flags for candidate moves in the position after `record`. Used by bot personalities. */
+export function describeMoves(
+  record: GameRecord,
+  ucis: string[],
+): Map<string, { capture: boolean; check: boolean; promotion: boolean }> {
+  const pos = startPosition(record);
+  for (const uci of record.moves) {
+    const m = parseUci(uci);
+    if (m) pos.play(normalizeMove(pos, m));
+  }
+  const out = new Map<string, { capture: boolean; check: boolean; promotion: boolean }>();
+  for (const uci of ucis) {
+    const m = parseUci(uci);
+    if (!m || !("from" in m)) continue;
+    const norm = normalizeMove(pos, m) as NormalMove;
+    if (!pos.isLegal(norm)) continue;
+    const piece = pos.board.get(norm.from);
+    const castling = castlingSide(pos, norm) !== undefined;
+    const enPassant = piece?.role === "pawn" && norm.to === pos.epSquare;
+    const capture = !castling && (pos.board.has(norm.to) || enPassant);
+    const next = pos.clone();
+    next.play(norm);
+    out.set(uci, { capture, check: next.isCheck(), promotion: norm.promotion !== undefined });
+  }
+  return out;
+}
+
 export function promotionFromChar(ch: string): PromotionRole | undefined {
   const role = ROLE_BY_CHAR[ch.toLowerCase()];
   return role as PromotionRole | undefined;

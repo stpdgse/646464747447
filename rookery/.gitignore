@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Stockfish engine files are copied from node_modules by scripts/copy-engine.mjs
+/public/engine/
