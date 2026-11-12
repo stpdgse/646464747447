@@ -51,9 +51,9 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 - [x] **M7 Puzzles**: 11,258 puzzles sampled from the Lichess database (CC0), rated Glicko-2 puzzle rating, theme filter, daily puzzle, Puzzle Rush with server-verified runs
 - [x] **M8 Analysis**: live Stockfish lines and best-move arrows, eval bar, full-game review with accuracy, inaccuracy/mistake/blunder marks and an evaluation graph; "Review with engine" on finished games
 - [x] **M9 Openings**: 3,865 named openings (ECO), opening names on games and the board, opening explorer with an offline book plus what the class played (`opening_stats`)
-- [ ] **M10 Social**: friends, in-game chat, presence, spectator view, notifications
-- [ ] **M11 Clubs and forum**: clubs/teams, club chat, forum categories/threads/posts
-- [ ] **M12 Admin and fair play**: moderation panel, bans/mutes/reports, accuracy flags
+- [x] **M10 Social**: friends and requests, blocking, online dots (heartbeat table, works behind school filters), in-game chat (players and spectators rooms), friends playing now, bell notifications
+- [x] **M11 Clubs and forum**: clubs (open or by request, invites, roles, club chat), forum with categories, threads, replies, edit/delete, lock and pin
+- [x] **M12 Admin and fair play**: reports queue, mute/ban, moderator role, audit log, fair-play watchlist plus in-browser Stockfish accuracy check with recorded flags
 - [ ] **M13 Polish**: PWA, sounds, themes, accessibility, performance, load test
 
 ## Notes
@@ -64,5 +64,6 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 
 ## Testing
 
+- `node e2e/social.cjs setup|run`: friends, chat, clubs, forum, reports and moderation (needs one account made moderator, see file header).
 - `npm test`: unit tests (validation, chess rules, Chess960, PGN).
 - `node e2e/board.cjs <screenshot-dir>`: browser test of the board against a running server (see the file header).
