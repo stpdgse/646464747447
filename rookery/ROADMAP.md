@@ -35,7 +35,7 @@ Real server-side app: **Next.js (App Router) + TypeScript** on **Vercel**, with 
 - Vercel project `rookery` (team `tforzas-projects`), root directory `rookery`, linked to this GitHub repo.
 - Production branch is `main`: merging the PR is what updates the public site. Other branches get preview URLs that sit behind Vercel login.
 - Supabase project `rookery` (`ultpyrvfzdqamprglnxd`, eu-central-1). Email confirmation is off by design (usernames, no real emails).
-- Known: npm marks `chessground` deprecated; M2 moves to the maintained `@lichess-org/chessground`.
+- Board uses the maintained `@lichess-org/chessground` and `chessops` (rules for all variants).
 
 ## Milestones
 
@@ -43,7 +43,7 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 
 - [x] **M0 Foundation**: scaffold, design system, site shell, Supabase project + migrations, CI, Vercel deploy (live: https://rookery-sable.vercel.app)
 - [x] **M1 Accounts**: sign up / in / out, profiles, settings, RLS (password reset will be admin-assisted, since there are no real emails)
-- [ ] **M2 Board**: Chessground board, chess.js rules, Chess960, PGN/FEN, move list, themes
+- [x] **M2 Board**: Chessground board, chessops rules (replaces chess.js, which lacks Chess960), Chess960, King of the Hill, Three-check, PGN/FEN, move list, 6 board themes, 8 piece sets
 - [ ] **M3 Vs computer**: Stockfish worker, strength levels, personality bots, takebacks, save games
 - [ ] **M4 Live games**: lobby, quick pairing, challenges, server clocks, resign/draw/abort, reconnect, spectate
 - [ ] **M5 Ratings**: Glicko-2 per time control, leaderboards, stats profile, rating graph, PGN download
@@ -61,3 +61,8 @@ Each milestone ends with tests passing, a verified browser run, and a check-in.
 - Chessground is GPL-3.0. A hosted site is not distribution, but keep the source available if the repo is ever shared.
 - Lichess puzzle and opening data are CC0, so they can be imported freely.
 - Stockfish is GPL-3.0 too, same note as above.
+
+## Testing
+
+- `npm test`: unit tests (validation, chess rules, Chess960, PGN).
+- `node e2e/board.cjs <screenshot-dir>`: browser test of the board against a running server (see the file header).
