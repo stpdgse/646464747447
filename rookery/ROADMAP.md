@@ -30,11 +30,18 @@ Real server-side app: **Next.js (App Router) + TypeScript** on **Vercel**, with 
 4. **Row Level Security on every table.** Nothing is readable or writable by default.
 5. **Stockfish runs in the browser** (WASM in a Web Worker); the server never runs an engine on the request path.
 
+## Hosting
+
+- Vercel project `rookery` (team `tforzas-projects`), root directory `rookery`, linked to this GitHub repo.
+- Production branch is `main`: merging the PR is what updates the public site. Other branches get preview URLs that sit behind Vercel login.
+- Supabase project `rookery` (`ultpyrvfzdqamprglnxd`, eu-central-1). Email confirmation is off by design (usernames, no real emails).
+- Known: npm marks `chessground` deprecated; M2 moves to the maintained `@lichess-org/chessground`.
+
 ## Milestones
 
 Each milestone ends with tests passing, a verified browser run, and a check-in.
 
-- [~] **M0 Foundation**: scaffold, design system, site shell, Supabase project + migrations, CI done; Vercel deploy waiting on the owner (see DEPLOY.md)
+- [x] **M0 Foundation**: scaffold, design system, site shell, Supabase project + migrations, CI, Vercel deploy (live: https://rookery-sable.vercel.app)
 - [x] **M1 Accounts**: sign up / in / out, profiles, settings, RLS (password reset will be admin-assisted, since there are no real emails)
 - [ ] **M2 Board**: Chessground board, chess.js rules, Chess960, PGN/FEN, move list, themes
 - [ ] **M3 Vs computer**: Stockfish worker, strength levels, personality bots, takebacks, save games
