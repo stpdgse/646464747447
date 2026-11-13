@@ -25,6 +25,7 @@ import { useMoveSounds } from "@/components/useMoveSounds";
 import { createClient } from "@/lib/supabase/client";
 import { clearSaved, loadSaved, restore, snapshot, writeSaved } from "./saved";
 import { useBotBroadcast } from "./useBotBroadcast";
+import { useBots } from "./useBots";
 import { useEngine } from "./useEngine";
 
 const EMPTY_SANS: string[] = [];
@@ -66,9 +67,10 @@ const HOW: Record<End["how"], string> = {
 const btn = "rounded-md border border-line bg-surface px-3 py-1.5 text-sm font-medium hover:bg-surface-2 disabled:opacity-40 disabled:hover:bg-surface";
 const field = "rounded-md border border-line bg-bg px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none";
 
-export function ComputerGame() {
+export function ComputerGame({ initialBotId }: { initialBotId?: string } = {}) {
   const engineState = useEngine();
-  const [setup, setSetup] = useState<Setup>(DEFAULT_SETUP);
+  const bots = useBots();
+  const [setup, setSetup] = useState<Setup>(() => ({ ...DEFAULT_SETUP, botId: initialBotId ?? DEFAULT_SETUP.botId }));
   const [game, setGame] = useState<Game | null>(null);
   const [now, setNow] = useState(0);
   const [notice, setNotice] = useState<string | null>(null);
@@ -156,7 +158,7 @@ export function ComputerGame() {
 
   // ---- start a game ----------------------------------------------------------------------------
   const start = (s: Setup) => {
-    const bot = getBot(s.botId) ?? BOTS[0];
+    const bot = bots.find((b) => b.id === s.botId) ?? getBot(s.botId) ?? BOTS[0];
     const tc = TIME_CONTROLS.find((t) => t.id === s.timeId) ?? TIME_CONTROLS[0];
     const player: Side = s.color === "random" ? (Math.random() < 0.5 ? "white" : "black") : s.color;
     const base = tc.initialMs;
@@ -340,7 +342,7 @@ export function ComputerGame() {
 
   // ============================== SETUP SCREEN ====================================================
   if (!game || !view) {
-    const bot = getBot(setup.botId) ?? BOTS[0];
+    const bot = bots.find((b) => b.id === setup.botId) ?? bots[0] ?? BOTS[0];
     return (
       <div className="grid gap-6">
         {remote && (
@@ -354,7 +356,7 @@ export function ComputerGame() {
             <section key={tier.label} aria-label={tier.label} className="grid gap-3">
               <h2 className="text-sm font-bold uppercase tracking-wide text-dim">{tier.label}</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {BOTS.filter((b) => b.rating >= tier.min && b.rating < tier.max).map((b) => (
+                {bots.filter((b) => b.rating >= tier.min && b.rating < tier.max).map((b) => (
                   <button
                     key={b.id}
                     role="radio"
