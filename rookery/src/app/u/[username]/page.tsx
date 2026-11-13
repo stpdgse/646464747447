@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { BotHistory, type BotHistoryRow } from "@/components/ratings/BotHistory";
+import { ageMs } from "@/lib/social";
 import { RatingPanel } from "@/components/ratings/RatingPanel";
 import type { ChartPoint } from "@/components/ratings/RatingChart";
 import { FriendActions } from "@/components/social/FriendActions";
@@ -38,7 +40,7 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
   const p = data as Profile;
   const viewer = await getCurrentProfile();
 
-  const [ratingsRes, historyRes, gamesRes, puzzleRes] = await Promise.all([
+  const [ratingsRes, historyRes, gamesRes, puzzleRes, botRes] = await Promise.all([
     supabase.from("ratings").select("user_id, perf, rating, rd, games").eq("user_id", p.id),
     supabase.from("rating_history").select("game_id, perf, rating_before, rating_after, created_at").eq("user_id", p.id).order("created_at", { ascending: true }).limit(2000),
     supabase
@@ -49,7 +51,13 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
       .order("ended_at", { ascending: false })
       .limit(500),
     supabase.from("puzzle_attempts").select("rating_before, rating_after, created_at").eq("user_id", p.id).order("created_at", { ascending: true }).limit(2000),
+    supabase.from("bot_games").select("id, bot_id, bot_name, bot_rating, player_color, variant, initial_fen, moves, status, result, reason, time_control, watchable, updated_at")
+      .eq("player_id", p.id).order("updated_at", { ascending: false }).limit(60),
   ]);
+  // A game nobody has moved in for an hour was left unfinished.
+  const botGames = ((botRes.data ?? []) as Omit<BotHistoryRow, "abandoned">[])
+    .map((g) => ({ ...g, abandoned: g.status === "playing" && ageMs(g.updated_at) > 3600_000 }))
+    .filter((g) => g.moves.length > 0 || g.status === "playing");
 
   const ratings = ((ratingsRes.data ?? []) as RatingRow[]).sort((a, b) => PERFS.findIndex((x) => x.id === a.perf) - PERFS.findIndex((x) => x.id === b.perf));
   const history = (historyRes.data ?? []) as HistoryPoint[];
@@ -131,6 +139,11 @@ async function ProfileView({ params }: { params: PageProps<"/u/[username]">["par
             <p className="text-sm text-dim"><strong className="text-ink">{plural(record.wins, "win")}</strong> · <strong className="text-ink">{plural(record.draws, "draw")}</strong> · <strong className="text-ink">{plural(record.losses, "loss", "losses")}</strong> ({plural(record.total, "game")})</p>
           </div>
         )}
+      </section>
+
+      <section aria-labelledby="botgames" className="grid gap-3">
+        <h2 id="botgames" className="text-xl font-bold">Against the computer</h2>
+        <BotHistory rows={botGames} username={p.username} isOwner={viewer?.id === p.id} />
       </section>
 
       <section aria-labelledby="games" className="grid gap-3">

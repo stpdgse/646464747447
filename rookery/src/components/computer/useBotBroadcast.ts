@@ -12,6 +12,9 @@ export type Broadcast = {
   variant: "standard" | "chess960";
   initialFen: string;
   moves: string[];
+  /** Others may spectate; private games are kept in the owner's history only. */
+  watchable: boolean;
+  timeControl: string;
   /** Set once the game is over. */
   end: { result: string; how: string } | null;
 };
@@ -61,7 +64,7 @@ export function useBotBroadcast(game: Broadcast | null, enabled: boolean) {
         created.current.add(id);
         const { error } = await supabase.from("bot_games").insert({
           id, player_id: uid, bot_id: game.botId, bot_name: game.botName, bot_rating: game.botRating,
-          player_color: game.player, variant: game.variant, initial_fen: game.initialFen, moves: game.moves, status: "playing",
+          player_color: game.player, variant: game.variant, initial_fen: game.initialFen, moves: game.moves, status: "playing", watchable: game.watchable, time_control: game.timeControl,
         });
         // 23505 = already published (a restored game): carry on and update it.
         if (error && error.code !== "23505") {
