@@ -3,9 +3,9 @@
 import { useCallback, useSyncExternalStore } from "react";
 
 export type ThemeChoice = "system" | "dark" | "light";
-export type Prefs = { theme: ThemeChoice; sound: boolean; volume: number };
+export type Prefs = { theme: ThemeChoice; sound: boolean; volume: number; feedback: boolean };
 
-export const DEFAULT_PREFS: Prefs = { theme: "system", sound: true, volume: 0.6 };
+export const DEFAULT_PREFS: Prefs = { theme: "system", sound: true, volume: 0.6, feedback: true };
 const KEY = "rookery.prefs";
 
 export function normalizePrefs(raw: unknown): Prefs {
@@ -13,6 +13,7 @@ export function normalizePrefs(raw: unknown): Prefs {
   return {
     theme: r.theme === "dark" || r.theme === "light" || r.theme === "system" ? r.theme : DEFAULT_PREFS.theme,
     sound: typeof r.sound === "boolean" ? r.sound : DEFAULT_PREFS.sound,
+    feedback: typeof r.feedback === "boolean" ? r.feedback : DEFAULT_PREFS.feedback,
     volume: typeof r.volume === "number" && r.volume >= 0 && r.volume <= 1 ? r.volume : DEFAULT_PREFS.volume,
   };
 }

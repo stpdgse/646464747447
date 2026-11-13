@@ -24,7 +24,10 @@ import { afterMove, clocksRunning, remaining, TIME_CONTROLS, type Clocks, type S
 import { useMoveSounds } from "@/components/useMoveSounds";
 import { createClient } from "@/lib/supabase/client";
 import { clearSaved, loadSaved, restore, snapshot, writeSaved } from "./saved";
+import { MoveFeedbackBar } from "@/components/chess/MoveFeedbackBar";
+import { usePrefs } from "@/lib/prefs";
 import { useBotBroadcast } from "./useBotBroadcast";
+import { useMoveFeedback } from "./useMoveFeedback";
 import { useBots } from "./useBots";
 import { useEngine } from "./useEngine";
 
@@ -149,6 +152,8 @@ export function ComputerGame({ initialBotId }: { initialBotId?: string } = {}) {
     setRemote(null);
   };
 
+  const [prefs, updatePrefs] = usePrefs();
+  const feedback = useMoveFeedback(game ? { id: game.id, record: game.record, player: game.player } : null, prefs.feedback && !!game);
   useBotBroadcast(
     game
       ? { id: game.id, botId: game.bot.id, botName: game.bot.name, botRating: game.bot.rating, player: game.player, variant: game.record.variant === "chess960" ? "chess960" : "standard", initialFen: game.record.initialFen, moves: game.record.moves, end: end ? { result: end.result, how: end.how } : null }
@@ -164,6 +169,7 @@ export function ComputerGame({ initialBotId }: { initialBotId?: string } = {}) {
     const base = tc.initialMs;
     engine?.newGame();
     setNotice(null);
+    window.scrollTo({ top: 0 }); // the opponent list is long: start at the top of the board
     setGame({
       id: crypto.randomUUID(),
       watchable: s.watchable,
@@ -446,6 +452,7 @@ export function ComputerGame({ initialBotId }: { initialBotId?: string } = {}) {
           onMove={onMove}
         />
         <ClockBar label="You" ms={clockOf(game.player)} active={!end && view.turn === game.player} timed={timed} />
+        <MoveFeedbackBar feedback={feedback.latest} pending={feedback.pending} enabled={prefs.feedback} onToggle={() => updatePrefs({ feedback: !prefs.feedback })} hint="Make a move and I'll tell you how good it was." />
         <div className="flex flex-wrap gap-2">
           <button className={btn} onClick={takeback} disabled={!!end || !game.takebacks || plyCount < (game.player === "white" ? 1 : 2)}>Takeback</button>
           <button className={btn} onClick={offerDraw} disabled={!!end || plyCount < 2}>Offer draw</button>

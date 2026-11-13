@@ -18,9 +18,9 @@ const rnd = () => String(Math.floor(10000 + Math.random() * 89999));
   await a.waitForFunction(() => { const x = [...document.querySelectorAll('button')].find((y) => y.textContent === 'Play'); return x && !x.disabled; }, null, { timeout: 30000 });
   await a.click('button:text-is("Play")');
   await a.waitForSelector('.cg-wrap piece');
-  const box = await a.locator('.cg-wrap').boundingBox();
-  const sq = (f, r) => ({ x: box.x + (f + .5) * box.width / 8, y: box.y + (8 - r + .5) * box.height / 8 });
-  for (const [f, r] of [[4, 2], [4, 4]]) { const s = sq(f, r); await a.mouse.click(s.x, s.y); await a.waitForTimeout(250); }
+  // the page can re-flow after the board appears, so measure the board fresh for every click
+  const sq = async (f, r) => { const box = await a.locator('.cg-wrap').boundingBox(); return { x: box.x + (f + .5) * box.width / 8, y: box.y + (8 - r + .5) * box.height / 8 }; };
+  for (const [f, r] of [[4, 2], [4, 4]]) { const s = await sq(f, r); await a.mouse.click(s.x, s.y); await a.waitForTimeout(250); }
   await a.waitForFunction(() => document.querySelectorAll('ol[aria-label=Moves] button').length >= 2, null, { timeout: 40000 });
   console.log('OK   A is playing Der Mann');
 
@@ -34,7 +34,7 @@ const rnd = () => String(Math.floor(10000 + Math.random() * 89999));
   const before = await count();
   console.log('OK   B sees the board and', before, 'moves');
   // A keeps playing: Nf3
-  for (const [f1, r1, f2, r2] of [[6, 1, 5, 3]]) { const s1 = sq(f1, r1), s2 = sq(f2, r2); await a.mouse.click(s1.x, s1.y); await a.waitForTimeout(250); await a.mouse.click(s2.x, s2.y); }
+  for (const [f1, r1, f2, r2] of [[6, 1, 5, 3]]) { const s1 = await sq(f1, r1); await a.mouse.click(s1.x, s1.y); await a.waitForTimeout(250); const s2 = await sq(f2, r2); await a.mouse.click(s2.x, s2.y); }
   await b.waitForFunction((n) => document.querySelectorAll('ol[aria-label=Moves] button').length > n, before, { timeout: 20000 });
   console.log('OK   a new move appeared for B live');
   assert.equal(await b.locator('.cg-wrap piece').first().evaluate((e) => !!e.closest('.cg-wrap')), true);
