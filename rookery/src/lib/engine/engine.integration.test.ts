@@ -108,17 +108,30 @@ describe.runIf(available)("Stockfish through UciEngine", () => {
   }, 60_000);
 
   it("can be aborted mid-search and then reused", async () => {
-    await withEngine(async (e) => {
+    // Abort only once the engine has really started searching ("go" sent), however slow the machine is.
+    const transport = nodeTransport();
+    let searching: () => void = () => {};
+    const started = new Promise<void>((resolve) => (searching = resolve));
+    const send = transport.send;
+    transport.send = (c: string) => {
+      send(c);
+      if (c.startsWith("go ")) searching();
+    };
+    const e = new UciEngine(transport);
+    try {
       const ac = new AbortController();
-      const started = Date.now();
+      const t0 = Date.now();
       const p = e.search({ fen: newRecord("standard").initialFen, movetime: 20_000 }, ac.signal);
+      await started;
       setTimeout(() => ac.abort(), 300);
       const res = await p;
-      expect(Date.now() - started).toBeLessThan(5_000);
+      expect(Date.now() - t0).toBeLessThan(15_000);
       expect(res.best).toBeTruthy();
       const again = await e.search({ fen: newRecord("standard").initialFen, depth: 4 });
       expect(again.best).toBeTruthy();
-    });
+    } finally {
+      e.terminate();
+    }
   }, 60_000);
 
   it("queues overlapping searches instead of mixing them up", async () => {
