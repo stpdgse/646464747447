@@ -16,6 +16,9 @@ import { categoryOf, describeGameTime, formatDuration } from "@/lib/live/timecon
 import { clockLeft, deadlineLeft, needsTimeoutCheck, recordOf, sideOf, type GameRow, type Names, type Side } from "@/lib/live/types";
 import { createClient } from "@/lib/supabase/client";
 import { signed } from "@/lib/ratings";
+import { useMoveFeedback } from "@/components/computer/useMoveFeedback";
+import { MoveFeedbackBar } from "@/components/chess/MoveFeedbackBar";
+import { usePrefs } from "@/lib/prefs";
 import { useMoveSounds } from "@/components/useMoveSounds";
 import { ChatBox } from "@/components/social/ChatBox";
 import { ReportButton } from "@/components/social/ReportButton";
@@ -51,6 +54,11 @@ export function LiveGame({ initial, names, viewerId, isMod = false }: { initial:
   const view = useMemo(() => viewAt(record), [record]);
   const playing = row.status === "started";
   useMoveSounds(view.sans, row.status !== "started");
+  // Move feedback (an engine rating of your own moves) is only for casual games: in rated games it would be engine help.
+  const [prefs, updatePrefs] = usePrefs();
+  const feedbackAllowed = !row.rated && !!side;
+  const serverRecord = useMemo(() => recordOf(row), [row]);
+  const feedback = useMoveFeedback(feedbackAllowed && side ? { id: row.id, record: serverRecord, player: side } : null, prefs.feedback && feedbackAllowed);
 
   // ---- rating changes, shown once a rated game has finished -------------------------------------
   const finishedRated = row.status === "finished" && row.rated;
@@ -210,6 +218,11 @@ export function LiveGame({ initial, names, viewerId, isMod = false }: { initial:
           onMove={onMove}
         />
         <ClockBar label={labelOf(bottomSide)} ms={leftOf(bottomSide)} active={playing && view.turn === bottomSide} timed={!isDaily} note={noteFor(bottomSide)} />
+        {feedbackAllowed ? (
+          <MoveFeedbackBar feedback={feedback.latest} pending={feedback.pending} enabled={prefs.feedback} onToggle={() => updatePrefs({ feedback: !prefs.feedback })} hint="Make a move and I'll tell you how good it was." />
+        ) : side ? (
+          <p className="text-xs text-dim">Move feedback is only available in casual games, not rated ones.</p>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           <button className={btn} onClick={() => setFlipped((f) => !f)}>Flip</button>
           <button className={btn} onClick={() => setShowSettings((s) => !s)} aria-expanded={showSettings}>Appearance</button>
