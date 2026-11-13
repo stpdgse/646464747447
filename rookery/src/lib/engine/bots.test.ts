@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BOTS, BOT_TIERS, candidatesFor, chooseMove, getBot, type Bot, type MoveFeatures } from "./bots";
+import { BOTS, BOT_TIERS, botFromRow, mergeBots, setBotRegistry, smartnessToPlay, suggestRating, type CustomBotRow, candidatesFor, chooseMove, getBot, type Bot, type MoveFeatures } from "./bots";
 import { parseInfo, type Line } from "./uci";
 
 const line = (uci: string, cp: number, multipv: number): Line => ({ uci, cp, mate: null, depth: 10, multipv, pv: [uci] });
@@ -152,5 +152,81 @@ describe("bot roster", () => {
     expect(candidatesFor(getBot("max")!, 0)).toBe(3);
     expect(candidatesFor(getBot("max")!, 20)).toBe(1);
     expect(candidatesFor(getBot("pawnie")!, 0)).toBe(10);
+  });
+});
+
+const row = (over: Partial<CustomBotRow>): CustomBotRow => ({
+  id: "newbie", name: "Newbie", avatar: "🤖", avatar_image: null, rating: 1000, blurb: "b", greeting: "g", quip_win: "w", quip_lose: "l", quip_draw: "d",
+  smartness: 10, style: null, style_bonus: null, blunder_pct: null, mate_sight_pct: null, thinking_ms: null, special: false, hidden: false, ...over,
+});
+
+describe("smartness 0-24", () => {
+  it("gets stronger with every step: lower noise, deeper search, higher engine Elo", () => {
+    let prev = smartnessToPlay(0);
+    for (let s = 1; s <= 24; s++) {
+      const cur = smartnessToPlay(s);
+      expect(cur.human.temperature).toBeLessThanOrEqual(prev.human.temperature);
+      expect(cur.human.blunderRate).toBeLessThanOrEqual(prev.human.blunderRate);
+      expect(cur.human.mateSight).toBeGreaterThanOrEqual(prev.human.mateSight);
+      if (cur.engine.elo !== undefined) expect(cur.engine.elo).toBeGreaterThanOrEqual(prev.engine.elo ?? 0);
+      prev = cur;
+    }
+  });
+  it("0 is nearly random and never sees mate; 24 is the full engine", () => {
+    const dumb = smartnessToPlay(0);
+    expect(dumb.human.blunderRate).toBeGreaterThanOrEqual(0.9);
+    expect(dumb.human.mateSight).toBe(0);
+    const top = smartnessToPlay(24);
+    expect(top.engine.elo).toBeGreaterThanOrEqual(3000);
+    expect(top.human.blunderRate).toBe(0);
+  });
+  it("engine Elo stays within what Stockfish accepts and always has a limit to search by", () => {
+    for (let s = 0; s <= 24; s++) {
+      const p = smartnessToPlay(s);
+      if (p.engine.elo !== undefined) expect(p.engine.elo).toBeGreaterThanOrEqual(1320);
+      expect(p.engine.elo !== undefined ? p.engine.movetime !== undefined : p.engine.depth !== undefined).toBe(true);
+    }
+  });
+  it("clamps out-of-range levels and suggests a rating that rises with smartness", () => {
+    expect(smartnessToPlay(-5)).toEqual(smartnessToPlay(0));
+    expect(smartnessToPlay(99)).toEqual(smartnessToPlay(24));
+    for (let s = 1; s <= 24; s++) expect(suggestRating(s)).toBeGreaterThanOrEqual(suggestRating(s - 1));
+  });
+});
+
+describe("admin-made bots", () => {
+  it("builds a new bot from a row, with per-habit overrides on top of smartness", () => {
+    const bot = botFromRow(row({ smartness: 12, style: "greedy", style_bonus: 99, blunder_pct: 20, mate_sight_pct: 40, thinking_ms: 700 }))!;
+    expect(bot.human.style).toBe("greedy");
+    expect(bot.human.styleBonus).toBe(99);
+    expect(bot.human.blunderRate).toBeCloseTo(0.2);
+    expect(bot.human.mateSight).toBeCloseTo(0.4);
+    expect(bot.engine.movetime).toBe(700);
+    expect(bot.quips).toEqual({ win: "w", lose: "l", draw: "d" });
+  });
+  it("a brand-new bot without smartness is rejected; an override without it keeps the original strength", () => {
+    expect(botFromRow(row({ smartness: null }))).toBeNull();
+    const cam = getBot("cam")!;
+    const edited = botFromRow(row({ id: "cam", name: "Cam 2", smartness: null, rating: 1111 }), cam)!;
+    expect(edited.name).toBe("Cam 2");
+    expect(edited.rating).toBe(1111);
+    expect(edited.engine).toEqual(cam.engine);
+    expect(edited.human).toEqual(cam.human);
+  });
+  it("merges: overrides replace, additions appear, hidden bots vanish, sorted by rating", () => {
+    const merged = mergeBots(BOTS, [row({ id: "cam", name: "Changed Cam", smartness: null, rating: 5 }), row({ id: "pawnie", hidden: true, smartness: null }), row({ id: "zed", name: "Zed", rating: 2750 }), row({ id: "ghost", smartness: 3, hidden: true })]);
+    expect(merged.find((b) => b.id === "cam")!.name).toBe("Changed Cam");
+    expect(merged.some((b) => b.id === "pawnie")).toBe(false);
+    expect(merged.some((b) => b.id === "ghost")).toBe(false);
+    expect(merged.some((b) => b.id === "zed")).toBe(true);
+    expect(merged.length).toBe(BOTS.length);
+    for (let i = 1; i < merged.length; i++) expect(merged[i].rating).toBeGreaterThanOrEqual(merged[i - 1].rating);
+  });
+  it("getBot finds admin-made bots once the registry is set, and falls back to built-ins", () => {
+    setBotRegistry(mergeBots(BOTS, [row({ id: "zed", name: "Zed", rating: 2750 })]));
+    expect(getBot("zed")!.name).toBe("Zed");
+    expect(getBot("max")!.name).toBe("Master Max");
+    setBotRegistry(null);
+    expect(getBot("zed")).toBeUndefined();
   });
 });

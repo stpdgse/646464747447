@@ -9,7 +9,7 @@ import { MoveList } from "@/components/chess/MoveList";
 import { ScreenshotKey } from "@/components/chess/ScreenshotKey";
 import { useBoardSettings } from "@/components/chess/settings";
 import { viewAt } from "@/lib/chess/game";
-import { getBot } from "@/lib/engine/bots";
+import { useBots } from "@/components/computer/useBots";
 import { createClient } from "@/lib/supabase/client";
 
 export type BotGameRow = {
@@ -28,6 +28,7 @@ export function BotSpectator({ initial }: { initial: BotGameRow }) {
   const [flipped, setFlipped] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [now, setNow] = useState(0);
+  const allBots = useBots();
 
   const load = useCallback(async () => {
     setNow(Date.now());
@@ -59,7 +60,7 @@ export function BotSpectator({ initial }: { initial: BotGameRow }) {
 
   if (!view) return <p className="text-dim">This game can&apos;t be shown.</p>;
 
-  const bot = getBot(row.bot_id);
+  const bot = allBots.find((b) => b.id === row.bot_id);
   const playerName = row.player?.username ?? "Player";
   const orientation = flipped ? (row.player_color === "white" ? "black" : "white") : row.player_color;
   const botSide = row.player_color === "white" ? "black" : "white";

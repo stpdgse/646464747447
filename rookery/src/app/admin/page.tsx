@@ -22,6 +22,6 @@ async function Loader({ searchParams }: { searchParams: PageProps<"/admin">["sea
   if (!me || !(me.is_admin || me.is_moderator)) notFound();
   const sp = await searchParams;
   const one = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
-  const tab = (["reports", "fairplay", "users", "log"] as const).find((t) => t === one("tab")) ?? "reports";
+  const tab = (["reports", "fairplay", "users", "bots", "log"] as const).find((t) => t === one("tab")) ?? "reports";
   return <AdminPanel initialTab={tab} initialGame={one("game")} initialUser={one("user")} isAdmin={me.is_admin} />;
 }

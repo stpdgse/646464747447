@@ -304,7 +304,103 @@ export const BOT_TIERS = [
 ] as const;
 
 export const BOT_IDS = BOTS.map((b) => b.id);
-export const getBot = (id: string): Bot | undefined => BOTS.find((b) => b.id === id);
+/**
+ * The bots currently on offer: the built-in roster plus whatever admins added or changed. Set by `setBotRegistry` once the
+ * custom bots have loaded; until then (and in tests) it is just the built-in roster.
+ */
+let registry: Bot[] | null = null;
+export const setBotRegistry = (list: Bot[] | null) => {
+  registry = list;
+};
+export const getBot = (id: string): Bot | undefined => (registry ?? BOTS).find((b) => b.id === id) ?? BOTS.find((b) => b.id === id);
+
+// ---------------------------------------------------------------------------------------------- smartness 0-24
+
+export const SMARTNESS_MAX = 24;
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
+
+/**
+ * One slider for playing strength. 0 plays almost random moves and never sees a mate; 24 is the full engine.
+ * 1-5 beginner, 6-10 casual, 11-13 club, 14-24 real engine at an Elo from about 1350 up to 3050 (UCI_Elo).
+ */
+export function smartnessToPlay(level: number): Pick<Bot, "engine" | "human"> {
+  const s = Math.max(0, Math.min(SMARTNESS_MAX, Math.round(level)));
+  const base = { style: "balanced" as Style, styleBonus: 0 };
+  if (s === 0) return { engine: { depth: 1, multipv: 10 }, human: { ...base, temperature: 5000, blunderRate: 0.9, mateSight: 0 } };
+  if (s <= 5) {
+    const t = (s - 1) / 4;
+    return { engine: { depth: 1, multipv: Math.round(lerp(10, 8, t)) }, human: { ...base, temperature: Math.round(lerp(300, 150, t)), blunderRate: +lerp(0.25, 0.15, t).toFixed(2), mateSight: +lerp(0.3, 0.6, t).toFixed(2) } };
+  }
+  if (s <= 10) {
+    const t = (s - 6) / 4;
+    return { engine: { depth: Math.round(lerp(2, 4, t)), multipv: 6 }, human: { ...base, temperature: Math.round(lerp(150, 60, t)), blunderRate: +lerp(0.15, 0.06, t).toFixed(2), mateSight: +lerp(0.6, 0.9, t).toFixed(2) } };
+  }
+  if (s <= 13) {
+    const t = (s - 11) / 2;
+    return { engine: { depth: Math.round(lerp(5, 8, t)), multipv: 4 }, human: { ...base, temperature: Math.round(lerp(40, 12, t)), blunderRate: +lerp(0.06, 0.02, t).toFixed(2), mateSight: +lerp(0.9, 1, t).toFixed(2) } };
+  }
+  const t = clamp01((s - 14) / 10);
+  return {
+    engine: { elo: Math.round(lerp(1350, 3050, t)), movetime: Math.round(lerp(300, 1300, t)), multipv: s < 17 ? 3 : s < 20 ? 2 : 1 },
+    human: { ...base, temperature: Math.round(lerp(10, 0, t)), blunderRate: 0, mateSight: 1 },
+  };
+}
+
+/** A sensible "rating" label for a smartness level (the label is only shown, strength comes from smartness). */
+export const suggestRating = (level: number): number => {
+  const pts: [number, number][] = [[0, 100], [5, 600], [10, 1000], [14, 1400], [19, 2200], [24, 3000]];
+  const s = Math.max(0, Math.min(SMARTNESS_MAX, level));
+  for (let i = 1; i < pts.length; i++) if (s <= pts[i][0]) return Math.round(lerp(pts[i - 1][1], pts[i][1], (s - pts[i - 1][0]) / (pts[i][0] - pts[i - 1][0])) / 10) * 10;
+  return 3000;
+};
+
+// ---------------------------------------------------------------------------------------------- admin-made bots
+
+/** A row of public.custom_bots. */
+export type CustomBotRow = {
+  id: string; name: string; avatar: string; avatar_image: string | null; rating: number; blurb: string; greeting: string;
+  quip_win: string; quip_lose: string; quip_draw: string; smartness: number | null; style: Style | null; style_bonus: number | null;
+  blunder_pct: number | null; mate_sight_pct: number | null; thinking_ms: number | null; special: boolean; hidden: boolean;
+};
+
+/** Build a bot from an admin's row, on top of the built-in bot with the same id (if any). */
+export function botFromRow(row: CustomBotRow, base?: Bot): Bot | null {
+  let play: Pick<Bot, "engine" | "human"> | null = null;
+  if (row.smartness !== null) play = smartnessToPlay(row.smartness);
+  else if (base) play = { engine: { ...base.engine }, human: { ...base.human } };
+  if (!play) return null; // a brand-new bot needs a smartness level
+  const human = { ...play.human };
+  if (row.style) human.style = row.style;
+  if (row.style_bonus !== null) human.styleBonus = row.style_bonus;
+  if (row.blunder_pct !== null) human.blunderRate = row.blunder_pct / 100;
+  if (row.mate_sight_pct !== null) human.mateSight = row.mate_sight_pct / 100;
+  const engine = { ...play.engine };
+  if (row.thinking_ms !== null) engine.movetime = row.thinking_ms; // a depth-limited bot also respects the time cap
+  return {
+    id: row.id, name: row.name, avatar: row.avatar, avatarImage: row.avatar_image ?? base?.avatarImage, rating: row.rating,
+    blurb: row.blurb, greeting: row.greeting, quips: { win: row.quip_win, lose: row.quip_lose, draw: row.quip_draw },
+    special: row.special || undefined, engine, human,
+  };
+}
+
+/** Built-in roster with admin overrides and additions applied, hidden bots removed, strongest last. */
+export function mergeBots(builtin: Bot[], rows: CustomBotRow[]): Bot[] {
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  const out: Bot[] = [];
+  for (const b of builtin) {
+    const row = byId.get(b.id);
+    if (!row) out.push(b);
+    else if (!row.hidden) out.push(botFromRow(row, b) ?? b);
+  }
+  const known = new Set(builtin.map((b) => b.id));
+  for (const r of rows) {
+    if (known.has(r.id) || r.hidden) continue;
+    const bot = botFromRow(r);
+    if (bot) out.push(bot);
+  }
+  return out.sort((a, b) => a.rating - b.rating);
+}
 
 export type MoveFeatures = { capture: boolean; check: boolean; promotion: boolean };
 

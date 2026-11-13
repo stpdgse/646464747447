@@ -42,10 +42,16 @@ describe("saving a bot game", () => {
     const g = game(["e2e4"], { startedAt: 1_000_000 });
     expect(snapshot(g, 1_090_000).clocks).toEqual({ white: 300_000, black: 300_000 });
   });
+  it("restores from the bot saved inside the game, so a bot an admin changed or deleted still works", () => {
+    const g = game(["e2e4"]);
+    const custom = { ...g.bot, id: "gone", name: "Deleted Bot" };
+    const back = restore(snapshot({ ...g, bot: custom }, 1), 2)!;
+    expect(back.bot.name).toBe("Deleted Bot");
+  });
   it("refuses a corrupt save", () => {
     const snap = snapshot(game(["e2e4"]), 1);
     expect(restore({ ...snap, moves: ["e2e5"] }, 2)).toBeNull();
-    expect(restore({ ...snap, botId: "nobody" }, 2)).toBeNull();
+    expect(restore({ ...snap, bot: undefined, botId: "nobody" }, 2)).toBeNull();
     expect(restore({ ...snap, tcId: "99+99" }, 2)).toBeNull();
   });
 });

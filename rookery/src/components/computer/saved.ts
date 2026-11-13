@@ -1,5 +1,5 @@
 import { viewAt, type GameRecord } from "@/lib/chess/game";
-import { getBot } from "@/lib/engine/bots";
+import { getBot, type Bot } from "@/lib/engine/bots";
 import { remaining, TIME_CONTROLS, type Clocks, type Side } from "./clock";
 import type { End, Game } from "./ComputerGame";
 
@@ -16,6 +16,8 @@ export type SavedGame = {
   id: string;
   watchable: boolean;
   botId: string;
+  /** The whole bot, so a game against an admin-made bot (or one that was changed since) restores exactly as it was, even offline. */
+  bot?: Bot;
   player: Side;
   variant: "standard" | "chess960";
   initialFen: string;
@@ -45,7 +47,7 @@ export function snapshot(g: Game, now: number): SavedGame {
     }
   }
   return {
-    v: 1, id: g.id, watchable: g.watchable, botId: g.bot.id, player: g.player, variant: g.record.variant === "chess960" ? "chess960" : "standard",
+    v: 1, id: g.id, watchable: g.watchable, botId: g.bot.id, bot: g.bot, player: g.player, variant: g.record.variant === "chess960" ? "chess960" : "standard",
     initialFen: g.record.initialFen, moves: g.record.moves, tcId: g.tc.id, takebacks: g.takebacks, clocks, end: g.end, botEval: g.botEval,
     startDate: g.startDate, savedAt: now,
   };
@@ -53,7 +55,7 @@ export function snapshot(g: Game, now: number): SavedGame {
 
 /** Rebuild a playable game from a save, or null if it is not valid any more. The clock restarts now. */
 export function restore(s: SavedGame, now: number): Game | null {
-  const bot = getBot(s.botId);
+  const bot = s.bot ?? getBot(s.botId);
   const tc = TIME_CONTROLS.find((t) => t.id === s.tcId);
   if (!bot || !tc) return null;
   const record: GameRecord = { variant: s.variant, initialFen: s.initialFen, moves: s.moves };

@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { REPORT_REASONS, USERNAME_RE, fmtDate, friendlyError, isFuture, ui } from "@/lib/social";
+import { BotsAdmin } from "./BotsAdmin";
 import { FairplayTab } from "./FairplayTab";
 
-type Tab = "reports" | "fairplay" | "users" | "log";
-const TABS: { id: Tab; label: string }[] = [
-  { id: "reports", label: "Reports" }, { id: "fairplay", label: "Fair play" }, { id: "users", label: "Users" }, { id: "log", label: "Audit log" },
+type Tab = "reports" | "fairplay" | "users" | "bots" | "log";
+const TABS: { id: Tab; label: string; adminOnly?: boolean }[] = [
+  { id: "reports", label: "Reports" }, { id: "fairplay", label: "Fair play" }, { id: "users", label: "Users" }, { id: "bots", label: "Bots", adminOnly: true }, { id: "log", label: "Audit log" },
 ];
 
 export function AdminPanel({ initialTab, initialGame, initialUser, isAdmin }: { initialTab: Tab; initialGame: string; initialUser: string; isAdmin: boolean }) {
@@ -16,7 +17,7 @@ export function AdminPanel({ initialTab, initialGame, initialUser, isAdmin }: { 
   return (
     <div className="grid min-w-0 gap-6">
       <div role="tablist" aria-label="Admin sections" className="flex flex-wrap gap-2">
-        {TABS.map((t) => (
+        {TABS.filter((t) => isAdmin || !t.adminOnly).map((t) => (
           <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}
             className={`rounded-md px-4 py-2 text-sm font-semibold ${tab === t.id ? "bg-brand text-brand-ink" : "border border-line bg-surface hover:bg-surface-2"}`}>{t.label}</button>
         ))}
@@ -24,6 +25,7 @@ export function AdminPanel({ initialTab, initialGame, initialUser, isAdmin }: { 
       {tab === "reports" && <Reports isAdmin={isAdmin} />}
       {tab === "fairplay" && <FairplayTab initialGame={initialGame} />}
       {tab === "users" && <Users initialUser={initialUser} isAdmin={isAdmin} />}
+      {tab === "bots" && isAdmin && <BotsAdmin />}
       {tab === "log" && <Log />}
     </div>
   );
