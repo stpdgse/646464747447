@@ -11,6 +11,8 @@ export type Bot = {
   id: string;
   name: string;
   avatar: string;
+  /** Optional pixel-art portrait (a path under /public) shown instead of the emoji. */
+  avatarImage?: string;
   /** Rough playing strength. Bots are tuned by feel, not calibrated against a rating pool. */
   rating: number;
   blurb: string;
@@ -34,6 +36,14 @@ export type Bot = {
 };
 
 export const BOTS: Bot[] = [
+  {
+    id: "dermann", name: "Der Mann", avatar: "🧔", avatarImage: "/bots/dermann.png", rating: 51, special: true,
+    blurb: "Just Der Mann. Knows the pieces move. Not where, not why. The weakest bot there is.",
+    greeting: "Ich bin Der Mann. Which one is the horse?",
+    quips: { win: "Der Mann hat gewonnen?! Das war ein Versehen.", lose: "Ja. Das habe ich erwartet.", draw: "Unentschieden. Der Mann weiß nicht, wie." },
+    engine: { depth: 1, multipv: 10 },
+    human: { temperature: 5000, blunderRate: 0.9, style: "chaotic", styleBonus: 400, mateSight: 0 },
+  },
   {
     id: "pawnie", name: "Pawnie", avatar: "🐣", rating: 400,
     blurb: "Just learned how the pieces move. Loves hanging them.",
@@ -272,6 +282,14 @@ export const BOTS: Bot[] = [
     greeting: "…",
     quips: { win: "…", lose: "…", draw: "…" },
     engine: { movetime: 1200, multipv: 1 },
+    human: { temperature: 0, blunderRate: 0, style: "balanced", styleBonus: 0, mateSight: 1 },
+  },
+  {
+    id: "ruedenrache", name: "Der Mann (Rüdenrache)", avatar: "🐺", avatarImage: "/bots/ruedenrache.png", rating: 4000, special: true,
+    blurb: "Der Mann came back for revenge. Full engine power and no mercy at all.",
+    greeting: "Der Mann ist zurück. Diesmal ist es persönlich.",
+    quips: { win: "Rüdenrache. Süß.", lose: "Unmöglich. Mach einen Screenshot (Taste S).", draw: "Remis. Der Mann kommt wieder." },
+    engine: { movetime: 2500, multipv: 1 },
     human: { temperature: 0, blunderRate: 0, style: "balanced", styleBonus: 0, mateSight: 1 },
   },
 ];
