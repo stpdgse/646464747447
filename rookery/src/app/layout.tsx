@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { ResumeBanner } from "@/components/ResumeBanner";
 import { SanctionBanner } from "@/components/SanctionBanner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -33,6 +35,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ServiceWorker />
         <SiteHeader />
         <Suspense fallback={null}><SanctionBanner /></Suspense>
+        <OfflineBanner />
+        <Suspense fallback={null}><ResumeBanner /></Suspense>
         <main id="main" tabIndex={-1} className="mx-auto outline-none w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
         <SiteFooter />
       </body>

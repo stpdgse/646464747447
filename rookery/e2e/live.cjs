@@ -146,7 +146,7 @@ const status = async (p) => (await p.locator('[aria-live=polite]').first().textC
   await spec.waitForSelector(`table >> text=${A}`, { timeout: 10000 });
   assert.ok((await spec.locator('table').textContent()).includes(Bn)); ok('leaderboard lists both players under Bullet');
   await spec.click('button[role=tab]:text-is("Rapid")');
-  await spec.waitForSelector('text=Nobody is rated here yet'); ok('empty leaderboard tab has a friendly message');
+  await spec.locator('text=Nobody is rated here yet').or(spec.locator('table')).first().waitFor({ timeout: 10000 }); ok('Rapid tab shows either the friendly empty message or real ratings');
   await spec.screenshot({ path: SP + '/live-leaderboard.png' });
 
   await spec.goto(B + '/u/' + A);

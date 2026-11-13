@@ -23,6 +23,8 @@ export type Broadcast = {
  */
 export function useBotBroadcast(game: Broadcast | null, enabled: boolean) {
   const [uid, setUid] = useState<string | null>(null);
+  // Bumped when the connection returns, so moves played offline are published right away.
+  const [resync, setResync] = useState(0);
   const created = useRef(new Set<string>());
   const finished = useRef(new Set<string>());
   const chain = useRef<Promise<unknown>>(Promise.resolve());
@@ -30,6 +32,9 @@ export function useBotBroadcast(game: Broadcast | null, enabled: boolean) {
 
   useEffect(() => {
     createClient().auth.getSession().then(({ data }) => setUid(data.session?.user.id ?? null)).catch(() => {});
+    const onOnline = () => setResync((n) => n + 1);
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
   }, []);
 
   const id = game?.id ?? null;
@@ -58,7 +63,8 @@ export function useBotBroadcast(game: Broadcast | null, enabled: boolean) {
           id, player_id: uid, bot_id: game.botId, bot_name: game.botName, bot_rating: game.botRating,
           player_color: game.player, variant: game.variant, initial_fen: game.initialFen, moves: game.moves, status: "playing",
         });
-        if (error) {
+        // 23505 = already published (a restored game): carry on and update it.
+        if (error && error.code !== "23505") {
           created.current.delete(id);
           return;
         }
@@ -73,5 +79,5 @@ export function useBotBroadcast(game: Broadcast | null, enabled: boolean) {
     });
     // `game` itself changes every tick (clocks); only moves and the result matter here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uid, enabled, id, movesKey, endKey]);
+  }, [uid, enabled, id, movesKey, endKey, resync]);
 }
