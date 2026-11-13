@@ -6,6 +6,7 @@ import { VARIANTS, type Variant } from "@/lib/chess/variants";
 import { describeGameTime } from "@/lib/live/timecontrols";
 import { plural } from "@/lib/ratings";
 import { createClient } from "@/lib/supabase/client";
+import { BotGameList } from "./BotGameList";
 
 type Item = {
   id: string; variant: Variant; status: string; result: string | null; moves: string[]; time_initial_ms: number; time_inc_ms: number; mode: "live" | "daily"; days_per_move: number | null;
@@ -51,6 +52,7 @@ export function WatchList() {
 
   return (
     <div className="grid gap-8">
+      <BotGameList />
       <section aria-labelledby="live" className="grid gap-3">
         <h2 id="live" className="text-xl font-bold">Live now</h2>
         {live === null ? <div className="h-20 animate-pulse rounded-xl bg-surface" /> : live.length === 0 ? (

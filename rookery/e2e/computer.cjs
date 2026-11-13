@@ -79,6 +79,8 @@ const ok = (m) => console.log('OK  ', ++step, m);
   assert.notEqual(c1, c2); ok('your clock counts down');
 
   // --- game 3: Chess960 vs Cam
+  // an unfinished game is now restored on return, so clear the save to get the setup screen
+  await p.click('button:text-is("Resign")'); await p.click('button:has-text("New opponent")');
   await p.goto(B + '/play/computer'); await p.waitForSelector('[role=radiogroup]');
   await p.click('[role=radio]:has-text("Casual Cam")');
   await p.selectOption('select >> nth=0', 'white');

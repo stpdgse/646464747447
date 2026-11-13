@@ -63,10 +63,14 @@ export function useLiveGame(initial: GameRow) {
     const timer = setInterval(() => document.visibilityState === "visible" && poll(), every);
     const onVisible = () => document.visibilityState === "visible" && poll();
     document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("online", poll);
+    window.addEventListener("focus", onVisible);
     return () => {
       dead = true;
       clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("online", poll);
+      window.removeEventListener("focus", onVisible);
     };
   }, [connection, id, merge, row.status]);
 

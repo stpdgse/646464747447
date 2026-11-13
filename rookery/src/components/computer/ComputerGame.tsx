@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Board } from "@/components/chess/Board";
 import { BoardSettingsPanel } from "@/components/chess/BoardSettingsPanel";
 import { ScreenshotKey } from "@/components/chess/ScreenshotKey";
@@ -22,13 +22,19 @@ import { BOTS, BOT_TIERS, candidatesFor, chooseMove, getBot, type Bot } from "@/
 import { ClockBar } from "@/components/chess/ClockBar";
 import { afterMove, clocksRunning, remaining, TIME_CONTROLS, type Clocks, type Side, type TimeControl } from "./clock";
 import { useMoveSounds } from "@/components/useMoveSounds";
+import { createClient } from "@/lib/supabase/client";
+import { clearSaved, loadSaved, restore, snapshot, writeSaved } from "./saved";
+import { useBotBroadcast } from "./useBotBroadcast";
 import { useEngine } from "./useEngine";
 
 const EMPTY_SANS: string[] = [];
 
-type Setup = { botId: string; color: Side | "random"; variant: "standard" | "chess960"; timeId: string; takebacks: boolean };
-type End = { result: Result; how: "checkmate" | "stalemate" | "insufficient" | "fifty" | "threefold" | "variant" | "resignation" | "timeout" | "agreement" };
-type Game = {
+type Setup = { botId: string; color: Side | "random"; variant: "standard" | "chess960"; timeId: string; takebacks: boolean; watchable: boolean };
+export type End = { result: Result; how: "checkmate" | "stalemate" | "insufficient" | "fifty" | "threefold" | "variant" | "resignation" | "timeout" | "agreement" };
+export type Game = {
+  /** Identifies this game for spectating. */
+  id: string;
+  watchable: boolean;
   bot: Bot;
   player: Side;
   record: GameRecord;
@@ -43,7 +49,7 @@ type Game = {
   startDate: string;
 };
 
-const DEFAULT_SETUP: Setup = { botId: "cam", color: "random", variant: "standard", timeId: "unlimited", takebacks: true };
+const DEFAULT_SETUP: Setup = { botId: "cam", color: "random", variant: "standard", timeId: "unlimited", takebacks: true, watchable: true };
 
 const HOW: Record<End["how"], string> = {
   checkmate: "by checkmate",
@@ -79,6 +85,74 @@ export function ComputerGame() {
     [game, view],
   );
   const botToMove = !!game && !!view && !end && view.turn !== game.player;
+  // ---- keep the game safe: save after every change, restore on the way back in -----------------
+  const latest = useRef<Game | null>(null);
+  useEffect(() => {
+    latest.current = game;
+    if (game) writeSaved(snapshot(game, Date.now()));
+  }, [game]);
+  useEffect(() => {
+    const flush = () => latest.current && writeSaved(snapshot(latest.current, Date.now()));
+    const onHide = () => document.visibilityState === "hidden" && flush();
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", flush);
+    return () => {
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", flush);
+    };
+  }, []);
+  useEffect(() => {
+    queueMicrotask(() => {
+      const saved = loadSaved(Date.now());
+      if (!saved || saved.end) return;
+      const g = restore(saved, Date.now());
+      if (!g) return;
+      setGame(g);
+      setNotice(`Welcome back. Your game against ${g.bot.name} was restored${g.tc.initialMs > 0 ? " (the clocks were paused while you were away)" : ""}.`);
+    });
+  }, []);
+
+  // Same account on another device (or cleared storage): the published copy of an unfinished game can be continued.
+  const [remote, setRemote] = useState<{ id: string; bot_id: string; bot_name: string; player_color: Side; variant: "standard" | "chess960"; initial_fen: string; moves: string[] } | null>(null);
+  useEffect(() => {
+    if (game) return;
+    let dead = false;
+    (async () => {
+      const supabase = createClient();
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user.id;
+      if (!uid || dead || loadSaved(Date.now())) return;
+      const since = new Date(Date.now() - 24 * 3600_000).toISOString();
+      const { data } = await supabase.from("bot_games").select("id, bot_id, bot_name, player_color, variant, initial_fen, moves")
+        .eq("player_id", uid).eq("status", "playing").gt("updated_at", since).order("updated_at", { ascending: false }).limit(1);
+      if (!dead) setRemote((data?.[0] as typeof remote) ?? null);
+    })().catch(() => {});
+    return () => {
+      dead = true;
+    };
+  }, [game]);
+  const continueRemote = () => {
+    if (!remote) return;
+    const bot = getBot(remote.bot_id);
+    const tc = TIME_CONTROLS[0];
+    if (!bot) return;
+    const record: GameRecord = { variant: remote.variant, initialFen: remote.initial_fen, moves: remote.moves };
+    try {
+      viewAt(record);
+    } catch {
+      return;
+    }
+    setNotice(`Continuing your game against ${bot.name} (no clock).`);
+    setGame({ id: remote.id, watchable: true, bot, player: remote.player_color, record, tc, takebacks: true, clocks: { white: 0, black: 0 }, startedAt: Date.now(), end: null, botEval: null, startDate: new Date().toISOString().slice(0, 10).replaceAll("-", ".") });
+    setRemote(null);
+  };
+
+  useBotBroadcast(
+    game
+      ? { id: game.id, botId: game.bot.id, botName: game.bot.name, botRating: game.bot.rating, player: game.player, variant: game.record.variant === "chess960" ? "chess960" : "standard", initialFen: game.record.initialFen, moves: game.record.moves, end: end ? { result: end.result, how: end.how } : null }
+      : null,
+    !!game?.watchable,
+  );
 
   // ---- start a game ----------------------------------------------------------------------------
   const start = (s: Setup) => {
@@ -89,6 +163,8 @@ export function ComputerGame() {
     engine?.newGame();
     setNotice(null);
     setGame({
+      id: crypto.randomUUID(),
+      watchable: s.watchable,
       bot,
       player,
       record: newRecord(s.variant),
@@ -267,6 +343,12 @@ export function ComputerGame() {
     const bot = getBot(setup.botId) ?? BOTS[0];
     return (
       <div className="grid gap-6">
+        {remote && (
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-brand bg-brand/10 px-4 py-3">
+            <span className="font-semibold">You have an unfinished game against {remote.bot_name} ({Math.ceil(remote.moves.length / 2)} moves).</span>
+            <button onClick={continueRemote} className="rounded-md bg-brand px-3 py-1.5 text-sm font-semibold text-brand-ink hover:bg-brand-hi">Continue</button>
+          </div>
+        )}
         <div role="radiogroup" aria-label="Choose your opponent" className="grid gap-6">
           {BOT_TIERS.map((tier) => (
             <section key={tier.label} aria-label={tier.label} className="grid gap-3">
@@ -281,7 +363,7 @@ export function ComputerGame() {
                     className={`grid gap-1 rounded-xl border p-4 text-left transition ${setup.botId === b.id ? "border-brand bg-brand/10" : b.special ? "border-warn bg-surface hover:bg-surface-2" : "border-line bg-surface hover:bg-surface-2"}`}
                   >
                     {b.avatarImage ? <img src={b.avatarImage} alt="" width={48} height={48} className="size-12 rounded-md [image-rendering:pixelated]" /> : <span className="text-3xl" aria-hidden>{b.avatar}</span>}
-                    <span className="font-bold">{b.name}{b.special && <span className="ml-2 rounded bg-warn/20 px-1.5 py-0.5 text-[10px] font-bold uppercase text-warn">Special</span>}</span>
+                    <span className="font-bold">{b.name}{b.special && <span className="ml-2 rounded bg-warn/30 px-1.5 py-0.5 text-[10px] font-bold uppercase text-ink">Special</span>}</span>
                     <span className="text-xs font-semibold text-brand">≈ {b.rating}</span>
                     <span className="text-xs text-dim">{b.blurb}</span>
                   </button>
@@ -320,6 +402,10 @@ export function ComputerGame() {
             <label className="flex items-center gap-2 self-end pb-2 text-sm">
               <input type="checkbox" checked={setup.takebacks} onChange={(e) => setSetup({ ...setup, takebacks: e.target.checked })} className="size-4 accent-[var(--brand)]" />
               Allow takebacks
+            </label>
+            <label className="flex items-center gap-2 text-sm sm:col-span-2">
+              <input type="checkbox" checked={setup.watchable} onChange={(e) => setSetup({ ...setup, watchable: e.target.checked })} className="size-4 accent-[var(--brand)]" />
+              Let classmates watch this game (needs a login, shows on the Watch page)
             </label>
           </div>
           <p className="text-xs text-dim">King of the Hill and Three-check are for the analysis board and live games: the computer only plays standard chess and Chess960.</p>
@@ -395,7 +481,7 @@ export function ComputerGame() {
             {plyCount >= 2 && <button className={btn} onClick={() => analyse(true)}>Review with engine</button>}
             <button className={btn} onClick={() => analyse(false)}>Analyse</button>
             <button className={btn} onClick={download}>Download PGN</button>
-            <button className={btn} onClick={() => setGame(null)}>New opponent</button>
+            <button className={btn} onClick={() => { clearSaved(); setGame(null); }}>New opponent</button>
           </div>
         ) : (
           <p className="text-xs text-dim">Playing {game.record.variant === "chess960" ? "Chess960" : "standard chess"} against {game.bot.name} (≈ {game.bot.rating}).</p>
