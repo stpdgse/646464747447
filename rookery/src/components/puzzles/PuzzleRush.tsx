@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { announceProgress } from "@/lib/progress";
 import { finishRush, moreRushPuzzles, startRush } from "@/app/actions/puzzles";
 import { Board } from "@/components/chess/Board";
 import { useBoardSettings } from "@/components/chess/settings";
@@ -64,7 +65,10 @@ export function PuzzleRush({ signedIn, best }: { signedIn: boolean; best: number
     const res = await finishRush(session.current, finalScore);
     if (!res.ok) setOutcome({ kind: "error", text: res.error });
     else if ("rejected" in res) setOutcome({ kind: "rejected" });
-    else setOutcome({ kind: "saved", best: res.best });
+    else {
+      setOutcome({ kind: "saved", best: res.best });
+      announceProgress();
+    }
   }, [signedIn]);
 
   const begin = async () => {

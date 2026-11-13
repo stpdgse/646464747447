@@ -26,6 +26,7 @@ import { createClient } from "@/lib/supabase/client";
 import { clearSaved, loadSaved, restore, snapshot, writeSaved } from "./saved";
 import { MoveFeedbackBar } from "@/components/chess/MoveFeedbackBar";
 import { usePrefs } from "@/lib/prefs";
+import { announceProgress } from "@/lib/progress";
 import { useBotBroadcast } from "./useBotBroadcast";
 import { useMoveFeedback } from "./useMoveFeedback";
 import { useBots } from "./useBots";
@@ -153,6 +154,10 @@ export function ComputerGame({ initialBotId }: { initialBotId?: string } = {}) {
   };
 
   const [prefs, updatePrefs] = usePrefs();
+  const ended = !!end;
+  useEffect(() => {
+    if (ended) announceProgress();
+  }, [ended]);
   const feedback = useMoveFeedback(game ? { id: game.id, record: game.record, player: game.player } : null, prefs.feedback && !!game);
   useBotBroadcast(
     game

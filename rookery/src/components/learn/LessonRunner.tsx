@@ -9,6 +9,7 @@ import { canonical } from "@/lib/puzzles/solve";
 import { needsPromotion, tryUci, viewAt, type GameRecord, type PromotionRole } from "@/lib/chess/game";
 import { afterOpponentOpening, judgeMove, puzzleStart, solutionMoves, type ClientPuzzle } from "@/lib/puzzles/solve";
 import type { Step } from "@/lib/lessons/lessons";
+import { announceProgress } from "@/lib/progress";
 import { createClient } from "@/lib/supabase/client";
 
 export type LessonItem = { id: string; puzzle?: ClientPuzzle; step?: Step };
@@ -73,6 +74,7 @@ export function LessonRunner({ lesson, items, done: initialDone, viewerId, next 
     setDoneSet((s) => new Set(s).add(id));
     if (!viewerId) return;
     await createClient().from("lesson_progress").insert({ user_id: viewerId, lesson_id: lesson.id, item_id: id });
+    announceProgress();
   }, [viewerId, lesson.id]);
 
   const view = useMemo(() => (record ? viewAt(record) : null), [record]);

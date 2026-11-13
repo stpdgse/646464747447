@@ -8,6 +8,7 @@ import { useBoardSettings } from "@/components/chess/settings";
 import { useEngine } from "@/components/computer/useEngine";
 import { needsPromotion, tryMove, tryUci, viewAt, type GameRecord, type PromotionRole } from "@/lib/chess/game";
 import type { Endgame } from "@/lib/lessons/lessons";
+import { announceProgress } from "@/lib/progress";
 import { createClient } from "@/lib/supabase/client";
 
 const btn = "rounded-md border border-line bg-surface px-3 py-1.5 text-sm font-medium hover:bg-surface-2 disabled:opacity-40";
@@ -42,6 +43,7 @@ export function EndgameTrainer({ endgame, viewerId, done, next }: { endgame: End
     if (viewerId && !saved) {
       setSaved(true);
       await createClient().from("lesson_progress").insert({ user_id: viewerId, lesson_id: "endgames", item_id: endgame.id });
+      announceProgress();
     }
   }, [viewerId, saved, endgame.id]);
 
