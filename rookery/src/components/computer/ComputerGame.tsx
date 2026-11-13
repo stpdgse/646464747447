@@ -280,7 +280,7 @@ export function ComputerGame() {
                     onClick={() => setSetup({ ...setup, botId: b.id })}
                     className={`grid gap-1 rounded-xl border p-4 text-left transition ${setup.botId === b.id ? "border-brand bg-brand/10" : b.special ? "border-warn bg-surface hover:bg-surface-2" : "border-line bg-surface hover:bg-surface-2"}`}
                   >
-                    <span className="text-3xl" aria-hidden>{b.avatar}</span>
+                    {b.avatarImage ? <img src={b.avatarImage} alt="" width={48} height={48} className="size-12 rounded-md [image-rendering:pixelated]" /> : <span className="text-3xl" aria-hidden>{b.avatar}</span>}
                     <span className="font-bold">{b.name}{b.special && <span className="ml-2 rounded bg-warn/20 px-1.5 py-0.5 text-[10px] font-bold uppercase text-warn">Special</span>}</span>
                     <span className="text-xs font-semibold text-brand">≈ {b.rating}</span>
                     <span className="text-xs text-dim">{b.blurb}</span>
@@ -347,7 +347,7 @@ export function ComputerGame() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,640px)_minmax(0,1fr)]">
       <div className="grid min-w-0 grid-cols-1 content-start gap-3">
-        <ClockBar label={game.bot.name} avatar={game.bot.avatar} ms={clockOf(opponent)} active={!end && view.turn === opponent} timed={timed} thinking={botToMove} />
+        <ClockBar label={game.bot.name} avatar={game.bot.avatar} avatarImage={game.bot.avatarImage} ms={clockOf(opponent)} active={!end && view.turn === opponent} timed={timed} thinking={botToMove} />
         <Board
           view={view}
           variant={game.record.variant}

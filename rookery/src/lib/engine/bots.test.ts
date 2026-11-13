@@ -133,6 +133,14 @@ describe("bot roster", () => {
     }
     for (const b of BOTS) expect(BOT_TIERS.filter((t) => b.rating >= t.min && b.rating < t.max)).toHaveLength(1);
   });
+  it("has Der Mann at 51 (the weakest) and Der Mann (Rüdenrache) at 4000 (the strongest)", () => {
+    expect(BOTS[0].id).toBe("dermann");
+    expect(BOTS[0].rating).toBe(51);
+    expect(BOTS[0].avatarImage).toBe("/bots/dermann.png");
+    expect(BOTS[BOTS.length - 1].id).toBe("ruedenrache");
+    expect(BOTS[BOTS.length - 1].rating).toBe(4000);
+    expect(BOTS[BOTS.length - 1].name).toBe("Der Mann (Rüdenrache)");
+  });
   it("new styles change the choice: greedy takes captures, checker gives checks", () => {
     const two = [line("e2e4", 0, 1), line("d2d4", 0, 2)];
     const feats = new Map<string, MoveFeatures>([["e2e4", { capture: false, check: false, promotion: false }], ["d2d4", { capture: true, check: false, promotion: false }]]);

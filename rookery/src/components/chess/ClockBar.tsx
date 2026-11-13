@@ -1,10 +1,10 @@
 import { formatClock } from "@/components/computer/clock";
 
-export function ClockBar({ label, avatar, ms, active, timed, thinking, note }: { label: string; avatar?: string; ms: number; active: boolean; timed: boolean; thinking?: boolean; note?: string }) {
+export function ClockBar({ label, avatar, avatarImage, ms, active, timed, thinking, note }: { label: string; avatar?: string; avatarImage?: string; ms: number; active: boolean; timed: boolean; thinking?: boolean; note?: string }) {
   return (
     <div className={`flex items-center justify-between rounded-lg border px-3 py-2 ${active ? "border-brand bg-brand/10" : "border-line bg-surface"}`}>
       <span className="flex items-center gap-2 font-semibold">
-        {avatar && <span aria-hidden className="text-xl">{avatar}</span>}
+        {avatarImage ? <img src={avatarImage} alt="" width={28} height={28} className="size-7 rounded [image-rendering:pixelated]" /> : avatar && <span aria-hidden className="text-xl">{avatar}</span>}
         {label}
         {thinking && <span className="text-xs font-normal text-dim" role="status">thinking…</span>}
       </span>
