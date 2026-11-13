@@ -29,4 +29,14 @@ update public.bot_games set status = 'finished', result = '1-0', reason = 'check
 select t.ok((select status from public.bot_games where id = '11111111-1111-1111-1111-111111111111') = 'finished', 'the player can finish the game');
 reset role;
 select t.ok((select updated_at >= created_at from public.bot_games where id = '11111111-1111-1111-1111-111111111111'), 'the server stamps updated_at');
+-- private games (history only)
+set role authenticated; select t.as_user(:'olga');
+insert into public.bot_games (id, player_id, bot_id, bot_name, bot_rating, player_color, variant, initial_fen, watchable, time_control)
+values ('44444444-4444-4444-4444-444444444444', :'olga', 'cam', 'Casual Cam', 1000, 'black', 'standard', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', false, '5+0');
+select t.ok((select count(*) from public.bot_games where id = '44444444-4444-4444-4444-444444444444') = 1, 'the owner sees their private game');
+select t.as_user(:'pete');
+select t.ok((select count(*) from public.bot_games where id = '44444444-4444-4444-4444-444444444444') = 0, 'other players cannot see a private game');
+reset role; set role anon; select t.as_user(null);
+select t.ok((select count(*) from public.bot_games where id = '44444444-4444-4444-4444-444444444444') = 0, 'nor can signed-out visitors');
+reset role;
 do $$ begin raise notice 'ALL BOT GAME TESTS PASSED'; end $$;

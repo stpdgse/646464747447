@@ -6,7 +6,7 @@ const assert = require('assert');
 const B = process.env.BASE || 'http://localhost:3111';
 let n = 0;
 const ok = (m) => console.log('OK  ', ++n, m);
-const PAGES = ['/', '/play', '/play/online', '/play/computer', '/play/board', '/puzzles', '/learn', '/openings', '/leaderboard', '/watch', '/community', '/forum', '/clubs', '/login', '/signup', '/credits', '/offline'];
+const PAGES = ['/', '/play', '/play/online', '/play/computer', '/play/board', '/puzzles', '/learn', '/learn/endgames', '/learn/lessons/basics', '/learn/endgames/kq-k', '/openings', '/leaderboard', '/watch', '/community', '/tournaments', '/forum', '/clubs', '/login', '/signup', '/credits', '/offline'];
 
 (async () => {
   const browser = await chromium.launch();
