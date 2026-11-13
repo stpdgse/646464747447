@@ -18,7 +18,7 @@ import {
   type PromotionRole,
   type Result,
 } from "@/lib/chess/game";
-import { BOTS, candidatesFor, chooseMove, getBot, type Bot } from "@/lib/engine/bots";
+import { BOTS, BOT_TIERS, candidatesFor, chooseMove, getBot, type Bot } from "@/lib/engine/bots";
 import { ClockBar } from "@/components/chess/ClockBar";
 import { afterMove, clocksRunning, remaining, TIME_CONTROLS, type Clocks, type Side, type TimeControl } from "./clock";
 import { useMoveSounds } from "@/components/useMoveSounds";
@@ -267,20 +267,27 @@ export function ComputerGame() {
     const bot = getBot(setup.botId) ?? BOTS[0];
     return (
       <div className="grid gap-6">
-        <div role="radiogroup" aria-label="Choose your opponent" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {BOTS.map((b) => (
-            <button
-              key={b.id}
-              role="radio"
-              aria-checked={setup.botId === b.id}
-              onClick={() => setSetup({ ...setup, botId: b.id })}
-              className={`grid gap-1 rounded-xl border p-4 text-left transition ${setup.botId === b.id ? "border-brand bg-brand/10" : "border-line bg-surface hover:bg-surface-2"}`}
-            >
-              <span className="text-3xl" aria-hidden>{b.avatar}</span>
-              <span className="font-bold">{b.name}</span>
-              <span className="text-xs font-semibold text-brand">≈ {b.rating}</span>
-              <span className="text-xs text-dim">{b.blurb}</span>
-            </button>
+        <div role="radiogroup" aria-label="Choose your opponent" className="grid gap-6">
+          {BOT_TIERS.map((tier) => (
+            <section key={tier.label} aria-label={tier.label} className="grid gap-3">
+              <h2 className="text-sm font-bold uppercase tracking-wide text-dim">{tier.label}</h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {BOTS.filter((b) => b.rating >= tier.min && b.rating < tier.max).map((b) => (
+                  <button
+                    key={b.id}
+                    role="radio"
+                    aria-checked={setup.botId === b.id}
+                    onClick={() => setSetup({ ...setup, botId: b.id })}
+                    className={`grid gap-1 rounded-xl border p-4 text-left transition ${setup.botId === b.id ? "border-brand bg-brand/10" : b.special ? "border-warn bg-surface hover:bg-surface-2" : "border-line bg-surface hover:bg-surface-2"}`}
+                  >
+                    <span className="text-3xl" aria-hidden>{b.avatar}</span>
+                    <span className="font-bold">{b.name}{b.special && <span className="ml-2 rounded bg-warn/20 px-1.5 py-0.5 text-[10px] font-bold uppercase text-warn">Special</span>}</span>
+                    <span className="text-xs font-semibold text-brand">≈ {b.rating}</span>
+                    <span className="text-xs text-dim">{b.blurb}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
 
@@ -368,7 +375,7 @@ export function ComputerGame() {
                 {draw ? "Draw" : youWon ? "You win!" : `${game.bot.name} wins`} <span className="font-normal text-dim">{HOW[end.how]}</span>
               </p>
               <p className="text-sm text-dim">
-                {draw ? "Well held." : youWon ? `“${game.bot.name}: Well played.”` : "Analyse the game to find where it turned."}
+                {`“${game.bot.name}: ${draw ? game.bot.quips.draw : youWon ? game.bot.quips.lose : game.bot.quips.win}”`}{!draw && !youWon ? " Analyse the game to find where it turned." : ""}
               </p>
             </div>
           ) : (

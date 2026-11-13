@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BOTS, candidatesFor, chooseMove, getBot, type Bot, type MoveFeatures } from "./bots";
+import { BOTS, BOT_TIERS, candidatesFor, chooseMove, getBot, type Bot, type MoveFeatures } from "./bots";
 import { parseInfo, type Line } from "./uci";
 
 const line = (uci: string, cp: number, multipv: number): Line => ({ uci, cp, mate: null, depth: 10, multipv, pv: [uci] });
@@ -119,6 +119,26 @@ describe("bot roster", () => {
       if (b.engine.elo !== undefined) expect(b.engine.elo).toBeGreaterThanOrEqual(1320);
       expect(b.engine.depth !== undefined || b.engine.movetime !== undefined).toBe(true);
     }
+  });
+  it("has many bots, each with a personality, and the special Pong Alf Femboy at 650", () => {
+    expect(BOTS.length).toBeGreaterThanOrEqual(25);
+    const alf = getBot("alf")!;
+    expect(alf.name).toBe("Pong Alf Femboy");
+    expect(alf.rating).toBe(650);
+    expect(alf.special).toBe(true);
+    for (const b of BOTS) {
+      expect(b.quips.win.length).toBeGreaterThan(0);
+      expect(b.quips.lose.length).toBeGreaterThan(0);
+      expect(b.quips.draw.length).toBeGreaterThan(0);
+    }
+    for (const b of BOTS) expect(BOT_TIERS.filter((t) => b.rating >= t.min && b.rating < t.max)).toHaveLength(1);
+  });
+  it("new styles change the choice: greedy takes captures, checker gives checks", () => {
+    const two = [line("e2e4", 0, 1), line("d2d4", 0, 2)];
+    const feats = new Map<string, MoveFeatures>([["e2e4", { capture: false, check: false, promotion: false }], ["d2d4", { capture: true, check: false, promotion: false }]]);
+    expect(chooseMove(two, bot({ temperature: 0, style: "greedy", styleBonus: 45 }), feats, lcg(), { ply: 40 })).toBe("d2d4");
+    const feats2 = new Map<string, MoveFeatures>([["e2e4", { capture: false, check: true, promotion: false }], ["d2d4", { capture: true, check: false, promotion: false }]]);
+    expect(chooseMove(two, bot({ temperature: 0, style: "checker", styleBonus: 45 }), feats2, lcg(), { ply: 40 })).toBe("e2e4");
   });
   it("asks for more candidate lines early for single-line bots", () => {
     expect(candidatesFor(getBot("max")!, 0)).toBe(3);
