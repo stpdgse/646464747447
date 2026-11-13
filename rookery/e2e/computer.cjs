@@ -27,7 +27,7 @@ const ok = (m) => console.log('OK  ', ++step, m);
 
   await p.goto(B + '/play/computer');
   await p.waitForSelector('[role=radiogroup]');
-  assert.equal(await p.locator('[role=radio]').count(), 8); ok('eight bots listed');
+  assert((await p.locator('[role=radio]').count()) >= 25); ok('all bots listed');
 
   // --- game 1: white vs Pawnie, unlimited
   await p.click('[role=radio]:has-text("Pawnie")');

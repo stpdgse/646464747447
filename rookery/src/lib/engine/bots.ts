@@ -1,6 +1,11 @@
 import type { Line } from "./uci";
 
-export type Style = "balanced" | "aggressive" | "solid";
+/**
+ * How a bot leans when several moves are about equally good:
+ * balanced = no preference, aggressive = captures/checks/promotions, solid = quiet moves,
+ * greedy = grabs material, checker = loves giving check, chaotic = picks with random flair.
+ */
+export type Style = "balanced" | "aggressive" | "solid" | "greedy" | "checker" | "chaotic";
 
 export type Bot = {
   id: string;
@@ -10,6 +15,10 @@ export type Bot = {
   rating: number;
   blurb: string;
   greeting: string;
+  /** What the bot says when the game ends, from its own point of view. */
+  quips: { win: string; lose: string; draw: string };
+  /** Highlighted as a special character in the picker. */
+  special?: boolean;
   engine: { elo?: number; skill?: number; depth?: number; movetime?: number; multipv: number };
   human: {
     /** Softmax temperature in centipawns: 0 = always the engine's pick, large = near random among candidates. */
@@ -29,59 +38,252 @@ export const BOTS: Bot[] = [
     id: "pawnie", name: "Pawnie", avatar: "🐣", rating: 400,
     blurb: "Just learned how the pieces move. Loves hanging them.",
     greeting: "Hi! Is it my turn yet?",
+    quips: { win: "I won?! Wait, really?", lose: "Oh no, my pieces!", draw: "A draw! That's like winning, right?" },
     engine: { depth: 1, multipv: 10 },
-    human: { temperature: 260, blunderRate: 0.25, style: "balanced", styleBonus: 0, mateSight: 0.35 },
+    human: { temperature: 260, blunderRate: 0.25, style: "balanced", styleBonus: 0, mateSight: 0.3 },
+  },
+  {
+    id: "wanda", name: "Wobbly Wanda", avatar: "🦆", rating: 450,
+    blurb: "Moves with total confidence and no plan whatsoever.",
+    greeting: "Quack! I mean, e4. Probably.",
+    quips: { win: "Quack-mate!", lose: "I blame the pond.", draw: "Nobody won. Everybody quacks." },
+    engine: { depth: 1, multipv: 10 },
+    human: { temperature: 300, blunderRate: 0.25, style: "chaotic", styleBonus: 120, mateSight: 0.3 },
+  },
+  {
+    id: "sam", name: "Sleepy Sam", avatar: "😴", rating: 500,
+    blurb: "Falls asleep mid-game. Wakes up to hang a piece.",
+    greeting: "*yawn* Oh, is it time?",
+    quips: { win: "Huh? I won? Cool. Nap time.", lose: "Zzz... what happened?", draw: "Draw. Fine by me, I'm tired." },
+    engine: { depth: 1, multipv: 8 },
+    human: { temperature: 240, blunderRate: 0.22, style: "solid", styleBonus: 30, mateSight: 0.35 },
+  },
+  {
+    id: "gus", name: "Greedy Gus", avatar: "🍩", rating: 550,
+    blurb: "Takes every piece he can. Never asks if it's a trap.",
+    greeting: "Free stuff? Yes please.",
+    quips: { win: "Om nom nom, all your pieces are mine!", lose: "I only wanted a snack...", draw: "We split the pieces. Fair enough." },
+    engine: { depth: 1, multipv: 8 },
+    human: { temperature: 210, blunderRate: 0.2, style: "greedy", styleBonus: 160, mateSight: 0.35 },
+  },
+  {
+    id: "chip", name: "Cheeky Chip", avatar: "🐿️", rating: 600,
+    blurb: "Gives check at every opportunity, wise or not.",
+    greeting: "Check! Oh, not yet? Soon!",
+    quips: { win: "Check, check, checkmate!", lose: "Hey, all those checks should count for something!", draw: "A draw, with a ton of checks." },
+    engine: { depth: 2, multipv: 8 },
+    human: { temperature: 190, blunderRate: 0.18, style: "checker", styleBonus: 110, mateSight: 0.4 },
+  },
+  {
+    id: "alf", name: "Pong Alf Femboy", avatar: "🏓", rating: 650, special: true,
+    blurb: "Table-tennis champion, chess hobbyist. Cheerful, chaotic and loves a trade.",
+    greeting: "Pong! Ready for a rally? Ping first, chess second.",
+    quips: { win: "Smashed it! Ping, pong, mate!", lose: "Good rally! I'll get you in the rematch.", draw: "A deuce! Let's play another point." },
+    engine: { depth: 2, multipv: 8 },
+    human: { temperature: 170, blunderRate: 0.17, style: "chaotic", styleBonus: 85, mateSight: 0.5 },
   },
   {
     id: "rae", name: "Rookie Rae", avatar: "🎒", rating: 700,
     blurb: "Knows a few tricks but misses most of yours.",
     greeting: "Good luck! I've been practising.",
+    quips: { win: "I did it! All that practice paid off!", lose: "Great game! I learned a lot.", draw: "A draw! Not bad for me." },
     engine: { depth: 2, multipv: 8 },
     human: { temperature: 150, blunderRate: 0.15, style: "balanced", styleBonus: 0, mateSight: 0.55 },
+  },
+  {
+    id: "pip", name: "Panicky Pip", avatar: "🐭", rating: 750,
+    blurb: "Scared of everything. Retreats at the first sign of trouble.",
+    greeting: "Please be gentle...",
+    quips: { win: "Oh! I won? I was so scared!", lose: "I knew it. I knew it!", draw: "Phew, a draw. I'll take it." },
+    engine: { depth: 2, multipv: 7 },
+    human: { temperature: 140, blunderRate: 0.14, style: "solid", styleBonus: 40, mateSight: 0.55 },
+  },
+  {
+    id: "gabe", name: "Gambit Gabe", avatar: "🎩", rating: 800,
+    blurb: "Throws pawns at you for a wild attack. Mostly it doesn't work.",
+    greeting: "A gambit a day keeps the boredom away!",
+    quips: { win: "The gambit worked! It never works!", lose: "Worth a try. It's always worth a try.", draw: "Drawn, but what a mess!" },
+    engine: { depth: 3, multipv: 6 },
+    human: { temperature: 130, blunderRate: 0.14, style: "aggressive", styleBonus: 70, mateSight: 0.6 },
+  },
+  {
+    id: "charlie", name: "Chatty Charlie", avatar: "🦜", rating: 850,
+    blurb: "Talks nonstop. Plays decent chess in between sentences.",
+    greeting: "So, did you see the game last night? Anyway, e4!",
+    quips: { win: "And THAT, my friend, is checkmate.", lose: "Hmm. I wasn't paying attention.", draw: "A draw. Rematch? I have stories." },
+    engine: { depth: 3, multipv: 6 },
+    human: { temperature: 115, blunderRate: 0.12, style: "balanced", styleBonus: 0, mateSight: 0.65 },
+  },
+  {
+    id: "suri", name: "Sneaky Suri", avatar: "🦊", rating: 900,
+    blurb: "Loves a surprise check or a quiet trap.",
+    greeting: "Nothing to see here...",
+    quips: { win: "Gotcha. Didn't see that coming, did you?", lose: "Huh, the trap fell apart.", draw: "Neither of us fell for it." },
+    engine: { depth: 3, multipv: 6 },
+    human: { temperature: 105, blunderRate: 0.1, style: "checker", styleBonus: 75, mateSight: 0.7 },
+  },
+  {
+    id: "nora", name: "Knight Nora", avatar: "🐴", rating: 950,
+    blurb: "Hops about the board looking for forks.",
+    greeting: "Neigh! Let's gallop.",
+    quips: { win: "Forked and finished!", lose: "You got me. Well played!", draw: "A draw, with plenty of galloping." },
+    engine: { depth: 3, multipv: 5 },
+    human: { temperature: 95, blunderRate: 0.09, style: "aggressive", styleBonus: 55, mateSight: 0.75 },
   },
   {
     id: "cam", name: "Casual Cam", avatar: "🍕", rating: 1000,
     blurb: "Plays between snacks. Solid-ish, easily distracted.",
     greeting: "Let's have a chill game.",
+    quips: { win: "GG! Pizza's on you.", lose: "Nice one. I got distracted by lunch.", draw: "A draw. Chill." },
     engine: { depth: 3, multipv: 6 },
     human: { temperature: 90, blunderRate: 0.08, style: "balanced", styleBonus: 0, mateSight: 0.8 },
+  },
+  {
+    id: "stella", name: "Steady Stella", avatar: "🐢", rating: 1100,
+    blurb: "Slow and careful. Rarely loses a piece for free.",
+    greeting: "Slow and steady wins the race.",
+    quips: { win: "Slow and steady. Checkmate.", lose: "Well played. I'll study that.", draw: "A careful draw." },
+    engine: { depth: 4, multipv: 5 },
+    human: { temperature: 60, blunderRate: 0.06, style: "solid", styleBonus: 35, mateSight: 0.85 },
+  },
+  {
+    id: "rafa", name: "Rapid Rafa", avatar: "⚡", rating: 1200,
+    blurb: "Plays fast and sharp. Sometimes too fast.",
+    greeting: "Fast hands! Ready?",
+    quips: { win: "Lightning!", lose: "Too fast for my own good.", draw: "Draw. Run it back!" },
+    engine: { depth: 5, multipv: 5 },
+    human: { temperature: 45, blunderRate: 0.07, style: "aggressive", styleBonus: 50, mateSight: 0.9 },
   },
   {
     id: "bert", name: "Blunder Bert", avatar: "🎲", rating: 1300,
     blurb: "Plays sharp chess, then randomly throws a piece away.",
     greeting: "Don't worry, I'll make a mistake eventually.",
+    quips: { win: "Wow, I didn't blunder. Mark the date.", lose: "There it is. The blunder.", draw: "A draw, with only a couple of blunders." },
     engine: { depth: 8, multipv: 4 },
     human: { temperature: 15, blunderRate: 0.12, style: "balanced", styleBonus: 0, mateSight: 0.95 },
+  },
+  {
+    id: "pim", name: "Professor Pim", avatar: "📚", rating: 1400,
+    blurb: "Plays by the book. Quotes the book, too.",
+    greeting: "Let us begin with a classical approach.",
+    quips: { win: "As the textbooks predict.", lose: "Fascinating. A novelty.", draw: "A theoretical draw." },
+    engine: { elo: 1400, movetime: 300, multipv: 3 },
+    human: { temperature: 22, blunderRate: 0.02, style: "balanced", styleBonus: 0, mateSight: 0.95 },
   },
   {
     id: "tess", name: "Tactician Tess", avatar: "⚔️", rating: 1500,
     blurb: "Always attacking. Captures and checks are her favourites.",
     greeting: "Prepare to be attacked.",
+    quips: { win: "Tactics wins again.", lose: "A fine counterattack!", draw: "A draw. I'll find the tactic next time." },
     engine: { depth: 6, multipv: 5 },
     human: { temperature: 25, blunderRate: 0.02, style: "aggressive", styleBonus: 45, mateSight: 1 },
+  },
+  {
+    id: "kai", name: "Counter Kai", avatar: "🥋", rating: 1600,
+    blurb: "Waits for you to overreach, then strikes back.",
+    greeting: "Show me your best attack.",
+    quips: { win: "Your attack ran out of steam.", lose: "You outplayed my counter.", draw: "Solid defence. Draw." },
+    engine: { elo: 1550, movetime: 350, multipv: 3 },
+    human: { temperature: 12, blunderRate: 0, style: "solid", styleBonus: 30, mateSight: 1 },
+  },
+  {
+    id: "sol", name: "Sacrifice Sol", avatar: "🔥", rating: 1700,
+    blurb: "Loves giving up material for a ferocious attack.",
+    greeting: "Material is temporary. Attack is forever.",
+    quips: { win: "The sacrifice was correct!", lose: "The sacrifice was... incorrect.", draw: "A draw, but a beautiful one." },
+    engine: { elo: 1650, movetime: 400, multipv: 4 },
+    human: { temperature: 20, blunderRate: 0, style: "aggressive", styleBonus: 55, mateSight: 1 },
   },
   {
     id: "finn", name: "Fortress Finn", avatar: "🛡️", rating: 1800,
     blurb: "Patient and solid. Hard to crack, happy to wait.",
     greeting: "No rush. I can wait all day.",
+    quips: { win: "The fortress held.", lose: "You broke through. Impressive.", draw: "A fortress. Draw." },
     engine: { elo: 1750, movetime: 500, multipv: 3 },
     human: { temperature: 8, blunderRate: 0, style: "solid", styleBonus: 25, mateSight: 1 },
+  },
+  {
+    id: "edda", name: "Endgame Edda", avatar: "🏔️", rating: 1900,
+    blurb: "Trades down to an endgame, then grinds you out.",
+    greeting: "Let's simplify things.",
+    quips: { win: "Endgames are my home.", lose: "You beat me at my own game.", draw: "A drawn endgame, naturally." },
+    engine: { elo: 1850, movetime: 550, multipv: 2 },
+    human: { temperature: 6, blunderRate: 0, style: "solid", styleBonus: 25, mateSight: 1 },
+  },
+  {
+    id: "quinn", name: "Queen Quinn", avatar: "👑", rating: 2000,
+    blurb: "Brings the queen out early and makes it count.",
+    greeting: "The queen goes where she pleases.",
+    quips: { win: "Long live the queen.", lose: "Dethroned. Well played.", draw: "A draw. The queen is content." },
+    engine: { elo: 1950, movetime: 600, multipv: 2 },
+    human: { temperature: 6, blunderRate: 0, style: "aggressive", styleBonus: 35, mateSight: 1 },
+  },
+  {
+    id: "sven", name: "Silent Sven", avatar: "🧊", rating: 2100,
+    blurb: "Says nothing. Plays accurately. Wins quietly.",
+    greeting: "...",
+    quips: { win: "...", lose: "...", draw: "..." },
+    engine: { elo: 2100, movetime: 700, multipv: 1 },
+    human: { temperature: 0, blunderRate: 0, style: "balanced", styleBonus: 0, mateSight: 1 },
+  },
+  {
+    id: "ines", name: "Iron Ines", avatar: "🦾", rating: 2200,
+    blurb: "Positional pressure that never lets up.",
+    greeting: "Prepare to be squeezed.",
+    quips: { win: "Slowly, then all at once.", lose: "I didn't see that coming.", draw: "A draw. I'll squeeze harder next time." },
+    engine: { elo: 2200, movetime: 750, multipv: 1 },
+    human: { temperature: 0, blunderRate: 0, style: "solid", styleBonus: 15, mateSight: 1 },
   },
   {
     id: "max", name: "Master Max", avatar: "🎓", rating: 2300,
     blurb: "A seasoned tournament player. Few mistakes.",
     greeting: "Let's see what you've got.",
+    quips: { win: "A good game. Study the endgame.", lose: "Well played. Genuinely.", draw: "A fair result." },
     engine: { elo: 2300, movetime: 800, multipv: 1 },
+    human: { temperature: 0, blunderRate: 0, style: "balanced", styleBonus: 0, mateSight: 1 },
+  },
+  {
+    id: "greta", name: "Grandmaster Greta", avatar: "🏆", rating: 2450,
+    blurb: "Titled player. Converts small advantages without fuss.",
+    greeting: "Good luck. You'll need it.",
+    quips: { win: "Thank you for the game.", lose: "That's rare. Well done.", draw: "A draw against the grandmaster. Not bad." },
+    engine: { elo: 2450, movetime: 900, multipv: 1 },
+    human: { temperature: 0, blunderRate: 0, style: "balanced", styleBonus: 0, mateSight: 1 },
+  },
+  {
+    id: "ravi", name: "Super GM Ravi", avatar: "🌟", rating: 2650,
+    blurb: "Elite level. Deep preparation, almost no errors.",
+    greeting: "Let's play some chess.",
+    quips: { win: "Accurate play wins.", lose: "Remarkable. Truly.", draw: "A draw. Impressive resistance." },
+    engine: { elo: 2650, movetime: 1000, multipv: 1 },
+    human: { temperature: 0, blunderRate: 0, style: "balanced", styleBonus: 0, mateSight: 1 },
+  },
+  {
+    id: "tori", name: "Titan Tori", avatar: "🗿", rating: 2800,
+    blurb: "Barely human. Barely loses.",
+    greeting: "...",
+    quips: { win: "Expected.", lose: "Impossible. Screenshot this.", draw: "A draw?! That's a story for school." },
+    engine: { elo: 2850, movetime: 1100, multipv: 1 },
     human: { temperature: 0, blunderRate: 0, style: "balanced", styleBonus: 0, mateSight: 1 },
   },
   {
     id: "stockfish", name: "Stockfish", avatar: "🤖", rating: 3000,
     blurb: "The full engine, no mercy. Don't expect to win.",
     greeting: "…",
+    quips: { win: "…", lose: "…", draw: "…" },
     engine: { movetime: 1200, multipv: 1 },
     human: { temperature: 0, blunderRate: 0, style: "balanced", styleBonus: 0, mateSight: 1 },
   },
 ];
+
+/** Groups for the opponent picker (min inclusive, max exclusive). */
+export const BOT_TIERS = [
+  { label: "Beginners", min: 0, max: 1000 },
+  { label: "Casual", min: 1000, max: 1500 },
+  { label: "Club players", min: 1500, max: 2000 },
+  { label: "Experts", min: 2000, max: 2500 },
+  { label: "Masters and engines", min: 2500, max: 10000 },
+] as const;
 
 export const BOT_IDS = BOTS.map((b) => b.id);
 export const getBot = (id: string): Bot | undefined => BOTS.find((b) => b.id === id);
@@ -126,7 +328,10 @@ export function chooseMove(
       const tactical = f.capture || f.check || f.promotion;
       if (style === "aggressive" && tactical) bonus = styleBonus;
       if (style === "solid" && !tactical) bonus = styleBonus;
+      if (style === "greedy" && f.capture) bonus = styleBonus;
+      if (style === "checker" && (f.check || f.promotion)) bonus = styleBonus;
     }
+    if (style === "chaotic") bonus = (rng() * 2 - 1) * styleBonus;
     const mating = l.mate !== null && l.mate > 0;
     return { uci: l.uci, score: (blind && mating ? calm : clampScore(l.cp)) + bonus };
   });
