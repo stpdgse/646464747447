@@ -22,13 +22,17 @@ import { BOTS, BOT_TIERS, candidatesFor, chooseMove, getBot, type Bot } from "@/
 import { ClockBar } from "@/components/chess/ClockBar";
 import { afterMove, clocksRunning, remaining, TIME_CONTROLS, type Clocks, type Side, type TimeControl } from "./clock";
 import { useMoveSounds } from "@/components/useMoveSounds";
+import { useBotBroadcast } from "./useBotBroadcast";
 import { useEngine } from "./useEngine";
 
 const EMPTY_SANS: string[] = [];
 
-type Setup = { botId: string; color: Side | "random"; variant: "standard" | "chess960"; timeId: string; takebacks: boolean };
+type Setup = { botId: string; color: Side | "random"; variant: "standard" | "chess960"; timeId: string; takebacks: boolean; watchable: boolean };
 type End = { result: Result; how: "checkmate" | "stalemate" | "insufficient" | "fifty" | "threefold" | "variant" | "resignation" | "timeout" | "agreement" };
 type Game = {
+  /** Identifies this game for spectating. */
+  id: string;
+  watchable: boolean;
   bot: Bot;
   player: Side;
   record: GameRecord;
@@ -43,7 +47,7 @@ type Game = {
   startDate: string;
 };
 
-const DEFAULT_SETUP: Setup = { botId: "cam", color: "random", variant: "standard", timeId: "unlimited", takebacks: true };
+const DEFAULT_SETUP: Setup = { botId: "cam", color: "random", variant: "standard", timeId: "unlimited", takebacks: true, watchable: true };
 
 const HOW: Record<End["how"], string> = {
   checkmate: "by checkmate",
@@ -79,6 +83,12 @@ export function ComputerGame() {
     [game, view],
   );
   const botToMove = !!game && !!view && !end && view.turn !== game.player;
+  useBotBroadcast(
+    game
+      ? { id: game.id, botId: game.bot.id, botName: game.bot.name, botRating: game.bot.rating, player: game.player, variant: game.record.variant === "chess960" ? "chess960" : "standard", initialFen: game.record.initialFen, moves: game.record.moves, end: end ? { result: end.result, how: end.how } : null }
+      : null,
+    !!game?.watchable,
+  );
 
   // ---- start a game ----------------------------------------------------------------------------
   const start = (s: Setup) => {
@@ -89,6 +99,8 @@ export function ComputerGame() {
     engine?.newGame();
     setNotice(null);
     setGame({
+      id: crypto.randomUUID(),
+      watchable: s.watchable,
       bot,
       player,
       record: newRecord(s.variant),
@@ -320,6 +332,10 @@ export function ComputerGame() {
             <label className="flex items-center gap-2 self-end pb-2 text-sm">
               <input type="checkbox" checked={setup.takebacks} onChange={(e) => setSetup({ ...setup, takebacks: e.target.checked })} className="size-4 accent-[var(--brand)]" />
               Allow takebacks
+            </label>
+            <label className="flex items-center gap-2 text-sm sm:col-span-2">
+              <input type="checkbox" checked={setup.watchable} onChange={(e) => setSetup({ ...setup, watchable: e.target.checked })} className="size-4 accent-[var(--brand)]" />
+              Let classmates watch this game (needs a login, shows on the Watch page)
             </label>
           </div>
           <p className="text-xs text-dim">King of the Hill and Three-check are for the analysis board and live games: the computer only plays standard chess and Chess960.</p>
