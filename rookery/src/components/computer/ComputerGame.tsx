@@ -26,6 +26,7 @@ import { createClient } from "@/lib/supabase/client";
 import { clearSaved, loadSaved, restore, snapshot, writeSaved } from "./saved";
 import { MoveFeedbackBar } from "@/components/chess/MoveFeedbackBar";
 import { usePrefs } from "@/lib/prefs";
+import { announceProgress } from "@/lib/progress";
 import { useBotBroadcast } from "./useBotBroadcast";
 import { useMoveFeedback } from "./useMoveFeedback";
 import { useBots } from "./useBots";
@@ -153,12 +154,16 @@ export function ComputerGame({ initialBotId }: { initialBotId?: string } = {}) {
   };
 
   const [prefs, updatePrefs] = usePrefs();
+  const ended = !!end;
+  useEffect(() => {
+    if (ended) announceProgress();
+  }, [ended]);
   const feedback = useMoveFeedback(game ? { id: game.id, record: game.record, player: game.player } : null, prefs.feedback && !!game);
   useBotBroadcast(
     game
-      ? { id: game.id, botId: game.bot.id, botName: game.bot.name, botRating: game.bot.rating, player: game.player, variant: game.record.variant === "chess960" ? "chess960" : "standard", initialFen: game.record.initialFen, moves: game.record.moves, end: end ? { result: end.result, how: end.how } : null }
+      ? { id: game.id, botId: game.bot.id, botName: game.bot.name, botRating: game.bot.rating, player: game.player, variant: game.record.variant === "chess960" ? "chess960" : "standard", initialFen: game.record.initialFen, moves: game.record.moves, watchable: game.watchable, timeControl: game.tc.id, end: end ? { result: end.result, how: end.how } : null }
       : null,
-    !!game?.watchable,
+    !!game, // every signed-in game is kept for the player's history; only watchable ones are visible to others
   );
 
   // ---- start a game ----------------------------------------------------------------------------

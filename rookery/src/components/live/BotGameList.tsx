@@ -24,8 +24,8 @@ export function BotGameList() {
       const fresh = new Date(Date.now() - 10 * 60_000).toISOString(); // no move for 10 minutes = abandoned
       const hour = new Date(Date.now() - 60 * 60_000).toISOString();
       const [a, b] = await Promise.all([
-        supabase.from("bot_games").select(SELECT).eq("status", "playing").gt("updated_at", fresh).order("updated_at", { ascending: false }).limit(30),
-        supabase.from("bot_games").select(SELECT).eq("status", "finished").gt("updated_at", hour).order("updated_at", { ascending: false }).limit(8),
+        supabase.from("bot_games").select(SELECT).eq("watchable", true).eq("status", "playing").gt("updated_at", fresh).order("updated_at", { ascending: false }).limit(30),
+        supabase.from("bot_games").select(SELECT).eq("watchable", true).eq("status", "finished").gt("updated_at", hour).order("updated_at", { ascending: false }).limit(8),
       ]);
       if (dead) return;
       setLive((a.data as unknown as Item[]) ?? []);

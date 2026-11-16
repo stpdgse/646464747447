@@ -6,7 +6,8 @@ export const metadata: Metadata = { title: "Play" };
 const MODES = [
   { href: "/play/online", title: "Play online", body: "Live games against classmates with real clocks. Bullet, Blitz and Rapid, plus challenges." },
   { href: "/play/daily", title: "Daily games", body: "Slow chess: days per move. Play between classes and get notified on your turn." },
-  { href: "/play/computer", title: "Play the computer", body: "Stockfish at any strength, plus eight bots with personalities." },
+  { href: "/play/computer", title: "Play the computer", body: "Stockfish at any strength, plus 30+ bots with personalities." },
+  { href: "/play/bots", title: "Bot battles", body: "Pick any two bots and let them fight. Everyone can watch live on the Watch tab." },
   { href: "/play/board", title: "Analysis board", body: "Play both sides, set up any position, load a PGN. Chess960, King of the Hill and Three-check included." },
 ];
 

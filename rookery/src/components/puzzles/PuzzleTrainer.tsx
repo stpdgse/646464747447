@@ -8,6 +8,7 @@ import { Board } from "@/components/chess/Board";
 import { BoardSettingsPanel } from "@/components/chess/BoardSettingsPanel";
 import { useBoardSettings } from "@/components/chess/settings";
 import { needsPromotion, toPgn, tryUci, viewAt, type GameRecord, type PromotionRole } from "@/lib/chess/game";
+import { announceProgress } from "@/lib/progress";
 import { signed } from "@/lib/ratings";
 import { afterOpponentOpening, judgeMove, puzzleStart, solutionMoves, type ClientPuzzle } from "@/lib/puzzles/solve";
 
@@ -51,6 +52,7 @@ export function PuzzleTrainer({ mode }: { mode: "train" | "daily" }) {
     if (res.ok) {
       setResult({ before: res.before, after: res.after, repeat: res.repeat });
       if (res.after !== undefined) setMyRating(res.after);
+      announceProgress();
     }
   }, []);
 

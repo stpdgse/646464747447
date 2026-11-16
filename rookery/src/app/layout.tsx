@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
+import { AchievementToaster } from "@/components/AchievementToaster";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { ResumeBanner } from "@/components/ResumeBanner";
 import { SanctionBanner } from "@/components/SanctionBanner";
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <OfflineBanner />
         <Suspense fallback={null}><ResumeBanner /></Suspense>
         <main id="main" tabIndex={-1} className="mx-auto outline-none w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+        <Suspense fallback={null}><AchievementToaster /></Suspense>
         <SiteFooter />
       </body>
     </html>

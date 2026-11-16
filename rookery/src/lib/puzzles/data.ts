@@ -74,3 +74,15 @@ export const THEMES = [
   { id: "endgame", label: "Endgame" }, { id: "opening", label: "Opening" }, { id: "middlegame", label: "Middlegame" },
   { id: "promotion", label: "Promotion" }, { id: "trappedPiece", label: "Trapped piece" },
 ] as const;
+
+/**
+ * A fixed set of puzzles for a lesson: every puzzle with the theme (and tag) in the rating band, sorted easiest first,
+ * then `count` of them spread evenly so the lesson ramps up. The same every time.
+ */
+export function lessonPuzzles(opts: { theme: string; alsoTag?: string; min: number; max: number; count: number }): ClientPuzzle[] {
+  const pool = ALL.filter((p) => p.rating >= opts.min && p.rating <= opts.max && p.themes.includes(opts.theme) && (!opts.alsoTag || p.themes.includes(opts.alsoTag)) && p.rd <= 110);
+  if (pool.length <= opts.count) return pool;
+  const out: ClientPuzzle[] = [];
+  for (let i = 0; i < opts.count; i++) out.push(pool[Math.floor((i * (pool.length - 1)) / (opts.count - 1))]);
+  return out;
+}

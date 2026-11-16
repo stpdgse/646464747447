@@ -19,6 +19,7 @@ import { signed } from "@/lib/ratings";
 import { useMoveFeedback } from "@/components/computer/useMoveFeedback";
 import { MoveFeedbackBar } from "@/components/chess/MoveFeedbackBar";
 import { usePrefs } from "@/lib/prefs";
+import { announceProgress } from "@/lib/progress";
 import { useMoveSounds } from "@/components/useMoveSounds";
 import { ChatBox } from "@/components/social/ChatBox";
 import { ReportButton } from "@/components/social/ReportButton";
@@ -56,6 +57,10 @@ export function LiveGame({ initial, names, viewerId, isMod = false }: { initial:
   useMoveSounds(view.sans, row.status !== "started");
   // Move feedback (an engine rating of your own moves) is only for casual games: in rated games it would be engine help.
   const [prefs, updatePrefs] = usePrefs();
+  const gameOver = row.status === "finished";
+  useEffect(() => {
+    if (gameOver) announceProgress();
+  }, [gameOver]);
   const feedbackAllowed = !row.rated && !!side;
   const serverRecord = useMemo(() => recordOf(row), [row]);
   const feedback = useMoveFeedback(feedbackAllowed && side ? { id: row.id, record: serverRecord, player: side } : null, prefs.feedback && feedbackAllowed);

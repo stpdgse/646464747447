@@ -56,3 +56,6 @@ export const ui = {
 
 /** True while a mute/ban timestamp is still in the future. Reads the clock, so keep it out of render paths that must stay pure. */
 export const isFuture = (iso: string | null | undefined): boolean => !!iso && new Date(iso).getTime() > Date.now();
+
+/** Milliseconds since an ISO timestamp. Reads the clock, so call it from a function, not directly in render. */
+export const ageMs = (iso: string): number => Date.now() - new Date(iso).getTime();
