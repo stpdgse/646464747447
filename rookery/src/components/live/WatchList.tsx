@@ -7,6 +7,7 @@ import { describeGameTime } from "@/lib/live/timecontrols";
 import { plural } from "@/lib/ratings";
 import { createClient } from "@/lib/supabase/client";
 import { BotGameList } from "./BotGameList";
+import { BotMatchList } from "./BotMatchList";
 
 type Item = {
   id: string; variant: Variant; status: string; result: string | null; moves: string[]; time_initial_ms: number; time_inc_ms: number; mode: "live" | "daily"; days_per_move: number | null;
@@ -52,6 +53,7 @@ export function WatchList() {
 
   return (
     <div className="grid gap-8">
+      <BotMatchList />
       <BotGameList />
       <section aria-labelledby="live" className="grid gap-3">
         <h2 id="live" className="text-xl font-bold">Live now</h2>
