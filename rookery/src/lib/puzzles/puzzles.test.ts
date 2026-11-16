@@ -27,7 +27,7 @@ describe("puzzle data", () => {
         rec = r.record;
       }
     }
-  });
+  }, 120_000); // replays every one of the 11,000 puzzles, so give a busy machine room
   it("the solver always has the move (side to move after the opening move is the solver)", () => {
     const p = lookup((raw as unknown as [string][])[5000][0])!;
     const after = viewAt(afterOpponentOpening(p));
@@ -53,7 +53,7 @@ describe("verifySolution", () => {
       const q = lookup(id)!;
       expect(verifySolution(q, solutionMoves(q)), id).toBe(true);
     }
-  });
+  }, 120_000);
 });
 
 describe("judgeMove", () => {
