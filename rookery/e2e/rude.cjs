@@ -27,7 +27,7 @@ function stockfish() {
   const browser = await chromium.launch();
   const mk = () => browser.newContext({ viewport: { width: 1280, height: 1100 } });
   const errors = [];
-  const p = await (await mk()).newPage(); p.on('pageerror', (e) => errors.push(String(e)));
+  const p = await (await mk()).newPage(); p.setDefaultTimeout(30000); p.on('pageerror', (e) => errors.push(String(e)));
   const name = 'e2erd' + rnd();
   await p.goto(B + '/signup'); await p.fill('#username', name); await p.fill('#password', 'e2e-test-password-1'); await p.click('button[type=submit]');
   await p.waitForURL(B + '/', { timeout: 30000 });
