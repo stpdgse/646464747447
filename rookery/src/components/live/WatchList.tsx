@@ -8,6 +8,7 @@ import { plural } from "@/lib/ratings";
 import { createClient } from "@/lib/supabase/client";
 import { BotGameList } from "./BotGameList";
 import { BotMatchList } from "./BotMatchList";
+import { BotTournamentWatch } from "./BotTournamentWatch";
 
 type Item = {
   id: string; variant: Variant; status: string; result: string | null; moves: string[]; time_initial_ms: number; time_inc_ms: number; mode: "live" | "daily"; days_per_move: number | null;
@@ -53,6 +54,7 @@ export function WatchList() {
 
   return (
     <div className="grid gap-8">
+      <BotTournamentWatch />
       <BotMatchList />
       <BotGameList />
       <section aria-labelledby="live" className="grid gap-3">

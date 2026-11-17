@@ -8,6 +8,7 @@ const MODES = [
   { href: "/play/daily", title: "Daily games", body: "Slow chess: days per move. Play between classes and get notified on your turn." },
   { href: "/play/computer", title: "Play the computer", body: "Stockfish at any strength, plus 30+ bots with personalities." },
   { href: "/play/bots", title: "Bot battles", body: "Pick any two bots and let them fight. Everyone can watch live on the Watch tab." },
+  { href: "/bot-tournaments", title: "Bot tournaments", body: "Knockouts and leagues between bots. Anyone can start one, everyone can watch." },
   { href: "/play/board", title: "Analysis board", body: "Play both sides, set up any position, load a PGN. Chess960, King of the Hill and Three-check included." },
 ];
 
