@@ -17,7 +17,8 @@ function stockfish() {
   const send = (c) => child.stdin.write(c + '\n');
   const until = (re) => new Promise((resolve) => waiters.push({ test: (l) => re.test(l), resolve }));
   return {
-    async init() { send('uci'); await until(/^uciok/); send('isready'); await until(/^readyok/); },
+    // The site writes castling as "king takes its own rook" (e8h8), which is Chess960 notation, so speak that to the engine too.
+    async init() { send('uci'); await until(/^uciok/); send('setoption name UCI_Chess960 value true'); send('isready'); await until(/^readyok/); },
     async best(moves) { send('position startpos' + (moves.length ? ' moves ' + moves.join(' ') : '')); send('go movetime 120'); return (await until(/^bestmove/)).split(' ')[1]; },
     quit() { child.kill(); },
   };
@@ -63,7 +64,11 @@ function stockfish() {
       if ((expectColor === 'white') !== whiteToMove) { await p.waitForTimeout(400); continue; } // the Rüde is thinking
       const best = await sf.best(moves);
       if (process.env.DEBUG_RUDE) console.log('     ply', moves.length, 'best', best, 'moves', moves.join(' ').slice(-40));
-      for (const s of [best.slice(0, 2), best.slice(2, 4)]) { const q = await sq(s); await p.mouse.click(q.x, q.y); await p.waitForTimeout(200); }
+      // a castling move is clicked as the king stepping two squares
+      const CASTLES = { e1h1: 'e1g1', e1a1: 'e1c1', e8h8: 'e8g8', e8a8: 'e8c8' };
+      const usedOrigins = new Set(moves.map((m) => m.slice(0, 2)));
+      const click = CASTLES[best] && !usedOrigins.has(best.slice(0, 2)) ? CASTLES[best] : best;
+      for (const s of [click.slice(0, 2), click.slice(2, 4)]) { const q = await sq(s); await p.mouse.click(q.x, q.y); await p.waitForTimeout(200); }
       if (best.length === 5) await p.click('button[aria-label=Queen]');
       await p.waitForFunction((n) => { const m = document.querySelector('[data-moves]').getAttribute('data-moves'); return (m ? m.split(' ').length : 0) > n; }, moves.length, { timeout: 20000 }).catch(() => {});
     }
@@ -77,9 +82,7 @@ function stockfish() {
   // a visitor can watch the game
   const v = await (await mk()).newPage(); v.on('pageerror', (e) => errors.push(String(e)));
   await p.waitForFunction(() => document.querySelector('[data-moves]')?.getAttribute('data-moves'), null, { timeout: 30000 }).catch(() => {});
-  const mv0 = await (async () => { const moves = await movesNow(); if (moves.length === 0) { const best = await sf.best([]); for (const s of [best.slice(0, 2), best.slice(2, 4)]) { const q = await sq(s); await p.mouse.click(q.x, q.y); await p.waitForTimeout(200); } } return true; })();
-  void mv0;
-  await v.goto(B + '/watch', { waitUntil: 'networkidle' });
+    await v.goto(B + '/watch', { waitUntil: 'networkidle' });
   await v.waitForSelector(`section[aria-labelledby=botlive] a:has-text("${name}")`, { timeout: 30000 });
   assert((await v.locator(`section[aria-labelledby=botlive] li:has-text("${name}")`).first().textContent()).includes('🐺'));
   ok('a visitor sees the game on the Watch tab, marked with the wolf');
