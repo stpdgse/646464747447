@@ -16,7 +16,7 @@ export function AchievementsGrid({ earned }: { earned: Record<string, string> })
                 <li key={a.key} className={`flex items-start gap-3 rounded-xl border p-3 ${when ? "border-brand bg-brand/10" : "border-dashed border-line bg-surface"}`}>
                   <span aria-hidden className={`text-2xl ${when ? "" : "grayscale"}`}>{a.icon}</span>
                   <span className="min-w-0">
-                    <span className="block text-sm font-bold">{a.name}{when ? <span className="sr-only"> (earned)</span> : <span className="sr-only"> (not yet earned)</span>}</span>
+                    <span className="block text-sm font-bold">{a.name}{a.limited && <span className="ml-2 rounded bg-warn/30 px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase text-ink">Limited</span>}{when ? <span className="sr-only"> (earned)</span> : <span className="sr-only"> (not yet earned)</span>}</span>
                     <span className="block text-xs text-dim">{a.desc}</span>
                     {when && <span className="block text-xs font-semibold text-brand">Earned {when.slice(0, 10)}</span>}
                   </span>

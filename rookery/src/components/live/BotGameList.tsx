@@ -6,11 +6,11 @@ import { plural } from "@/lib/ratings";
 import { createClient } from "@/lib/supabase/client";
 
 type Item = {
-  id: string; bot_name: string; bot_rating: number; variant: string; moves: string[]; status: "playing" | "finished"; result: string | null; updated_at: string;
+  id: string; bot_id: string; bot_name: string; bot_rating: number; variant: string; moves: string[]; status: "playing" | "finished"; result: string | null; updated_at: string;
   player: { username: string } | null;
 };
 
-const SELECT = "id, bot_name, bot_rating, variant, moves, status, result, updated_at, player:profiles(username)";
+const SELECT = "id, bot_id, bot_name, bot_rating, variant, moves, status, result, updated_at, player:profiles(username)";
 
 /** Games people are playing against the computer right now, plus a few that just finished. */
 export function BotGameList() {
@@ -42,7 +42,7 @@ export function BotGameList() {
   const row = (g: Item) => (
     <li key={g.id}>
       <Link href={`/watch/bot/${g.id}`} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-surface px-4 py-3 transition hover:border-brand">
-        <span className="font-semibold">{g.player?.username ?? "?"} <span className="font-normal text-dim">vs</span> {g.bot_name} <span className="font-normal text-dim">(bot, ≈{g.bot_rating})</span></span>
+        <span className="font-semibold">{g.bot_id.startsWith("rude-") && <span title="Rüdenrache Holiday Challenge">🐺 </span>}{g.player?.username ?? "?"} <span className="font-normal text-dim">vs</span> {g.bot_name} <span className="font-normal text-dim">(bot, ≈{g.bot_rating})</span></span>
         <span className="text-sm text-dim">
           {g.variant === "chess960" ? "Chess960 · " : ""}{plural(Math.ceil(g.moves.length / 2), "move")}{g.result ? ` · ${g.result}` : ""}
         </span>

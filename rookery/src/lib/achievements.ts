@@ -1,6 +1,6 @@
-export type Category = "Games" | "Computer" | "Puzzles" | "Learning" | "Community" | "Tournaments";
+export type Category = "Games" | "Computer" | "Puzzles" | "Learning" | "Community" | "Tournaments" | "Events";
 
-export type Achievement = { key: string; name: string; icon: string; category: Category; desc: string };
+export type Achievement = { key: string; name: string; icon: string; category: Category; desc: string; /** only earnable during a limited-time event */ limited?: boolean };
 
 /** Badge definitions. The conditions live in the database (`check_achievements()`); a test keeps the two lists in step. */
 export const ACHIEVEMENTS: Achievement[] = [
@@ -40,7 +40,13 @@ export const ACHIEVEMENTS: Achievement[] = [
   { key: "tournament_played", name: "Competitor", icon: "🏟️", category: "Tournaments", desc: "Play a game in a tournament." },
   { key: "tournament_podium", name: "On the podium", icon: "🥉", category: "Tournaments", desc: "Finish in the top three of a tournament (3+ players)." },
   { key: "tournament_winner", name: "Tournament winner", icon: "🥇", category: "Tournaments", desc: "Win a tournament (3+ players)." },
+  { key: "rude_holiday", name: "Holiday hunter", icon: "🎄", category: "Events", limited: true, desc: "Take part in the Rüdenrache Holiday Challenge. Limited edition: only during the event." },
+  { key: "rude_first", name: "Wolf bait", icon: "🐺", category: "Events", limited: true, desc: "Beat Rüde 100 in the Holiday Challenge." },
+  { key: "rude_500", name: "Pack leader", icon: "❄️", category: "Events", limited: true, desc: "Beat Rüde 500 in the Holiday Challenge." },
+  { key: "rude_1000", name: "Alpha", icon: "🌕", category: "Events", limited: true, desc: "Beat Rüde 1000 in the Holiday Challenge." },
+  { key: "rude_1500", name: "Wolf slayer", icon: "🗡️", category: "Events", limited: true, desc: "Beat Rüde 1500 in the Holiday Challenge." },
+  { key: "rude_2000", name: "Rüdenmeister", icon: "🏔️", category: "Events", limited: true, desc: "Beat all 20 Rüden, up to Rüde 2000. Limited edition." },
 ];
 
-export const CATEGORIES: Category[] = ["Games", "Computer", "Puzzles", "Learning", "Community", "Tournaments"];
+export const CATEGORIES: Category[] = ["Games", "Computer", "Puzzles", "Learning", "Community", "Tournaments", "Events"];
 export const achievementOf = (key: string): Achievement | undefined => ACHIEVEMENTS.find((a) => a.key === key);
