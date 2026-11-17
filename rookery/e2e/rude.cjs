@@ -42,6 +42,7 @@ function stockfish() {
   ok('the page shows the holiday banner, the ladder of 20 Rüden and 0 of 8 attempts used');
 
   const sq = async (s) => {
+    await p.locator('.cg-wrap').scrollIntoViewIfNeeded();
     const box = await p.locator('.cg-wrap').boundingBox();
     const black = await p.evaluate(() => document.querySelector('.cg-wrap').classList.contains('orientation-black'));
     const f = FILES.indexOf(s[0]), r = Number(s[1]);
@@ -61,6 +62,7 @@ function stockfish() {
       const whiteToMove = moves.length % 2 === 0;
       if ((expectColor === 'white') !== whiteToMove) { await p.waitForTimeout(400); continue; } // the Rüde is thinking
       const best = await sf.best(moves);
+      if (process.env.DEBUG_RUDE) console.log('     ply', moves.length, 'best', best, 'moves', moves.join(' ').slice(-40));
       for (const s of [best.slice(0, 2), best.slice(2, 4)]) { const q = await sq(s); await p.mouse.click(q.x, q.y); await p.waitForTimeout(200); }
       if (best.length === 5) await p.click('button[aria-label=Queen]');
       await p.waitForFunction((n) => { const m = document.querySelector('[data-moves]').getAttribute('data-moves'); return (m ? m.split(' ').length : 0) > n; }, moves.length, { timeout: 20000 }).catch(() => {});

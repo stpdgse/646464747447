@@ -40,6 +40,7 @@ export function RudeChallenge({ phase: eventPhase, viewerId, initialAttempts }: 
   const [showSettings, setShowSettings] = useState(false);
   const [settings, updateSettings] = useBoardSettings();
   const reported = useRef(false);
+  const gameTop = useRef<HTMLDivElement>(null);
   const engineState = useEngine(phase === "playing");
   const engine = engineState.status === "ready" ? engineState.engine : null;
 
@@ -99,7 +100,8 @@ export function RudeChallenge({ phase: eventPhase, viewerId, initialAttempts }: 
     setRecord(rec);
     setGameId(restore && rec !== base ? restore.gameId : crypto.randomUUID());
     setPhase("playing");
-    window.scrollTo({ top: 0 });
+    // bring the board into view (the holiday banner above it is tall)
+    setTimeout(() => gameTop.current?.scrollIntoView({ block: "start" }), 60);
   }, []);
 
   const start = async () => {
@@ -233,7 +235,7 @@ export function RudeChallenge({ phase: eventPhase, viewerId, initialAttempts }: 
   }
 
   return (
-    <div className="grid gap-4">
+    <div ref={gameTop} className="grid scroll-mt-16 gap-4">
       {error && <p role="alert" className={ui.err}>{error}</p>}
       <div className={`${ui.card} grid gap-3`}>
         <p className="text-sm text-dim">Attempt {attempt?.attempt_no} of {MAX_ATTEMPTS} · you play {color} against Rüde {level}</p>
