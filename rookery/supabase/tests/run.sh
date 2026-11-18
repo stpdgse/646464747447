@@ -26,3 +26,4 @@ for f in "$HERE"/../migrations/*.sql; do echo "-- applying $(basename "$f")"; "$
 "${PSQL[@]}" -f "$HERE/achievements.sql" 2>&1 | grep -E "^(psql:|NOTICE:  ok|NOTICE:  FAILED|ERROR|ALL )|FAILED" | sed -e "s/^NOTICE:  //" -e "s/^psql:[^ ]* //"
 "${PSQL[@]}" -f "$HERE/bot_matches.sql" 2>&1 | grep -E "^(psql:|NOTICE:  ok|NOTICE:  FAILED|ERROR|ALL )|FAILED" | sed -e "s/^NOTICE:  //" -e "s/^psql:[^ ]* //"
 "${PSQL[@]}" -f "$HERE/bot_tournaments.sql" 2>&1 | grep -E "^(psql:|NOTICE:  ok|NOTICE:  FAILED|ERROR|ALL )|FAILED" | sed -e "s/^NOTICE:  //" -e "s/^psql:[^ ]* //"
+"${PSQL[@]}" -f "$HERE/rude.sql" 2>&1 | grep -E "^(psql:|NOTICE:  ok|NOTICE:  FAILED|ERROR|ALL )|FAILED" | sed -e "s/^NOTICE:  //" -e "s/^psql:[^ ]* //"

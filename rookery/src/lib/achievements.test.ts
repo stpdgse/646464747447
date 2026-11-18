@@ -3,8 +3,10 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { ACHIEVEMENTS, CATEGORIES, achievementOf } from "./achievements";
 
-const sql = readFileSync(path.resolve(__dirname, "../../supabase/migrations/20261112000017_achievements.sql"), "utf8");
-const sqlKeys = [...sql.matchAll(/select '([a-z0-9_]+)'/g)].map((m) => m[1]);
+const sql = readFileSync(path.resolve(__dirname, "../../supabase/migrations/20261112000020_rude_challenge.sql"), "utf8");
+// The badge checker is redefined by later migrations, so read the newest definition.
+const fnSql = sql.slice(sql.indexOf("create or replace function public.check_achievements()"));
+const sqlKeys = [...fnSql.matchAll(/select '([a-z0-9_]+)'/g)].map((m) => m[1]);
 
 describe("achievement catalogue", () => {
   it("has unique keys, names and a known category for every badge", () => {

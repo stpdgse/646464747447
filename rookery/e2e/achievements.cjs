@@ -16,7 +16,7 @@ const FILES = 'abcdefgh';
 
   await p.goto(B + '/u/' + name, { waitUntil: 'networkidle' });
   await p.waitForSelector('h2:text-is("Achievements")');
-  await p.waitForSelector('text=0 of 36 badges earned');
+  await p.waitForSelector('text=0 of 42 badges earned');
   ok('a new player has the badge wall with nothing earned');
 
   await p.goto(B + '/learn/lessons/basics', { waitUntil: 'networkidle' });

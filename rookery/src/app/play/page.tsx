@@ -3,7 +3,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = { title: "Play" };
 
-const MODES = [
+const MODES: { href: string; title: string; body: string; badge?: string }[] = [
+  { href: "/play/rudenrache", title: "🐺 Rüdenrache Holiday Challenge", body: "Beat 20 Rüde bots in a row, rated 100 to 2000. Eight attempts, a leaderboard and special badges.", badge: "Limited time" },
   { href: "/play/online", title: "Play online", body: "Live games against classmates with real clocks. Bullet, Blitz and Rapid, plus challenges." },
   { href: "/play/daily", title: "Daily games", body: "Slow chess: days per move. Play between classes and get notified on your turn." },
   { href: "/play/computer", title: "Play the computer", body: "Stockfish at any strength, plus 30+ bots with personalities." },
@@ -19,7 +20,7 @@ export default function PlayPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         {MODES.map((m) => (
           <Link key={m.href} href={m.href} className="rounded-xl border border-brand bg-surface p-5 transition hover:bg-surface-2">
-            <h2 className="text-lg font-bold">{m.title}</h2>
+            <h2 className="text-lg font-bold">{m.title}{m.badge && <span className="ml-2 rounded-full bg-warn px-2 py-0.5 align-middle text-[10px] font-extrabold uppercase text-[#151515]">{m.badge}</span>}</h2>
             <p className="mt-1 text-sm text-dim">{m.body}</p>
           </Link>
         ))}
