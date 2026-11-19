@@ -43,3 +43,5 @@ mc-web/classlib-ext/build/
 mc-web/classlib-ext/.gradle/
 mc-web/feasibility/build.*.log
 mc-web/feasibility/build.keep.log
+mc-web/probe/build/
+mc-web/probe/.gradle/

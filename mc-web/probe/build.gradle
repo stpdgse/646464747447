@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'org.teavm' version '0.16.0'
+}
+repositories { mavenCentral() }
+dependencies {
+    implementation files('../classlib-ext/build/libs/classlib-ext.jar')
+}
+teavm.wasmGC {
+    mainClass = 'probe.Main'
+    outOfProcess = false
+    copyRuntime = true
+}
