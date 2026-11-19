@@ -54,3 +54,5 @@ mc-web/driver/*.log
 mc-web/driver/*.time
 mc-web/driver/.gradle/
 mc-web/driver/build/
+mc-web/driver/stubinfo-classes/
+mc-web/driver/stubinfo.txt
