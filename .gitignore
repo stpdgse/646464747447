@@ -38,3 +38,4 @@ mc-web/build/
 mc-web/feasibility/build/
 mc-web/feasibility/.gradle/
 mc-web/feasibility/*.log
+mc-web/feasibility/*.hprof
