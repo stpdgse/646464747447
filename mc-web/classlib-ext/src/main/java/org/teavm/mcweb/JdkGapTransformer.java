@@ -50,6 +50,7 @@ public class JdkGapTransformer implements ClassHolderTransformer {
     private static final String SHIMS = "org.teavm.mcweb.JdkShims";
     private final java.util.Map<String, String> stubClasses = new HashMap<>();
     private final List<String> lenientPrefixes = new ArrayList<>();
+    private final Set<String> cutMethods = new HashSet<>();
     private boolean stubsLoaded;
 
     /**
@@ -81,12 +82,19 @@ public class JdkGapTransformer implements ClassHolderTransformer {
                     lenientPrefixes.add(name);
                     continue;
                 }
+                if (kind.equals("cut")) {
+                    // cut <class> <method>: replace every overload's body with a "not available" error
+                    cutMethods.add(name + "#" + p[2]);
+                    continue;
+                }
                 if (context.getHierarchy().getClassSource().get(name) != null) {
                     continue;
                 }
-                String parent = p.length > 2 ? p[2] : kind.equals("exception") ? "java.io.IOException"
-                        : "java.lang.Object";
-                context.submit(createStubClass(kind, name, parent));
+                String parent = p.length > 2 && !p[2].equals("-") ? p[2]
+                        : kind.equals("exception") ? "java.io.IOException" : "java.lang.Object";
+                boolean isAbstract = p.length > 3 && p[3].equals("abstract");
+                String[] interfaces = p.length > 4 && !p[4].equals("-") ? p[4].split(",") : new String[0];
+                context.submit(createStubClass(kind, name, parent, isAbstract, interfaces));
                 stubClasses.put(name, kind.equals("interface") ? "java.lang.Object" : parent);
             }
         } catch (java.io.IOException e) {
@@ -94,20 +102,21 @@ public class JdkGapTransformer implements ClassHolderTransformer {
         }
     }
 
-    private static ClassHolder createStubClass(String kind, String name, String parent) {
+    private static ClassHolder createStubClass(String kind, String name, String parent, boolean isAbstract,
+            String[] interfaces) {
         ClassHolder c = new ClassHolder(name);
         c.setLevel(AccessLevel.PUBLIC);
+        for (String i : interfaces) {
+            c.getInterfaces().add(i);
+        }
         if (kind.equals("interface")) {
             c.getModifiers().add(ElementModifier.INTERFACE);
             c.getModifiers().add(ElementModifier.ABSTRACT);
             c.setParent("java.lang.Object");
-            // A method-less interface lets TeaVM's WASM vtable builder fold it into java.lang.Object's
-            // table and corrupt Object's "concrete" flag, so give every placeholder one marker method.
-            MethodHolder marker = new MethodHolder("mcweb$marker", ValueType.VOID);
-            marker.setLevel(AccessLevel.PUBLIC);
-            marker.getModifiers().add(ElementModifier.ABSTRACT);
-            c.addMethod(marker);
             return c;
+        }
+        if (isAbstract) {
+            c.getModifiers().add(ElementModifier.ABSTRACT);
         }
         c.setParent(parent);
         return c;
@@ -116,6 +125,17 @@ public class JdkGapTransformer implements ClassHolderTransformer {
     @Override
     public void transformClass(ClassHolder cls, ClassHolderTransformerContext context) {
         loadStubs(context);
+        if (cls.getName().startsWith("org.teavm.runtime.Fiber$Platform")) {
+            // These classes are really browser objects (anyref). With reflection support enabled TeaVM
+            // would generate a reflective constructor helper for their public default constructor, and
+            // that helper is ill-typed. Hide the constructor from reflection.
+            for (MethodHolder m : cls.getMethods()) {
+                if (m.getName().equals("<init>")) {
+                    m.setLevel(AccessLevel.PACKAGE_PRIVATE);
+                }
+            }
+            return;
+        }
         if (cls.getName().startsWith("org.teavm.")) {
             return;
         }
@@ -124,6 +144,12 @@ public class JdkGapTransformer implements ClassHolderTransformer {
         boolean libraryCaller = cls.getName().startsWith("java.") || cls.getName().startsWith("javax.");
         Map<MethodReference, MethodReference> generated = new HashMap<>();
         for (MethodHolder method : new ArrayList<>(cls.getMethods())) {
+            if (cutMethods.contains(cls.getName() + "#" + method.getName()) && method.getProgram() != null) {
+                MethodHolder t = createThrowing(method.getName(), method.getSignature(),
+                        cls.getName() + "." + method.getName() + " was cut from the browser build");
+                method.setProgram(t.getProgram());
+                continue;
+            }
             Program program = method.getProgram();
             if (program == null) {
                 continue;
@@ -220,16 +246,18 @@ public class JdkGapTransformer implements ClassHolderTransformer {
         return context.getHierarchy().resolve(f) != null;
     }
 
-    private boolean isPlatform(String owner) {
-        if (owner.startsWith("java.") || owner.startsWith("javax.") || stubClasses.containsKey(owner)) {
-            return true;
-        }
+    private boolean isLenient(String owner) {
         for (String p : lenientPrefixes) {
             if (owner.startsWith(p)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean isPlatform(String owner) {
+        return owner.startsWith("java.") || owner.startsWith("javax.") || stubClasses.containsKey(owner)
+                || isLenient(owner);
     }
 
     /** Library classes that extend a placeholder (e.g. netty's JFR events) inherit its missing members. */
@@ -246,8 +274,12 @@ public class JdkGapTransformer implements ClassHolderTransformer {
 
     private void rewriteField(GetFieldInstruction get, ClassHolderTransformerContext context) {
         FieldReference f = get.getField();
-        if (!isPlatform(f.getClassName())
-                || (isResolvable(f.getClassName(), context) && isFieldResolved(f, context))) {
+        // Only placeholders (and library classes inheriting from them) get the null/0 fallback. Real
+        // JDK classes never do: the hierarchy lookup does not see TeaVM's mapped fields reliably, so a
+        // "missing" field there is usually present (Level.FINE, StandardCharsets.UTF_8, ...).
+        String owner = f.getClassName();
+        boolean placeholder = stubClasses.containsKey(owner) || isLenient(owner) || inheritsStub(owner, context);
+        if (!placeholder || (isResolvable(owner, context) && isFieldResolved(f, context))) {
             return;
         }
         Instruction replacement;

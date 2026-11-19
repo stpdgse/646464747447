@@ -73,6 +73,25 @@ public class Driver {
             if (problems.isEmpty()) {
                 System.out.println("GENERATED OK");
             } else {
+                System.out.println("(problems present)");
+            }
+            {
+                var di = tool.getDependencyInfo();
+                java.util.Map<String, Integer> pk = new java.util.TreeMap<>();
+                for (String c : di.getReachableClasses()) {
+                    String[] parts = c.split("\\.");
+                    int n = Math.min(parts.length - 1, c.startsWith("net.minecraft") || c.startsWith("com.mojang") ? 4 : 3);
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < n; i++) {
+                        sb.append(i > 0 ? "." : "").append(parts[i]);
+                    }
+                    pk.merge(sb.toString(), 1, Integer::sum);
+                }
+                for (var e : pk.entrySet()) {
+                    System.out.println("PKG " + e.getValue() + " " + e.getKey());
+                }
+            }
+            if (!problems.isEmpty()) {
                 System.out.println("GENERATED WITH " + problems.size() + " SEVERE PROBLEMS");
                 var consumer = new org.teavm.diagnostics.DefaultProblemTextConsumer();
                 for (var p : problems) {

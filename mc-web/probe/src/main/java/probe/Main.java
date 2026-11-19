@@ -28,6 +28,8 @@ public class Main {
         } catch (UnsupportedOperationException e) {
             System.out.println("expected: " + e.getMessage());
         }
+        System.out.println("fine=" + java.util.logging.Level.FINE + " utf8=" + java.nio.charset.StandardCharsets.UTF_8
+                + " maxint=" + Integer.MAX_VALUE + " empty=" + java.util.Collections.EMPTY_LIST);
         MessageDigest s2 = MessageDigest.getInstance("SHA-256");
         sb.setLength(0);
         for (byte b : s2.digest("abc".getBytes("UTF-8"))) sb.append(String.format("%02x", b));
