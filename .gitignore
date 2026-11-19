@@ -31,3 +31,10 @@ gbc-handheld/build/schematic*.erc
 gbc-handheld/build/*.kicad_pcb-bak
 gbc-handheld/build/placed.kicad_pro
 gbc-handheld/build/unplaced.kicad_pro
+
+# mc-web local-only work dir (Mojang jar, assets, build output) - never commit
+mc-web/work/
+mc-web/build/
+mc-web/feasibility/build/
+mc-web/feasibility/.gradle/
+mc-web/feasibility/*.log
