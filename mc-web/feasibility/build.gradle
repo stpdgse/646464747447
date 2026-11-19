@@ -69,5 +69,6 @@ dependencies {
 teavm.wasmGC {
     mainClass = 'net.minecraft.client.main.Main'
     outOfProcess = false
+    fastGlobalAnalysis = true
     obfuscated = false
 }
