@@ -6,6 +6,10 @@ repositories {
     mavenCentral()
     maven { url 'https://libraries.minecraft.net' }
 }
+configurations.all {
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+}
 dependencies {
     implementation files('../classlib-ext/build/libs/classlib-ext.jar')
     implementation files('../work/client.jar')

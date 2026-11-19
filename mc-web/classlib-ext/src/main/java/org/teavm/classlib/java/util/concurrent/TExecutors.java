@@ -36,6 +36,18 @@ public final class TExecutors {
         return new TThreadPoolExecutor(Integer.MAX_VALUE, null);
     }
 
+    public static TScheduledExecutorService newScheduledThreadPool(int n) {
+        return new TScheduledThreadPoolExecutor(n);
+    }
+
+    public static TScheduledExecutorService newScheduledThreadPool(int n, TThreadFactory f) {
+        return new TScheduledThreadPoolExecutor(n, f);
+    }
+
+    public static TScheduledExecutorService newSingleThreadScheduledExecutor() {
+        return new TScheduledThreadPoolExecutor(1);
+    }
+
     public static TThreadFactory defaultThreadFactory() {
         return Thread::new;
     }
