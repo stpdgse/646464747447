@@ -66,6 +66,7 @@ dependencies {
     gameLibs 'org.slf4j:slf4j-api:2.0.17'
 }
 configurations.gameLibs {
+    exclude group: 'org.lwjgl'
     exclude group: 'com.mojang', module: 'jtracy'
     exclude group: 'com.mojang', module: 'text2speech'
     exclude group: 'ca.weblite'

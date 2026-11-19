@@ -1,6 +1,6 @@
 """List the members of given JDK classes that jars actually reference.
 
-usage: apiuse.py CLASS[,CLASS...] JAR [JAR...]
+usage: apiuse.py CLASS[,CLASS...] JAR [JAR...]   (a trailing * makes a name a prefix)
 Parses the constant pool of every .class in the jars (no JVM needed).
 """
 import struct
@@ -58,6 +58,7 @@ def refs(data):
 
 def main():
     wanted = set(sys.argv[1].split(','))
+    prefixes = tuple(w[:-1] for w in wanted if w.endswith('*'))
     use = defaultdict(set)
     for jar in sys.argv[2:]:
         try:
@@ -72,7 +73,7 @@ def main():
             except Exception:
                 continue
             for c, m, d in r:
-                if c in wanted:
+                if c in wanted or (prefixes and c.startswith(prefixes)):
                     use[c].add((m, d))
     for c in sorted(use):
         print('##', c)
