@@ -1,0 +1,8 @@
+plugins { id 'java-library' }
+repositories { mavenCentral() }
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+dependencies {
+    compileOnly 'org.teavm:teavm-classlib:0.16.0'
+    compileOnly 'org.teavm:teavm-core:0.16.0'
+    compileOnly 'org.teavm:teavm-interop:0.16.0'
+}

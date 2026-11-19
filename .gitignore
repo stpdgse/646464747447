@@ -39,3 +39,7 @@ mc-web/feasibility/build/
 mc-web/feasibility/.gradle/
 mc-web/feasibility/*.log
 mc-web/feasibility/*.hprof
+mc-web/classlib-ext/build/
+mc-web/classlib-ext/.gradle/
+mc-web/feasibility/build.*.log
+mc-web/feasibility/build.keep.log

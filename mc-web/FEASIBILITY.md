@@ -39,3 +39,23 @@ analysis only reports what is reachable from `Main` so far.
 ## Next
 Phase 2: patch layer (our own replacements for the missing JDK classes), reproducible local build
 script, and a first successful `.wasm` output.
+
+## Phase 2 progress (in progress)
+
+- New module `mc-web/classlib-ext/`: our own TeaVM class-library extension, written from scratch.
+  Classes named `T<Name>` under `org.teavm.classlib.java...` replace the missing JDK classes.
+  Done so far: `ReentrantLock`, `ReentrantReadWriteLock` (+ `Lock`, `Condition`, `ReadWriteLock`),
+  `Future`, `FutureTask`, `ExecutorService`, `AbstractExecutorService`, `ThreadPoolExecutor`,
+  `Executors`, `ForkJoinPool`, `ThreadFactory`, `ConcurrentLinkedQueue`, `LinkedBlockingQueue`,
+  `TimeoutException`, `RejectedExecutionException`. Verified: the lock and Guava segment errors
+  disappeared in the next TeaVM run.
+- `log4j-core` and the log4j SLF4J binding are removed from the build (not needed in a browser).
+- Heap: use `-Xmx11g`. A 24 GB setting gets the process killed on this 15 GB machine.
+- Error count is 116 distinct items (was 125 after the first extension pass, 104 at the start).
+  The count is not monotonic because fixing one layer lets TeaVM see the next.
+- Remaining groups: `CompletableFuture`, atomic arrays, `LockSupport`, scheduled executors;
+  `ClassLoader`/`Class`/`Package` resource and reflection methods; `System.exit/getenv/load*`,
+  `Runtime.maxMemory/exec`; `File`/`NIO` channel methods; `Locale`, `UUID`, `Date`, `Character`,
+  `Math` gaps; `java.net`/`javax.net.ssl` (HTTP, not needed offline); `sun.misc.Unsafe`
+  (JOML, LWJGL, Guava); JNA internals; LWJGL `system` internals (the native shim, Phase 3).
+- Each full compile takes about 8 minutes.
