@@ -11,7 +11,8 @@ import sys
 
 PLATFORM = ('java.', 'javax.', 'jdk.', 'sun.')
 OPTIONAL = ('org.osgi.', 'org.apache.log4j.', 'org.slf4j.', 'com.lmax.', 'aQute.', 'com.google.auto.',
-            'oshi.', 'com.sun.jna.')
+            'oshi.', 'com.sun.jna.', 'io.netty.channel.epoll.', 'io.netty.channel.kqueue.',
+            'io.netty.channel.unix.', 'com.mojang.jtracy.', 'com.mojang.text2speech.', 'ca.weblite.')
 INTERFACES = {
     'java.nio.file.PathMatcher',
     'com.sun.jna.Structure$ByValue', 'com.sun.jna.Structure$ByReference', 'com.sun.jna.Library',

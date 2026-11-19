@@ -66,6 +66,14 @@ dependencies {
     gameLibs 'org.slf4j:slf4j-api:2.0.17'
 }
 configurations.gameLibs {
+    exclude group: 'com.mojang', module: 'jtracy'
+    exclude group: 'com.mojang', module: 'text2speech'
+    exclude group: 'ca.weblite'
+    exclude group: 'io.netty', module: 'netty-transport-classes-epoll'
+    exclude group: 'io.netty', module: 'netty-transport-classes-kqueue'
+    exclude group: 'io.netty', module: 'netty-transport-native-epoll'
+    exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
+    exclude group: 'io.netty', module: 'netty-transport-native-unix-common'
     exclude group: 'net.java.dev.jna'
     exclude group: 'com.github.oshi'
     exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
