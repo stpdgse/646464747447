@@ -45,3 +45,4 @@ mc-web/feasibility/build.*.log
 mc-web/feasibility/build.keep.log
 mc-web/probe/build/
 mc-web/probe/.gradle/
+mc-web/feasibility/fast.start
