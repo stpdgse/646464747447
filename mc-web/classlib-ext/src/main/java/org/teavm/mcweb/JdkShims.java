@@ -21,6 +21,23 @@ public final class JdkShims {
     private JdkShims() {
     }
 
+    // java.io ----------------------------------------------------------------------------------
+
+    public static long transferTo(java.io.BufferedReader in, java.io.Writer out) throws java.io.IOException {
+        return transferTo((java.io.Reader) in, out);
+    }
+
+    public static long transferTo(java.io.Reader in, java.io.Writer out) throws java.io.IOException {
+        char[] buf = new char[4096];
+        long total = 0;
+        int n;
+        while ((n = in.read(buf, 0, buf.length)) >= 0) {
+            out.write(buf, 0, n);
+            total += n;
+        }
+        return total;
+    }
+
     // java.lang.System / Runtime ---------------------------------------------------------------
 
     public static Map<String, String> getenv() {
