@@ -101,6 +101,12 @@ public class JdkGapTransformer implements ClassHolderTransformer {
             c.getModifiers().add(ElementModifier.INTERFACE);
             c.getModifiers().add(ElementModifier.ABSTRACT);
             c.setParent("java.lang.Object");
+            // A method-less interface lets TeaVM's WASM vtable builder fold it into java.lang.Object's
+            // table and corrupt Object's "concrete" flag, so give every placeholder one marker method.
+            MethodHolder marker = new MethodHolder("mcweb$marker", ValueType.VOID);
+            marker.setLevel(AccessLevel.PUBLIC);
+            marker.getModifiers().add(ElementModifier.ABSTRACT);
+            c.addMethod(marker);
             return c;
         }
         c.setParent(parent);

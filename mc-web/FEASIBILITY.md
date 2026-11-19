@@ -81,3 +81,25 @@ script, and a first successful `.wasm` output.
 - Real implementations still owed (currently stubs or throwing): `FileChannel` (OPFS, Phase 4),
   `Thread` constructors taking a `ThreadGroup`, `Class.getGenericSuperclass` (Gson `TypeToken`),
   `sun.misc.Unsafe` users (JOML, Netty, Guava).
+
+## Phase 2 result: first `game.wasm`
+
+- `mc-web/driver/` runs the TeaVM tool in-process on the game (`./run.sh out`, about 1 minute for
+  analysis, 3.5 minutes through code generation) and prints TeaVM's own problem list. It also holds
+  the diagnostics that found the blocker below.
+- **Root cause of the vtable crash:** TeaVM 0.16's WASM GC vtable builder merges "trivial" tables.
+  JNA's huge empty-interface web made `java.lang.Object`'s table collapse into an interface
+  (`com.sun.jna.platform.unix.Reboot`), so Object looked non-concrete. A placeholder that was an
+  interface in reality but declared as a class caused the same class of failure for `PathMatcher`.
+- **Fix:** JNA, jna-platform and OSHI are removed from the build (native code; useless in a browser)
+  and replaced by generated placeholders.
+- **Result:** `game.wasm` is generated (about 200 MB; unoptimized, with debug info). TeaVM still
+  reports 525 problems, all of one kind: native methods with no browser implementation.
+
+| Native methods | Where | Plan |
+|---|---|---|
+| 204 | `org.lwjgl.system` (JNI, LibFFI, MemoryAccessJNI) | Phase 3 LWJGL shim |
+| 115 | `org.lwjgl.opengl` (GL11C ... GL45C) | Phase 3: WebGL2 |
+| 163 | `io.netty.channel` (epoll, kqueue, unix sockets) | drop the native transports |
+| 20 | `com.mojang.jtracy` (profiler) | drop |
+| 15 | `org.lwjgl.stb`, `lwjgl.util.vma`, text2speech, objc bridge | shim or drop |

@@ -46,3 +46,11 @@ mc-web/feasibility/build.keep.log
 mc-web/probe/build/
 mc-web/probe/.gradle/
 mc-web/feasibility/fast.start
+mc-web/driver/libs/
+mc-web/driver/out*/
+mc-web/driver/classes/
+mc-web/driver/bisect/classes/
+mc-web/driver/*.log
+mc-web/driver/*.time
+mc-web/driver/.gradle/
+mc-web/driver/build/

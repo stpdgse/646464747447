@@ -1,6 +1,7 @@
 """Turn a TeaVM build log into placeholder-class declarations for the mc-web plugin.
 
-usage: genstubs.py BUILD_LOG STUBS_FILE
+usage: genstubs.py BUILD_LOG STUBS_FILE   (also reads driver output: 'reachable but no holder: X' and
+'MISSING PARENT: X of Y' lines)
 Adds a line for every 'Class X was not found' / 'implements' / 'extends ... missing' entry that is a
 platform type (java.*, javax.*, jdk.*, sun.*) or a known optional third-party type. Existing lines are
 kept. Types TeaVM already implements are never reported, so nothing here shadows real behaviour.
@@ -9,7 +10,19 @@ import re
 import sys
 
 PLATFORM = ('java.', 'javax.', 'jdk.', 'sun.')
-OPTIONAL = ('org.osgi.', 'org.apache.log4j.', 'org.slf4j.', 'com.lmax.')
+OPTIONAL = ('org.osgi.', 'org.apache.log4j.', 'org.slf4j.', 'com.lmax.', 'aQute.', 'com.google.auto.',
+            'oshi.', 'com.sun.jna.')
+INTERFACES = {
+    'java.nio.file.PathMatcher',
+    'com.sun.jna.Structure$ByValue', 'com.sun.jna.Structure$ByReference', 'com.sun.jna.Library',
+    'java.net.SocketOption', 'java.util.concurrent.Delayed', 'java.nio.file.Watchable',
+    'java.nio.file.attribute.FileAttributeView', 'java.security.spec.KeySpec',
+    'java.security.spec.AlgorithmParameterSpec', 'java.security.PrivateKey',
+    'java.net.http.HttpRequest$BodyPublisher', 'java.net.http.HttpResponse$BodyHandler',
+}
+INTERFACE_PREFIXES = ('aQute.', 'com.google.auto.')
+JFR_CLASSES = {'jdk.jfr.Event', 'jdk.jfr.FlightRecorder', 'jdk.jfr.EventType', 'jdk.jfr.Recording',
+               'jdk.jfr.Configuration'}
 
 
 def main():
@@ -21,12 +34,17 @@ def main():
     new = {}
     ifaces, supers = set(), set()
     for l in open(log):
+        if l.startswith('PROBLEM: '):
+            l = l[len('PROBLEM: '):]
         m = re.match(r'Class (\S+) implements (\S+), which is missing', l)
         if m:
             ifaces.add(m.group(2))
         m = re.match(r'Class (\S+) extends (\S+), which is missing', l)
         if m:
             supers.add(m.group(2))
+        m = re.match(r'(?:reachable but no holder|MISSING PARENT|MISSING INTERFACE): (\S+)', l)
+        if m:
+            new.setdefault(m.group(1), None)
         m = re.match(r'Class (\S+) was not found', l)
         if m:
             new.setdefault(m.group(1), None)
@@ -36,7 +54,8 @@ def main():
             continue
         if not (n.startswith(PLATFORM) or n.startswith(OPTIONAL)):
             continue
-        if n in ifaces:
+        if n in ifaces or n in INTERFACES or n.startswith(INTERFACE_PREFIXES) \
+                or (n.startswith('jdk.jfr.') and n not in JFR_CLASSES):
             kind = 'interface'
         elif n.endswith(('Exception', 'Error')):
             kind = 'exception'
