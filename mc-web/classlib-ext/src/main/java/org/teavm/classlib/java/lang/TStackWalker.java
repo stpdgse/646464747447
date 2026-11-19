@@ -29,6 +29,11 @@ public final class TStackWalker extends TObject {
         return new TStackWalker();
     }
 
+    /** TeaVM has no stack inspection; callers (logger factories) only need some class. */
+    public Class<?> getCallerClass() {
+        return Object.class;
+    }
+
     public <T> T walk(Function<? super Stream<StackFrame>, ? extends T> function) {
         return function.apply(Collections.<StackFrame>emptyList().stream());
     }

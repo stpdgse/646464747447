@@ -240,7 +240,6 @@ interface java.util.SequencedMap - - java.util.Map
 interface java.util.Set - - java.util.Collection
 interface java.util.SortedMap - - java.util.SequencedMap
 interface java.util.Spliterator - - -
-class java.util.Spliterators$AbstractSpliterator java.lang.Object abstract java.util.Spliterator
 class java.util.SplittableRandom java.lang.Object - java.util.random.RandomGenerator,java.util.random.RandomGenerator$SplittableGenerator
 class java.util.StringJoiner java.lang.Object - -
 class java.util.concurrent.ConcurrentHashMap$CollectionView java.lang.Object abstract java.util.Collection,java.io.Serializable

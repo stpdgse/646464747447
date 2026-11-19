@@ -103,3 +103,27 @@ script, and a first successful `.wasm` output.
 | 163 | `io.netty.channel` (epoll, kqueue, unix sockets) | drop the native transports |
 | 20 | `com.mojang.jtracy` (profiler) | drop |
 | 15 | `org.lwjgl.stb`, `lwjgl.util.vma`, text2speech, objc bridge | shim or drop |
+
+## Phase 3 status: the game runs in a WebAssembly engine
+
+- **Dropped for the browser:** Netty native transports, JNA, OSHI, jtracy (replaced by real no-op
+  classes), text2speech (silent narrator), and every LWJGL jar (replaced by placeholders with their
+  true class hierarchies, extracted from the real jars by `tools/stubinfo`).
+- **Clean output:** `game.wasm` compiles with zero TeaVM problems (`driver/run.sh`), the oversized
+  start function is split by `tools/wasmsplit.py` (V8 rejects any function over 7.6 MB), and the
+  result validates in both Binaryen and V8 with zero errors.
+- **Real bugs found and worked around** (all documented in the code):
+  - `Object`'s vtable merged into a JNA interface (fixed by removing JNA).
+  - TeaVM coroutine code-gen type error in two methods (`cut` list in `stub-classes.txt`).
+  - TeaVM reflective-constructor helper ill-typed for `Fiber$Platform*` (constructor hidden).
+  - My own field-fallback rewriter nulled real JDK constants (now limited to placeholders).
+- **Running:** `tools/cycle.sh` rebuilds everything and runs the game in Node (same V8 as Chrome).
+  Minecraft's `Main.main` starts, parses launch arguments (`org.teavm.mcweb.McWebMain`), prints its
+  own crash report, and stops at **"Loading native libraries"**: the LWJGL layer.
+- **Next:** implement `org.lwjgl.system` (memory, configuration, library loading), then SDL
+  (window, input, events), OpenGL (WebGL2), shaders (shaderc/SPIR-V Cross stand-ins), stb, OpenAL.
+- **Design notes for later:**
+  - WASM GC objects cannot be shared between Web Workers. The planned integrated-server worker has
+    to communicate by message passing, not shared memory.
+  - Methods that can block (locks, `wait`, `Thread.sleep`) become TeaVM coroutines and spread
+    through the call graph. Keep blocking primitives out of hot paths.

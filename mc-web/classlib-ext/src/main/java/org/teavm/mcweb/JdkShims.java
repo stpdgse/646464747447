@@ -21,7 +21,13 @@ public final class JdkShims {
     private JdkShims() {
     }
 
-    // java.io ----------------------------------------------------------------------------------
+    // java.io / java.nio.file --------------------------------------------------------------------
+
+    public static java.nio.file.Path toPath(java.io.File file) {
+        return java.nio.file.Paths.get(file.getPath());
+    }
+
+    // java.io (continued) ----------------------------------------------------------------------------------
 
     public static long transferTo(java.io.BufferedReader in, java.io.Writer out) throws java.io.IOException {
         return transferTo((java.io.Reader) in, out);
