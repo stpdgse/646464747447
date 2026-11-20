@@ -2,12 +2,18 @@ package com.kamikazeskies.drone;
 
 import com.kamikazeskies.core.KamikazeSkies;
 import com.kamikazeskies.core.KsRegistries;
+import com.kamikazeskies.destruction.CollapseManager;
 import com.kamikazeskies.sim.DroneParams;
 import com.kamikazeskies.sim.FlightInput;
+import com.kamikazeskies.sim.Vec3d;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -15,6 +21,8 @@ import net.minecraft.world.phys.Vec3;
  * <ul>
  *   <li>{@code fly}: the joining player's camera rides a drone flying a fixed script (FPV view, OSD, camera roll).</li>
  *   <li>{@code model}: a hovering drone floats in front of the player (checks the 3D model and prop animation).</li>
+ *   <li>{@code strike}: a cottage stands ahead; the player's camera rides an armed drone that homes in on it. At the
+ *       blast the game drops into slow motion while the structure collapses.</li>
  * </ul>
  */
 public final class DemoMode {
@@ -31,6 +39,7 @@ public final class DemoMode {
         if (drone == null) return;
         Vec3 look = player.getLookAngle();
         Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
+        if (MODE.equalsIgnoreCase("strike")) { startStrike(player, level); return; }
         boolean model = MODE.equalsIgnoreCase("model");
         Vec3 pos = player.position().add(flat.scale(model ? 1.6 : 2.5)).add(0, model ? 1.5 : 0.1, 0);
         drone.snapTo(pos);
@@ -45,6 +54,83 @@ public final class DemoMode {
             drone.debugScript(t -> script(t, drone, groundY));
         }
         KamikazeSkies.LOGGER.info("KS_DEMO started ({})", MODE);
+    }
+
+    // ---- strike demo ----------------------------------------------------------------------------------
+    private static boolean slowMo;
+    private static long slowMoStart;
+
+    private static void startStrike(ServerPlayer player, ServerLevel level) {
+        Vec3 look = player.getLookAngle();
+        int fx = Math.abs(look.x) > Math.abs(look.z) ? (int) Math.signum(look.x) : 0;
+        int fz = fx == 0 ? (look.z >= 0 ? 1 : -1) : 0;                   // horizontal facing axis
+        int rx = -fz, rz = fx;                                           // the player's right-hand axis
+        BlockPos feet = player.blockPosition();
+        int gy = feet.getY();
+        int dist = 34;                                                   // metres from the operator to the cottage front wall
+        double yaw = player.getYRot();
+
+        // cottage: 7 wide (u) x 5 deep (v) planks walls 4 high, glass windows, spruce roof. u is to the right, v away from the operator.
+        for (int u = -3; u <= 3; u++) {
+            for (int v = 0; v <= 4; v++) {
+                boolean wall = u == -3 || u == 3 || v == 0 || v == 4;
+                for (int y = 0; y < 4; y++) {
+                    Block b = Blocks.AIR;
+                    if (wall) {
+                        b = Blocks.OAK_PLANKS;
+                        boolean window = y == 2 && ((v == 0 || v == 4) && (u == -1 || u == 1)) || (y == 2 && (u == -3 || u == 3) && v == 2);
+                        boolean door = v == 4 && u == 0 && y < 2;
+                        if (window) b = Blocks.GLASS;
+                        if (door) b = Blocks.AIR;
+                    }
+                    set(level, gy + y, feet, fx, fz, rx, rz, dist, u, v, b);
+                }
+                set(level, gy + 4, feet, fx, fz, rx, rz, dist, u, v, Blocks.SPRUCE_PLANKS);       // roof
+            }
+        }
+        Vec3 target = new Vec3(feet.getX() + 0.5 + fx * dist + rx * 0.0, gy + 2.2, feet.getZ() + 0.5 + fz * dist);
+
+        DroneEntity drone = KsRegistries.DRONE.get().create(level, EntitySpawnReason.COMMAND);
+        if (drone == null) return;
+        drone.snapTo(new Vec3(feet.getX() + 0.5 + fx * 2.5, gy + 0.1, feet.getZ() + 0.5 + fz * 2.5));
+        drone.resetOrientation((float) yaw);
+        drone.setWarhead(Warhead.IMPACT);
+        level.addFreshEntity(drone);
+        drone.startPilot(player);
+        double tilt = 0.55 * P.maxAngleDeg();
+        drone.debugScript(t -> {
+            if (t < 12) return new FlightInput(0, 0, 0, 0, false, 1);
+            Vec3d pos = drone.sim().position();
+            double wantYaw = Math.toDegrees(Math.atan2(-(target.x - pos.x()), target.z - pos.z()));
+            double err = ((wantYaw - drone.sim().orientation().minecraftYawDeg() + 540) % 360) - 180;
+            double alt = altHold(drone, target.y, tilt);
+            return new FlightInput(alt, 0, t < 30 ? 0 : 0.55, Math.max(-1, Math.min(1, err / 40.0)), true, 1);
+        });
+        KamikazeSkies.LOGGER.info("KS_DEMO started (strike)");
+    }
+
+    private static void set(ServerLevel level, int y, BlockPos feet, int fx, int fz, int rx, int rz, int dist, int u, int v, Block b) {
+        level.setBlock(new BlockPos(feet.getX() + fx * (dist + v) + rx * u, y, feet.getZ() + fz * (dist + v) + rz * u), b.defaultBlockState(), 2);
+    }
+
+    /** Called by the blast executor: slow the game down so the collapse is easy to capture. */
+    public static void onBlast(ServerLevel level) {
+        if (!MODE.equalsIgnoreCase("strike") || slowMo) return;
+        slowMo = true;
+        slowMoStart = level.getGameTime();
+        level.getServer().tickRateManager().setTickRate(4.0f);
+        KamikazeSkies.LOGGER.info("KS_DEMO impact: slow motion");
+    }
+
+    /** Restore normal speed once the collapse has played out. */
+    public static void tick(MinecraftServer server) {
+        if (!slowMo) return;
+        long elapsed = server.overworld().getGameTime() - slowMoStart;
+        if (elapsed > 30 && !CollapseManager.busy()) {
+            server.tickRateManager().setTickRate(20.0f);
+            slowMo = false;
+            KamikazeSkies.LOGGER.info("KS_DEMO slow motion over");
+        }
     }
 
     /**

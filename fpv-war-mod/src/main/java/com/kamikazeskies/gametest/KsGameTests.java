@@ -52,13 +52,13 @@ public final class KsGameTests {
      * The 1x1 test structure only keeps its own chunk ticking; drones that fly into neighbouring chunks (or are
      * spawned there) would otherwise start ticking late and make tests nondeterministic. Force-load a 5x5 area.
      */
-    private static void keepAreaTicking(GameTestHelper h) {
+    static void keepAreaTicking(GameTestHelper h) {
         BlockPos origin = h.absolutePos(BlockPos.ZERO);
         int cx = origin.getX() >> 4, cz = origin.getZ() >> 4;
         for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) h.getLevel().setChunkForced(cx + dx, cz + dz, true);
     }
 
-    private static DroneEntity spawnDrone(GameTestHelper h, double x, double y, double z) {
+    static DroneEntity spawnDrone(GameTestHelper h, double x, double y, double z) {
         keepAreaTicking(h);
         DroneEntity d = h.spawn(KsRegistries.DRONE.get(), new Vec3(x, y, z));
         d.resetOrientation(0);            // facing +Z
@@ -66,7 +66,7 @@ public final class KsGameTests {
         return d;
     }
 
-    private static void floor(GameTestHelper h, int y, int half) {
+    static void floor(GameTestHelper h, int y, int half) {
         keepAreaTicking(h);
         for (int x = -half; x <= half; x++) for (int z = -half; z <= half + 20; z++) h.setBlock(new BlockPos(x, y, z), Blocks.STONE);
     }
@@ -76,7 +76,7 @@ public final class KsGameTests {
      * tick) until then, so results do not depend on when the chunk started entity-ticking. A failing check keeps
      * failing, which surfaces as the test failure at timeout.
      */
-    private static void afterTicks(GameTestHelper h, DroneEntity d, int ticks, Runnable check) {
+    static void afterTicks(GameTestHelper h, DroneEntity d, int ticks, Runnable check) {
         RuntimeException[] failure = {null};
         boolean[] ran = {false};
         h.succeedWhen(() -> {
@@ -89,7 +89,7 @@ public final class KsGameTests {
         });
     }
 
-    private static Vec3 rel(GameTestHelper h, DroneEntity d) { return h.relativeVec(d.position()); }
+    static Vec3 rel(GameTestHelper h, DroneEntity d) { return h.relativeVec(d.position()); }
 
     // ---- tests --------------------------------------------------------------------------------------
     /** Phase 0 smoke test: the world is live, blocks can be placed and read back. */

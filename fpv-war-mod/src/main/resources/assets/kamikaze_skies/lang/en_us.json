@@ -4,7 +4,6 @@
   "entity.kamikaze_skies.fpv_drone": "FPV Drone",
   "message.kamikaze_skies.link_established": "Link established. Press R to arm.",
   "message.kamikaze_skies.crashed": "Drone destroyed (impact %s m/s)",
-
   "key.category.kamikaze_skies.flight": "Kamikaze Skies - Flight",
   "key.kamikaze_skies.pitch_forward": "Pitch forward (nose down)",
   "key.kamikaze_skies.pitch_back": "Pitch back (nose up)",
@@ -17,10 +16,14 @@
   "key.kamikaze_skies.arm": "Arm / disarm",
   "key.kamikaze_skies.assist_mode": "Cycle assist mode",
   "key.kamikaze_skies.exit_goggles": "Take goggles off",
-
   "kamikaze_skies.configuration.title": "Kamikaze Skies Configs",
   "kamikaze_skies.configuration.section.kamikaze_skies.synced.toml": "Kamikaze Skies Settings",
   "kamikaze_skies.configuration.section.kamikaze_skies.synced.toml.title": "Kamikaze Skies Settings",
   "kamikaze_skies.configuration.flightSubsteps": "Flight substeps per tick",
-  "kamikaze_skies.configuration.crashSpeed": "Crash speed (m/s)"
+  "kamikaze_skies.configuration.crashSpeed": "Crash speed (m/s)",
+  "item.kamikaze_skies.fpv_strike_drone": "FPV Strike Drone (impact)",
+  "item.kamikaze_skies.fpv_shaped_drone": "FPV Strike Drone (shaped charge)",
+  "message.kamikaze_skies.detonated": "Warhead detonated",
+  "kamikaze_skies.configuration.destructionQuality": "Destruction quality",
+  "kamikaze_skies.configuration.detonationSpeed": "Detonation speed (m/s)"
 }

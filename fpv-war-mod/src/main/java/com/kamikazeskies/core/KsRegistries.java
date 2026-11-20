@@ -2,6 +2,7 @@ package com.kamikazeskies.core;
 
 import com.kamikazeskies.drone.DroneEntity;
 import com.kamikazeskies.drone.DroneItem;
+import com.kamikazeskies.drone.Warhead;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -26,13 +27,30 @@ public final class KsRegistries {
             b -> b.sized(0.30f, 0.12f).eyeHeight(0.06f).clientTrackingRange(16).updateInterval(1));
 
     public static final DeferredItem<Item> DRONE_ITEM = ITEMS.registerItem(
-            "fpv_drone", DroneItem::new, p -> p.stacksTo(1));
+            "fpv_drone", p -> new DroneItem(p, Warhead.NONE), p -> p.stacksTo(1));
+    public static final DeferredItem<Item> STRIKE_DRONE_ITEM = ITEMS.registerItem(
+            "fpv_strike_drone", p -> new DroneItem(p, Warhead.IMPACT), p -> p.stacksTo(1));
+    public static final DeferredItem<Item> SHAPED_DRONE_ITEM = ITEMS.registerItem(
+            "fpv_shaped_drone", p -> new DroneItem(p, Warhead.SHAPED), p -> p.stacksTo(1));
+
+    /** The item that places (and is returned by picking up) a drone carrying the given warhead. */
+    public static Item itemFor(Warhead w) {
+        return switch (w) {
+            case NONE -> DRONE_ITEM.get();
+            case IMPACT -> STRIKE_DRONE_ITEM.get();
+            case SHAPED -> SHAPED_DRONE_ITEM.get();
+        };
+    }
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB = TABS.register("main", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.kamikaze_skies"))
                     .icon(() -> DRONE_ITEM.get().getDefaultInstance())
-                    .displayItems((params, output) -> output.accept(DRONE_ITEM.get()))
+                    .displayItems((params, output) -> {
+                        output.accept(DRONE_ITEM.get());
+                        output.accept(STRIKE_DRONE_ITEM.get());
+                        output.accept(SHAPED_DRONE_ITEM.get());
+                    })
                     .build());
 
     private KsRegistries() {}

@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_3",
+  "function": "kamikaze_skies:tower_collapses_when_base_is_blasted",
+  "max_ticks": 6000,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty",
+  "padding": 100
+}

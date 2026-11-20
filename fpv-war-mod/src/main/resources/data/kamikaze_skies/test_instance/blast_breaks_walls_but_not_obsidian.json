@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_0",
+  "function": "kamikaze_skies:blast_breaks_walls_but_not_obsidian",
+  "max_ticks": 6000,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty",
+  "padding": 100
+}

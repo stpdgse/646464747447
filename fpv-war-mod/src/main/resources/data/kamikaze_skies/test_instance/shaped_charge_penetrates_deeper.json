@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_2",
+  "function": "kamikaze_skies:shaped_charge_penetrates_deeper",
+  "max_ticks": 6000,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty",
+  "padding": 100
+}

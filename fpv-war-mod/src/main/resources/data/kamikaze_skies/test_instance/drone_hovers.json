@@ -2,7 +2,7 @@
   "type": "minecraft:function",
   "environment": "minecraft:default",
   "function": "kamikaze_skies:drone_hovers",
-  "max_ticks": 400,
+  "max_ticks": 6000,
   "setup_ticks": 1,
   "required": true,
   "structure": "minecraft:empty"

@@ -13,7 +13,14 @@ import net.minecraft.world.phys.Vec3;
 
 /** Places a drone entity on the clicked block face. */
 public class DroneItem extends Item {
-    public DroneItem(Properties properties) { super(properties); }
+    private final Warhead warhead;
+
+    public DroneItem(Properties properties, Warhead warhead) {
+        super(properties);
+        this.warhead = warhead;
+    }
+
+    public Warhead warhead() { return warhead; }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
@@ -27,6 +34,7 @@ public class DroneItem extends Item {
         drone.snapTo(new Vec3(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5));
         drone.setYRot(yaw);
         drone.resetOrientation(yaw);
+        drone.setWarhead(warhead);
         server.addFreshEntity(drone);
         context.getItemInHand().shrink(1);
         return InteractionResult.SUCCESS;

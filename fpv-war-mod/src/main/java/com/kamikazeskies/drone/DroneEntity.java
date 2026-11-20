@@ -13,6 +13,7 @@ import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import com.kamikazeskies.core.KsConfig;
 import com.kamikazeskies.core.KsRegistries;
+import com.kamikazeskies.destruction.BlastExecutor;
 import com.kamikazeskies.sim.DroneParams;
 import com.kamikazeskies.sim.FlightInput;
 import com.kamikazeskies.sim.FlightSim;
@@ -49,6 +50,7 @@ public class DroneEntity extends Entity implements GeoEntity {
     private static final EntityDataAccessor<Float> QZ = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> MOTOR = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> SPEED = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> WARHEAD = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> ARMED = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> PILOT = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
 
@@ -100,7 +102,7 @@ public class DroneEntity extends Entity implements GeoEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder b) {
         b.define(QW, 1f).define(QX, 0f).define(QY, 0f).define(QZ, 0f)
-                .define(MOTOR, 0f).define(SPEED, 0f).define(ARMED, false).define(PILOT, -1);
+                .define(MOTOR, 0f).define(SPEED, 0f).define(WARHEAD, 0).define(ARMED, false).define(PILOT, -1);
     }
 
     public Quat syncedOrientation() {
@@ -114,6 +116,8 @@ public class DroneEntity extends Entity implements GeoEntity {
     /** True speed in m/s as simulated by the server. */
     public float speed() { return entityData.get(SPEED); }
     public boolean isArmed() { return entityData.get(ARMED); }
+    public Warhead warhead() { return Warhead.byOrdinal(entityData.get(WARHEAD)); }
+    public void setWarhead(Warhead w) { entityData.set(WARHEAD, w.ordinal()); }
     public int pilotEntityId() { return entityData.get(PILOT); }
     public float renderPropAngle(float partialTick) { return prevMotorSpin + (motorSpin - prevMotorSpin) * partialTick; }
 
@@ -208,7 +212,12 @@ public class DroneEntity extends Entity implements GeoEntity {
             Vec3 before = position();
             move(MoverType.SELF, new Vec3(disp.x(), disp.y(), disp.z()));
             Vec3 after = position();
+            Vec3d preImpactVelocity = sim.velocity();          // sim.commit() removes the blocked components
             sim.commit(disp, new Vec3d(after.x - before.x, after.y - before.y, after.z - before.z));
+            if (warhead().armed() && sim.impactSpeed() >= KsConfig.DETONATION_SPEED.getAsDouble()) {
+                detonate(preImpactVelocity);
+                return;
+            }
             if (onGround()) sim.groundContact(GROUND_FRICTION);
             if (sim.impactSpeed() > KsConfig.CRASH_SPEED.getAsDouble()) {
                 crash(sim.impactSpeed());
@@ -242,6 +251,16 @@ public class DroneEntity extends Entity implements GeoEntity {
         entityData.set(QZ, (float) q.z());
     }
 
+    private void detonate(Vec3d preImpactVelocity) {
+        Vec3d dir = preImpactVelocity.normalized();
+        Vec3 axis = dir.lengthSq() < 1e-9 ? new Vec3(0, -1, 0) : new Vec3(dir.x(), dir.y(), dir.z());
+        if (pilot != null) pilot.sendOverlayMessage(Component.translatable("message.kamikaze_skies.detonated"));
+        Vec3 center = position().add(0, getBbHeight() * 0.5, 0);
+        stopPilot();
+        discard();
+        if (level() instanceof ServerLevel server) BlastExecutor.detonate(server, center, axis, warhead().profile(), null);
+    }
+
     private void crash(double impact) {
         if (pilot != null) {
             pilot.sendOverlayMessage(Component.translatable("message.kamikaze_skies.crashed", String.format("%.1f", impact)));
@@ -261,7 +280,7 @@ public class DroneEntity extends Entity implements GeoEntity {
         if (!(player instanceof ServerPlayer sp)) return InteractionResult.PASS;
         if (player.isShiftKeyDown()) {            // pick the drone up
             stopPilot();
-            ItemStack stack = new ItemStack(KsRegistries.DRONE_ITEM.get());
+            ItemStack stack = new ItemStack(KsRegistries.itemFor(warhead()));
             if (!player.getInventory().add(stack)) spawnAtLocation((ServerLevel) level(), stack);
             discard();
             return InteractionResult.SUCCESS;
@@ -281,8 +300,8 @@ public class DroneEntity extends Entity implements GeoEntity {
     }
 
     // ---- persistence (parked drones keep their pose; flight state is not persisted) -----------------
-    @Override protected void readAdditionalSaveData(ValueInput in) { simInitialised = false; }
-    @Override protected void addAdditionalSaveData(ValueOutput out) { }
+    @Override protected void readAdditionalSaveData(ValueInput in) { simInitialised = false; setWarhead(Warhead.byOrdinal(in.getIntOr("Warhead", 0))); }
+    @Override protected void addAdditionalSaveData(ValueOutput out) { out.putInt("Warhead", warhead().ordinal()); }
 
     private static Vec3d toSim(Vec3 v) { return new Vec3d(v.x, v.y, v.z); }
 }

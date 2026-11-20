@@ -17,6 +17,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /** Mod entry point. Common (client + server) bootstrap only; client-only code lives in {@code client/}. */
 @Mod(KamikazeSkies.MODID)
@@ -27,13 +28,16 @@ public class KamikazeSkies {
     public KamikazeSkies(IEventBus modEventBus, ModContainer modContainer) {
         KsRegistries.register(modEventBus);
         KsGameTests.register(modEventBus);
+        com.kamikazeskies.gametest.DestructionGameTests.register(modEventBus);
         modEventBus.addListener(KsNetwork::register);
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent e) -> {
             if (e.getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) PilotRegistry.releasePlayer(sp);
         });
-        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent e) -> PilotRegistry.clear());
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent e) -> { PilotRegistry.clear(); com.kamikazeskies.destruction.CollapseManager.clear(); });
+        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> com.kamikazeskies.destruction.CollapseManager.tick(e.getServer()));
         if (com.kamikazeskies.drone.DemoMode.ENABLED) {
+            NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> com.kamikazeskies.drone.DemoMode.tick(e.getServer()));
             NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent e) -> {
                 if (e.getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.kamikazeskies.drone.DemoMode.start(sp);
             });
