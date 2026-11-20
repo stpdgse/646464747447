@@ -1,0 +1,16 @@
+{
+ "info": {
+  "name": "fpv_quad",
+  "format": "free",
+  "cubes": 20,
+  "groups": 9,
+  "textures": 1,
+  "errors": 0
+ },
+ "exports": {
+  "project": 15459,
+  "java_block": 10799,
+  "bedrock": 9690,
+  "obj": 17909
+ }
+}
