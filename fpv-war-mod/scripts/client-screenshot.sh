@@ -17,6 +17,16 @@ export DISPLAY=$DISP XDG_RUNTIME_DIR=/tmp/xdg-rt LIBGL_ALWAYS_SOFTWARE=1 GALLIUM
 mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"
 say() { printf '[%3ss] %s\n' "$SECONDS" "$*"; }
 
+# Headless dev run: skip the first-launch onboarding, tutorial hints, and never pause when the window is unfocused.
+ensure_options() {
+  local f=run/options.txt; touch "$f"
+  for kv in onboardAccessibility:false tutorialStep:none pauseOnLostFocus:false; do
+    k=${kv%%:*}
+    if grep -q "^$k:" "$f"; then sed -i "s/^$k:.*/$kv/" "$f"; else echo "$kv" >> "$f"; fi
+  done
+}
+ensure_options
+
 Xvfb $DISP -screen 0 1280x720x24 +extension GLX +render -noreset >/dev/null 2>&1 &
 XPID=$!
 setsid ./gradlew --no-daemon --max-workers=1 -Dorg.gradle.parallel=false runClient > "$LOG" 2>&1 &

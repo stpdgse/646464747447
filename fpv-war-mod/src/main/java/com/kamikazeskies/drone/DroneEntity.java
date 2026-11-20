@@ -1,7 +1,16 @@
 package com.kamikazeskies.drone;
 
+import java.util.function.IntFunction;
+
 import org.jspecify.annotations.Nullable;
 
+import com.geckolib.animatable.GeoEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.util.GeckoLibUtil;
 import com.kamikazeskies.core.KsConfig;
 import com.kamikazeskies.core.KsRegistries;
 import com.kamikazeskies.sim.DroneParams;
@@ -33,12 +42,13 @@ import net.minecraft.world.phys.Vec3;
  * A player-piloted quadcopter. The server owns the physics ({@link FlightSim}, substepped each tick, with real
  * block collisions); the client only renders, using the synced orientation.
  */
-public class DroneEntity extends Entity {
+public class DroneEntity extends Entity implements GeoEntity {
     private static final EntityDataAccessor<Float> QW = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> QX = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> QY = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> QZ = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> MOTOR = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> SPEED = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> ARMED = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> PILOT = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
 
@@ -48,6 +58,9 @@ public class DroneEntity extends Entity {
     /** Sentinels far from overflow range: {@code now - lastInputTick} must never wrap. */
     private static final long NEVER = -1_000_000L, ALWAYS = Long.MAX_VALUE / 2;
 
+    private static final RawAnimation SPIN = RawAnimation.begin().thenLoop("animation.fpv_drone.spin");
+    private final AnimatableInstanceCache animCache = GeckoLibUtil.createInstanceCache(this);
+
     // server side
     private final FlightSim sim = new FlightSim(DroneParams.fiveInch());
     private FlightInput input = FlightInput.DISARMED;
@@ -55,6 +68,7 @@ public class DroneEntity extends Entity {
     private @Nullable ServerPlayer pilot;
     private boolean simInitialised;
     private int serverTicks;
+    private @Nullable IntFunction<FlightInput> script;   // dev/test: scripted flight, ignores pilot packets
 
     // client side render interpolation
     private Quat prevQuat = Quat.IDENTITY;
@@ -67,11 +81,26 @@ public class DroneEntity extends Entity {
         this.setNoGravity(true);   // the flight sim applies its own gravity
     }
 
+    // ---- GeckoLib -----------------------------------------------------------------------------------
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        // props spin while armed; faster with more motor output
+        controllers.add(new AnimationController<DroneEntity>("props", 0, test -> {
+            DroneEntity d = test.animatable();
+            if (!d.isArmed()) return PlayState.STOP;
+            test.setControllerSpeed(1.0f + 5.0f * d.motorFraction());
+            return test.setAndContinue(SPIN);
+        }));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() { return animCache; }
+
     // ---- synced data --------------------------------------------------------------------------------
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder b) {
         b.define(QW, 1f).define(QX, 0f).define(QY, 0f).define(QZ, 0f)
-                .define(MOTOR, 0f).define(ARMED, false).define(PILOT, -1);
+                .define(MOTOR, 0f).define(SPEED, 0f).define(ARMED, false).define(PILOT, -1);
     }
 
     public Quat syncedOrientation() {
@@ -82,6 +111,8 @@ public class DroneEntity extends Entity {
     public Quat renderOrientation(float partialTick) { return Quat.slerp(prevQuat, currQuat, partialTick); }
 
     public float motorFraction() { return entityData.get(MOTOR); }
+    /** True speed in m/s as simulated by the server. */
+    public float speed() { return entityData.get(SPEED); }
     public boolean isArmed() { return entityData.get(ARMED); }
     public int pilotEntityId() { return entityData.get(PILOT); }
     public float renderPropAngle(float partialTick) { return prevMotorSpin + (motorSpin - prevMotorSpin) * partialTick; }
@@ -99,6 +130,7 @@ public class DroneEntity extends Entity {
 
     public void startPilot(ServerPlayer player) {
         this.pilot = player;
+        PilotRegistry.bind(player, this);
         entityData.set(PILOT, player.getId());
         this.input = FlightInput.DISARMED;
         this.lastInputTick = level().getGameTime();
@@ -106,6 +138,7 @@ public class DroneEntity extends Entity {
     }
 
     public void stopPilot() {
+        PilotRegistry.unbind(this.pilot, this);
         this.pilot = null;
         entityData.set(PILOT, -1);
         this.input = FlightInput.DISARMED;
@@ -114,10 +147,14 @@ public class DroneEntity extends Entity {
 
     /** Called by the network layer. Ignored unless {@code player} is the current pilot. */
     public void acceptPilotInput(ServerPlayer player, FlightInput in) {
-        if (player != pilot) return;
+        if (player != pilot || script != null) return;
         this.input = in;
         this.lastInputTick = level().getGameTime();
     }
+
+    /** Dev/test hook: fly a script (server tick since this call -> input). Pilot packets are ignored while set. */
+    public void debugScript(IntFunction<FlightInput> script) { this.script = script; this.scriptStart = serverTicks; this.lastInputTick = ALWAYS; }
+    private int scriptStart;
 
     /** Test hook: drive the drone without a player. */
     public void debugSetInput(FlightInput in) {
@@ -160,7 +197,8 @@ public class DroneEntity extends Entity {
         if (pilot != null && (pilot.isRemoved() || !pilot.isAlive() || pilot.level() != level())) stopPilot();
 
         long now = level().getGameTime();
-        FlightInput in = (lastInputTick != ALWAYS && now - lastInputTick > INPUT_TIMEOUT_TICKS) ? FlightInput.DISARMED : input;
+        FlightInput in = script != null ? script.apply(serverTicks - scriptStart)
+                : (lastInputTick != ALWAYS && now - lastInputTick > INPUT_TIMEOUT_TICKS) ? FlightInput.DISARMED : input;
 
         int substeps = KsConfig.FLIGHT_SUBSTEPS.getAsInt();
         double dt = 1.0 / (20.0 * substeps);
@@ -185,6 +223,7 @@ public class DroneEntity extends Entity {
         setXRot((float) q.minecraftPitchDeg());
         publishOrientation(q);
         entityData.set(MOTOR, (float) Math.round(sim.averageMotorFraction() * 50) / 50f);
+        entityData.set(SPEED, (float) Math.round(sim.speed() * 10) / 10f);
         entityData.set(ARMED, in.armed());
     }
 

@@ -1,6 +1,26 @@
 {
+  "itemGroup.kamikaze_skies": "Kamikaze Skies",
+  "item.kamikaze_skies.fpv_drone": "FPV Drone",
+  "entity.kamikaze_skies.fpv_drone": "FPV Drone",
+  "message.kamikaze_skies.link_established": "Link established. Press R to arm.",
+  "message.kamikaze_skies.crashed": "Drone destroyed (impact %s m/s)",
+
+  "key.category.kamikaze_skies.flight": "Kamikaze Skies - Flight",
+  "key.kamikaze_skies.pitch_forward": "Pitch forward (nose down)",
+  "key.kamikaze_skies.pitch_back": "Pitch back (nose up)",
+  "key.kamikaze_skies.roll_left": "Roll left",
+  "key.kamikaze_skies.roll_right": "Roll right",
+  "key.kamikaze_skies.yaw_left": "Yaw left",
+  "key.kamikaze_skies.yaw_right": "Yaw right",
+  "key.kamikaze_skies.throttle_up": "Throttle up",
+  "key.kamikaze_skies.throttle_down": "Throttle down",
+  "key.kamikaze_skies.arm": "Arm / disarm",
+  "key.kamikaze_skies.assist_mode": "Cycle assist mode",
+  "key.kamikaze_skies.exit_goggles": "Take goggles off",
+
   "kamikaze_skies.configuration.title": "Kamikaze Skies Configs",
   "kamikaze_skies.configuration.section.kamikaze_skies.synced.toml": "Kamikaze Skies Settings",
   "kamikaze_skies.configuration.section.kamikaze_skies.synced.toml.title": "Kamikaze Skies Settings",
-  "kamikaze_skies.configuration.flightSubsteps": "Flight substeps per tick"
+  "kamikaze_skies.configuration.flightSubsteps": "Flight substeps per tick",
+  "kamikaze_skies.configuration.crashSpeed": "Crash speed (m/s)"
 }

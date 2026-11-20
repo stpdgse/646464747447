@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import com.kamikazeskies.core.KamikazeSkies;
 import com.kamikazeskies.core.KsRegistries;
 import com.kamikazeskies.drone.DroneEntity;
+import com.kamikazeskies.drone.PilotRegistry;
 import com.kamikazeskies.sim.DroneParams;
 import com.kamikazeskies.sim.FlightInput;
 
@@ -12,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
@@ -36,6 +38,7 @@ public final class KsGameTests {
         reg("drone_crashes_on_hard_impact", KsGameTests::droneCrashesOnHardImpact);
         reg("drone_survives_soft_landing", KsGameTests::droneSurvivesSoftLanding);
         reg("drone_failsafe_when_link_lost", KsGameTests::droneFailsafe);
+        reg("pilot_flow", KsGameTests::pilotFlow);
     }
 
     private KsGameTests() {}
@@ -174,6 +177,39 @@ public final class KsGameTests {
         afterTicks(h, d, 30, () -> {
             h.assertTrue(rel(h, d).y < 20 || d.isRemoved(), Component.literal("drone kept climbing without a link"));
             h.assertTrue(!d.isArmed(), Component.literal("drone still armed without a link"));
+        });
+    }
+
+    /**
+     * Full pilot flow on the server: bind, reject a stranger's input, accept the pilot's input (kept fresh
+     * every tick like the real client does), then release.
+     */
+    private static void pilotFlow(GameTestHelper h) {
+        DroneEntity d = spawnDrone(h, 1.5, 5, 1.5);
+        ServerPlayer pilot = h.makeMockServerPlayerInLevel();
+        ServerPlayer stranger = h.makeMockServerPlayerInLevel();
+
+        d.startPilot(pilot);
+        h.assertTrue(PilotRegistry.of(pilot) == d, Component.literal("pilot not registered"));
+        h.assertTrue(d.pilotEntityId() == pilot.getId(), Component.literal("pilot id not synced"));
+
+        FlightInput full = new FlightInput(1, 0, 0, 0, true, 1);
+        d.acceptPilotInput(stranger, full);                      // not the pilot: must be ignored
+        h.assertTrue(d.sim().velocity().y() == 0 && !d.isArmed(), Component.literal("stranger's input was accepted"));
+
+        for (int t = 1; t <= 400; t++) h.runAfterDelay(t, () -> d.acceptPilotInput(pilot, full));   // client sends every tick
+
+        boolean[] released = {false};
+        h.succeedWhen(() -> {
+            if (!released[0]) {
+                h.assertTrue(d.simTicks() >= 20, Component.literal("waiting for ticks"));
+                h.assertTrue(rel(h, d).y > 8, Component.literal("pilot input did not make the drone climb: y=" + rel(h, d).y));
+                h.assertTrue(d.isArmed(), Component.literal("drone not armed by pilot input"));
+                PilotRegistry.releasePlayer(pilot);               // what ExitPilotPayload does
+                released[0] = true;
+            }
+            h.assertTrue(d.pilot() == null && d.pilotEntityId() == -1, Component.literal("pilot not released"));
+            h.assertTrue(PilotRegistry.of(pilot) == null, Component.literal("registry still bound"));
         });
     }
 }

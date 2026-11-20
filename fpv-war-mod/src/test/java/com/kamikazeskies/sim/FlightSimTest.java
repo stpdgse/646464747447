@@ -40,6 +40,14 @@ class FlightSimTest {
     }
 
     @Test
+    void inverseThrottleCurveRoundTrips() {
+        for (double stick : new double[] {0.1, 0.25, p.hoverStick(), 0.6, 0.9}) {
+            assertEquals(stick, p.stickForThrustFraction(p.throttleToThrustFraction(stick)), 1e-9);
+        }
+        assertEquals(p.hoverStick(), p.stickForThrustFraction(p.hoverThrustFraction()), 1e-9);
+    }
+
+    @Test
     void thrustToWeightIsRealisticFor5Inch() {
         double tw = 4 * p.maxThrustPerMotor() / (p.mass() * DroneParams.GRAVITY);
         assertTrue(tw > 4 && tw < 8, "T/W " + tw);
@@ -207,5 +215,15 @@ class FlightSimTest {
         }
         assertEquals(a.position(), b.position());
         assertEquals(a.orientation(), b.orientation());
+    }
+
+    @Test
+    void flightInputSanitizesNaNAndInfinity() {
+        FlightInput in = new FlightInput(Double.NaN, Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, true, Double.NaN);
+        assertEquals(0, in.throttle());
+        assertEquals(0, in.roll());
+        assertEquals(1, in.pitch());
+        assertEquals(-1, in.yaw());
+        assertEquals(0, in.assist());
     }
 }

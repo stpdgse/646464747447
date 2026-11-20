@@ -37,6 +37,13 @@ public record DroneParams(
 
     public double hoverThrustFraction() { return mass * GRAVITY / (4 * maxThrustPerMotor); }
 
+    /** Inverse of {@link #throttleToThrustFraction}: the stick position that yields the given collective thrust fraction. */
+    public double stickForThrustFraction(double fraction) {
+        double f = Math.max(1e-6, Math.min(1, fraction));
+        double p = Math.log(hoverThrustFraction()) / Math.log(hoverStick);
+        return Math.min(1, Math.pow(f, 1.0 / p));
+    }
+
     /** Maps the throttle stick to a collective thrust fraction in 0..1 (power law through the hover point). */
     public double throttleToThrustFraction(double stick) {
         double s = Math.max(0, Math.min(1, stick));

@@ -21,5 +21,9 @@ public record FlightInput(double throttle, double roll, double pitch, double yaw
         assist = clamp(assist, 0, 1);
     }
 
-    private static double clamp(double v, double lo, double hi) { return v < lo ? lo : Math.min(v, hi); }
+    /** Clamp to [lo, hi]; NaN (e.g. from a malformed packet) becomes 0 so it can never reach the simulation. */
+    private static double clamp(double v, double lo, double hi) {
+        if (Double.isNaN(v)) return Math.max(lo, Math.min(0, hi));
+        return v < lo ? lo : Math.min(v, hi);
+    }
 }

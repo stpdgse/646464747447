@@ -53,6 +53,11 @@ neoForge {
     runs {
         client {
             client()
+            // Dev options (used by scripts/client-screenshot.sh):
+            //   -Pks.world=<save name>  auto-join that singleplayer world;  -Pks.demo=true  run the scripted demo flight
+            if (project.hasProperty('ks.world')) programArguments.addAll('--quickPlaySingleplayer', project.property('ks.world'))
+            programArguments.addAll('--width', '1280', '--height', '720')
+            if (project.hasProperty('ks.demo')) systemProperty 'kamikaze_skies.demo', project.property('ks.demo').toString()
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
