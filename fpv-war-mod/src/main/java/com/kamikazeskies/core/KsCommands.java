@@ -35,6 +35,15 @@ public final class KsCommands {
                                 .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(java.util.Arrays.stream(com.kamikazeskies.drone.SoldierAnim.Stance.values()).map(x -> x.name().toLowerCase()), b))
                                 .executes(ctx -> spawnSoldier(ctx.getSource(), com.kamikazeskies.drone.SoldierAnim.Stance.valueOf(
                                         com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "stance").toUpperCase(java.util.Locale.ROOT))))))
+                .then(Commands.literal("tank").executes(ctx -> {
+                    CommandSourceStack src = ctx.getSource();
+                    com.kamikazeskies.drone.TankEntity t = KsRegistries.TANK.get().create(src.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    if (t == null) return 0;
+                    t.snapTo(src.getPosition().x, src.getPosition().y, src.getPosition().z, src.getRotation().y + 180f, 0f);
+                    src.getLevel().addFreshEntity(t);
+                    src.sendSuccess(() -> Component.literal("Spawned a tank"), false);
+                    return 1;
+                }))
                 .then(Commands.literal("training").executes(ctx -> {
                     ServerPlayer player = ctx.getSource().getPlayerOrException();
                     Direction facing = player.getDirection();

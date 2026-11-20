@@ -23,7 +23,7 @@ const fs = require('fs'), path = require('path');
   const spec = JSON.parse(fs.readFileSync(specFile, 'utf8'));
   for (let i = 0; i < spec.length; i++) {
     const ok = await page.evaluate((s) => {
-      const a = Animation.all.find(x => x.name === 'animation.rifleman.' + s.anim || x.name.endsWith('.' + s.anim));
+      const a = Animation.all.find(x => x.name === 'animation.tank.' + s.anim || x.name.endsWith('.' + s.anim));
       if (!a) return false;
       a.select(); Timeline.setTime(s.t); Animator.preview(); return true;
     }, spec[i]);

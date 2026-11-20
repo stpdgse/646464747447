@@ -29,3 +29,11 @@ crouch (hold), crouch_idle, panic, flee, flinch, death_a (fall back), death_b (f
 `SoldierAssetsTest` (unit): every animated bone exists in the model, every animation the entity can request exists, loops close, one-shots do not loop.
 `SoldierGameTests` (headless server): spawn, stance persistence, damage, corpse stays after the death animation.
 `/kamikaze soldier [stance]` spawns one; `KS_DEMO_MODE=soldiers scripts/demo-screenshots.sh` plays the whole set in the real client.
+
+## Tank
+`art/tank.py` (34 cubes, 256x256 atlas, plus a procedurally burnt `tank_wreck.png`) and `art/tank_anim.py`: idle (engine rumble), drive (road wheels roll,
+hull pitches on the suspension), turret_scan (turret and commander MG sweep independently), fire (barrel slides back 7 units, hull rocks, gun kicks),
+destroyed (hull sags, turret thrown clear, gun droops; holds). The renderer swaps to the wreck texture when the tank dies.
+`TankEntity`: 120 HP, unpushable, explodes on death (no terrain damage; the destruction system handles that), wreck stays 5 minutes.
+`TankAssetsTest` + `TankGameTests` cover it. `/kamikaze tank` spawns one; `KS_DEMO_MODE=tank` plays the sequence.
+Export a second model with `bb-driver.js ... art/out/export_tank`, copy `export_bedrock.txt` to `art/out/export/export_bedrock_tank.txt`, then `python3 art/install.py tank`.

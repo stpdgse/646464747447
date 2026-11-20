@@ -11,6 +11,8 @@ for sub, src, dst in [("geckolib/models/entity", None, f"{name}.geo.json"), ("ge
     d = os.path.join(res, sub); os.makedirs(d, exist_ok=True)
     if src is None: json.dump(geo, open(os.path.join(d, dst), "w"), indent=1)
     else: shutil.copy(os.path.join(out, src), os.path.join(d, dst))
+import glob
+for extra in glob.glob(os.path.join(out, f"{name}_*.png")): shutil.copy(extra, os.path.join(res, "textures/entity", os.path.basename(extra)))
 bones = {b["name"] for b in geo["minecraft:geometry"][0]["bones"]}
 anims = json.load(open(os.path.join(out, f"{name}.animation.json")))["animations"]
 used = {b for a in anims.values() for b in a["bones"]}

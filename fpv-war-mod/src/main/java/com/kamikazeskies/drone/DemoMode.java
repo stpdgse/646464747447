@@ -27,6 +27,7 @@ import net.minecraft.world.phys.Vec3;
  *       the real game renders each item model and texture.</li>
  *   <li>{@code soldiers}: a squad of riflemen stands ahead and plays every animation in turn: idle, walking, aiming and firing, reloading,
  *       crouching, panicking and fleeing, then a death from the front and one from behind.</li>
+ *   <li>{@code tank}: a tank scans with its turret, fires twice, drives off, then is destroyed (turret thrown, wreck texture).</li>
  *   <li>{@code strike}: a cottage stands ahead; the player's camera rides an armed drone that homes in on it. At the
  *       blast the game drops into slow motion while the structure collapses.</li>
  * </ul>
@@ -47,6 +48,7 @@ public final class DemoMode {
         Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
         if (MODE.equalsIgnoreCase("strike")) { startStrike(player, level); return; }
         if (MODE.equalsIgnoreCase("parts")) { startParts(player, level); return; }
+        if (MODE.equalsIgnoreCase("tank")) { startTank(player, level); return; }
         if (MODE.equalsIgnoreCase("soldiers")) { startSoldiers(player, level); return; }
         if (MODE.equalsIgnoreCase("link") || MODE.equalsIgnoreCase("battery")) { startLinkOrBattery(player, level, MODE.equalsIgnoreCase("link")); return; }
         boolean model = MODE.equalsIgnoreCase("model");
@@ -63,6 +65,35 @@ public final class DemoMode {
             drone.debugScript(t -> script(t, drone, groundY));
         }
         KamikazeSkies.LOGGER.info("KS_DEMO started ({})", MODE);
+    }
+
+    // ---- tank demo ------------------------------------------------------------------------------------
+    private static TankEntity demoTank;
+    private static ServerPlayer tankPlayer;
+    private static long tankStart;
+
+    private static void startTank(ServerPlayer player, ServerLevel level) {
+        Vec3 look = player.getLookAngle();
+        Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
+        demoTank = KsRegistries.TANK.get().create(level, EntitySpawnReason.COMMAND);
+        Vec3 pos = player.position().add(flat.scale(10));
+        float yaw = player.getYRot() + 125f;
+        demoTank.snapTo(pos.x, player.getY(), pos.z, yaw, 0f);
+        demoTank.setYBodyRot(yaw); demoTank.setYHeadRot(yaw);
+        demoTank.setPersistenceRequired();
+        demoTank.setScanning(true);
+        level.addFreshEntity(demoTank);
+        tankPlayer = player;
+        tankStart = level.getGameTime();
+        KamikazeSkies.LOGGER.info("KS_DEMO started (tank)");
+    }
+
+    private static void tickTank(ServerLevel level) {
+        long t = level.getGameTime() - tankStart;
+        if (t == 110) demoTank.setScanning(false);
+        if (t == 140 || t == 200) demoTank.fireCannon();
+        if (t >= 250 && t < 330) demoTank.setZza(1.0f);
+        if (t == 520 && !demoTank.isDeadOrDying()) demoTank.hurtServer(level, level.damageSources().generic(), 500f);
     }
 
     // ---- soldiers demo --------------------------------------------------------------------------------
@@ -244,6 +275,7 @@ public final class DemoMode {
 
     /** Restore normal speed once the collapse has played out. */
     public static void tick(MinecraftServer server) {
+        if (demoTank != null && tankPlayer != null && tankPlayer.level() instanceof ServerLevel tl) tickTank(tl);
         if (!squad.isEmpty() && squadPlayer != null && squadPlayer.level() instanceof ServerLevel sl) tickSoldiers(sl);
         if (partsShowcase != null && partsPlayer != null) {
             long elapsed = server.overworld().getGameTime() - partsStart;
