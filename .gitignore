@@ -33,3 +33,4 @@ gbc-handheld/build/placed.kicad_pro
 gbc-handheld/build/unplaced.kicad_pro
 __pycache__/
 tools/blockbench/out/result/export_*.txt
+kamikaze-skies-handoff.zip
