@@ -37,3 +37,9 @@ destroyed (hull sags, turret thrown clear, gun droops; holds). The renderer swap
 `TankEntity`: 120 HP, unpushable, explodes on death (no terrain damage; the destruction system handles that), wreck stays 5 minutes.
 `TankAssetsTest` + `TankGameTests` cover it. `/kamikaze tank` spawns one; `KS_DEMO_MODE=tank` plays the sequence.
 Export a second model with `bb-driver.js ... art/out/export_tank`, copy `export_bedrock.txt` to `art/out/export/export_bedrock_tank.txt`, then `python3 art/install.py tank`.
+
+## Drone (hero pass)
+`art/fpv_drone.py` replaced the 16x16 palette placeholder with a 37-cube model on a 128x128 procedural atlas: twill carbon plates on metal standoffs,
+ESC/FC boards with chips and traces, strapped LiPo with printed label, FPV camera with a glass lens and red cheeks, anodised motors, smoked
+props with bright tips, VTX mast and receiver pod. Bone names (`body`, `arm_N`, `prop_N`) are unchanged, so the spin animation and renderer needed no code changes.
+Export: `bb-driver.js art/out/fpv_drone.bbmodel art/out/export_drone`, copy `export_bedrock.txt` to `art/out/export/export_bedrock_fpv_drone.txt`, `python3 art/install.py fpv_drone`.
