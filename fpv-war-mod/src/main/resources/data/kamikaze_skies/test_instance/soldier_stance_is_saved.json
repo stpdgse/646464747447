@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "kamikaze_skies:soldier_stance_is_saved",
+  "max_ticks": 200,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}

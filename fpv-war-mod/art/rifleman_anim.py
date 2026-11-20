@@ -156,22 +156,22 @@ def build(REST, outdir, preview=None):
     for name, gen, length, loop, n in SET:
         an = Anim(name, length, loop)
         seq = frames(gen, n)
-        last = {}
-        for i, pose in enumerate(seq):
-            t = length * i / n
-            for b in names:
-                v = pose.get(b)
-                if v is None: v = {}
-                rest = REST.get(b, {})
-                if "rot" in v or "rot" in rest or b in pose:
-                    rot = [a - r for a, r in zip(v.get("rot", [0, 0, 0]), rest.get("rot", [0, 0, 0]))]
-                    if b in last: rot = unwrap(last[b], rot)
-                    last[b] = rot
-                    if any(abs(x) > 1e-3 for x in rot) or b in ("torso", "body", "root", "head") or i == 0:
-                        an.key(b, "rotation", t, rot)
-                pos = [a - r for a, r in zip(v.get("pos", [0, 0, 0]), rest.get("pos", [0, 0, 0]))]
-                if any(abs(x) > 1e-3 for x in pos): an.key(b, "position", t, pos)
-                if "scale" in v: an.key(b, "scale", t, v["scale"])
+        tracks = {}                                  # (bone, channel) -> [value per frame]; complete tracks only, so interpolation never skips frames
+        for b in names:
+            rot_track, pos_track, scl_track, prev = [], [], [], None
+            for pose in seq:
+                v, rest = pose.get(b, {}), REST.get(b, {})
+                rot = [a - r for a, r in zip(v.get("rot", [0, 0, 0]), rest.get("rot", [0, 0, 0]))]
+                if prev is not None: rot = unwrap(prev, rot)
+                prev = rot
+                rot_track.append(rot)
+                pos_track.append([a - r for a, r in zip(v.get("pos", [0, 0, 0]), rest.get("pos", [0, 0, 0]))])
+                scl_track.append(v.get("scale"))
+            if any(abs(x) > 1e-3 for r in rot_track for x in r): tracks[(b, "rotation")] = rot_track
+            if any(abs(x) > 1e-3 for r in pos_track for x in r): tracks[(b, "position")] = pos_track
+            if any(sc is not None for sc in scl_track): tracks[(b, "scale")] = [sc if sc is not None else [1, 1, 1] for sc in scl_track]
+        for (b, ch), vals in tracks.items():
+            for i, val in enumerate(vals): an.key(b, ch, length * i / n, val)
         anims.append(an)
         if preview is not None and name in preview:
             for ph in preview[name]:

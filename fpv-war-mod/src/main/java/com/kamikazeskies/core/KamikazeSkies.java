@@ -33,7 +33,10 @@ public class KamikazeSkies {
         com.kamikazeskies.gametest.DestructionGameTests.register(modEventBus);
         com.kamikazeskies.gametest.LinkBatteryGameTests.register(modEventBus);
         com.kamikazeskies.gametest.BuildGameTests.register(modEventBus);
+        com.kamikazeskies.gametest.SoldierGameTests.register(modEventBus);
         modEventBus.addListener(KsNetwork::register);
+        modEventBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) ->
+                e.put(KsRegistries.SOLDIER.get(), com.kamikazeskies.drone.SoldierEntity.attributes().build()));
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent e) -> {
             if (e.getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) PilotRegistry.releasePlayer(sp);

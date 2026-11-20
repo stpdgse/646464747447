@@ -9,6 +9,7 @@ import com.kamikazeskies.build.PartKind;
 import com.kamikazeskies.drone.DroneItem;
 import com.kamikazeskies.drone.JammerEntity;
 import com.kamikazeskies.drone.JammerItem;
+import com.kamikazeskies.drone.SoldierEntity;
 import com.kamikazeskies.item.DroneAssemblyRecipe;
 import com.kamikazeskies.item.DroneWorkbenchBlock;
 import com.kamikazeskies.item.KsComponents;
@@ -47,6 +48,11 @@ public final class KsRegistries {
     public static final DeferredHolder<EntityType<?>, EntityType<JammerEntity>> JAMMER = ENTITIES.registerEntityType(
             "jammer", JammerEntity::new, MobCategory.MISC,
             b -> b.sized(0.6f, 1.5f).clientTrackingRange(10).updateInterval(20));
+
+    /** Rifleman. Standard human hitbox; spawned by the AI/mission layer or {@code /kamikaze soldier}. */
+    public static final DeferredHolder<EntityType<?>, EntityType<SoldierEntity>> SOLDIER = ENTITIES.registerEntityType(
+            "soldier", SoldierEntity::new, MobCategory.MISC,
+            b -> b.sized(0.6f, 1.8f).eyeHeight(1.62f).clientTrackingRange(10).updateInterval(2));
 
     public static final DeferredItem<Item> JAMMER_ITEM = ITEMS.registerItem("jammer", JammerItem::new, p -> p.stacksTo(16));
 

@@ -126,6 +126,7 @@ dependencies {
     // Pure-Java unit tests for sim/ (no Minecraft classes needed there).
     testImplementation platform("org.junit:junit-bom:${junit_version}")
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'com.google.code.gson:gson:2.11.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

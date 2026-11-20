@@ -25,6 +25,8 @@ import net.minecraft.world.phys.Vec3;
  *   <li>{@code battery}: a nearly empty pack: voltage sags, warnings flash, and the drone runs out of power.</li>
  *   <li>{@code parts}: a Drone Workbench stands ahead and the hotbar cycles through every part, drone preset and the jammer, so
  *       the real game renders each item model and texture.</li>
+ *   <li>{@code soldiers}: a squad of riflemen stands ahead and plays every animation in turn: idle, walking, aiming and firing, reloading,
+ *       crouching, panicking and fleeing, then a death from the front and one from behind.</li>
  *   <li>{@code strike}: a cottage stands ahead; the player's camera rides an armed drone that homes in on it. At the
  *       blast the game drops into slow motion while the structure collapses.</li>
  * </ul>
@@ -45,6 +47,7 @@ public final class DemoMode {
         Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
         if (MODE.equalsIgnoreCase("strike")) { startStrike(player, level); return; }
         if (MODE.equalsIgnoreCase("parts")) { startParts(player, level); return; }
+        if (MODE.equalsIgnoreCase("soldiers")) { startSoldiers(player, level); return; }
         if (MODE.equalsIgnoreCase("link") || MODE.equalsIgnoreCase("battery")) { startLinkOrBattery(player, level, MODE.equalsIgnoreCase("link")); return; }
         boolean model = MODE.equalsIgnoreCase("model");
         Vec3 pos = player.position().add(flat.scale(model ? 1.6 : 2.5)).add(0, model ? 1.5 : 0.1, 0);
@@ -60,6 +63,53 @@ public final class DemoMode {
             drone.debugScript(t -> script(t, drone, groundY));
         }
         KamikazeSkies.LOGGER.info("KS_DEMO started ({})", MODE);
+    }
+
+    // ---- soldiers demo --------------------------------------------------------------------------------
+    private static final java.util.List<SoldierEntity> squad = new java.util.ArrayList<>();
+    private static ServerPlayer squadPlayer;
+    private static long squadStart;
+
+    private static void startSoldiers(ServerPlayer player, ServerLevel level) {
+        Vec3 look = player.getLookAngle();
+        Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
+        Vec3 right = new Vec3(-flat.z, 0, flat.x);
+        float yaw = player.getYRot() + 180f;
+        squad.clear();
+        for (int i = 0; i < 7; i++) {
+            SoldierEntity s = KsRegistries.SOLDIER.get().create(level, EntitySpawnReason.COMMAND);
+            Vec3 pos = i < 6 ? player.position().add(flat.scale(6.5)).add(right.scale((i - 2.5) * 1.35)) : player.position().add(flat.scale(10)).add(right.scale(2.5 * 1.35));
+            s.snapTo(pos.x, player.getY(), pos.z, yaw, 0f);
+            s.setYHeadRot(yaw); s.setYBodyRot(yaw);
+            s.setPersistenceRequired();
+            level.addFreshEntity(s);
+            squad.add(s);
+        }
+        squad.get(2).setStance(SoldierAnim.Stance.AIM);
+        squad.get(4).setStance(SoldierAnim.Stance.CROUCH);
+        squad.get(5).setStance(SoldierAnim.Stance.PANIC);
+        squad.get(6).setStance(SoldierAnim.Stance.AIM);
+        squadPlayer = player;
+        squadStart = level.getGameTime();
+        KamikazeSkies.LOGGER.info("KS_DEMO started (soldiers)");
+    }
+
+    private static void tickSoldiers(ServerLevel level) {
+        long t = level.getGameTime() - squadStart;
+        SoldierEntity walker = squad.get(1);
+        walker.setZza(1.0f);
+        if (t % 70 == 35) { float y = walker.getYRot() + 180f; walker.setYRot(y); walker.setYHeadRot(y); walker.setYBodyRot(y); }
+        if (t % 24 == 12) squad.get(2).fireShot();
+        SoldierEntity reloader = squad.get(3);
+        if (t % 80 == 0) reloader.setStance(SoldierAnim.Stance.STAND);
+        if (t % 80 == 2) reloader.setStance(SoldierAnim.Stance.RELOAD);
+        SoldierEntity runner = squad.get(5);
+        if (t >= 120 && t < 170) { runner.setZza(1.0f); runner.setYRot(squadPlayer.getYRot()); runner.setYBodyRot(squadPlayer.getYRot()); } // flee away from the camera
+        else if (t >= 170 && !runner.isDeadOrDying()) { runner.setYRot(squadPlayer.getYRot() + 180f); runner.setYBodyRot(squadPlayer.getYRot() + 180f); }
+        if (t == 300 && !squad.get(4).isDeadOrDying()) squad.get(4).hurtServer(level, level.damageSources().playerAttack(squadPlayer), 100f);
+        if (t == 330) squad.get(6).fireShot();
+        if (t == 332 && !runner.isDeadOrDying()) runner.hurtServer(level, level.damageSources().mobAttack(squad.get(6)), 100f);
+        if (t == 340 && !squad.get(0).isDeadOrDying()) squad.get(0).hurtServer(level, level.damageSources().generic(), 3f);   // a flinch
     }
 
     // ---- parts demo ----------------------------------------------------------------------------------
@@ -194,6 +244,7 @@ public final class DemoMode {
 
     /** Restore normal speed once the collapse has played out. */
     public static void tick(MinecraftServer server) {
+        if (!squad.isEmpty() && squadPlayer != null && squadPlayer.level() instanceof ServerLevel sl) tickSoldiers(sl);
         if (partsShowcase != null && partsPlayer != null) {
             long elapsed = server.overworld().getGameTime() - partsStart;
             if (elapsed > 0 && elapsed % 50 == 0) showPartsPage((int) ((elapsed / 50) % ((partsShowcase.size() + 8) / 9)));
