@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kamikaze_skies:item/part_camera_t2"
+  }
+}

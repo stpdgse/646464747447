@@ -27,10 +27,12 @@ public class KamikazeSkies {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public KamikazeSkies(IEventBus modEventBus, ModContainer modContainer) {
+        com.kamikazeskies.item.KsComponents.register(modEventBus);
         KsRegistries.register(modEventBus);
         KsGameTests.register(modEventBus);
         com.kamikazeskies.gametest.DestructionGameTests.register(modEventBus);
         com.kamikazeskies.gametest.LinkBatteryGameTests.register(modEventBus);
+        com.kamikazeskies.gametest.BuildGameTests.register(modEventBus);
         modEventBus.addListener(KsNetwork::register);
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent e) -> {

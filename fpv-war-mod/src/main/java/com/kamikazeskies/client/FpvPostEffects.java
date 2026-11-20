@@ -42,7 +42,7 @@ public final class FpvPostEffects {
             if (applied) { player.setActivePostEffects(List.of()); applied = false; }
             return;
         }
-        shown = SignalLevel.withHysteresis(shown, drone.rssi(), 0.03);
+        shown = SignalLevel.withHysteresis(shown, drone.build().videoSignal(drone.rssi()), 0.03);
         player.setActivePostEffects(List.of(id(shown, (int) (mc.level.getGameTime() + drone.tickCount))));
         applied = true;
     }

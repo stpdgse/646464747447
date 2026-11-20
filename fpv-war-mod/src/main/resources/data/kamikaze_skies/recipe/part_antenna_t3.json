@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:lightning_rod",
+    "minecraft:diamond",
+    "minecraft:gold_ingot",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "kamikaze_skies:part_antenna_t3",
+    "count": 1
+  }
+}

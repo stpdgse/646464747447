@@ -81,3 +81,14 @@ Check a new test can fail by temporarily breaking its assertion.
   it. The demo script now restores `DemoWorld.base` before every run.
 - **Slow-motion makes fast events capturable** in software rendering (~1 frame per real second): demos set 5-10 TPS.
 - Colour blocks are a `ColorCollection` in this Minecraft version: `Blocks.CONCRETE.pick(DyeColor.RED)`.
+
+## Phase 4 lessons (crafting and builds)
+- **Use the object's own parameters in tests.** The blackbox-detonation test computed a throttle from one drone's thrust curve and fed
+  it to a heavier build: the drone over-throttled and flew over the wall. A build changes the throttle curve, so take it from
+  `drone.sim().params()`.
+- **Test the data, not just the code.** `part_recipes_craft_from_raw_materials` asks the loaded `RecipeManager` for every generated
+  recipe key and crafts a few from vanilla items; a typo in the generator's JSON would otherwise only show up in a player's hands.
+- **Sweep combinatorial content.** `DroneBuildTest` visits all 13,122 builds and asserts flyability and sane flight time; it caught
+  nothing, which is the point of keeping it as tables are tuned.
+- Show real item/block rendering with the `parts` demo: `KS_DEMO_MODE=parts KS_START_DELAY=1 scripts/demo-screenshots.sh build/screenshots/parts 200 16 1.2`.
+- Colour/loot/blockstate/model JSON formats for 26.x: copy a vanilla example out of the jar (`data/minecraft/...`) before writing your own.

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:copper_ingot",
+    "minecraft:stick",
+    "minecraft:iron_nugget"
+  ],
+  "result": {
+    "id": "kamikaze_skies:part_antenna_t1",
+    "count": 1
+  }
+}

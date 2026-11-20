@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "kamikaze_skies:block/drone_workbench_top",
+    "side": "kamikaze_skies:block/drone_workbench_side",
+    "bottom": "kamikaze_skies:block/drone_workbench_bottom"
+  }
+}

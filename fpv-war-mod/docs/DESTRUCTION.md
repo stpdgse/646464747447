@@ -7,7 +7,7 @@ they play and feel, and are meant to be edited.
 ![Cottage close-up](images/phase2-strike-zoom.gif)
 
 ## Overview
-A strike drone carries a **warhead** (`Warhead`: NONE, IMPACT, SHAPED). When an armed drone hits something faster than the
+A strike drone carries a **warhead** (`Warhead`: NONE, IMPACT, SHAPED), chosen when the drone is assembled (see `CRAFTING.md`). When an armed drone hits something faster than the
 detonation speed (config, default 3 m/s), the warhead fires:
 
 1. **Blast** (`BlastSolver`, pure Java): rays spread from the centre; each ray starts with some energy and loses it to

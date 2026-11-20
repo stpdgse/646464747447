@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:glass",
+    "minecraft:diamond",
+    "minecraft:redstone",
+    "minecraft:redstone",
+    "minecraft:gold_ingot",
+    "minecraft:quartz"
+  ],
+  "result": {
+    "id": "kamikaze_skies:part_camera_t3",
+    "count": 1
+  }
+}

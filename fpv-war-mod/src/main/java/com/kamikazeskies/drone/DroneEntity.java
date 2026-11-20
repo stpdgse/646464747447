@@ -11,9 +11,13 @@ import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
+import com.kamikazeskies.build.DroneBuild;
+import com.kamikazeskies.build.FlightRecorder;
 import com.kamikazeskies.core.KsConfig;
 import com.kamikazeskies.core.KsRegistries;
 import com.kamikazeskies.destruction.BlastExecutor;
+import com.kamikazeskies.item.FlightLog;
+import com.kamikazeskies.item.KsComponents;
 import com.kamikazeskies.sim.Battery;
 import com.kamikazeskies.sim.DroneParams;
 import com.kamikazeskies.sim.FlightInput;
@@ -55,7 +59,7 @@ public class DroneEntity extends Entity implements GeoEntity {
     private static final EntityDataAccessor<Float> QZ = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> MOTOR = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> SPEED = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Integer> WARHEAD = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> BUILD = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> VOLTS = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> SOC = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> RSSI = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
@@ -72,12 +76,16 @@ public class DroneEntity extends Entity implements GeoEntity {
     private final AnimatableInstanceCache animCache = GeckoLibUtil.createInstanceCache(this);
 
     // server side
-    private final FlightSim sim = new FlightSim(DroneParams.fiveInch());
+    private FlightSim sim = new FlightSim(DroneBuild.STANDARD.toParams());
     private FlightInput input = FlightInput.DISARMED;
     private long lastInputTick = NEVER;
     private @Nullable ServerPlayer pilot;
     private boolean simInitialised;
-    private final Battery battery = new Battery(Battery.Spec.fourS1300());
+    private Battery battery = new Battery(DroneBuild.STANDARD.batterySpec());
+    private @Nullable FlightRecorder recorder;
+    private double launchY = Double.NaN;
+    private int cachedBuildCode = DroneBuild.STANDARD.encode();
+    private DroneBuild cachedBuild = DroneBuild.STANDARD;
     private final LinkMonitor link = new LinkMonitor();
     private @Nullable Vec3 debugOperator;
     private FlightInput heldInput = FlightInput.DISARMED;
@@ -114,7 +122,7 @@ public class DroneEntity extends Entity implements GeoEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder b) {
         b.define(QW, 1f).define(QX, 0f).define(QY, 0f).define(QZ, 0f)
-                .define(MOTOR, 0f).define(SPEED, 0f).define(WARHEAD, 0).define(VOLTS, 16.8f).define(SOC, 1f).define(RSSI, 100).define(ARMED, false).define(PILOT, -1);
+                .define(MOTOR, 0f).define(SPEED, 0f).define(BUILD, DroneBuild.STANDARD.encode()).define(VOLTS, 16.8f).define(SOC, 1f).define(RSSI, 100).define(ARMED, false).define(PILOT, -1);
     }
 
     public Quat syncedOrientation() {
@@ -137,8 +145,28 @@ public class DroneEntity extends Entity implements GeoEntity {
     public SignalLevel signalLevel() { return SignalLevel.of(rssi()); }
     public boolean batteryLow() { return batterySoc() < 0.12f; }
 
-    public Warhead warhead() { return Warhead.byOrdinal(entityData.get(WARHEAD)); }
-    public void setWarhead(Warhead w) { entityData.set(WARHEAD, w.ordinal()); }
+    public Warhead warhead() { return build().warhead(); }
+    public void setWarhead(Warhead w) { setBuild(build().withWarhead(w)); }
+
+    /** The parts this drone was assembled from (synced, so the client knows e.g. the camera's field of view). */
+    public DroneBuild build() {
+        int code = entityData.get(BUILD);
+        if (code != cachedBuildCode) { cachedBuildCode = code; cachedBuild = DroneBuild.decode(code); }
+        return cachedBuild;
+    }
+
+    /** Apply a build: mass, thrust, response, battery, blackbox. Keeps the current flight state. */
+    public void setBuild(DroneBuild b) {
+        entityData.set(BUILD, b.encode());
+        cachedBuildCode = b.encode();
+        cachedBuild = b;
+        if (level().isClientSide()) return;
+        FlightSim old = sim;
+        sim = new FlightSim(b.toParams());
+        if (simInitialised) sim.setState(old.position(), old.velocity(), old.orientation(), old.angularVelocity());
+        battery = new Battery(b.batterySpec());
+        recorder = b.blackbox() ? new FlightRecorder() : null;
+    }
     public int pilotEntityId() { return entityData.get(PILOT); }
     public float renderPropAngle(float partialTick) { return prevMotorSpin + (motorSpin - prevMotorSpin) * partialTick; }
 
@@ -242,7 +270,7 @@ public class DroneEntity extends Entity implements GeoEntity {
         heldInput = in;
 
         // --- battery: drain by what the motors drew last tick, and limit power as the loaded voltage collapses ---
-        double current = in.armed() ? Battery.currentFor(sim.averageMotorFraction()) : 0.3;
+        double current = in.armed() ? Battery.currentFor(sim.averageMotorFraction(), build().maxCurrentA()) : 0.3;
         if (KsConfig.BATTERY_ENABLED.getAsBoolean()) {
             battery.drain(current, 0.05);
             sim.setPowerScale(battery.powerScale(current));
@@ -265,7 +293,7 @@ public class DroneEntity extends Entity implements GeoEntity {
                 return;
             }
             if (onGround()) sim.groundContact(GROUND_FRICTION);
-            if (sim.impactSpeed() > KsConfig.CRASH_SPEED.getAsDouble()) {
+            if (sim.impactSpeed() > build().crashSpeed() * KsConfig.CRASH_SPEED.getAsDouble() / 9.0) {
                 crash(sim.impactSpeed());
                 return;
             }
@@ -283,6 +311,10 @@ public class DroneEntity extends Entity implements GeoEntity {
         entityData.set(VOLTS, (float) Math.round(battery.voltage(current) * 10) / 10f);
         entityData.set(SOC, (float) Math.round(battery.soc() * 100) / 100f);
         entityData.set(RSSI, (int) Math.round(link.rssi() * 100));
+        if (recorder != null) {
+            if (Double.isNaN(launchY)) launchY = getY();
+            recorder.record(serverTicks, getX(), getY(), getZ(), sim.speed(), battery.voltage(current), link.rssi(), launchY);
+        }
     }
 
     /** Evaluate the signal between the operator and the drone: distance, solid blocks on the line, jammers. */
@@ -293,7 +325,7 @@ public class DroneEntity extends Entity implements GeoEntity {
         double dist = operator.distanceTo(me);
         double blocked = blockedMetres(level(), operator, me);
         double jam = JammerEntity.jammingAt(level(), me);
-        link.update(RadioLink.rssi(dist, KsConfig.LINK_RANGE.getAsDouble(), blocked, jam));
+        link.update(RadioLink.rssi(dist, KsConfig.LINK_RANGE.getAsDouble() * build().rangeMultiplier(), blocked, jam));
     }
 
     /** Metres of opaque blocks along the straight line between two points (sampled; at most 128 samples). */
@@ -332,6 +364,7 @@ public class DroneEntity extends Entity implements GeoEntity {
         Vec3 axis = dir.lengthSq() < 1e-9 ? new Vec3(0, -1, 0) : new Vec3(dir.x(), dir.y(), dir.z());
         if (pilot != null) pilot.sendOverlayMessage(Component.translatable("message.kamikaze_skies.detonated"));
         Vec3 center = position().add(0, getBbHeight() * 0.5, 0);
+        dropBlackbox(FlightLog.WARHEAD);
         stopPilot();
         discard();
         if (level() instanceof ServerLevel server) BlastExecutor.detonate(server, center, axis, warhead().profile(), null);
@@ -345,8 +378,17 @@ public class DroneEntity extends Entity implements GeoEntity {
             server.sendParticles(net.minecraft.core.particles.ParticleTypes.POOF,
                     getX(), getY() + 0.1, getZ(), 12, 0.15, 0.05, 0.15, 0.02);
         }
+        dropBlackbox(link.controlLost() ? FlightLog.LINK_LOST : battery.soc() < 0.02 ? FlightLog.BATTERY_EMPTY : FlightLog.CRASH);
         stopPilot();
         discard();
+    }
+
+    /** A drone carrying a blackbox leaves it behind with the last 30 seconds of telemetry. */
+    private void dropBlackbox(int cause) {
+        if (recorder == null || !(level() instanceof ServerLevel server)) return;
+        ItemStack box = new ItemStack(KsRegistries.part(com.kamikazeskies.build.PartKind.BLACKBOX, 1));
+        box.set(KsComponents.FLIGHT_LOG.get(), FlightLog.of(cause, recorder));
+        spawnAtLocation(server, box);
     }
 
     // ---- interaction --------------------------------------------------------------------------------
@@ -356,7 +398,7 @@ public class DroneEntity extends Entity implements GeoEntity {
         if (!(player instanceof ServerPlayer sp)) return InteractionResult.PASS;
         if (player.isShiftKeyDown()) {            // pick the drone up
             stopPilot();
-            ItemStack stack = new ItemStack(KsRegistries.itemFor(warhead()));
+            ItemStack stack = KsRegistries.droneStack(build());
             if (!player.getInventory().add(stack)) spawnAtLocation((ServerLevel) level(), stack);
             discard();
             return InteractionResult.SUCCESS;
@@ -376,8 +418,8 @@ public class DroneEntity extends Entity implements GeoEntity {
     }
 
     // ---- persistence (parked drones keep their pose; flight state is not persisted) -----------------
-    @Override protected void readAdditionalSaveData(ValueInput in) { simInitialised = false; setWarhead(Warhead.byOrdinal(in.getIntOr("Warhead", 0))); }
-    @Override protected void addAdditionalSaveData(ValueOutput out) { out.putInt("Warhead", warhead().ordinal()); }
+    @Override protected void readAdditionalSaveData(ValueInput in) { simInitialised = false; setBuild(DroneBuild.decode(in.getIntOr("Build", DroneBuild.STANDARD.encode()))); }
+    @Override protected void addAdditionalSaveData(ValueOutput out) { out.putInt("Build", build().encode()); }
 
     private static Vec3d toSim(Vec3 v) { return new Vec3d(v.x, v.y, v.z); }
 }

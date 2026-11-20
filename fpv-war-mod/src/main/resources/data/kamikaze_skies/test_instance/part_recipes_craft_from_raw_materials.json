@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_42",
+  "function": "kamikaze_skies:part_recipes_craft_from_raw_materials",
+  "max_ticks": 6000,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty",
+  "padding": 100
+}

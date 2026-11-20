@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:redstone",
+    "minecraft:quartz",
+    "minecraft:iron_nugget"
+  ],
+  "result": {
+    "id": "kamikaze_skies:part_flight_controller_t1",
+    "count": 1
+  }
+}

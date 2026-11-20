@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:paper",
+    "minecraft:stick"
+  ],
+  "result": {
+    "id": "kamikaze_skies:part_props_t1",
+    "count": 1
+  }
+}

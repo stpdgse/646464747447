@@ -11,8 +11,7 @@ roughly with thrust^1.5). When the loaded cell voltage falls, the motors lose po
 
 | Pack | Capacity | Notes |
 |---|---|---|
-| `fourS1300` (default) | 1300 mAh | hovers about 7-8 minutes in the sim |
-| `fourS2200` | 2200 mAh | longer flights (weight comes with drone parts in Phase 4) |
+| tier 1 / 2 / 3 pack | 900 / 1300 / 1800 mAh | hover roughly 5-6 / 7-8 / 10 minutes in the sim; bigger packs are heavier |
 
 OSD: pack voltage and percent (yellow below ~12%, red and flashing below 5%), flashing LOW BATTERY / BATTERY CRITICAL, and
 warning beeps (slow when low, fast when critical). Config `batteryEnabled` turns draining off for practice.
@@ -59,6 +58,6 @@ Demos run in slow motion (5-10 TPS) so each state lasts several captured frames,
 of the world.
 
 ## Known limits / next
-- Antenna tiers and battery choices are not selectable yet; they arrive with drone crafting (Phase 4).
+- Antenna tiers and battery choices are set by the parts you assemble (see `CRAFTING.md`).
 - Static and beep sounds are placeholder vanilla tones; real radio audio comes with the audio pass.
 - "Freeze" is represented by heavy break-up and static, not a frozen frame.

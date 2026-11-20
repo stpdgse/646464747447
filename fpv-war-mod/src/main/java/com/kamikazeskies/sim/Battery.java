@@ -56,9 +56,12 @@ public final class Battery {
     public double cellVoltage(double currentA) { return voltage(currentA) / spec.cells(); }
 
     /** Current drawn for an average per-motor thrust fraction in [0, 1] (power grows roughly with thrust^1.5). */
-    public static double currentFor(double averageThrustFraction) {
+    public static double currentFor(double averageThrustFraction) { return currentFor(averageThrustFraction, MAX_CURRENT_A); }
+
+    /** As above for a drone whose full-thrust draw is {@code maxCurrentA} (set by its motors and props). */
+    public static double currentFor(double averageThrustFraction, double maxCurrentA) {
         double f = Math.max(0, Math.min(1, averageThrustFraction));
-        return IDLE_CURRENT_A + (MAX_CURRENT_A - IDLE_CURRENT_A) * Math.pow(f, 1.5);
+        return IDLE_CURRENT_A + (maxCurrentA - IDLE_CURRENT_A) * Math.pow(f, 1.5);
     }
 
     public void drain(double currentA, double dt) { usedMah = Math.min(spec.capacityMah(), usedMah + currentA * dt / 3.6); }

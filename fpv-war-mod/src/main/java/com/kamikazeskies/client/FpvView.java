@@ -43,7 +43,8 @@ public final class FpvView {
     }
 
     public static void onFov(ViewportEvent.ComputeFov e) {
-        if (activeDrone() != null) e.setFOV(FOV_DEGREES);
+        DroneEntity d = activeDrone();
+        if (d != null) e.setFOV((float) d.build().fovDegrees());
     }
 
     public static void onRenderHand(RenderHandEvent e) {

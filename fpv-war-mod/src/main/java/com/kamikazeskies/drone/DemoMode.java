@@ -23,6 +23,8 @@ import net.minecraft.world.phys.Vec3;
  *   <li>{@code model}: a hovering drone floats in front of the player (checks the 3D model and prop animation).</li>
  *   <li>{@code link}: the drone flies straight at a jammer; the picture degrades through every signal level until the link is lost.</li>
  *   <li>{@code battery}: a nearly empty pack: voltage sags, warnings flash, and the drone runs out of power.</li>
+ *   <li>{@code parts}: a Drone Workbench stands ahead and the hotbar cycles through every part, drone preset and the jammer, so
+ *       the real game renders each item model and texture.</li>
  *   <li>{@code strike}: a cottage stands ahead; the player's camera rides an armed drone that homes in on it. At the
  *       blast the game drops into slow motion while the structure collapses.</li>
  * </ul>
@@ -42,6 +44,7 @@ public final class DemoMode {
         Vec3 look = player.getLookAngle();
         Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
         if (MODE.equalsIgnoreCase("strike")) { startStrike(player, level); return; }
+        if (MODE.equalsIgnoreCase("parts")) { startParts(player, level); return; }
         if (MODE.equalsIgnoreCase("link") || MODE.equalsIgnoreCase("battery")) { startLinkOrBattery(player, level, MODE.equalsIgnoreCase("link")); return; }
         boolean model = MODE.equalsIgnoreCase("model");
         Vec3 pos = player.position().add(flat.scale(model ? 1.6 : 2.5)).add(0, model ? 1.5 : 0.1, 0);
@@ -57,6 +60,40 @@ public final class DemoMode {
             drone.debugScript(t -> script(t, drone, groundY));
         }
         KamikazeSkies.LOGGER.info("KS_DEMO started ({})", MODE);
+    }
+
+    // ---- parts demo ----------------------------------------------------------------------------------
+    private static java.util.List<net.minecraft.world.item.ItemStack> partsShowcase;
+    private static ServerPlayer partsPlayer;
+    private static long partsStart;
+
+    private static void startParts(ServerPlayer player, ServerLevel level) {
+        Vec3 look = player.getLookAngle();
+        Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
+        BlockPos at = BlockPos.containing(player.position().add(flat.scale(2.2)));
+        level.setBlock(at, KsRegistries.WORKBENCH.get().defaultBlockState(), 3);
+        java.util.List<net.minecraft.world.item.ItemStack> list = new java.util.ArrayList<>();
+        for (var part : KsRegistries.PARTS.values()) list.add(new net.minecraft.world.item.ItemStack(part.get()));
+        list.add(KsRegistries.droneStack(com.kamikazeskies.build.DroneBuild.STANDARD));
+        list.add(KsRegistries.droneStack(com.kamikazeskies.build.DroneBuild.STANDARD.withWarhead(Warhead.IMPACT)));
+        list.add(KsRegistries.droneStack(new com.kamikazeskies.build.DroneBuild(3, 3, 3, 3, 3, 3, 3, Warhead.SHAPED, true)));
+        list.add(new net.minecraft.world.item.ItemStack(KsRegistries.JAMMER_ITEM.get()));
+        list.add(new net.minecraft.world.item.ItemStack(KsRegistries.WORKBENCH_ITEM.get()));
+        partsShowcase = list;
+        partsPlayer = player;
+        partsStart = level.getGameTime();
+        showPartsPage(0);
+        KamikazeSkies.LOGGER.info("KS_DEMO started (parts)");
+    }
+
+    private static void showPartsPage(int page) {
+        if (partsPlayer == null || partsShowcase == null) return;
+        for (int i = 0; i < 9; i++) {
+            int idx = page * 9 + i;
+            partsPlayer.getInventory().setItem(i, idx < partsShowcase.size() ? partsShowcase.get(idx).copy() : net.minecraft.world.item.ItemStack.EMPTY);
+        }
+        partsPlayer.inventoryMenu.broadcastChanges();
+        KamikazeSkies.LOGGER.info("KS_DEMO page {}", page);
     }
 
     // ---- link / battery demos -------------------------------------------------------------------------
@@ -157,6 +194,10 @@ public final class DemoMode {
 
     /** Restore normal speed once the collapse has played out. */
     public static void tick(MinecraftServer server) {
+        if (partsShowcase != null && partsPlayer != null) {
+            long elapsed = server.overworld().getGameTime() - partsStart;
+            if (elapsed > 0 && elapsed % 50 == 0) showPartsPage((int) ((elapsed / 50) % ((partsShowcase.size() + 8) / 9)));
+        }
         if (!slowMo) return;
         long elapsed = server.overworld().getGameTime() - slowMoStart;
         if (elapsed > 30 && !CollapseManager.busy()) {

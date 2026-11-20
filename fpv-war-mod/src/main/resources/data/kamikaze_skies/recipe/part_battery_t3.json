@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:redstone_block",
+    "minecraft:gold_ingot",
+    "minecraft:gold_ingot",
+    "minecraft:diamond"
+  ],
+  "result": {
+    "id": "kamikaze_skies:part_battery_t3",
+    "count": 1
+  }
+}

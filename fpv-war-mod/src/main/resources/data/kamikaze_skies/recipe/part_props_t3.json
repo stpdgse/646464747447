@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:iron_ingot",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:stick"
+  ],
+  "result": {
+    "id": "kamikaze_skies:part_props_t3",
+    "count": 1
+  }
+}
