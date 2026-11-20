@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_101",
+  "function": "kamikaze_skies:mission_completes_and_pays_rewards",
+  "max_ticks": 600,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}

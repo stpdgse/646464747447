@@ -51,6 +51,10 @@ while (( SECONDS < HARD )); do
     next_us=$(( $(now_us) + EVERY_US ))
   fi
   (( taken >= SHOTS )) && break
+  # A world with a custom dimension (the warzone) shows vanilla's one-time "Experimental Settings" prompt: click "I Know What I'm Doing".
+  if (( ! started )) && (( SECONDS >= 25 )) && (( SECONDS % 10 == 0 )) && [[ "${last_click:-}" != "$SECONDS" ]] && command -v xdotool >/dev/null; then
+    DISPLAY=$DISP xdotool mousemove 878 465 click 1 2>/dev/null; last_click=$SECONDS
+  fi
   (( SECONDS % 20 == 0 )) && [[ "$last_say" != "$SECONDS" ]] && { say "waiting... started=$started shots=$taken"; last_say=$SECONDS; }
   sleep ${KS_FRAME_DELAY:-0.05}
 done

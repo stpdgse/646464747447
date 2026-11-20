@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_100",
+  "function": "kamikaze_skies:mission_builds_ground_and_spawns_enemy",
+  "max_ticks": 600,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}

@@ -42,6 +42,34 @@ public final class KsCommands {
                                         java.util.Arrays.stream(com.kamikazeskies.drone.SoldierAnim.Stance.values()).map(x -> x.name().toLowerCase()),
                                         java.util.Arrays.stream(com.kamikazeskies.ai.Role.values()).map(x -> x.name().toLowerCase())), bld))
                                 .executes(ctx -> spawnSoldier(ctx.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "kind")))))
+                .then(Commands.literal("warzone").executes(ctx -> {
+                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    net.minecraft.server.level.ServerLevel wz = ctx.getSource().getServer().getLevel(com.kamikazeskies.mission.MissionManager.WARZONE);
+                    if (wz == null) { ctx.getSource().sendFailure(Component.literal("The warzone dimension is not loaded")); return 0; }
+                    int y = wz.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, 0, 0);
+                    p.teleportTo(wz, 0.5, y, 0.5, java.util.Set.of(), p.getYRot(), 0f, true);
+                    return 1;
+                }))
+                .then(Commands.literal("mission")
+                        .then(Commands.literal("list").executes(ctx -> {
+                            for (var m : com.kamikazeskies.mission.MissionRegistry.all().values()) ctx.getSource().sendSuccess(() -> Component.literal(m.id() + ": " + m.title()), false);
+                            return com.kamikazeskies.mission.MissionRegistry.all().size();
+                        }))
+                        .then(Commands.literal("start").then(Commands.argument("id", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(com.kamikazeskies.mission.MissionRegistry.all().keySet(), b))
+                                .executes(ctx -> {
+                                    var def = com.kamikazeskies.mission.MissionRegistry.all().get(com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "id"));
+                                    if (def == null) { ctx.getSource().sendFailure(Component.literal("Unknown mission")); return 0; }
+                                    if (!com.kamikazeskies.mission.MissionManager.start(ctx.getSource().getPlayerOrException(), def)) { ctx.getSource().sendFailure(Component.literal("You already have a mission running")); return 0; }
+                                    return 1;
+                                })))
+                        .then(Commands.literal("status").executes(ctx -> {
+                            var st = com.kamikazeskies.mission.MissionManager.stateOf(ctx.getSource().getPlayerOrException());
+                            if (st == null) { ctx.getSource().sendSuccess(() -> Component.literal("No mission running"), false); return 0; }
+                            for (int i = 0; i < st.def().objectives().size(); i++) { int k = i; ctx.getSource().sendSuccess(() -> Component.literal(st.def().objectives().get(k).text() + ": " + st.progress(k) + "/" + st.def().objectives().get(k).count()), false); }
+                            return 1;
+                        }))
+                        .then(Commands.literal("abort").executes(ctx -> { com.kamikazeskies.mission.MissionManager.abort(ctx.getSource().getPlayerOrException()); return 1; })))
                 .then(Commands.literal("tank").executes(ctx -> {
                     CommandSourceStack src = ctx.getSource();
                     com.kamikazeskies.drone.TankEntity t = KsRegistries.TANK.get().create(src.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);

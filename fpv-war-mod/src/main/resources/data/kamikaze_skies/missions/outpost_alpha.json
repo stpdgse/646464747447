@@ -1,0 +1,21 @@
+{
+  "id": "outpost_alpha",
+  "title": "Outpost Alpha",
+  "briefing": "A small enemy outpost holds the crossroads beyond the treeline: four infantry in the trench and a tank covering the road. Fly in, take out the tank first, then the infantry. Expect them to shoot back at anything that hovers. Stay out of their sight when you launch.",
+  "time_limit_seconds": 600,
+  "spawns": [
+    { "entity": "soldier", "role": "conscript", "count": 2, "dx": -6, "dz": 62, "radius": 4 },
+    { "entity": "soldier", "role": "rifleman", "count": 1, "dx": 4, "dz": 60, "radius": 3 },
+    { "entity": "soldier", "role": "veteran", "count": 1, "dx": 0, "dz": 66, "radius": 2 },
+    { "entity": "tank", "count": 1, "dx": 14, "dz": 58, "radius": 0 }
+  ],
+  "objectives": [
+    { "entity": "tank", "count": 1, "text": "Destroy the tank" },
+    { "entity": "soldier", "count": 4, "text": "Eliminate the infantry" }
+  ],
+  "bonus": [ { "seconds": 240, "text": "Finish within four minutes" } ],
+  "rewards": [
+    { "item": "kamikaze_skies:part_battery_t2", "count": 1 },
+    { "item": "kamikaze_skies:part_motors_t2", "count": 1 }
+  ]
+}

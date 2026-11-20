@@ -27,6 +27,7 @@ import net.minecraft.world.phys.Vec3;
  *       the real game renders each item model and texture.</li>
  *   <li>{@code soldiers}: a squad of riflemen stands ahead and plays every animation in turn: idle, walking, aiming and firing, reloading,
  *       crouching, panicking and fleeing, then a death from the front and one from behind.</li>
+ *   <li>{@code mission}: starts Outpost Alpha in the warzone dimension; the camera rides an armed drone that cruises toward the tank at 3.5 m.</li>
  *   <li>{@code ai}: a mixed squad (conscripts, riflemen, a veteran) stands in a field; an armed drone dives on them from behind the player.
  *       Watch who runs, who ducks, who shoots back, and who is shot out of the sky.</li>
  *   <li>{@code tank}: a tank scans with its turret, fires twice, drives off, then is destroyed (turret thrown, wreck texture).</li>
@@ -50,6 +51,7 @@ public final class DemoMode {
         Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
         if (MODE.equalsIgnoreCase("strike")) { startStrike(player, level); return; }
         if (MODE.equalsIgnoreCase("parts")) { startParts(player, level); return; }
+        if (MODE.equalsIgnoreCase("mission")) { startMission(player); return; }
         if (MODE.equalsIgnoreCase("ai")) { startAi(player, level); return; }
         if (MODE.equalsIgnoreCase("tank")) { startTank(player, level); return; }
         if (MODE.equalsIgnoreCase("soldiers")) { startSoldiers(player, level); return; }
@@ -68,6 +70,20 @@ public final class DemoMode {
             drone.debugScript(t -> script(t, drone, groundY));
         }
         KamikazeSkies.LOGGER.info("KS_DEMO started ({})", MODE);
+    }
+
+    // ---- mission demo ---------------------------------------------------------------------------------
+    private static void startMission(ServerPlayer player) {
+        com.kamikazeskies.mission.MissionManager.start(player, com.kamikazeskies.mission.MissionRegistry.all().get("outpost_alpha"));
+        ServerLevel level = (ServerLevel) player.level();
+        DroneEntity drone = KsRegistries.DRONE.get().create(level, EntitySpawnReason.COMMAND);
+        drone.snapTo(player.getX(), player.getY() + 0.1, player.getZ() + 1.5);
+        drone.resetOrientation(0f);
+        level.addFreshEntity(drone);
+        drone.startPilot(player);
+        double gy = player.getY();
+        drone.debugScript(t -> t < 20 ? new FlightInput(0, 0, 0, 0, false, 1) : new FlightInput(altHold(drone, gy + 3.5, 0.3 * P.maxAngleDeg()), 0, t < 40 ? 0 : 0.3, 0, true, 1));
+        KamikazeSkies.LOGGER.info("KS_DEMO started (mission)");
     }
 
     // ---- ai demo --------------------------------------------------------------------------------------
