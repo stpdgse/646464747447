@@ -31,6 +31,22 @@ const fs = require('fs'), path = require('path');
   }
   console.log('exports:', JSON.stringify(results.exports));
   await page.screenshot({ path: path.join(outdir, 'screenshot.png') });
+  // optional: render the viewport from several angles (VIEWS=front,side,back,iso, DIST=<units>, TARGET=x,y,z)
+  if (process.env.VIEWS) {
+    const dist = parseFloat(process.env.DIST || '60');
+    const [tx, ty, tz] = (process.env.TARGET || '0,16,0').split(',').map(Number);
+    const dirs = { front: [0, 0.15, -1], back: [0, 0.15, 1], side: [1, 0.15, 0], left: [-1, 0.15, 0], iso: [0.7, 0.45, -0.8], top: [0, 1, -0.05] };
+    for (const v of process.env.VIEWS.split(',')) {
+      const d = dirs[v]; if (!d) continue;
+      const n = Math.hypot(...d);
+      await page.evaluate(([pos, target]) => {
+        Preview.selected.loadAnglePreset({ projection: 'perspective', position: pos, target: target });
+      }, [[tx + d[0] / n * dist, ty + d[1] / n * dist, tz + d[2] / n * dist], [tx, ty, tz]]);
+      await page.waitForTimeout(500);
+      const box = await page.evaluate(() => { const r = document.querySelector('#preview canvas, .preview canvas')?.getBoundingClientRect(); return r ? { x: r.x, y: r.y, width: r.width, height: r.height } : null; });
+      await page.screenshot({ path: path.join(outdir, `view_${v}.png`), ...(box ? { clip: box } : {}) });
+    }
+  }
   fs.writeFileSync(path.join(outdir, 'result.json'), JSON.stringify(results, null, 1));
   await browser.close();
 })().catch(e => { console.error('DRIVER FAILED:', e.message); process.exit(1); });

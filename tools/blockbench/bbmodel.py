@@ -58,9 +58,24 @@ class Model:
         (parent["children"] if parent else self.outliner).append(e["uuid"])
         return e
 
+    def box_cube(self, name, frm, to, uv_offset, parent=None, rotation=(0, 0, 0), origin=None, inflate=0, mirror_uv=False, tex=0, color=0):
+        """A cube with Minecraft-style box UV (one unfolded strip at uv_offset); sizes should be whole numbers."""
+        e = {
+            "name": name, "type": "cube", "box_uv": True, "rescale": False, "locked": False,
+            "render_order": "default", "allow_mirror_modeling": True,
+            "from": list(frm), "to": list(to), "autouv": 0, "color": color, "inflate": inflate,
+            "origin": list(origin if origin is not None else [(a + b) / 2 for a, b in zip(frm, to)]),
+            "rotation": list(rotation), "uv_offset": list(uv_offset), "mirror_uv": mirror_uv,
+            "faces": {f: {"uv": [0, 0, 0, 0], "texture": tex} for f in FACES},
+            "uuid": _uid(),
+        }
+        self.elements.append(e)
+        (parent["children"] if parent else self.outliner).append(e["uuid"])
+        return e
+
     def to_json(self):
         return {
-            "meta": {"format_version": "4.10", "model_format": "free", "box_uv": False},
+            "meta": {"format_version": "4.10", "model_format": "free", "box_uv": any(e.get("box_uv") for e in self.elements)},
             "name": self.name, "model_identifier": "", "visible_box": [1, 1, 0],
             "variable_placeholders": "", "variable_placeholder_buttons": [],
             "unhandled_marker_colors": [],
