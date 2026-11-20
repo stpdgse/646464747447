@@ -19,6 +19,7 @@ public class KamikazeSkies {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public KamikazeSkies(IEventBus modEventBus, ModContainer modContainer) {
+        KsRegistries.register(modEventBus);
         KsGameTests.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
         modContainer.registerConfig(ModConfig.Type.SYNCED, KsConfig.SPEC);

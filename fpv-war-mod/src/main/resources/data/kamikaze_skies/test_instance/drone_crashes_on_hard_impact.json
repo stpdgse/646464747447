@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "kamikaze_skies:drone_crashes_on_hard_impact",
+  "max_ticks": 400,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}
