@@ -19,5 +19,5 @@ force-gamemode=true
 PROPS
 scripts/server-smoke.sh "$LIMIT" >/tmp/ks-make-world.log 2>&1 || { echo "MAKE-DEMO-WORLD: FAIL (server did not boot)"; tail -15 /tmp/ks-make-world.log; exit 1; }
 [[ -f run/world/level.dat ]] || { echo "MAKE-DEMO-WORLD: FAIL (no level.dat; log /tmp/ks-make-world.log)"; exit 1; }
-mkdir -p run/saves && cp -r run/world run/saves/DemoWorld
-echo "MAKE-DEMO-WORLD: PASS -> run/saves/DemoWorld"
+mkdir -p run/saves && rm -rf run/saves/DemoWorld.base && cp -r run/world run/saves/DemoWorld.base && cp -r run/world run/saves/DemoWorld
+echo "MAKE-DEMO-WORLD: PASS -> run/saves/DemoWorld (pristine copy kept in DemoWorld.base)"

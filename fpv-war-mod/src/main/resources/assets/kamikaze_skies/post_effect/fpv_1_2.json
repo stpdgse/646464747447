@@ -1,0 +1,82 @@
+{
+  "targets": {
+    "temp": {}
+  },
+  "passes": [
+    {
+      "vertex_shader": "minecraft:core/screenquad",
+      "fragment_shader": "kamikaze_skies:post/fpv_analog",
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "minecraft:main"
+        }
+      ],
+      "output": "temp",
+      "uniforms": {
+        "AnalogConfig": [
+          {
+            "name": "Noise",
+            "type": "float",
+            "value": 0.08
+          },
+          {
+            "name": "Scan",
+            "type": "float",
+            "value": 0.12
+          },
+          {
+            "name": "Bleed",
+            "type": "float",
+            "value": 0.0012
+          },
+          {
+            "name": "Bar",
+            "type": "float",
+            "value": 0.06
+          },
+          {
+            "name": "Glitch",
+            "type": "float",
+            "value": 0.0
+          },
+          {
+            "name": "Snow",
+            "type": "float",
+            "value": 0.0
+          },
+          {
+            "name": "Seed",
+            "type": "float",
+            "value": 15.99
+          }
+        ]
+      }
+    },
+    {
+      "vertex_shader": "minecraft:core/screenquad",
+      "fragment_shader": "minecraft:post/blit",
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "temp"
+        }
+      ],
+      "output": "minecraft:main",
+      "uniforms": {
+        "BlitConfig": [
+          {
+            "name": "ColorModulate",
+            "type": "vec4",
+            "value": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

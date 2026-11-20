@@ -50,12 +50,12 @@ public final class KsGameTests {
     // ---- helpers ------------------------------------------------------------------------------------
     /**
      * The 1x1 test structure only keeps its own chunk ticking; drones that fly into neighbouring chunks (or are
-     * spawned there) would otherwise start ticking late and make tests nondeterministic. Force-load a 5x5 area.
+     * spawned there) would otherwise start ticking late and make tests nondeterministic. Force-load a 7x7 chunk area.
      */
     static void keepAreaTicking(GameTestHelper h) {
         BlockPos origin = h.absolutePos(BlockPos.ZERO);
         int cx = origin.getX() >> 4, cz = origin.getZ() >> 4;
-        for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) h.getLevel().setChunkForced(cx + dx, cz + dz, true);
+        for (int dx = -3; dx <= 3; dx++) for (int dz = -3; dz <= 3; dz++) h.getLevel().setChunkForced(cx + dx, cz + dz, true);
     }
 
     static DroneEntity spawnDrone(GameTestHelper h, double x, double y, double z) {
@@ -188,6 +188,7 @@ public final class KsGameTests {
         DroneEntity d = spawnDrone(h, 1.5, 5, 1.5);
         ServerPlayer pilot = h.makeMockServerPlayerInLevel();
         ServerPlayer stranger = h.makeMockServerPlayerInLevel();
+        pilot.snapTo(h.absoluteVec(new Vec3(1.5, 2, 1.5)));       // the operator stands next to the drone: the radio link depends on it
 
         d.startPilot(pilot);
         h.assertTrue(PilotRegistry.of(pilot) == d, Component.literal("pilot not registered"));

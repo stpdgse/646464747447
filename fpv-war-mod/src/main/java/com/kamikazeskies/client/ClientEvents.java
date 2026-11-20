@@ -26,6 +26,7 @@ public final class ClientEvents {
         @SubscribeEvent
         static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(com.kamikazeskies.core.KsRegistries.DRONE.get(), DroneRenderer::new);
+            event.registerEntityRenderer(com.kamikazeskies.core.KsRegistries.JAMMER.get(), JammerRenderer::new);
         }
 
         @SubscribeEvent
@@ -37,7 +38,7 @@ public final class ClientEvents {
     @EventBusSubscriber(modid = KamikazeSkies.MODID, value = Dist.CLIENT)
     public static final class Game {
         @SubscribeEvent
-        static void onClientTick(ClientTickEvent.Post event) { ClientPilot.tick(); }
+        static void onClientTick(ClientTickEvent.Post event) { ClientPilot.tick(); FpvPostEffects.update(); }
 
         @SubscribeEvent
         static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) { FpvView.onCameraAngles(event); }

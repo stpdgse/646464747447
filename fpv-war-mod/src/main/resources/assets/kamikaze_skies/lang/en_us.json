@@ -25,5 +25,10 @@
   "item.kamikaze_skies.fpv_shaped_drone": "FPV Strike Drone (shaped charge)",
   "message.kamikaze_skies.detonated": "Warhead detonated",
   "kamikaze_skies.configuration.destructionQuality": "Destruction quality",
-  "kamikaze_skies.configuration.detonationSpeed": "Detonation speed (m/s)"
+  "kamikaze_skies.configuration.detonationSpeed": "Detonation speed (m/s)",
+  "item.kamikaze_skies.jammer": "Anti-Drone Jammer",
+  "entity.kamikaze_skies.jammer": "Anti-Drone Jammer",
+  "kamikaze_skies.configuration.linkRangeBlocks": "Radio range (blocks)",
+  "kamikaze_skies.configuration.batteryEnabled": "Drain the battery",
+  "message.kamikaze_skies.training_built": "Training range built (%s blocks). Gates run straight ahead, then a wall with a window. Place the drone, right-click it, press R to arm."
 }

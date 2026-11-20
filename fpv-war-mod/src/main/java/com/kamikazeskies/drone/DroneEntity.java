@@ -14,12 +14,17 @@ import com.geckolib.util.GeckoLibUtil;
 import com.kamikazeskies.core.KsConfig;
 import com.kamikazeskies.core.KsRegistries;
 import com.kamikazeskies.destruction.BlastExecutor;
+import com.kamikazeskies.sim.Battery;
 import com.kamikazeskies.sim.DroneParams;
 import com.kamikazeskies.sim.FlightInput;
 import com.kamikazeskies.sim.FlightSim;
+import com.kamikazeskies.sim.LinkMonitor;
+import com.kamikazeskies.sim.RadioLink;
+import com.kamikazeskies.sim.SignalLevel;
 import com.kamikazeskies.sim.Quat;
 import com.kamikazeskies.sim.Vec3d;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -51,6 +56,9 @@ public class DroneEntity extends Entity implements GeoEntity {
     private static final EntityDataAccessor<Float> MOTOR = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> SPEED = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> WARHEAD = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> VOLTS = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> SOC = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> RSSI = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> ARMED = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> PILOT = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
 
@@ -69,6 +77,10 @@ public class DroneEntity extends Entity implements GeoEntity {
     private long lastInputTick = NEVER;
     private @Nullable ServerPlayer pilot;
     private boolean simInitialised;
+    private final Battery battery = new Battery(Battery.Spec.fourS1300());
+    private final LinkMonitor link = new LinkMonitor();
+    private @Nullable Vec3 debugOperator;
+    private FlightInput heldInput = FlightInput.DISARMED;
     private int serverTicks;
     private @Nullable IntFunction<FlightInput> script;   // dev/test: scripted flight, ignores pilot packets
 
@@ -102,7 +114,7 @@ public class DroneEntity extends Entity implements GeoEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder b) {
         b.define(QW, 1f).define(QX, 0f).define(QY, 0f).define(QZ, 0f)
-                .define(MOTOR, 0f).define(SPEED, 0f).define(WARHEAD, 0).define(ARMED, false).define(PILOT, -1);
+                .define(MOTOR, 0f).define(SPEED, 0f).define(WARHEAD, 0).define(VOLTS, 16.8f).define(SOC, 1f).define(RSSI, 100).define(ARMED, false).define(PILOT, -1);
     }
 
     public Quat syncedOrientation() {
@@ -116,6 +128,15 @@ public class DroneEntity extends Entity implements GeoEntity {
     /** True speed in m/s as simulated by the server. */
     public float speed() { return entityData.get(SPEED); }
     public boolean isArmed() { return entityData.get(ARMED); }
+    /** Pack voltage in volts (synced, rounded to 0.1 V). */
+    public float voltage() { return entityData.get(VOLTS); }
+    /** Battery state of charge, 0..1. */
+    public float batterySoc() { return entityData.get(SOC); }
+    /** Signal quality, 0..1 (synced as a percentage). */
+    public float rssi() { return entityData.get(RSSI) / 100f; }
+    public SignalLevel signalLevel() { return SignalLevel.of(rssi()); }
+    public boolean batteryLow() { return batterySoc() < 0.12f; }
+
     public Warhead warhead() { return Warhead.byOrdinal(entityData.get(WARHEAD)); }
     public void setWarhead(Warhead w) { entityData.set(WARHEAD, w.ordinal()); }
     public int pilotEntityId() { return entityData.get(PILOT); }
@@ -169,6 +190,13 @@ public class DroneEntity extends Entity implements GeoEntity {
     /** Test hook: make the last input look stale, as if the link had dropped. */
     public void debugExpireInput() { this.lastInputTick = NEVER; }
 
+    /** Test hook: pretend the operator stands here (used when no real pilot is bound). */
+    public void debugOperator(Vec3 pos) { this.debugOperator = pos; }
+    /** Test hook: set the battery's state of charge. */
+    public void debugBatterySoc(double soc) { battery.setSoc(soc); }
+    public Battery battery() { return battery; }
+    public LinkMonitor link() { return link; }
+
     /** Test hook: motors already spinning at hover. */
     public void debugSpinUpToHover() { ensureSim(); sim.spinUpToHover(); }
 
@@ -204,6 +232,24 @@ public class DroneEntity extends Entity implements GeoEntity {
         FlightInput in = script != null ? script.apply(serverTicks - scriptStart)
                 : (lastInputTick != ALWAYS && now - lastInputTick > INPUT_TIMEOUT_TICKS) ? FlightInput.DISARMED : input;
 
+        // --- radio link: failsafe when lost, dropped control packets when weak ---
+        updateLink();
+        if (link.controlLost()) {
+            in = FlightInput.DISARMED;
+        } else if (link.dropPacket(level().getRandom().nextDouble())) {
+            in = heldInput;                                   // this tick's control packet never arrived
+        }
+        heldInput = in;
+
+        // --- battery: drain by what the motors drew last tick, and limit power as the loaded voltage collapses ---
+        double current = in.armed() ? Battery.currentFor(sim.averageMotorFraction()) : 0.3;
+        if (KsConfig.BATTERY_ENABLED.getAsBoolean()) {
+            battery.drain(current, 0.05);
+            sim.setPowerScale(battery.powerScale(current));
+        } else {
+            sim.setPowerScale(1.0);
+        }
+
         int substeps = KsConfig.FLIGHT_SUBSTEPS.getAsInt();
         double dt = 1.0 / (20.0 * substeps);
         sim.setPosition(toSim(position()));
@@ -234,6 +280,36 @@ public class DroneEntity extends Entity implements GeoEntity {
         entityData.set(MOTOR, (float) Math.round(sim.averageMotorFraction() * 50) / 50f);
         entityData.set(SPEED, (float) Math.round(sim.speed() * 10) / 10f);
         entityData.set(ARMED, in.armed());
+        entityData.set(VOLTS, (float) Math.round(battery.voltage(current) * 10) / 10f);
+        entityData.set(SOC, (float) Math.round(battery.soc() * 100) / 100f);
+        entityData.set(RSSI, (int) Math.round(link.rssi() * 100));
+    }
+
+    /** Evaluate the signal between the operator and the drone: distance, solid blocks on the line, jammers. */
+    private void updateLink() {
+        Vec3 operator = pilot != null ? pilot.getEyePosition() : debugOperator;
+        if (operator == null) { link.update(1.0); return; }          // parked / no operator: nothing to lose
+        Vec3 me = position().add(0, getBbHeight() * 0.5, 0);
+        double dist = operator.distanceTo(me);
+        double blocked = blockedMetres(level(), operator, me);
+        double jam = JammerEntity.jammingAt(level(), me);
+        link.update(RadioLink.rssi(dist, KsConfig.LINK_RANGE.getAsDouble(), blocked, jam));
+    }
+
+    /** Metres of opaque blocks along the straight line between two points (sampled; at most 128 samples). */
+    static double blockedMetres(Level level, Vec3 a, Vec3 b) {
+        double dist = a.distanceTo(b);
+        if (dist < 1.5) return 0;
+        int n = (int) Math.min(128, Math.ceil(dist));
+        double step = dist / n;
+        int blocked = 0;
+        BlockPos.MutableBlockPos mp = new BlockPos.MutableBlockPos();
+        for (int i = 1; i < n; i++) {
+            double t = (double) i / n;
+            mp.set(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t);
+            if (level.getBlockState(mp).canOcclude()) blocked++;
+        }
+        return blocked * step;
     }
 
     private void clientTick() {

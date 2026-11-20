@@ -44,4 +44,9 @@ deadzone logic is unit-tested and the SDL polling initialises cleanly.
 | ACRO | Pure rate control; the drone holds whatever attitude you leave it in. Flips and rolls. |
 
 ## On-screen display
-Armed state, assist mode, input device, motor power, speed (km/h) and altitude above ground. Warnings: *arming refused*.
+Top-left: armed state, assist mode, input device. Top-centre: flight timer. Top-right: pack voltage and percent, RSSI and signal bars.
+Bottom: motor power, speed (km/h), altitude above ground. Centre warnings: *LOW BATTERY*, *BATTERY CRITICAL*, *WEAK SIGNAL*,
+*LINK LOST*, *arming refused*. See `LINK_AND_BATTERY.md`.
+
+## Practice
+`/kamikaze training` (operators) builds a small course in front of you and gives you a drone.

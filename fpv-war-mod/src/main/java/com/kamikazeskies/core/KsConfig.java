@@ -24,6 +24,14 @@ public final class KsConfig {
             .comment("Impact speed (m/s) at which a warhead's impact fuze fires.")
             .defineInRange("detonationSpeed", 3.0, 0.5, 50.0);
 
+    public static final ModConfigSpec.DoubleValue LINK_RANGE = BUILDER
+            .comment("Radio range of the standard antenna, in blocks. Signal fades with distance, blocks in the way and jammers.")
+            .defineInRange("linkRangeBlocks", 400.0, 50.0, 5000.0);
+
+    public static final ModConfigSpec.BooleanValue BATTERY_ENABLED = BUILDER
+            .comment("Drain the battery while flying. Turn off for practice or creative play.")
+            .define("batteryEnabled", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private KsConfig() {}

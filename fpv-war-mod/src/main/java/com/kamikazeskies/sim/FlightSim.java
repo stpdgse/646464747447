@@ -30,6 +30,7 @@ public final class FlightSim {
     private Vec3d heading = new Vec3d(0, 0, 1);          // last horizontal heading (angle mode fallback)
     private double impactSpeed;                          // largest speed absorbed by the last commit, m/s
     private boolean wasArmed;
+    private double powerScale = 1.0;                      // battery/voltage limit on available motor thrust, 0..1
     private boolean saturated;                           // mixer ran out of authority last step (anti-windup)
 
     public FlightSim(DroneParams params) { this.p = params; }
@@ -47,6 +48,10 @@ public final class FlightSim {
         return (thrust[0] + thrust[1] + thrust[2] + thrust[3]) / (4 * p.maxThrustPerMotor());
     }
     public double speed() { return vel.length(); }
+
+    /** Scale the motors' available thrust (weak battery under load). 1 = full power. */
+    public void setPowerScale(double scale) { this.powerScale = Math.max(0, Math.min(1, scale)); }
+    public double powerScale() { return powerScale; }
 
     public void setPosition(Vec3d position) { this.pos = position; }
 
@@ -80,6 +85,7 @@ public final class FlightSim {
         if (in.armed()) {
             Vec3d torque = controlTorque(in, dt);
             mix(in, torque, cmd);
+            for (int i = 0; i < 4; i++) cmd[i] *= powerScale;
         } else {
             iTerm = Vec3d.ZERO;
             saturated = false;

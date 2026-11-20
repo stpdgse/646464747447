@@ -9,7 +9,9 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 OUT="$(realpath -m "${1:-build/screenshots/demo}")"; HARD="${2:-240}"; SHOTS="${3:-6}"; EVERY="${4:-4}"
 export JAVA_HOME="${JAVA_HOME:-/opt/jdk-25}"; export PATH="$JAVA_HOME/bin:$PATH"
-[[ -d run/saves/DemoWorld ]] || { echo "run scripts/make-demo-world.sh first"; exit 2; }
+[[ -d run/saves/DemoWorld.base ]] || { echo "run scripts/make-demo-world.sh first"; exit 2; }
+# every demo starts in a pristine world (earlier demos build and blow up things)
+rm -rf run/saves/DemoWorld && cp -r run/saves/DemoWorld.base run/saves/DemoWorld
 mkdir -p "$OUT"; rm -f "$OUT"/shot_*.png "$OUT"/fail.png
 LOG="$(mktemp /tmp/ks-demo.XXXXXX.log)"; DISP=:98
 export DISPLAY=$DISP XDG_RUNTIME_DIR=/tmp/xdg-rt LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \

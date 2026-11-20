@@ -1,0 +1,16 @@
+{
+ "info": {
+  "name": "jammer",
+  "format": "free",
+  "cubes": 14,
+  "groups": 2,
+  "textures": 1,
+  "errors": 0
+ },
+ "exports": {
+  "project": 9235,
+  "java_block": 6958,
+  "bedrock": 6200,
+  "obj": 11011
+ }
+}

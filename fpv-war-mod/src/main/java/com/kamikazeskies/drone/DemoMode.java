@@ -21,6 +21,8 @@ import net.minecraft.world.phys.Vec3;
  * <ul>
  *   <li>{@code fly}: the joining player's camera rides a drone flying a fixed script (FPV view, OSD, camera roll).</li>
  *   <li>{@code model}: a hovering drone floats in front of the player (checks the 3D model and prop animation).</li>
+ *   <li>{@code link}: the drone flies straight at a jammer; the picture degrades through every signal level until the link is lost.</li>
+ *   <li>{@code battery}: a nearly empty pack: voltage sags, warnings flash, and the drone runs out of power.</li>
  *   <li>{@code strike}: a cottage stands ahead; the player's camera rides an armed drone that homes in on it. At the
  *       blast the game drops into slow motion while the structure collapses.</li>
  * </ul>
@@ -40,6 +42,7 @@ public final class DemoMode {
         Vec3 look = player.getLookAngle();
         Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
         if (MODE.equalsIgnoreCase("strike")) { startStrike(player, level); return; }
+        if (MODE.equalsIgnoreCase("link") || MODE.equalsIgnoreCase("battery")) { startLinkOrBattery(player, level, MODE.equalsIgnoreCase("link")); return; }
         boolean model = MODE.equalsIgnoreCase("model");
         Vec3 pos = player.position().add(flat.scale(model ? 1.6 : 2.5)).add(0, model ? 1.5 : 0.1, 0);
         drone.snapTo(pos);
@@ -53,6 +56,36 @@ public final class DemoMode {
             double groundY = drone.getY();
             drone.debugScript(t -> script(t, drone, groundY));
         }
+        KamikazeSkies.LOGGER.info("KS_DEMO started ({})", MODE);
+    }
+
+    // ---- link / battery demos -------------------------------------------------------------------------
+    private static void startLinkOrBattery(ServerPlayer player, ServerLevel level, boolean link) {
+        Vec3 look = player.getLookAngle();
+        Vec3 flat = new Vec3(look.x, 0, look.z).normalize();
+        double gy = player.getY();
+        DroneEntity drone = KsRegistries.DRONE.get().create(level, EntitySpawnReason.COMMAND);
+        if (drone == null) return;
+        drone.snapTo(player.position().add(flat.scale(2.5)).add(0, 0.1, 0));
+        drone.resetOrientation(player.getYRot());
+        level.addFreshEntity(drone);
+        drone.startPilot(player);
+        if (link) {
+            JammerEntity jammer = KsRegistries.JAMMER.get().create(level, EntitySpawnReason.COMMAND);
+            if (jammer != null) {
+                jammer.snapTo(player.position().add(flat.scale(95)));
+                level.addFreshEntity(jammer);
+            }
+            double tilt = 0.2 * P.maxAngleDeg();                      // a gentle cruise so every signal level is visible
+            drone.debugScript(t -> t < 12 ? new FlightInput(0, 0, 0, 0, false, 1)
+                    : new FlightInput(altHold(drone, gy + 6, tilt), 0, t < 40 ? 0 : 0.2, 0, true, 1));
+        } else {
+            drone.debugBatterySoc(0.045);
+            drone.debugScript(t -> t < 12 ? new FlightInput(0, 0, 0, 0, false, 1)
+                    : new FlightInput(altHold(drone, gy + 8, 0), 0, 0, 0, true, 1));
+        }
+        // slow motion so each signal level / warning lasts several captured frames (software rendering is slow)
+        level.getServer().tickRateManager().setTickRate(link ? 5.0f : 10.0f);
         KamikazeSkies.LOGGER.info("KS_DEMO started ({})", MODE);
     }
 

@@ -89,8 +89,9 @@ public final class BlastExecutor {
             double d = mid.distanceTo(center);
             if (d > reach) continue;
             double f = 1.0 - d / reach;
-            if (e instanceof LivingEntity living) {
-                living.hurtServer(level, level.damageSources().explosion(source, source), (float) (profile.power() * 2.2 * f * f));
+            float damage = (float) (profile.power() * 2.2 * f * f);
+            if (e instanceof LivingEntity || e instanceof com.kamikazeskies.drone.JammerEntity) {
+                e.hurtServer(level, level.damageSources().explosion(source, source), damage);
             }
             Vec3 away = mid.subtract(center);
             away = away.lengthSqr() < 1e-6 ? new Vec3(0, 1, 0) : away.normalize();

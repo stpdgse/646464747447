@@ -67,3 +67,17 @@ Check a new test can fail by temporarily breaking its assertion.
 - Vanilla tag contents change between versions; check them in the jar's `data/minecraft/tags/` before relying on them.
 - `scripts/demo-screenshots.sh` takes `KS_DEMO_MODE=strike`, `KS_START_DELAY=0` and a fractional interval for dense frames,
   e.g. `KS_DEMO_MODE=strike KS_START_DELAY=0 scripts/demo-screenshots.sh build/screenshots/strike 150 60 0.25`.
+
+## Phase 3 lessons (battery, link, video)
+- **A model change can silently break old tests.** Adding the radio link made the Phase 1 `pilot_flow` test fail, because its mock
+  pilot stood far from the drone and the link correctly failed. Tests that bind a pilot must place the pilot next to the drone.
+- **Check a value at the moment you mean to**, not after the world has moved on: the jammer failsafe test measured the signal
+  after the disarmed drone had fallen out of the jammer's field. Assert soon after the event (`afterTicks`), or tie the check
+  to a state flag.
+- **Visual features need a real-client look.** The shader compiled and loaded without any log error but did nothing at first:
+  `GameRenderer` rebuilds its post-effect list every frame, wiping a per-tick addition. Only the screenshot revealed it; the
+  fix was `LocalPlayer.setActivePostEffects`.
+- **Demos mutate the world.** The strike demo's cottage was still standing in the saved demo world and the next demo flew into
+  it. The demo script now restores `DemoWorld.base` before every run.
+- **Slow-motion makes fast events capturable** in software rendering (~1 frame per real second): demos set 5-10 TPS.
+- Colour blocks are a `ColorCollection` in this Minecraft version: `Blocks.CONCRETE.pick(DyeColor.RED)`.

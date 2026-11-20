@@ -2,6 +2,8 @@ package com.kamikazeskies.core;
 
 import com.kamikazeskies.drone.DroneEntity;
 import com.kamikazeskies.drone.DroneItem;
+import com.kamikazeskies.drone.JammerEntity;
+import com.kamikazeskies.drone.JammerItem;
 import com.kamikazeskies.drone.Warhead;
 
 import net.minecraft.core.registries.Registries;
@@ -25,6 +27,13 @@ public final class KsRegistries {
     public static final DeferredHolder<EntityType<?>, EntityType<DroneEntity>> DRONE = ENTITIES.registerEntityType(
             "fpv_drone", DroneEntity::new, MobCategory.MISC,
             b -> b.sized(0.30f, 0.12f).eyeHeight(0.06f).clientTrackingRange(16).updateInterval(1));
+
+    /** Anti-drone jammer mast. */
+    public static final DeferredHolder<EntityType<?>, EntityType<JammerEntity>> JAMMER = ENTITIES.registerEntityType(
+            "jammer", JammerEntity::new, MobCategory.MISC,
+            b -> b.sized(0.6f, 1.5f).clientTrackingRange(10).updateInterval(20));
+
+    public static final DeferredItem<Item> JAMMER_ITEM = ITEMS.registerItem("jammer", JammerItem::new, p -> p.stacksTo(16));
 
     public static final DeferredItem<Item> DRONE_ITEM = ITEMS.registerItem(
             "fpv_drone", p -> new DroneItem(p, Warhead.NONE), p -> p.stacksTo(1));
@@ -50,6 +59,7 @@ public final class KsRegistries {
                         output.accept(DRONE_ITEM.get());
                         output.accept(STRIKE_DRONE_ITEM.get());
                         output.accept(SHAPED_DRONE_ITEM.get());
+                        output.accept(JAMMER_ITEM.get());
                     })
                     .build());
 

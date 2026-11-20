@@ -16,6 +16,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -29,6 +30,7 @@ public class KamikazeSkies {
         KsRegistries.register(modEventBus);
         KsGameTests.register(modEventBus);
         com.kamikazeskies.gametest.DestructionGameTests.register(modEventBus);
+        com.kamikazeskies.gametest.LinkBatteryGameTests.register(modEventBus);
         modEventBus.addListener(KsNetwork::register);
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent e) -> {
@@ -36,6 +38,7 @@ public class KamikazeSkies {
         });
         NeoForge.EVENT_BUS.addListener((ServerStoppedEvent e) -> { PilotRegistry.clear(); com.kamikazeskies.destruction.CollapseManager.clear(); });
         NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> com.kamikazeskies.destruction.CollapseManager.tick(e.getServer()));
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> KsCommands.register(e.getDispatcher()));
         if (com.kamikazeskies.drone.DemoMode.ENABLED) {
             NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> com.kamikazeskies.drone.DemoMode.tick(e.getServer()));
             NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent e) -> {

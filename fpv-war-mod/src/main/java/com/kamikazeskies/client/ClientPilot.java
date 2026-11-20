@@ -15,6 +15,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
@@ -32,6 +34,8 @@ public final class ClientPilot {
     private static GamepadSticks gamepad = new GamepadSticks(switches);
     private static boolean usingGamepad;
     private static FlightInput lastInput = FlightInput.DISARMED;
+    private static int armedTicks;
+    private static int beepClock;
 
     private static @Nullable ClientInput savedInput;
     private static float savedYaw, savedPitch;
@@ -44,6 +48,8 @@ public final class ClientPilot {
     public static FlightInput lastInput() { return lastInput; }
     public static PilotSwitches switches() { return switches; }
     public static boolean usingGamepad() { return usingGamepad; }
+    /** Seconds spent armed in this session (the OSD flight timer). */
+    public static int flightSeconds() { return armedTicks / 20; }
 
     /** Called every client tick (post). */
     public static void tick() {
@@ -60,6 +66,9 @@ public final class ClientPilot {
         else if (found == null && drone != null) end(mc, player);
         else if (found != null && found != drone) drone = found;
         if (drone == null) return;
+
+        if (drone.isArmed()) armedTicks++;
+        warningBeeps(mc, drone);
 
         // keep the operator standing still and looking where they were
         player.setYRot(savedYaw);
@@ -98,6 +107,17 @@ public final class ClientPilot {
         ClientPacketDistributor.sendToServer(PilotInputPayload.of(in));
     }
 
+    /** Radio-style warning tones: slow beep for a low pack, fast double beep when critical, short chirps on weak signal. */
+    private static void warningBeeps(Minecraft mc, DroneEntity d) {
+        beepClock++;
+        boolean critical = d.batterySoc() < 0.05f, low = d.batteryLow();
+        boolean lost = d.rssi() < 0.08f;
+        int period = critical ? 6 : low ? 20 : lost ? 12 : 0;
+        if (period == 0 || beepClock % period != 0) return;
+        float pitch = critical ? 1.9f : low ? 1.4f : 0.8f;
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_PLING.value(), pitch, 0.7f));
+    }
+
     private static @Nullable DroneEntity findPilotedDrone(ClientLevel level, int playerId) {
         for (Entity e : level.entitiesForRendering()) {
             if (e instanceof DroneEntity d && d.pilotEntityId() == playerId) return d;
@@ -112,6 +132,8 @@ public final class ClientPilot {
         gamepad = new GamepadSticks(switches);
         usingGamepad = false;
         lastInput = FlightInput.DISARMED;
+        armedTicks = 0;
+        beepClock = 0;
 
         savedInput = player.input;
         player.input = new ClientInput();           // inert: no walking, jumping or sneaking while flying

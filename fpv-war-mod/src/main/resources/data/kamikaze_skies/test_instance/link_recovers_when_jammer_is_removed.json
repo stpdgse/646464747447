@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_25",
+  "function": "kamikaze_skies:link_recovers_when_jammer_is_removed",
+  "max_ticks": 6000,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty",
+  "padding": 100
+}

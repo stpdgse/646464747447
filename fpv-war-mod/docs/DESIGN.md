@@ -239,7 +239,7 @@ Delivery is in big chunks with a draft PR, screenshots/GIFs and a short written 
 | 0 | **Project skeleton and test harness** ✅ done 2026-11-20 | Gradle project builds a NeoForge mod jar; dedicated server boots; a GameTest runs; client launches under Xvfb and a screenshot is captured; CI builds |
 | 1 | **Flight sim core + input** ✅ done 2026-11-20 | `sim/` flight model with unit tests; spawnable drone entity; keyboard and gamepad flying; goggles camera; basic OSD |
 | 2 | **Destruction prototype** ✅ done 2026-11-20 | Drone impact destroys blocks with a blast profile; structural collapse of a test house; budgets and quality presets; GIF of a house collapsing |
-| 3 | **FPV feed, battery, link** | Analog post-process, voltage sag, RSSI with distance and jammers, signal loss/freeze; training range |
+| 3 | **FPV feed, battery, link** ✅ done 2026-11-20 | Analog post-process, voltage sag, RSSI with distance and jammers, signal loss/freeze; training range |
 | 4 | **Crafting and drone assembly** | Parts, tiers, workbench, warheads, blackbox; drone loss rules |
 | 5 | **Art pipeline vertical slice** | One soldier (rifleman, full animation set), one vehicle (tank) and the FPV drone, fully modeled, textured and animated through Blockbench + GeckoLib |
 | 6 | **Scared AI + enemy roles** | Perception, morale, contagion, hide/flee/fight; all four soldier roles; jammer and anti-air defenses; operator hunt |
@@ -270,6 +270,7 @@ Phase order may change as we learn. Phase 2 may be pulled earlier if the skeleto
 ---
 
 ## 12. Changelog
+- 2026-11-20: Phase 3 complete. LiPo battery with voltage sag and power fade, radio link (distance, blocks, jammers) with failsafe and dropped packets, jammer entity and item, analog FPV post-process shader with 6 signal levels, OSD telemetry and warnings, training range command. 97 unit tests, 26 GameTests. See `LINK_AND_BATTERY.md`.
 - 2026-11-20: Phase 2 complete. Blast solver, structural stability solver, async collapse manager with per-tick budgets and debris caps, quality presets, warhead drone items that detonate on impact, strike demo. 81 unit tests, 18 GameTests (soaked 8/8). See `DESTRUCTION.md`.
 - 2026-11-20: Phase 1 complete. Pure-Java flight sim (rate PID with I-term relax and anti-windup, angle/acro assist blend, X-quad mixer, motor lag, drag), server-authoritative drone entity with block collisions and crash, pilot networking, keyboard + gamepad (SDL3) input layer, quaternion FPV camera with roll, OSD, GeckoLib model from the Blockbench pipeline. 55 unit tests, 10 GameTests. Controls in `CONTROLS.md`.
 - 2026-11-20: Phase 0 complete. Pinned Minecraft 26.3 / NeoForge 26.3.0.114 / GeckoLib 5.5.7 / Java 25. Gradle project, unit tests, GameTest harness, server smoke test and software-rendered client screenshot all working (see `TESTING.md`).
