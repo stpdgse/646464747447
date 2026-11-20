@@ -28,7 +28,7 @@ A single-player-first (AI first, multiplayer later) Minecraft mod about flying F
 
 | Area | Decision |
 |---|---|
-| Platform | Minecraft Java, **NeoForge, latest stable** at project start (pin the exact version in `gradle.properties`) |
+| Platform | Minecraft Java **26.3**, **NeoForge 26.3.0.114**, **Java 25** (pinned in `gradle.properties`; Minecraft now uses year-based versions) |
 | Hard dependency | **GeckoLib** only. Others allowed only if they clearly help and are explained here first |
 | Shaders | Iris + a pack such as Complementary/Photon **recommended, not required**. Our own FPV video effect works with or without a pack |
 | Project type | Personal passion project, All Rights Reserved |
@@ -236,7 +236,7 @@ Delivery is in big chunks with a draft PR, screenshots/GIFs and a short written 
 
 | # | Phase | Exit criteria |
 |---|---|---|
-| 0 | **Project skeleton and test harness** | Gradle project builds a NeoForge mod jar; dedicated server boots; a GameTest runs; client launches under Xvfb and a screenshot is captured; CI builds |
+| 0 | **Project skeleton and test harness** ✅ done 2026-11-20 | Gradle project builds a NeoForge mod jar; dedicated server boots; a GameTest runs; client launches under Xvfb and a screenshot is captured; CI builds |
 | 1 | **Flight sim core + input** | `sim/` flight model with unit tests; spawnable drone entity; keyboard and gamepad flying; goggles camera; basic OSD |
 | 2 | **Destruction prototype** | Drone impact destroys blocks with a blast profile; structural collapse of a test house; budgets and quality presets; GIF of a house collapsing |
 | 3 | **FPV feed, battery, link** | Analog post-process, voltage sag, RSSI with distance and jammers, signal loss/freeze; training range |
@@ -265,9 +265,10 @@ Phase order may change as we learn. Phase 2 may be pulled earlier if the skeleto
 | NeoForge/Minecraft version churn | Pin exact versions; upgrade only at milestone boundaries |
 | Touch controls on Java Edition | On-screen sticks via our own overlay; confirm the target devices later |
 
-**Open questions (decide later):** exact Minecraft version to pin (latest NeoForge-supported), faction names and mission narrative, flight-feel preset values, final asset art direction palette, whether vehicles need crews in v1.
+**Open questions (decide later):** faction names and mission narrative, flight-feel preset values, final asset art direction palette, whether vehicles need crews in v1.
 
 ---
 
 ## 12. Changelog
+- 2026-11-20: Phase 0 complete. Pinned Minecraft 26.3 / NeoForge 26.3.0.114 / GeckoLib 5.5.7 / Java 25. Gradle project, unit tests, GameTest harness, server smoke test and software-rendered client screenshot all working (see `TESTING.md`).
 - 2026-11-20: Design v1 written from the planning Q&A. Decisions: NeoForge + GeckoLib, new folder in this repo, fictional (non-real-conflict) setting, CC0 sound sourcing approved, all-input-equal control layer.

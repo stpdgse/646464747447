@@ -1,0 +1,6 @@
+{
+  "kamikaze_skies.configuration.title": "Kamikaze Skies Configs",
+  "kamikaze_skies.configuration.section.kamikaze_skies.synced.toml": "Kamikaze Skies Settings",
+  "kamikaze_skies.configuration.section.kamikaze_skies.synced.toml.title": "Kamikaze Skies Settings",
+  "kamikaze_skies.configuration.flightSubsteps": "Flight substeps per tick"
+}

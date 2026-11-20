@@ -1,0 +1,31 @@
+name: Kamikaze Skies
+
+on:
+  push:
+    paths: ['fpv-war-mod/**', '.github/workflows/fpv-war-mod.yml']
+  pull_request:
+    paths: ['fpv-war-mod/**', '.github/workflows/fpv-war-mod.yml']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: fpv-war-mod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build and unit tests
+        run: ./gradlew build
+      - name: GameTests (headless server)
+        run: ./gradlew runGameTestServer
+      - name: Upload mod jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: kamikaze_skies-jar
+          path: fpv-war-mod/build/libs/*.jar

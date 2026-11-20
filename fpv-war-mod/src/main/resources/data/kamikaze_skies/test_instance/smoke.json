@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "kamikaze_skies:smoke",
+  "max_ticks": 20,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}
