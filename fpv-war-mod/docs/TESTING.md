@@ -52,3 +52,18 @@ Check a new test can fail by temporarily breaking its assertion.
   copied to `assets/kamikaze_skies/geckolib/models/entity/*.geo.json` (animations under `geckolib/animations/entity/`,
   textures under `textures/entity/`). GeckoLib logs `Loaded N models and N animations` on success.
 - Gamepads come from SDL3 (LWJGL is on the classpath; Minecraft 26 has no GLFW).
+
+## Phase 2 lessons (destruction)
+- **GameTest ticks run faster than real time**, while force-loaded chunks load in real time. A test that waits a fixed number
+  of ticks for a chunk to start ticking can time out. Use generous `max_ticks` (6000) for tests that spawn entities; passing
+  tests still finish immediately.
+- **Neighbouring GameTests contaminate each other** when the code under test looks tens of blocks around (stability
+  analysis). Give those tests their own `test_environment` (so they run one at a time) and a large `padding` in the test
+  instance JSON (100 blocks).
+- **Assert "at least", not "exactly", when other tests may leave blocks nearby**, and prefer checks tied to your own blocks.
+- **A failing assertion should say what it saw.** Putting the offending cells and block types in the failure message turned a
+  mysterious flake into an obvious bug (vanilla's `#dirt` tag no longer contains grass blocks, so grass was classified as a
+  structure).
+- Vanilla tag contents change between versions; check them in the jar's `data/minecraft/tags/` before relying on them.
+- `scripts/demo-screenshots.sh` takes `KS_DEMO_MODE=strike`, `KS_START_DELAY=0` and a fractional interval for dense frames,
+  e.g. `KS_DEMO_MODE=strike KS_START_DELAY=0 scripts/demo-screenshots.sh build/screenshots/strike 150 60 0.25`.
