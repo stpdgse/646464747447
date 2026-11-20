@@ -73,6 +73,7 @@ public final class BlastExecutor {
         }
 
         hurtEntities(level, center, profile, Math.max(4.0, radius + 1.5), source);
+        com.kamikazeskies.drone.SoldierEntity.alarm(level, center, radius);
         effects(level, center, radius, q, rnd);
 
         CollapseManager.schedule(level, BlockPos.containing(center), (int) Math.ceil(radius));

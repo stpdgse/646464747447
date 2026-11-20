@@ -1,6 +1,6 @@
 {
   "type": "minecraft:function",
-  "environment": "minecraft:default",
+  "environment": "kamikaze_skies:solo_65",
   "function": "kamikaze_skies:tank_has_heavy_hit_points",
   "max_ticks": 200,
   "setup_ticks": 1,

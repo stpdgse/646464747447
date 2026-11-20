@@ -4,6 +4,7 @@
   "entity.kamikaze_skies.fpv_drone": "FPV Drone",
   "message.kamikaze_skies.link_established": "Link established. Press R to arm.",
   "message.kamikaze_skies.crashed": "Drone destroyed (impact %s m/s)",
+  "message.kamikaze_skies.shot_down": "Drone shot down",
   "key.category.kamikaze_skies.flight": "Kamikaze Skies - Flight",
   "key.kamikaze_skies.pitch_forward": "Pitch forward (nose down)",
   "key.kamikaze_skies.pitch_back": "Pitch back (nose up)",

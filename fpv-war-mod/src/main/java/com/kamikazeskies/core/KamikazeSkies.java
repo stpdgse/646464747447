@@ -35,6 +35,7 @@ public class KamikazeSkies {
         com.kamikazeskies.gametest.BuildGameTests.register(modEventBus);
         com.kamikazeskies.gametest.SoldierGameTests.register(modEventBus);
         com.kamikazeskies.gametest.TankGameTests.register(modEventBus);
+        com.kamikazeskies.gametest.AiGameTests.register(modEventBus);
         modEventBus.addListener(KsNetwork::register);
         modEventBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) ->
                 e.put(KsRegistries.SOLDIER.get(), com.kamikazeskies.drone.SoldierEntity.attributes().build()));

@@ -1,6 +1,6 @@
 {
   "type": "minecraft:function",
-  "environment": "minecraft:default",
+  "environment": "kamikaze_skies:solo_62",
   "function": "kamikaze_skies:soldier_spawns_with_attributes",
   "max_ticks": 200,
   "setup_ticks": 1,

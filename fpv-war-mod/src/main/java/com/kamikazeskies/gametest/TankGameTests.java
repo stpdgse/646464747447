@@ -26,9 +26,8 @@ public final class TankGameTests {
     public static void register(IEventBus bus) { FUNCTIONS.register(bus); }
 
     private static TankEntity spawn(GameTestHelper h) {
-        TankEntity t = KsRegistries.TANK.get().create(h.getLevel(), EntitySpawnReason.COMMAND);
-        t.snapTo(h.absoluteVec(new Vec3(3, 2, 3)));
-        h.getLevel().addFreshEntity(t);
+        KsGameTests.floor(h, 1, 10);
+        TankEntity t = h.spawn(KsRegistries.TANK.get(), new Vec3(3, 2, 3));
         return t;
     }
 
@@ -52,9 +51,9 @@ public final class TankGameTests {
         TankEntity t = spawn(h);
         t.hurtServer(h.getLevel(), h.getLevel().damageSources().generic(), 500f);
         t.fireCannon();                                   // must be a harmless no-op on a wreck
-        h.runAfterDelay(60, () -> {
+        h.succeedWhen(() -> {
+            h.assertTrue(t.deathTime >= 55, Component.literal("waiting for death ticks: " + t.deathTime));
             h.assertTrue(!t.isRemoved(), Component.literal("wreck vanished (deathTime=" + t.deathTime + ")"));
-            h.succeed();
         });
     }
 }

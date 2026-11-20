@@ -1,6 +1,6 @@
 {
   "type": "minecraft:function",
-  "environment": "minecraft:default",
+  "environment": "kamikaze_skies:solo_60",
   "function": "kamikaze_skies:soldier_corpse_stays_after_death_animation",
   "max_ticks": 200,
   "setup_ticks": 1,

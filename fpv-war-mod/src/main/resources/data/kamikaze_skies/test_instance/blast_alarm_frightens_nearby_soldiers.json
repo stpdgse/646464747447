@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_71",
+  "function": "kamikaze_skies:blast_alarm_frightens_nearby_soldiers",
+  "max_ticks": 400,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}

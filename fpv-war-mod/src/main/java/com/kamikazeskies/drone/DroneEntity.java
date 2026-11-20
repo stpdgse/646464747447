@@ -370,6 +370,19 @@ public class DroneEntity extends Entity implements GeoEntity {
         if (level() instanceof ServerLevel server) BlastExecutor.detonate(server, center, axis, warhead().profile(), null);
     }
 
+    /** Hit by gunfire or a shell: the drone drops dead where it is (blackbox, if fitted, survives). */
+    public void shotDown() {
+        if (isRemoved() || level().isClientSide()) return;
+        if (pilot != null) pilot.sendOverlayMessage(Component.translatable("message.kamikaze_skies.shot_down"));
+        if (level() instanceof ServerLevel server) {
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE, getX(), getY(), getZ(), 10, 0.2, 0.1, 0.2, 0.02);
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT, getX(), getY(), getZ(), 8, 0.2, 0.2, 0.2, 0.3);
+        }
+        dropBlackbox(FlightLog.CRASH);
+        stopPilot();
+        discard();
+    }
+
     private void crash(double impact) {
         if (pilot != null) {
             pilot.sendOverlayMessage(Component.translatable("message.kamikaze_skies.crashed", String.format("%.1f", impact)));

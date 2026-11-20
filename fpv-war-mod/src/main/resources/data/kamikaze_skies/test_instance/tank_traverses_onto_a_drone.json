@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_67",
+  "function": "kamikaze_skies:tank_traverses_onto_a_drone",
+  "max_ticks": 400,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}

@@ -1,6 +1,6 @@
 {
   "type": "minecraft:function",
-  "environment": "minecraft:default",
+  "environment": "kamikaze_skies:solo_64",
   "function": "kamikaze_skies:soldier_survives_light_hit_and_dies_to_heavy",
   "max_ticks": 200,
   "setup_ticks": 1,

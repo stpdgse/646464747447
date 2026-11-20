@@ -1,6 +1,6 @@
 {
   "type": "minecraft:function",
-  "environment": "minecraft:default",
+  "environment": "kamikaze_skies:solo_87",
   "function": "kamikaze_skies:drone_survives_soft_landing",
   "max_ticks": 6000,
   "setup_ticks": 1,

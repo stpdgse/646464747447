@@ -29,6 +29,11 @@ public class TankEntity extends PathfinderMob implements GeoEntity {
     public static final float MAX_HEALTH = 120f;
     /** A wreck stays for five minutes. */
     public static final int WRECK_TICKS = 6000;
+    public static final int FIRE_INTERVAL = 80;
+    public static final double SIGHT = 64.0, TRAVERSE_DEG_PER_TICK = 3.0;
+    private int aiTick, nextFire;
+    private @org.jspecify.annotations.Nullable DroneEntity target;
+
     public static final String HULL = "hull", WEAPON = "weapon";
 
     private static final EntityDataAccessor<Boolean> SCANNING = SynchedEntityData.defineId(TankEntity.class, EntityDataSerializers.BOOLEAN);
@@ -46,6 +51,7 @@ public class TankEntity extends PathfinderMob implements GeoEntity {
     }
 
     @Override protected void defineSynchedData(SynchedEntityData.Builder b) { super.defineSynchedData(b); b.define(SCANNING, false); }
+    public int aiTicks() { return aiTick; }
     public boolean scanning() { return entityData.get(SCANNING); }
     public void setScanning(boolean v) { entityData.set(SCANNING, v); }
 
@@ -60,6 +66,28 @@ public class TankEntity extends PathfinderMob implements GeoEntity {
     @Override protected void tickDeath() {
         deathTime++;
         if (deathTime >= WRECK_TICKS && !level().isClientSide() && !isRemoved()) remove(Entity.RemovalReason.KILLED);
+    }
+
+    /** The crew scans until a drone shows up, then traverses the whole hull onto it (the turret is fixed in this model) and fires when aligned. */
+    @Override protected void customServerAiStep(net.minecraft.server.level.ServerLevel level) {
+        super.customServerAiStep(level);
+        aiTick++;
+        if (aiTick % 5 == 0) target = Threats.nearestArmedDrone(this, SIGHT);
+        DroneEntity d = target;
+        if (d == null || d.isRemoved()) { setScanning(true); return; }
+        setScanning(false);
+        double dx = d.getX() - getX(), dz = d.getZ() - getZ();
+        float want = (float) (Math.toDegrees(Math.atan2(-dx, dz)));
+        float diff = net.minecraft.util.Mth.wrapDegrees(want - getYRot());
+        float step = (float) Math.max(-TRAVERSE_DEG_PER_TICK, Math.min(TRAVERSE_DEG_PER_TICK, diff));
+        setYRot(getYRot() + step); setYBodyRot(getYRot()); setYHeadRot(getYRot());
+        if (Math.abs(diff) < 12 && aiTick >= nextFire) {
+            nextFire = aiTick + FIRE_INTERVAL;
+            fireCannon();
+            level.playSound(null, getX(), getY(), getZ(), net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE.value(), net.minecraft.sounds.SoundSource.HOSTILE, 2.0f, 0.55f);
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE, getX() - Math.sin(Math.toRadians(getYRot())) * 3, getY() + 1.2, getZ() + Math.cos(Math.toRadians(getYRot())) * 3, 6, 0.2, 0.1, 0.2, 0.02);
+            if (random.nextDouble() < com.kamikazeskies.ai.Marksmanship.cannonChance(distanceTo(d), d.speed())) d.shotDown();
+        }
     }
 
     @Override public boolean isPushable() { return false; }

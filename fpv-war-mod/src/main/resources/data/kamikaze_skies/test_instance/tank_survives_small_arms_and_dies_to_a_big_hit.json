@@ -1,6 +1,6 @@
 {
   "type": "minecraft:function",
-  "environment": "minecraft:default",
+  "environment": "kamikaze_skies:solo_66",
   "function": "kamikaze_skies:tank_survives_small_arms_and_dies_to_a_big_hit",
   "max_ticks": 200,
   "setup_ticks": 1,

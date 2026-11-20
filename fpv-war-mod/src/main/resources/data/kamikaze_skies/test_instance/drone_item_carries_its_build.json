@@ -1,6 +1,6 @@
 {
   "type": "minecraft:function",
-  "environment": "kamikaze_skies:solo_50",
+  "environment": "kamikaze_skies:solo_86",
   "function": "kamikaze_skies:drone_item_carries_its_build",
   "max_ticks": 6000,
   "setup_ticks": 1,

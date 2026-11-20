@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_73",
+  "function": "kamikaze_skies:calm_soldier_stays_idle_without_threat",
+  "max_ticks": 400,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "kamikaze_skies:solo_69",
+  "function": "kamikaze_skies:veteran_engages_a_hovering_drone",
+  "max_ticks": 400,
+  "setup_ticks": 1,
+  "required": true,
+  "structure": "minecraft:empty"
+}

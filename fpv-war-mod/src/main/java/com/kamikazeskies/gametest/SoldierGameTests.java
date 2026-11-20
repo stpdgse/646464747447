@@ -30,9 +30,8 @@ public final class SoldierGameTests {
     public static void register(IEventBus bus) { FUNCTIONS.register(bus); }
 
     private static SoldierEntity spawn(GameTestHelper h) {
-        SoldierEntity s = KsRegistries.SOLDIER.get().create(h.getLevel(), EntitySpawnReason.COMMAND);
-        s.snapTo(h.absoluteVec(new Vec3(1.5, 2, 1.5)));
-        h.getLevel().addFreshEntity(s);
+        KsGameTests.floor(h, 1, 10);
+        SoldierEntity s = h.spawn(KsRegistries.SOLDIER.get(), new Vec3(1.5, 2, 1.5));
         return s;
     }
 
@@ -66,10 +65,9 @@ public final class SoldierGameTests {
     private static void corpseStays(GameTestHelper h) {
         SoldierEntity s = spawn(h);
         s.hurtServer(h.getLevel(), h.getLevel().damageSources().generic(), 100f);
-        h.runAfterDelay(60, () -> {      // vanilla would have removed it after 20 ticks
+        h.succeedWhen(() -> {            // vanilla would have removed it after 20 ticks
+            h.assertTrue(s.deathTime >= 55, Component.literal("waiting for death ticks: " + s.deathTime));
             h.assertTrue(!s.isRemoved(), Component.literal("corpse removed too early (deathTime=" + s.deathTime + ")"));
-            h.assertTrue(s.deathTime >= 55, Component.literal("death not ticking: " + s.deathTime));
-            h.succeed();
         });
     }
 }
