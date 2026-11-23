@@ -278,8 +278,10 @@ public class JdkGapTransformer implements ClassHolderTransformer {
         // JDK classes never do: the hierarchy lookup does not see TeaVM's mapped fields reliably, so a
         // "missing" field there is usually present (Level.FINE, StandardCharsets.UTF_8, ...).
         String owner = f.getClassName();
-        boolean placeholder = stubClasses.containsKey(owner) || isLenient(owner) || inheritsStub(owner, context)
-                || (isPlatform(owner) && !isResolvable(owner, context)); // class does not exist at all
+        // Only for classes that are placeholders (or inherit from one), or that do not exist at all.
+        // A real class is never touched: field lookups on it are not reliable enough to call a field "missing".
+        boolean placeholder = stubClasses.containsKey(owner) || inheritsStub(owner, context)
+                || (!isResolvable(owner, context) && (isPlatform(owner) || isLenient(owner)));
         if (!placeholder || (isResolvable(owner, context) && isFieldResolved(f, context))) {
             return;
         }

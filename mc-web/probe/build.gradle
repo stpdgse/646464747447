@@ -7,7 +7,7 @@ dependencies {
     implementation files('../classlib-ext/build/libs/classlib-ext.jar')
 }
 teavm.wasmGC {
-    mainClass = 'probe.Main'
+    mainClass = 'probe.ZipProbe'
     outOfProcess = false
     copyRuntime = true
 }
