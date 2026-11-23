@@ -3,7 +3,7 @@
 <title>mc-web</title>
 <style>html,body{margin:0;background:#111;color:#ddd;font:14px monospace}canvas{display:block}</style>
 <canvas id="game" width="854" height="480"></canvas>
-<script>Error.stackTraceLimit = 100;</script>
+<script>Error.stackTraceLimit = 100; globalThis.mcwebStats = new URLSearchParams(location.search).has("stats");</script>
 <script src="mcweb.js"></script>
 <script src="mcshader.js"></script>
 <script src="mcaudio.js"></script>

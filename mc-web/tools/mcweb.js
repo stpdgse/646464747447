@@ -29,6 +29,16 @@
   const MOD_BITS = { 225: 0x1, 229: 0x2, 224: 0x40, 228: 0x80, 226: 0x100, 230: 0x200, 227: 0x400, 231: 0x800 };
 
   const queue = [];
+  let frameCount = 0, eventCount = 0, lastStats = 0;
+  if (hasDom) {
+    setInterval(() => {
+      const now = performance.now();
+      if (lastStats && globalThis.mcwebStats) {
+        console.log("[mcweb] fps=" + (frameCount * 1000 / (now - lastStats)).toFixed(1) + " events=" + eventCount + " queued=" + queue.length);
+      }
+      lastStats = now; frameCount = 0;
+    }, 5000);
+  }
   let cur = { type: 0, ints: [0, 0, 0, 0], floats: [0, 0, 0, 0], str: "" };
   const keys = new Uint8Array(512);
   let modBits = 0;
@@ -42,6 +52,8 @@
   let frameRequested = false;
 
   function ev(type, ints, floats, str) {
+    eventCount++;
+    if (globalThis.mcwebStats && eventCount <= 40) console.log('[mcweb] event 0x' + type.toString(16) + ' ' + JSON.stringify(ints || '') + ' ' + JSON.stringify(floats || ''));
     queue.push({ type, ints: ints || [0, 0, 0, 0], floats: floats || [0, 0, 0, 0], str: str || "" });
   }
 
@@ -126,6 +138,8 @@
         api.canvas = canvas;
         canvas.tabIndex = 0;
         canvas.focus();
+        if (api.listening) return;      // the game opens the window once per GL version it tries
+        api.listening = true;
         window.addEventListener("keydown", (e) => onKey(e, true));
         window.addEventListener("keyup", (e) => onKey(e, false));
         canvas.addEventListener("mousemove", (e) => {
@@ -178,6 +192,12 @@
         });
         window.addEventListener("beforeunload", (e) => { /* unsaved worlds live in browser storage */ });
         refreshClipboard();
+        // SDL tells a new window that it has the input focus; the game ignores input until it hears so
+        // the game opened the window at its own requested size; tell it the real one
+        ev(0x206, [cssSize().w, cssSize().h, 0, 0]);               // WINDOW_RESIZED
+        ev(0x207, [canvas.width, canvas.height, 0, 0]);             // WINDOW_PIXEL_SIZE_CHANGED
+        ev(0x20e, [0, 0, 0, 0]);     // WINDOW_FOCUS_GAINED
+        ev(0x20c, [0, 0, 0, 0]);     // WINDOW_MOUSE_ENTER
       }
     },
 
@@ -232,6 +252,7 @@
     mouseButtons() { return buttons; },
 
     requestFrame(cb) {
+      frameCount++;
       frameCallbacks.push(cb);
       if (frameRequested) return;
       frameRequested = true;

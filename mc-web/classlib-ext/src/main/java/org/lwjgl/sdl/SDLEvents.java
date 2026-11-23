@@ -5,6 +5,7 @@ import org.teavm.mcweb.host.Sdl;
 /** Event polling: the page queues DOM events in SDL form and this copies the next one into the struct. */
 public class SDLEvents {
     public static final long WINDOW_HANDLE = 1L;
+    private static int consumed;
 
     public static boolean SDL_PollEvent(SDL_Event event) {
         if (event == null) {
@@ -15,6 +16,9 @@ public class SDLEvents {
         }
         int type = Sdl.evType();
         event.type = type;
+        if (consumed++ < 30) {
+            org.teavm.mcweb.host.WebHost.consoleLog("[sdl] event 0x" + Integer.toHexString(type));
+        }
         switch (type) {
             case 0x300:
             case 0x301:
