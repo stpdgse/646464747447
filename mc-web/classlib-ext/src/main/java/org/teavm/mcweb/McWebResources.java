@@ -18,6 +18,7 @@ public final class McWebResources {
     public static void install(byte[] archive) throws IOException {
         image = new ZipImage(archive);
         mount();
+        selfCheck("/assets/minecraft/textures/gui/title/mojangstudios.png");
     }
 
     /**
@@ -27,6 +28,57 @@ public final class McWebResources {
      */
     private static void mount() throws IOException {
         mountDirectory("/");
+    }
+
+    private static void selfCheck(String path) throws IOException {
+        ZipImage.Node node = image.get(path);
+        byte[] expected = image.read(node);
+        java.io.File f = new java.io.File(path);
+        java.io.InputStream in = new java.io.FileInputStream(f);
+        byte[] actual = in.readAllBytes();
+        in.close();
+        byte[] viaFiles = java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(path));
+        org.teavm.mcweb.host.WebHost.consoleLog("[selfcheck] zip=" + expected.length + " first=" + (expected[0] & 0xff)
+                + " fileInputStream=" + actual.length + " first=" + (actual.length > 0 ? actual[0] & 0xff : -1)
+                + " Files.readAllBytes=" + viaFiles.length + " first=" + (viaFiles.length > 0 ? viaFiles[0] & 0xff : -1)
+                + " fileLength=" + f.length());
+        java.nio.ByteBuffer wrapped = java.nio.ByteBuffer.wrap(expected);
+        wrapped.order(java.nio.ByteOrder.BIG_ENDIAN);
+        long viaWrap = wrapped.getLong(0);
+        java.nio.file.Path base = java.nio.file.Paths.get("/assets/minecraft");
+        java.nio.file.Path child = java.nio.file.Paths.get("/assets/minecraft/textures/x.png");
+        java.nio.file.Path rel = base.relativize(child);
+        StringBuilder names = new StringBuilder();
+        if (rel != null) {
+            for (java.nio.file.Path part : rel) {
+                names.append('[').append(part).append(']');
+            }
+        }
+        org.teavm.mcweb.host.WebHost.consoleLog("[selfcheck] relativize=" + rel + " iter=" + names);
+        try {
+            com.google.common.base.Joiner joiner = com.google.common.base.Joiner.on("/");
+            org.teavm.mcweb.host.WebHost.consoleLog("[selfcheck] joiner=" + joiner.join(java.util.List.of("a", "b")));
+            org.teavm.mcweb.host.WebHost.consoleLog("[selfcheck] joiner path=" + joiner.join(rel));
+            java.nio.file.Path empty = base.relativize(base);
+            org.teavm.mcweb.host.WebHost.consoleLog("[selfcheck] joiner empty=" + joiner.join(empty));
+        } catch (Throwable t) {
+            org.teavm.mcweb.host.WebHost.consoleLog("[selfcheck] joiner failed: " + t);
+        }
+        java.nio.ByteBuffer probe = java.nio.ByteBuffer.wrap(expected.clone());
+        probe.getLong(0);
+        int afterLong = probe.position();
+        probe.getInt(0);
+        int afterInt = probe.position();
+        probe.get(0);
+        probe.getShort(0);
+        org.teavm.mcweb.host.WebHost.consoleLog("[selfcheck] positions after absolute getLong/getInt/get/getShort: "
+                + afterLong + " " + afterInt + " " + probe.position());
+        java.nio.ByteBuffer le = java.nio.ByteBuffer.wrap(expected.clone());
+        le.order(java.nio.ByteOrder.LITTLE_ENDIAN);
+        le.order(java.nio.ByteOrder.BIG_ENDIAN);
+        org.teavm.mcweb.host.WebHost.consoleLog("[selfcheck] getLong wrap=" + Long.toHexString(viaWrap)
+                + " flipped=" + Long.toHexString(le.getLong(0)) + " expected=89504e470d0a1a0a eq=" + (viaWrap == 0x89504E470D0A1A0AL)
+                + " int=" + Integer.toHexString(wrapped.getInt(0)) + " int8=" + Integer.toHexString(wrapped.getInt(8)));
     }
 
     /** Like {@code Files.createDirectories}, which TeaVM's version fails on existing directories. */

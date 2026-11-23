@@ -14,8 +14,17 @@ public final class Mcshader {
     @JSBody(script = "return !!globalThis.mcshader;")
     public static native boolean ready();
 
-    @JSBody(params = {"fn", "a", "b", "c", "d", "e"}, script = "return mcshader.exports[fn](a, b, c, d, e) | 0;")
-    public static native int call(String fn, int a, int b, int c, int d, int e);
+    @JSBody(params = {"fn", "a", "b", "c", "d", "e", "f", "g", "h", "i"},
+            script = "return mcshader.exports[fn](a, b, c, d, e, f, g, h, i) | 0;")
+    public static native int call(String fn, int a, int b, int c, int d, int e, int f, int g, int h, int i);
+
+    public static int call(String fn, int a, int b, int c, int d, int e) {
+        return call(fn, a, b, c, d, e, 0, 0, 0, 0);
+    }
+
+    public static int call(String fn, int a, int b, int c, int d, int e, int f) {
+        return call(fn, a, b, c, d, e, f, 0, 0, 0);
+    }
 
     public static int call(String fn) {
         return call(fn, 0, 0, 0, 0, 0);
@@ -86,5 +95,25 @@ public final class Mcshader {
 
     public static byte[] spirv() {
         return spirvBytes().copyToJavaArray();
+    }
+
+    // bulk copies between the emulated native heap and the module's memory ---------------------------
+
+    /** Copies {@code length} bytes at a heap address into freshly allocated module memory; free with {@link #free}. */
+    public static int copyIn(long heapAddress, int length) {
+        byte[] page = org.lwjgl.system.Heap.pageOf(heapAddress);
+        int offset = org.lwjgl.system.Heap.offsetOf(heapAddress);
+        byte[] part = new byte[length];
+        System.arraycopy(page, offset, part, 0, length);
+        int p = malloc(Math.max(1, length));
+        write(p, part);
+        return p;
+    }
+
+    /** Copies module memory to a heap address. */
+    public static void copyOut(int pointer, long heapAddress, int length) {
+        byte[] part = readBytes(pointer, length);
+        byte[] page = org.lwjgl.system.Heap.pageOf(heapAddress);
+        System.arraycopy(part, 0, page, org.lwjgl.system.Heap.offsetOf(heapAddress), length);
     }
 }

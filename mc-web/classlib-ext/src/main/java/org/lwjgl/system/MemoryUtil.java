@@ -104,12 +104,19 @@ public final class MemoryUtil {
             return memAlloc(size);
         }
         long fresh = Heap.reallocate(memAddress0(old), size);
-        return Heap.byteBuffer(fresh, size);
+        ByteBuffer grown = Heap.byteBuffer(fresh, size);
+        // LWJGL keeps the position so callers can continue appending where they stopped
+        grown.position(Math.min(old.position(), size));
+        return grown;
     }
 
     public static PointerBuffer memRealloc(PointerBuffer old, int size) {
         long fresh = old == null ? Heap.alloc((long) size * 8) : Heap.reallocate(old.address0(), (long) size * 8);
-        return PointerBuffer.create(fresh, size);
+        PointerBuffer grown = PointerBuffer.create(fresh, size);
+        if (old != null) {
+            grown.position(Math.min(old.position(), size));
+        }
+        return grown;
     }
 
     public static void memFree(ByteBuffer buffer) {
@@ -280,8 +287,11 @@ public final class MemoryUtil {
         Heap.copy(src, dst, bytes);
     }
 
+    /** Like LWJGL: copies src.remaining() bytes from the buffers' positions and leaves both positions alone. */
     public static void memCopy(ByteBuffer src, ByteBuffer dst) {
-        dst.put(src);
+        ByteBuffer from = src.duplicate();
+        ByteBuffer to = dst.duplicate();
+        to.put(from);
     }
 
     public static void memSet(long a, int value, long bytes) {

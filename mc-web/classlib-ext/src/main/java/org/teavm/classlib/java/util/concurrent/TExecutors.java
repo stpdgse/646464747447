@@ -48,6 +48,10 @@ public final class TExecutors {
         return new TScheduledThreadPoolExecutor(1);
     }
 
+    public static TScheduledExecutorService newSingleThreadScheduledExecutor(TThreadFactory f) {
+        return new TScheduledThreadPoolExecutor(1, f);
+    }
+
     public static TThreadFactory defaultThreadFactory() {
         return Thread::new;
     }

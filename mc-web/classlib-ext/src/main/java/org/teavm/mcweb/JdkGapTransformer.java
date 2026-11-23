@@ -57,6 +57,9 @@ public class JdkGapTransformer implements ClassHolderTransformer {
             "java.lang.ClassLoader#getResourceAsStream",
             "java.lang.ClassLoader#getSystemResourceAsStream",
             "java.nio.file.Files#createDirectories",
+            "java.nio.file.Files#find",
+            "java.nio.file.Files#newInputStream",
+            "java.nio.file.Files#newOutputStream",
             "java.nio.file.Paths#get",
             "java.nio.file.Path#of",
             "java.lang.Class#getResource",
@@ -250,7 +253,27 @@ public class JdkGapTransformer implements ClassHolderTransformer {
                 BasicBlock rb = redirected.createBasicBlock();
                 InvokeInstruction call = new InvokeInstruction();
                 call.setType(InvocationType.SPECIAL);
-                call.setMethod(new MethodReference(SHIMS, redirectTo, method.getSignature()));
+                String shimOwner = SHIMS;
+                String shimName = redirectTo;
+                int hash = redirectTo.indexOf('#');
+                if (hash > 0) {
+                    // "owner#method": the shim lives next to the code it replaces (needed for package-private types)
+                    shimOwner = redirectTo.substring(0, hash);
+                    shimName = redirectTo.substring(hash + 1);
+                }
+                MethodReference shimRef = new MethodReference(shimOwner, shimName, method.getSignature());
+                var shimClass = context.getHierarchy().getClassSource().get(shimOwner);
+                if (shimClass != null && shimClass.getMethod(shimRef.getDescriptor()) == null) {
+                    // package-private parameter types cannot be named in the shim's source: match by name and arity
+                    for (var candidate : shimClass.getMethods()) {
+                        if (candidate.getName().equals(shimName)
+                                && candidate.getParameterTypes().length == method.getParameterTypes().length) {
+                            shimRef = candidate.getReference();
+                            break;
+                        }
+                    }
+                }
+                call.setMethod(shimRef);
                 call.setArguments(params.toArray(new Variable[0]));
                 org.teavm.model.instructions.ExitInstruction rexit = new org.teavm.model.instructions.ExitInstruction();
                 if (method.getResultType() != ValueType.VOID) {

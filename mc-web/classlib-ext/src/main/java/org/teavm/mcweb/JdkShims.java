@@ -197,17 +197,140 @@ public final class JdkShims {
     // debugging --------------------------------------------------------------------------------
 
     public static void trace(String message) {
-        System.out.println("[trace] " + message);
+        org.teavm.mcweb.host.WebHost.logStack("[trace] " + message);
     }
 
     public static void traceValue(String label, Object value) {
         System.out.println("[trace] " + label + " = " + value);
     }
 
+    /** Files.find: TeaVM's version dereferences a null stream when the start path itself does not match. */
+    public static java.util.stream.Stream<java.nio.file.Path> find(java.nio.file.Path start, int maxDepth,
+            java.util.function.BiPredicate<java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes> matcher,
+            java.nio.file.FileVisitOption[] options) throws java.io.IOException {
+        java.util.List<java.nio.file.Path> found = new java.util.ArrayList<>();
+        findInto(start, maxDepth, matcher, found);
+        return found.stream();
+    }
+
+    private static void findInto(java.nio.file.Path path, int depth,
+            java.util.function.BiPredicate<java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes> matcher,
+            java.util.List<java.nio.file.Path> out) throws java.io.IOException {
+        java.nio.file.attribute.BasicFileAttributes attributes =
+                java.nio.file.Files.readAttributes(path, java.nio.file.attribute.BasicFileAttributes.class);
+        if (matcher.test(path, attributes)) {
+            out.add(path);
+        }
+        if (depth > 0 && attributes.isDirectory()) {
+            try (java.nio.file.DirectoryStream<java.nio.file.Path> children = java.nio.file.Files.newDirectoryStream(path)) {
+                for (java.nio.file.Path child : children) {
+                    findInto(child, depth - 1, matcher, out);
+                }
+            }
+        }
+    }
+
+    /** Files.newInputStream: TeaVM's default provider does not implement it; paths of the default file system use java.io. */
+    public static java.io.InputStream newInputStream(java.nio.file.Path path, java.nio.file.OpenOption[] options)
+            throws java.io.IOException {
+        java.nio.file.spi.FileSystemProvider provider = path.getFileSystem().provider();
+        if (provider instanceof org.teavm.mcweb.fs.ZipFileSystemProvider) {
+            return provider.newInputStream(path, options);
+        }
+        java.io.File file = new java.io.File(path.toString());
+        if (!file.exists()) {
+            throw new java.nio.file.NoSuchFileException(path.toString());
+        }
+        if (file.isDirectory()) {
+            throw new java.io.IOException(path + ": is a directory");
+        }
+        return new java.io.FileInputStream(file);
+    }
+
+    public static java.io.OutputStream newOutputStream(java.nio.file.Path path, java.nio.file.OpenOption[] options)
+            throws java.io.IOException {
+        java.nio.file.spi.FileSystemProvider provider = path.getFileSystem().provider();
+        if (provider instanceof org.teavm.mcweb.fs.ZipFileSystemProvider) {
+            return provider.newOutputStream(path, options);
+        }
+        java.util.Set<java.nio.file.OpenOption> set = new java.util.HashSet<>(java.util.Arrays.asList(options));
+        java.io.File file = new java.io.File(path.toString());
+        boolean create = set.isEmpty() || set.contains(java.nio.file.StandardOpenOption.CREATE)
+                || set.contains(java.nio.file.StandardOpenOption.CREATE_NEW);
+        if (set.contains(java.nio.file.StandardOpenOption.CREATE_NEW) && file.exists()) {
+            throw new java.nio.file.FileAlreadyExistsException(path.toString());
+        }
+        if (!file.exists() && !create) {
+            throw new java.nio.file.NoSuchFileException(path.toString());
+        }
+        java.io.File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            throw new java.nio.file.NoSuchFileException(path.toString());
+        }
+        return new java.io.FileOutputStream(file, set.contains(java.nio.file.StandardOpenOption.APPEND));
+    }
+
+    /**
+     * PathPackResources.listPath without Guava's Joiner (which hits a null dereference on paths in this build):
+     * lists every regular file below the resolved directory and reports it as an identifier.
+     */
+    public static void listPath(String namespace, java.nio.file.Path root, java.util.List<String> directories,
+            net.minecraft.server.packs.PackResources.ResourceOutput output) {
+        java.nio.file.Path directory = net.minecraft.util.FileUtil.resolvePath(root, directories);
+        java.util.List<java.nio.file.Path> files;
+        try {
+            files = new java.util.ArrayList<>();
+            findInto(directory, Integer.MAX_VALUE, (p, a) -> a.isRegularFile(), files);
+        } catch (java.nio.file.NoSuchFileException e) {
+            return;
+        } catch (java.io.IOException e) {
+            org.teavm.mcweb.host.WebHost.consoleWarn("Failed to list path " + directory + ": " + e);
+            return;
+        }
+        org.teavm.mcweb.host.WebHost.consoleLog("[listPath] ns=" + namespace + " root=" + root + " (" + root.getClass().getName()
+                + ") dir=" + directory + " n=" + files.size() + (files.isEmpty() ? "" : " first=" + files.get(0)
+                + " (" + files.get(0).getClass().getName() + ")"));
+        for (java.nio.file.Path path : files) {
+            StringBuilder name = new StringBuilder();
+            for (java.nio.file.Path part : root.relativize(path)) {
+                if (name.length() > 0) {
+                    name.append('/');
+                }
+                name.append(part.toString());
+            }
+            net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.tryBuild(namespace, name.toString());
+            if (id == null) {
+                org.teavm.mcweb.host.WebHost.consoleWarn("Invalid path in pack: " + namespace + ":" + name + ", ignoring");
+            } else {
+                output.accept(id, net.minecraft.server.packs.resources.IoSupplier.create(path));
+            }
+        }
+    }
+
     // java.io / java.nio.file --------------------------------------------------------------------
 
     public static java.nio.file.Path toPath(java.io.File file) {
         return java.nio.file.Paths.get(file.getPath());
+    }
+
+    /** Reader.readAllAsString (JDK 26): drains the reader into one string. */
+    public static String readAllAsString(java.io.Reader in) throws java.io.IOException {
+        StringBuilder sb = new StringBuilder();
+        char[] buf = new char[4096];
+        int n;
+        while ((n = in.read(buf, 0, buf.length)) >= 0) {
+            sb.append(buf, 0, n);
+        }
+        return sb.toString();
+    }
+
+    public static java.util.List<String> readAllLines(java.io.BufferedReader in) throws java.io.IOException {
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        String line;
+        while ((line = in.readLine()) != null) {
+            lines.add(line);
+        }
+        return lines;
     }
 
     // java.io (continued) ----------------------------------------------------------------------------------
@@ -356,6 +479,37 @@ public final class JdkShims {
         return null;
     }
 
+    public static long convert(java.util.concurrent.TimeUnit self, java.time.Duration duration) {
+        long nanos;
+        try {
+            nanos = duration.toNanos();
+        } catch (ArithmeticException e) {
+            nanos = duration.isNegative() ? Long.MIN_VALUE : Long.MAX_VALUE;
+        }
+        return convert(self, nanos, java.util.concurrent.TimeUnit.NANOSECONDS);
+    }
+
+    public static long convert(java.util.concurrent.TimeUnit self, long duration,
+            java.util.concurrent.TimeUnit source) {
+        long nanos = source.toNanos(duration);
+        switch (self) {
+            case NANOSECONDS:
+                return nanos;
+            case MICROSECONDS:
+                return nanos / 1000L;
+            case MILLISECONDS:
+                return nanos / 1_000_000L;
+            case SECONDS:
+                return nanos / 1_000_000_000L;
+            case MINUTES:
+                return nanos / 60_000_000_000L;
+            case HOURS:
+                return nanos / 3_600_000_000_000L;
+            default:
+                return nanos / 86_400_000_000_000L;
+        }
+    }
+
     // java.util.stream ---------------------------------------------------------------------------
 
     private static final class IntSink implements java.util.function.IntConsumer {
@@ -425,6 +579,10 @@ public final class JdkShims {
 
     public static String getScript(Locale l) {
         return "";
+    }
+
+    public static java.util.Set<Character> getExtensionKeys(Locale l) {
+        return Collections.emptySet();
     }
 
     public static String getExtension(Locale l, char key) {

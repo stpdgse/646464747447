@@ -33,7 +33,16 @@
     } else {
       result = await WebAssembly.instantiate(source, { wasi_snapshot_preview1: wasi });
     }
-    const ex = result.instance.exports;
+    let ex = result.instance.exports;
+    if (globalThis.mcshaderDebug) {
+      const raw = ex;
+      ex = {};
+      for (const k of Object.keys(raw)) {
+        ex[k] = typeof raw[k] === "function" ? (...a) => {
+          try { return raw[k](...a); } catch (e) { console.log("[mcshader] " + k + " threw " + e + "\n" + e.stack); throw e; }
+        } : raw[k];
+      }
+    }
     memory = ex.memory;
     ex._initialize();
     ex.mc_init();

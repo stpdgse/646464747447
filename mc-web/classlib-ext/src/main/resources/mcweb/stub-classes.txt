@@ -295,14 +295,6 @@ lenient org.lwjgl.
 class org.lwjgl.BufferUtils java.lang.Object - -
 class org.lwjgl.PointerBuffer org.lwjgl.system.CustomBuffer - java.lang.Comparable
 class org.lwjgl.Version java.lang.Object - -
-class org.lwjgl.openal.AL java.lang.Object - -
-class org.lwjgl.openal.AL10 java.lang.Object - -
-class org.lwjgl.openal.ALC java.lang.Object - -
-class org.lwjgl.openal.ALC10 java.lang.Object - -
-class org.lwjgl.openal.ALC11 org.lwjgl.openal.ALC10 - -
-class org.lwjgl.openal.ALUtil java.lang.Object - -
-interface org.lwjgl.openal.SOFTSystemEventProcI - - org.lwjgl.system.CallbackI
-class org.lwjgl.openal.SOFTSystemEvents java.lang.Object - -
 class org.lwjgl.opengl.ARBBaseInstance java.lang.Object - -
 class org.lwjgl.opengl.ARBBufferStorage java.lang.Object - -
 class org.lwjgl.opengl.ARBClipControl java.lang.Object - -
@@ -367,11 +359,6 @@ class org.lwjgl.sdl.SDL_Surface org.lwjgl.system.Struct - org.lwjgl.system.Nativ
 class org.lwjgl.sdl.SDL_TextEditingEvent org.lwjgl.system.Struct - org.lwjgl.system.NativeResource
 class org.lwjgl.sdl.SDL_TextInputEvent org.lwjgl.system.Struct - org.lwjgl.system.NativeResource
 class org.lwjgl.sdl.SDL_WindowEvent org.lwjgl.system.Struct - org.lwjgl.system.NativeResource
-class org.lwjgl.stb.STBIWriteCallback org.lwjgl.system.Callback abstract org.lwjgl.stb.STBIWriteCallbackI
-interface org.lwjgl.stb.STBIWriteCallbackI - - org.lwjgl.system.CallbackI
-class org.lwjgl.stb.STBImage java.lang.Object - -
-class org.lwjgl.stb.STBImageResize java.lang.Object - -
-class org.lwjgl.stb.STBImageWrite java.lang.Object - -
 class org.lwjgl.system.Callback java.lang.Object abstract org.lwjgl.system.Pointer,org.lwjgl.system.NativeResource
 interface org.lwjgl.system.CallbackI - - org.lwjgl.system.Pointer
 class org.lwjgl.system.Configuration java.lang.Object - -
@@ -582,3 +569,6 @@ redirect net.minecraft.util.Util doFetchChoiceType nullChoiceType
 redirect net.minecraft.util.datafix.DataFixers optimize noOptimize
 redirect net.minecraft.client.Minecraft fillSystemReport keepReport
 noop net.minecraft.util.Util startTimerHackThread
+noop com.mojang.blaze3d.platform.DebugMemoryUntracker <clinit>
+noop com.mojang.blaze3d.platform.DebugMemoryUntracker untrack
+redirect net.minecraft.client.renderer.item.properties.select.LocalTime create net.minecraft.client.renderer.item.properties.select.McShims#localTimeUnsupported

@@ -18,6 +18,12 @@ public final class ALC {
     private ALC() {
     }
 
+    private static final ALCCapabilities CAPS = new ALCCapabilities();
+
+    public static ALCCapabilities createCapabilities(long device) {
+        return CAPS;
+    }
+
     public static FunctionProviderLocal getFunctionProvider() {
         return PROVIDER;
     }

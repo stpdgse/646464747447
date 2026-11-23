@@ -82,6 +82,7 @@
   }
 
   function onKey(e, down) {
+    if (down && globalThis.mcaudio) globalThis.mcaudio.resume();
     const sc = SC[e.code];
     if (sc === undefined) return;
     const allowDefault = e.code === "F5" || e.code === "F11" || e.code === "F12" ||
@@ -140,6 +141,7 @@
         });
         canvas.addEventListener("mousedown", (e) => {
           e.preventDefault();
+          if (globalThis.mcaudio) globalThis.mcaudio.resume();
           canvas.focus();
           requestLockIfWanted();
           buttons |= 1 << e.button;
