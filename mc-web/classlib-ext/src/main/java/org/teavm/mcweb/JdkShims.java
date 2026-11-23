@@ -230,11 +230,31 @@ public final class JdkShims {
         }
     }
 
+    public static java.nio.channels.SeekableByteChannel newByteChannel(java.nio.file.Path path,
+            java.nio.file.OpenOption[] options) throws java.io.IOException {
+        return newByteChannel(path, new java.util.HashSet<>(java.util.Arrays.asList(options)),
+                new java.nio.file.attribute.FileAttribute<?>[0]);
+    }
+
+    public static java.nio.channels.SeekableByteChannel newByteChannel(java.nio.file.Path path,
+            java.util.Set<? extends java.nio.file.OpenOption> options,
+            java.nio.file.attribute.FileAttribute<?>[] attributes) throws java.io.IOException {
+        java.nio.file.spi.FileSystemProvider provider = path.getFileSystem().provider();
+        if (provider.getClass().getName().endsWith("DefaultFileSystemProvider")) {
+            return java.nio.channels.FileChannel.open(path, options);
+        }
+        return provider.newByteChannel(path, options, attributes);
+    }
+
     /** Files.newInputStream: TeaVM's default provider does not implement it; paths of the default file system use java.io. */
     public static java.io.InputStream newInputStream(java.nio.file.Path path, java.nio.file.OpenOption[] options)
             throws java.io.IOException {
         java.nio.file.spi.FileSystemProvider provider = path.getFileSystem().provider();
         if (provider instanceof org.teavm.mcweb.fs.ZipFileSystemProvider) {
+            return provider.newInputStream(path, options);
+        }
+        if (!provider.getClass().getName().endsWith("DefaultFileSystemProvider")) {
+            // a game-supplied file system (like the pack link file system)
             return provider.newInputStream(path, options);
         }
         java.io.File file = new java.io.File(path.toString());
@@ -385,6 +405,15 @@ public final class JdkShims {
 
     // java.lang.Thread / Math / Character -------------------------------------------------------
 
+    /** Threads are cooperative fibers: a spin-wait must hand control back or nothing else can run. */
+    public static void onSpinWait() {
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     public static long threadId(Thread t) {
         return t.getId();
     }
@@ -510,6 +539,42 @@ public final class JdkShims {
         }
     }
 
+    // atomics (single-threaded cooperative scheduling: plain read-modify-write is atomic) -------------------
+
+    public static Object compareAndExchange(java.util.concurrent.atomic.AtomicReferenceArray<Object> array, int index,
+            Object expected, Object value) {
+        Object witness = array.get(index);
+        if (witness == expected) {
+            array.set(index, value);
+        }
+        return witness;
+    }
+
+    public static Object compareAndExchange(java.util.concurrent.atomic.AtomicReference<Object> ref, Object expected,
+            Object value) {
+        Object witness = ref.get();
+        if (witness == expected) {
+            ref.set(value);
+        }
+        return witness;
+    }
+
+    public static int compareAndExchange(java.util.concurrent.atomic.AtomicInteger ref, int expected, int value) {
+        int witness = ref.get();
+        if (witness == expected) {
+            ref.set(value);
+        }
+        return witness;
+    }
+
+    public static long compareAndExchange(java.util.concurrent.atomic.AtomicLong ref, long expected, long value) {
+        long witness = ref.get();
+        if (witness == expected) {
+            ref.set(value);
+        }
+        return witness;
+    }
+
     // java.util.stream ---------------------------------------------------------------------------
 
     private static final class IntSink implements java.util.function.IntConsumer {
@@ -579,6 +644,62 @@ public final class JdkShims {
 
     public static String getScript(Locale l) {
         return "";
+    }
+
+    public static String getISO3Country(Locale l) {
+        String c = l.getCountry();
+        switch (c) {
+            case "":
+                return "";
+            case "US":
+                return "USA";
+            case "GB":
+                return "GBR";
+            case "DE":
+                return "DEU";
+            case "FR":
+                return "FRA";
+            case "ES":
+                return "ESP";
+            case "IT":
+                return "ITA";
+            case "JP":
+                return "JPN";
+            case "CN":
+                return "CHN";
+            case "BR":
+                return "BRA";
+            case "RU":
+                return "RUS";
+            default:
+                return c;
+        }
+    }
+
+    public static String getISO3Language(Locale l) {
+        String c = l.getLanguage();
+        switch (c) {
+            case "en":
+                return "eng";
+            case "de":
+                return "deu";
+            case "fr":
+                return "fra";
+            case "es":
+                return "spa";
+            case "it":
+                return "ita";
+            case "ja":
+                return "jpn";
+            case "zh":
+                return "zho";
+            case "pt":
+                return "por";
+            case "ru":
+                return "rus";
+            default:
+                return c;
+        }
     }
 
     public static java.util.Set<Character> getExtensionKeys(Locale l) {

@@ -59,6 +59,7 @@ public class JdkGapTransformer implements ClassHolderTransformer {
             "java.nio.file.Files#createDirectories",
             "java.nio.file.Files#find",
             "java.nio.file.Files#newInputStream",
+            "java.nio.file.Files#newByteChannel",
             "java.nio.file.Files#newOutputStream",
             "java.nio.file.Paths#get",
             "java.nio.file.Path#of",

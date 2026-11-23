@@ -205,6 +205,15 @@ public final class Gl {
     @JSBody(params = {"target", "pname"}, script = "var v = mcweb.gl.getBufferParameter(target, pname); return v | 0;")
     public static native int bufferParameter(int target, int pname);
 
+    /** Reads {@code size} bytes of a buffer back into a zero-padded array of {@code total} bytes. */
+    @JSBody(params = {"buffer", "size", "total"}, script = ""
+            + "var g = mcweb.gl;"
+            + "var d = new Int8Array(total);"
+            + "g.bindBuffer(g.COPY_READ_BUFFER, buffer);"
+            + "g.getBufferSubData(g.COPY_READ_BUFFER, 0, d, 0, size);"
+            + "return d;")
+    public static native Int8Array readBuffer(JSObject buffer, int size, int total);
+
     @JSBody(params = {"msg"}, script = "console.warn('[gl] ' + msg);")
     public static native void warn(String msg);
 }

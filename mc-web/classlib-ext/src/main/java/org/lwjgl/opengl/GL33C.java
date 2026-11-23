@@ -45,9 +45,66 @@ public final class GL33C {
     private static final Map<Integer, Integer> BOUND_BUFFER = new HashMap<>();
     private static final Map<Integer, Integer> BOUND_TEXTURE = new HashMap<>();
     private static final Map<Integer, Integer> SHADER_TYPE = new HashMap<>();
+    private static final Map<Integer, String> SHADER_SOURCE = new HashMap<>();
     private static final Map<Integer, int[]> TEXTURE_INFO = new HashMap<>(); // id -> {w,h,internalFormat} of level 0
     private static int activeUnit;
     private static int nextMapId;
+    private static int boundVao;
+
+    private static final int TEXTURE_BUFFER = 0x8C2A;
+    private static final int COPY_READ_BUFFER = 0x8F36;
+    private static final int TEXEL_UNIT = 31; // scratch unit used while refreshing emulated texture buffers
+
+    /** A texture buffer emulated by a 2D texture; refreshed from the buffer before drawing when it changed. */
+    private static final class Tbo {
+        int buffer;
+        int format;
+        boolean dirty = true;
+    }
+
+    private static final Map<Integer, Tbo> TBOS = new HashMap<>(); // texture name -> emulation state
+    private static final Map<Integer, Integer> BUFFER_SIZE = new HashMap<>();
+
+    /** Vertex attribute state per VAO, needed to emulate base-vertex drawing (WebGL2 has no such call). */
+    private static final class Attrib {
+        boolean enabled;
+        int buffer;
+        int size;
+        int type;
+        boolean normalized;
+        boolean integer;
+        int stride;
+        long offset;
+        int divisor;
+    }
+
+    private static final Map<Integer, Attrib[]> VAO_ATTRIBS = new HashMap<>();
+
+    private static Attrib attrib(int index) {
+        Attrib[] list = VAO_ATTRIBS.get(boundVao);
+        if (list == null) {
+            list = new Attrib[32];
+            for (int i = 0; i < list.length; i++) {
+                list[i] = new Attrib();
+            }
+            VAO_ATTRIBS.put(boundVao, list);
+        }
+        return list[index];
+    }
+
+    private static int typeSize(int type) {
+        switch (type) {
+            case 0x1400: // BYTE
+            case 0x1401: // UNSIGNED_BYTE
+                return 1;
+            case 0x1402: // SHORT
+            case 0x1403: // UNSIGNED_SHORT
+            case 0x140B: // HALF_FLOAT
+                return 2;
+            default: // INT, UNSIGNED_INT, FLOAT and the packed 2_10_10_10 formats
+                return 4;
+        }
+    }
 
     private static final class Mapping {
         long address;
@@ -84,20 +141,36 @@ public final class GL33C {
         g().bindBufferRange(target, index, (WebGLBuffer) Gl.BUFFERS.get(buffer), (int) offset, (int) size);
     }
 
+    private static void bufferChanged(int buffer) {
+        for (Tbo t : TBOS.values()) {
+            if (t.buffer == buffer) {
+                t.dirty = true;
+            }
+        }
+    }
+
     public static void glBufferData(int target, long size, int usage) {
+        int buffer = boundBuffer(target);
+        BUFFER_SIZE.put(buffer, (int) size);
+        bufferChanged(buffer);
         g().bufferData(target, (int) size, usage);
     }
 
     public static void glBufferData(int target, ByteBuffer data, int usage) {
+        int buffer = boundBuffer(target);
+        BUFFER_SIZE.put(buffer, data.remaining());
+        bufferChanged(buffer);
         g().bufferData(target, Gl.bytes(data), usage);
     }
 
     public static void glBufferSubData(int target, long offset, ByteBuffer data) {
+        bufferChanged(boundBuffer(target));
         g().bufferSubData(target, (int) offset, Gl.bytes(data));
     }
 
     public static void glCopyBufferSubData(int readTarget, int writeTarget, long readOffset, long writeOffset,
             long size) {
+        bufferChanged(boundBuffer(writeTarget));
         g().copyBufferSubData(readTarget, writeTarget, (int) readOffset, (int) writeOffset, (int) size);
     }
 
@@ -118,6 +191,7 @@ public final class GL33C {
     }
 
     public static void glFlushMappedBufferRange(int target, long offset, long length) {
+        bufferChanged(boundBuffer(target));
         Mapping m = MAPPINGS.get(boundBuffer(target));
         if (m != null && length > 0) {
             g().bufferSubData(target, m.offset + (int) offset, Gl.bytes(m.address + offset, (int) length));
@@ -126,6 +200,7 @@ public final class GL33C {
 
     public static boolean glUnmapBuffer(int target) {
         int buffer = boundBuffer(target);
+        bufferChanged(buffer);
         Mapping m = MAPPINGS.remove(buffer);
         if (m == null) {
             return false;
@@ -146,51 +221,108 @@ public final class GL33C {
     public static void glDeleteVertexArrays(int array) {
         g().deleteVertexArray((WebGLVertexArrayObject) Gl.VAOS.get(array));
         Gl.VAOS.remove(array);
+        VAO_ATTRIBS.remove(array);
     }
 
     public static void glBindVertexArray(int array) {
+        boundVao = array;
         g().bindVertexArray((WebGLVertexArrayObject) Gl.VAOS.get(array));
     }
 
     public static void glEnableVertexAttribArray(int index) {
+        attrib(index).enabled = true;
         g().enableVertexAttribArray(index);
     }
 
     public static void glVertexAttribPointer(int index, int size, int type, boolean normalized, int stride,
             long pointer) {
+        Attrib a = attrib(index);
+        a.buffer = boundBuffer(ARRAY_BUFFER);
+        a.size = size;
+        a.type = type;
+        a.normalized = normalized;
+        a.integer = false;
+        a.stride = stride;
+        a.offset = pointer;
         g().vertexAttribPointer(index, size, type, normalized, stride, (int) pointer);
     }
 
     public static void glVertexAttribIPointer(int index, int size, int type, int stride, long pointer) {
+        Attrib a = attrib(index);
+        a.buffer = boundBuffer(ARRAY_BUFFER);
+        a.size = size;
+        a.type = type;
+        a.normalized = false;
+        a.integer = true;
+        a.stride = stride;
+        a.offset = pointer;
         g().vertexAttribIPointer(index, size, type, stride, (int) pointer);
     }
 
     public static void glVertexAttribDivisor(int index, int divisor) {
+        attrib(index).divisor = divisor;
         g().vertexAttribDivisor(index, divisor);
+    }
+
+    /** Points every per-vertex attribute {@code baseVertex} vertices further into its buffer (or back again). */
+    private static void shiftAttributes(int baseVertex) {
+        Attrib[] list = VAO_ATTRIBS.get(boundVao);
+        if (list == null) {
+            return;
+        }
+        int previousBuffer = boundBuffer(ARRAY_BUFFER);
+        int currentBuffer = previousBuffer;
+        for (int i = 0; i < list.length; i++) {
+            Attrib a = list[i];
+            if (!a.enabled || a.divisor != 0) {
+                continue;
+            }
+            int stride = a.stride != 0 ? a.stride : a.size * typeSize(a.type);
+            if (a.buffer != currentBuffer) {
+                g().bindBuffer(ARRAY_BUFFER, (WebGLBuffer) Gl.BUFFERS.get(a.buffer));
+                currentBuffer = a.buffer;
+            }
+            int offset = (int) (a.offset + (long) baseVertex * stride);
+            if (a.integer) {
+                g().vertexAttribIPointer(i, a.size, a.type, a.stride, offset);
+            } else {
+                g().vertexAttribPointer(i, a.size, a.type, a.normalized, a.stride, offset);
+            }
+        }
+        if (currentBuffer != previousBuffer) {
+            g().bindBuffer(ARRAY_BUFFER, (WebGLBuffer) Gl.BUFFERS.get(previousBuffer));
+        }
     }
 
     // drawing ------------------------------------------------------------------------------------
 
     public static void glDrawArrays(int mode, int first, int count) {
+        refreshTexelBuffers();
         g().drawArrays(mode, first, count);
     }
 
     public static void glDrawArraysInstanced(int mode, int first, int count, int instances) {
+        refreshTexelBuffers();
         g().drawArraysInstanced(mode, first, count, instances);
     }
 
     public static void glDrawElements(int mode, int count, int type, long indices) {
+        refreshTexelBuffers();
         g().drawElements(mode, count, type, (int) indices);
     }
 
     public static void glDrawElementsInstancedBaseVertex(int mode, int count, int type, long indices, int instances,
             int baseVertex) {
+        refreshTexelBuffers();
         if (baseVertex == 0) {
             g().drawElementsInstanced(mode, count, type, (int) indices, instances);
         } else if (Gl.hasBaseVertex()) {
             Gl.drawElementsInstancedBaseVertex(mode, count, type, (int) indices, instances, baseVertex, 0);
         } else {
-            throw new UnsupportedOperationException("base-vertex drawing needs WEBGL_draw_instanced_base_vertex_base_instance");
+            // no extension (Safari, software GL): move the vertex data pointers instead
+            shiftAttributes(baseVertex);
+            g().drawElementsInstanced(mode, count, type, (int) indices, instances);
+            shiftAttributes(0);
         }
     }
 
@@ -402,11 +534,12 @@ public final class GL33C {
 
     public static void glBindTexture(int target, int texture) {
         BOUND_TEXTURE.put(activeUnit * 0x10000 + target, texture);
-        g().bindTexture(target, (WebGLTexture) Gl.TEXTURES.get(texture));
+        // texture buffers are emulated by 2D textures
+        g().bindTexture(target == TEXTURE_BUFFER ? TEXTURE_2D : target, (WebGLTexture) Gl.TEXTURES.get(texture));
     }
 
     public static void glTexParameteri(int target, int pname, int param) {
-        g().texParameteri(target, pname, param);
+        g().texParameteri(target == TEXTURE_BUFFER ? TEXTURE_2D : target, pname, param);
     }
 
     private static void recordTexture(int target, int level, int w, int h, int internalFormat) {
@@ -458,9 +591,79 @@ public final class GL33C {
         }
     }
 
-    /** Texture buffer objects do not exist in WebGL2. */
+    /** {internalFormat, format, type, bytesPerTexel} of the 2D texture that stands in for a texture buffer. */
+    private static int[] texelFormat(int bufferFormat) {
+        switch (bufferFormat) {
+            case 0x8229: return new int[] {0x8229, 0x1903, 0x1401, 1};   // R8
+            case 0x8232: return new int[] {0x8232, 0x8D94, 0x1401, 1};   // R8UI
+            case 0x8231: return new int[] {0x8231, 0x8D94, 0x1400, 1};   // R8I
+            case 0x8234: return new int[] {0x8234, 0x8D94, 0x1403, 2};   // R16UI
+            case 0x8233: return new int[] {0x8233, 0x8D94, 0x1402, 2};   // R16I
+            case 0x8235: return new int[] {0x8235, 0x8D94, 0x1404, 4};   // R32I
+            case 0x8236: return new int[] {0x8236, 0x8D94, 0x1405, 4};   // R32UI
+            case 0x822E: return new int[] {0x822E, 0x1903, 0x1406, 4};   // R32F
+            case 0x8058: return new int[] {0x8058, 0x1908, 0x1401, 4};   // RGBA8
+            case 0x8D70: return new int[] {0x8D70, 0x8D99, 0x1405, 16};  // RGBA32UI
+            case 0x8D82: return new int[] {0x8D82, 0x8D99, 0x1404, 16};  // RGBA32I
+            case 0x8814: return new int[] {0x8814, 0x1908, 0x1406, 16};  // RGBA32F
+            default: return null;
+        }
+    }
+
+    /**
+     * Texture buffer objects do not exist in WebGL2: remember the association, the 2D texture behind it is
+     * (re)filled from the buffer just before the next draw.
+     */
     public static void glTexBuffer(int target, int internalFormat, int buffer) {
-        Gl.warn("glTexBuffer is not supported by WebGL2");
+        Integer texture = BOUND_TEXTURE.get(activeUnit * 0x10000 + TEXTURE_BUFFER);
+        if (texture == null || texture == 0) {
+            return;
+        }
+        if (texelFormat(internalFormat) == null) {
+            Gl.warn("unsupported texture buffer format 0x" + Integer.toHexString(internalFormat));
+            return;
+        }
+        Tbo tbo = TBOS.get(texture);
+        if (tbo == null) {
+            tbo = new Tbo();
+            TBOS.put(texture, tbo);
+        }
+        tbo.buffer = buffer;
+        tbo.format = internalFormat;
+        tbo.dirty = true;
+    }
+
+    private static void refreshTexelBuffers() {
+        for (Map.Entry<Integer, Tbo> entry : TBOS.entrySet()) {
+            Tbo tbo = entry.getValue();
+            if (!tbo.dirty) {
+                continue;
+            }
+            tbo.dirty = false;
+            int[] f = texelFormat(tbo.format);
+            Integer sizeBoxed = BUFFER_SIZE.get(tbo.buffer);
+            int size = sizeBoxed == null ? 0 : sizeBoxed;
+            int texels = size / f[3];
+            if (texels == 0) {
+                continue;
+            }
+            int width = org.teavm.mcweb.host.GlslEs.TEXEL_BUFFER_WIDTH;
+            int height = (texels + width - 1) / width;
+            org.teavm.jso.typedarrays.Int8Array data = Gl.readBuffer(Gl.BUFFERS.get(tbo.buffer), texels * f[3],
+                    width * height * f[3]);
+            g().bindBuffer(COPY_READ_BUFFER, (WebGLBuffer) Gl.BUFFERS.get(boundBuffer(COPY_READ_BUFFER)));
+            int previousUnit = activeUnit;
+            Integer previous = BOUND_TEXTURE.get(TEXEL_UNIT * 0x10000 + TEXTURE_2D);
+            g().activeTexture(0x84C0 + TEXEL_UNIT);
+            g().bindTexture(TEXTURE_2D, (WebGLTexture) Gl.TEXTURES.get(entry.getKey()));
+            g().texParameteri(TEXTURE_2D, 0x2801, 0x2600); // MIN_FILTER NEAREST
+            g().texParameteri(TEXTURE_2D, 0x2800, 0x2600); // MAG_FILTER NEAREST
+            g().texParameteri(TEXTURE_2D, 0x2802, 0x812F); // WRAP_S CLAMP_TO_EDGE
+            g().texParameteri(TEXTURE_2D, 0x2803, 0x812F); // WRAP_T CLAMP_TO_EDGE
+            g().texImage2D(TEXTURE_2D, 0, f[0], width, height, 0, f[1], f[2], Gl.typed(data, f[2]));
+            g().bindTexture(TEXTURE_2D, (WebGLTexture) Gl.TEXTURES.get(previous == null ? 0 : previous));
+            g().activeTexture(0x84C0 + previousUnit);
+        }
     }
 
     public static int glGenSamplers() {
@@ -515,11 +718,25 @@ public final class GL33C {
             }
             sb.append(new String(raw, java.nio.charset.StandardCharsets.UTF_8));
         }
-        g().shaderSource((WebGLShader) Gl.SHADERS.get(shader), GlslEs.convert(sb.toString()));
+        String converted = GlslEs.convert(sb.toString());
+        SHADER_SOURCE.put(shader, converted);
+        g().shaderSource((WebGLShader) Gl.SHADERS.get(shader), converted);
     }
 
     public static void glCompileShader(int shader) {
         g().compileShader((WebGLShader) Gl.SHADERS.get(shader));
+        if (Gl.shaderParameter(Gl.SHADERS.get(shader), 0x8B81) == 0) { // COMPILE_STATUS
+            String source = SHADER_SOURCE.get(shader);
+            StringBuilder numbered = new StringBuilder();
+            if (source != null) {
+                String[] lines = source.split("\n", -1);
+                for (int i = 0; i < lines.length; i++) {
+                    numbered.append(i + 1).append(": ").append(lines[i]).append('\n');
+                }
+            }
+            Gl.warn("shader failed to compile: " + g().getShaderInfoLog((WebGLShader) Gl.SHADERS.get(shader))
+                    + "\n" + numbered);
+        }
     }
 
     public static int glGetShaderi(int shader, int pname) {
@@ -615,8 +832,26 @@ public final class GL33C {
         return Gl.SYNCS.add(g().fenceSync(condition, flags));
     }
 
-    public static int glClientWaitSync(long sync, int flags, long timeout) {
-        return g().clientWaitSync((WebGLSync) Gl.SYNCS.get((int) sync), flags, 0);
+    /**
+     * WebGL only allows polling (timeout 0), so a real timeout is honoured by yielding to the browser between
+     * polls; the commands only make progress while control is back in its event loop.
+     */
+    public static int glClientWaitSync(long sync, int flags, long timeoutNanos) {
+        WebGLSync object = (WebGLSync) Gl.SYNCS.get((int) sync);
+        // the timeout is an unsigned 64-bit value: -1 means "forever"
+        long limit = timeoutNanos < 0 ? 5_000_000_000L : Math.min(timeoutNanos, 5_000_000_000L);
+        long deadline = System.nanoTime() + limit;
+        while (true) {
+            int result = g().clientWaitSync(object, flags, 0);
+            if (result != 0x911B || System.nanoTime() >= deadline) { // TIMEOUT_EXPIRED
+                return result;
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                return result;
+            }
+        }
     }
 
     public static void glDeleteSync(long sync) {
