@@ -12,6 +12,7 @@ globalThis.fetch = async (url) => {
   const f = path.join(dir, String(url).replace(/^.*\//, ''));
   return new Response(fs.readFileSync(f), { headers: { 'content-type': f.endsWith('.wasm') ? 'application/wasm' : 'text/plain' } });
 };
+vm.runInThisContext(fs.readFileSync(path.join(__dirname, 'mcweb.js'), 'utf8'));
 const rt = fs.readFileSync(path.join(dir, 'game.wasm-runtime.js'), 'utf8');
 vm.runInThisContext(rt, { importModuleDynamically: vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER });
 (async () => {

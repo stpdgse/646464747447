@@ -39,10 +39,10 @@ public final class Library {
         return new WebLibrary(names.length > 0 ? names[0] : module);
     }
 
-    static final class WebLibrary implements SharedLibrary {
+    public static final class WebLibrary implements SharedLibrary {
         private final String name;
 
-        WebLibrary(String name) {
+        public WebLibrary(String name) {
             this.name = name;
         }
 
@@ -63,7 +63,8 @@ public final class Library {
 
         @Override
         public long getFunctionAddress(java.nio.ByteBuffer functionName) {
-            return 0;
+            // Entry points are Java methods; a non-zero address only tells callers the function exists.
+            return functionName != null && functionName.remaining() > 1 ? 1L : 0L;
         }
 
         @Override

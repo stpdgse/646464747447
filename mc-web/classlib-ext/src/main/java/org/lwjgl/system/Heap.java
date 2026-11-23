@@ -80,6 +80,14 @@ public final class Heap {
 
     // addressing -------------------------------------------------------------------------------
 
+    public static byte[] pageOf(long address) {
+        return page(address);
+    }
+
+    public static int offsetOf(long address) {
+        return offset(address);
+    }
+
     static byte[] page(long address) {
         int id = (int) (address >>> 32);
         byte[] page = id > 0 && id < PAGES.size() ? PAGES.get(id) : null;

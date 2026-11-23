@@ -146,6 +146,20 @@ public final class JdkShims {
         return c.getSuperclass();
     }
 
+    public static boolean isAnonymousClass(Class<?> c) {
+        String n = c.getName();
+        int i = n.lastIndexOf('$');
+        if (i < 0 || i == n.length() - 1) {
+            return false;
+        }
+        for (int j = i + 1; j < n.length(); j++) {
+            if (!Character.isDigit(n.charAt(j))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static java.lang.reflect.Type[] getGenericInterfaces(Class<?> c) {
         return c.getInterfaces();
     }

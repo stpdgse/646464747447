@@ -53,6 +53,7 @@ public class JdkGapTransformer implements ClassHolderTransformer {
             "java.lang.Class#getResourceAsStream",
             "java.lang.Class#getGenericSuperclass",
             "java.lang.Class#getGenericInterfaces",
+            "java.lang.Class#isAnonymousClass",
             "java.lang.ClassLoader#getResourceAsStream",
             "java.lang.ClassLoader#getSystemResourceAsStream",
             "java.nio.file.Files#createDirectories",

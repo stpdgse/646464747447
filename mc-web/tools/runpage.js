@@ -17,5 +17,6 @@ const srv = http.createServer((q, r) => {
   p.on('crash', () => console.log('[PAGE CRASHED]'));
   await p.goto('http://127.0.0.1:' + srv.address().port + '/');
   await p.waitForTimeout(secs * 1000);
+  if (process.argv[4]) await p.screenshot({ path: process.argv[4] });
   await b.close(); srv.close();
 });
