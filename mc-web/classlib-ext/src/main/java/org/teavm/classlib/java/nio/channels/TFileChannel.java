@@ -31,12 +31,12 @@ public abstract class TFileChannel extends TObject implements TSeekableByteChann
 
     public static TFileChannel open(java.nio.file.Path path, java.nio.file.OpenOption... options)
             throws IOException {
-        throw new UnsupportedOperationException("FileChannel needs the browser storage layer (not built yet)");
+        return TMcFileChannel.open(path, new java.util.HashSet<>(java.util.Arrays.asList(options)));
     }
 
     public static TFileChannel open(java.nio.file.Path path, java.util.Set<? extends java.nio.file.OpenOption> options,
             java.nio.file.attribute.FileAttribute<?>... attrs) throws IOException {
-        throw new UnsupportedOperationException("FileChannel needs the browser storage layer (not built yet)");
+        return TMcFileChannel.open(path, options);
     }
 
     @Override

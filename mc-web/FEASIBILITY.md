@@ -127,3 +127,44 @@ script, and a first successful `.wasm` output.
     to communicate by message passing, not shared memory.
   - Methods that can block (locks, `wait`, `Thread.sleep`) become TeaVM coroutines and spread
     through the call graph. Keep blocking primitives out of hot paths.
+
+## Phase 3 progress: through Bootstrap
+
+State: the game starts in **real Chromium 157** and in Node, loads all LWJGL "libraries", parses
+its launch arguments, and runs `Bootstrap` (block, item and registry setup). It currently stops
+at the next unimplemented platform piece. `tools/cycle.sh` rebuilds and runs; `tools/crash.sh`
+shows the crash report head from Chromium.
+
+Built so far (all in `mc-web/classlib-ext`):
+
+- `org.lwjgl.system`: an emulated native heap (`Heap`: address = page id and offset into a registered
+  `byte[]`), `MemoryUtil`, `MemoryStack`, `PointerBuffer`, `CustomBuffer`, `Struct`, `Configuration`,
+  `Platform`, `Library`. Library entry points for SDL, OpenGL, OpenAL, STB, FreeType (reports
+  "unavailable"), shaderc, SPIRV-Cross and VMA.
+- A read-only **ZIP file system** registered as the `jar` provider (the game opens zip files with it),
+  and a resource store: `getResourceAsStream` reads from `client-resources.zip`, which
+  `tools/make_archive.py` builds from the client jar (assets and data only, never committed).
+- No-op `jtracy` profiler and silent `Narrator`; a console SLF4J backend that writes to the browser
+  console directly (System.out is redirected back into SLF4J by the game).
+- Build-time plugin directives in `stub-classes.txt`: `cut`, `noop`, `redirect`, `trace`,
+  `tracem`, `tracefield` (debugging aids that print initializer and method activity), plus a
+  stack-trace-logging "gap" stub for anything not available in the browser.
+
+Real bugs found along the way (TeaVM or its class library):
+
+- `ConcurrentMap.computeIfAbsent` default returned the previous value (null for new keys). Fixed
+  with a corrected `TConcurrentMap` copy. This had broken `ResourceKey`, and with it every registry.
+- `new WeakReference<>(null)` crashed in the WASM GC JavaScript runtime. Fixed by a documented patch
+  to the runtime script (`tools/make_runtime.py`).
+- `StackWalker`, `Class.getGenericSuperclass` and similar JDK APIs are missing or empty.
+- Long compares on an interface call result inside `&&` were miscompiled (workaround in `Pointer`).
+
+Decisions:
+
+- **Data fixers are neutralized** (`DataFixers` becomes a pass-through): browser worlds are always
+  current, and the library needs generic reflection TeaVM cannot provide.
+- Monitors (`synchronized`) are removed at build time and `Object.wait/notify` become cooperative
+  polling, because TeaVM turns every `synchronized` into a potential suspension point.
+- Pooled executors run tasks inline in the submitting thread; long-running loops must use a real Thread.
+
+Next: SDL window and input, WebGL2 (OpenGL shim), shader translation, then audio.

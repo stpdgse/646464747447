@@ -5,9 +5,12 @@ dependencies {
     compileOnly 'org.teavm:teavm-classlib:0.16.0'
     compileOnly 'org.teavm:teavm-core:0.16.0'
     compileOnly 'org.teavm:teavm-interop:0.16.0'
+    compileOnly 'org.teavm:teavm-jso:0.16.0'
+    compileOnly 'org.teavm:teavm-jso-apis:0.16.0'
     compileOnly 'org.slf4j:slf4j-api:2.0.17'
     compileOnly 'net.sf.jopt-simple:jopt-simple:5.0.4'
     compileOnly files('../work/client.jar')
+    compileOnly fileTree(dir: '../driver/libs/game', include: ['datafixerupper*.jar', 'gson*.jar', 'guava*.jar', 'fastutil*.jar'])
     // Real LWJGL jars: compile-time signatures only. Nothing from them is shipped or run.
     compileOnly fileTree(dir: '../driver/libs/removed', include: ['lwjgl*.jar'])
 }

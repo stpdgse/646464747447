@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>mc-web</title>
+<style>html,body{margin:0;background:#111;color:#ddd;font:14px monospace}canvas{display:block}</style>
+<canvas id="game" width="854" height="480"></canvas>
+<script>Error.stackTraceLimit = 100;</script>
+<script src="game.wasm-runtime.js"></script>
+<script>
+(async () => {
+  try {
+    const res = await fetch("client-resources.zip");
+    if (res.ok) {
+      globalThis.mcwebArchive = new Int8Array(await res.arrayBuffer());
+    }
+    const t = await TeaVM.wasmGC.load("game-split.wasm");
+    await t.exports.main([]);
+  } catch (e) {
+    console.log("ERR " + e + "\n" + (e.stack || "").split("\n").slice(0, 60).join("\n"));
+  }
+})();
+</script>

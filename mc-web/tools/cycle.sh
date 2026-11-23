@@ -8,4 +8,6 @@ grep -E 'GENERAT' driver/run.log | head -1
 grep -E '^PROBLEM:' driver/run.log | cut -c1-200 | sort | uniq -c | sort -rn | head -6
 grep -q 'GENERATED OK' driver/run.log || exit 1
 python3 -I tools/wasmsplit.py driver/out/game.wasm driver/out/game-split.wasm 1000000 | tail -1
+python3 -I tools/make_runtime.py driver/libs/tool/teavm-core-0.16.0.jar driver/out/game.wasm-runtime.js >/dev/null
+cp tools/index.html driver/out/index.html
 cd driver && node --max-old-space-size=8000 --stack-size=8000 ../tools/runnode.js out game-split.wasm ${1:-60} 2>&1 | grep -v -i 'warning\|trace-warnings' | cut -c1-260

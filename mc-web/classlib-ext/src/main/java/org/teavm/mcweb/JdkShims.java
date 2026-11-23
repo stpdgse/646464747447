@@ -21,6 +21,175 @@ public final class JdkShims {
     private JdkShims() {
     }
 
+    // classpath resources ------------------------------------------------------------------------
+
+    /** Minecraft.fillSystemReport: leave the report as is (the window and GPU may not exist yet). */
+    public static net.minecraft.SystemReport keepReport(net.minecraft.SystemReport report,
+            net.minecraft.client.Minecraft minecraft, net.minecraft.client.resources.language.LanguageManager language,
+            String launchedVersion, net.minecraft.client.Options options) {
+        return report;
+    }
+
+    /** Paths.get(URI): TeaVM rejects file URIs without an authority; use the path component. */
+    public static java.nio.file.Path get(java.net.URI uri) {
+        if ("file".equals(uri.getScheme())) {
+            return java.nio.file.Paths.get(uri.getPath());
+        }
+        throw new IllegalArgumentException("unsupported URI scheme: " + uri);
+    }
+
+    public static java.nio.file.Path of(java.net.URI uri) {
+        return get(uri);
+    }
+
+    /** Files.createDirectories that tolerates existing directories (TeaVM's throws). */
+    public static java.nio.file.Path createDirectories(java.nio.file.Path dir,
+            java.nio.file.attribute.FileAttribute<?>[] attrs) throws java.io.IOException {
+        McWebResources.ensureDirectory(dir);
+        return dir;
+    }
+
+    public static java.io.InputStream getResourceAsStream(Class<?> c, String name) {
+        return McWebResources.open(c, name);
+    }
+
+    public static java.io.InputStream getResourceAsStream(ClassLoader cl, String name) {
+        return McWebResources.open(name);
+    }
+
+    public static java.io.InputStream getSystemResourceAsStream(String name) {
+        return McWebResources.open(name);
+    }
+
+    // game replacements ---------------------------------------------------------------------------
+
+    /** DataFixers.optimize: world-upgrade optimisation is skipped (new worlds need no data fixing). */
+    public static java.util.concurrent.CompletableFuture<?> noOptimize(java.util.Set<?> types) {
+        return java.util.concurrent.CompletableFuture.completedFuture(null);
+    }
+
+    /** Util.doFetchChoiceType: entity/block-entity data-fixer type lookup, only used for upgrading old data. */
+    public static com.mojang.datafixers.types.Type<?> nullChoiceType(com.mojang.datafixers.DSL.TypeReference type,
+            String id) {
+        return null;
+    }
+
+    /** DataFixers.getDataFixer: a pass-through fixer (see NoopDataFixer). */
+    public static com.mojang.datafixers.DataFixer noDataFixer() {
+        return org.teavm.mcweb.game.NoopDataFixer.INSTANCE;
+    }
+
+    public static void gapHit(String message) {
+        org.teavm.mcweb.host.WebHost.logStack("[gap] " + message);
+    }
+
+
+    // generic supertypes ------------------------------------------------------------------------
+
+    /** Minimal ParameterizedType for the few anonymous TypeToken subclasses the game uses. */
+    private static final class Param implements java.lang.reflect.ParameterizedType {
+        private final Class<?> raw;
+        private final java.lang.reflect.Type[] args;
+
+        Param(Class<?> raw, java.lang.reflect.Type... args) {
+            this.raw = raw;
+            this.args = args;
+        }
+
+        @Override
+        public java.lang.reflect.Type[] getActualTypeArguments() {
+            return args.clone();
+        }
+
+        @Override
+        public java.lang.reflect.Type getRawType() {
+            return raw;
+        }
+
+        @Override
+        public java.lang.reflect.Type getOwnerType() {
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof java.lang.reflect.ParameterizedType p && p.getRawType() == raw
+                    && java.util.Arrays.equals(p.getActualTypeArguments(), args);
+        }
+
+        @Override
+        public int hashCode() {
+            return java.util.Arrays.hashCode(args) ^ raw.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder(raw.getName()).append('<');
+            for (int i = 0; i < args.length; i++) {
+                sb.append(i > 0 ? ", " : "").append(args[i] instanceof Class<?> c ? c.getName() : args[i].toString());
+            }
+            return sb.append('>').toString();
+        }
+    }
+
+    /** Class.getGenericSuperclass: TeaVM keeps no generic class signatures, so known cases are tabulated. */
+    public static java.lang.reflect.Type getGenericSuperclass(Class<?> c) {
+        String n = c.getName();
+        if (n.equals("net.minecraft.client.Options$1")) {
+            return new Param(com.google.gson.reflect.TypeToken.class, new Param(java.util.List.class, String.class));
+        }
+        if (n.equals("net.minecraft.client.sounds.SoundManager$1")) {
+            return new Param(com.google.gson.reflect.TypeToken.class,
+                    new Param(java.util.Map.class, String.class,
+                            net.minecraft.client.resources.sounds.SoundEventRegistration.class));
+        }
+        return c.getSuperclass();
+    }
+
+    public static java.lang.reflect.Type[] getGenericInterfaces(Class<?> c) {
+        return c.getInterfaces();
+    }
+
+    // wait / notify without monitors ------------------------------------------------------------
+
+    private static int waitLogged;
+
+    private static void logWait(String what, Object o) {
+        if (waitLogged++ < 3) {
+            org.teavm.mcweb.host.WebHost.logStack("[wait] " + what + " on " + o.getClass().getName());
+        }
+    }
+
+    public static void wait(Object o) throws InterruptedException {
+        logWait("wait()", o);
+        Thread.sleep(1);
+    }
+
+    public static void wait(Object o, long timeoutMillis) throws InterruptedException {
+        logWait("wait(" + timeoutMillis + ")", o);
+        Thread.sleep(1);
+    }
+
+    public static void wait(Object o, long timeoutMillis, int nanos) throws InterruptedException {
+        Thread.sleep(1);
+    }
+
+    public static void notify(Object o) {
+    }
+
+    public static void notifyAll(Object o) {
+    }
+
+    // debugging --------------------------------------------------------------------------------
+
+    public static void trace(String message) {
+        System.out.println("[trace] " + message);
+    }
+
+    public static void traceValue(String label, Object value) {
+        System.out.println("[trace] " + label + " = " + value);
+    }
+
     // java.io / java.nio.file --------------------------------------------------------------------
 
     public static java.nio.file.Path toPath(java.io.File file) {
@@ -124,23 +293,30 @@ public final class JdkShims {
     // java.lang.Class / ClassLoader / Package --------------------------------------------------
 
     public static java.net.URL getResource(ClassLoader cl, String name) {
-        return null;
+        return McWebResources.url(name);
     }
 
     public static java.net.URL getSystemResource(String name) {
-        return null;
+        return McWebResources.url(name);
     }
 
     public static Enumeration<java.net.URL> getResources(ClassLoader cl, String name) {
-        return Collections.emptyEnumeration();
+        java.net.URL u = McWebResources.url(name);
+        return u == null ? Collections.<java.net.URL>emptyEnumeration() : Collections.enumeration(Collections.singletonList(u));
     }
 
     public static Enumeration<java.net.URL> getSystemResources(String name) {
-        return Collections.emptyEnumeration();
+        java.net.URL u = McWebResources.url(name);
+        return u == null ? Collections.<java.net.URL>emptyEnumeration() : Collections.enumeration(Collections.singletonList(u));
     }
 
     public static java.net.URL getResource(Class<?> c, String name) {
-        return null;
+        if (name != null && !name.startsWith("/")) {
+            String cn = c.getName();
+            int dot = cn.lastIndexOf('.');
+            name = (dot < 0 ? "" : cn.substring(0, dot).replace('.', '/') + "/") + name;
+        }
+        return McWebResources.url(name);
     }
 
     public static Class<?> loadClass(ClassLoader cl, String name) throws ClassNotFoundException {
@@ -164,6 +340,51 @@ public final class JdkShims {
 
     public static ThreadGroup getThreadGroup(Thread t) {
         return null;
+    }
+
+    // java.util.stream ---------------------------------------------------------------------------
+
+    private static final class IntSink implements java.util.function.IntConsumer {
+        int[] data = new int[16];
+        int size;
+
+        @Override
+        public void accept(int v) {
+            if (size == data.length) {
+                data = java.util.Arrays.copyOf(data, size * 2);
+            }
+            data[size++] = v;
+        }
+    }
+
+    private static final class LongSink implements java.util.function.LongConsumer {
+        long[] data = new long[16];
+        int size;
+
+        @Override
+        public void accept(long v) {
+            if (size == data.length) {
+                data = java.util.Arrays.copyOf(data, size * 2);
+            }
+            data[size++] = v;
+        }
+    }
+
+    /** Eager conversion: TeaVM has no spliterator-backed primitive streams. */
+    public static java.util.stream.IntStream intStream(java.util.Spliterator.OfInt spliterator, boolean parallel) {
+        IntSink sink = new IntSink();
+        while (spliterator.tryAdvance((java.util.function.IntConsumer) sink)) {
+            // drain
+        }
+        return java.util.Arrays.stream(sink.data, 0, sink.size);
+    }
+
+    public static java.util.stream.LongStream longStream(java.util.Spliterator.OfLong spliterator, boolean parallel) {
+        LongSink sink = new LongSink();
+        while (spliterator.tryAdvance((java.util.function.LongConsumer) sink)) {
+            // drain
+        }
+        return java.util.Arrays.stream(sink.data, 0, sink.size);
     }
 
     // java.util --------------------------------------------------------------------------------

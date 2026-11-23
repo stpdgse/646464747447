@@ -4,10 +4,12 @@ package org.teavm.classlib.java.util.concurrent;
 public class TScheduledThreadPoolExecutor extends TThreadPoolExecutor implements TScheduledExecutorService {
     public TScheduledThreadPoolExecutor(int core) {
         super(Integer.MAX_VALUE, null);
+        inline(false); // timer loops sleep, so each needs its own fiber
     }
 
     public TScheduledThreadPoolExecutor(int core, TThreadFactory factory) {
         super(Integer.MAX_VALUE, factory);
+        inline(false);
     }
 
     private final class Task extends TFutureTask<Object> implements TScheduledFuture<Object> {

@@ -22,6 +22,19 @@ public class TThreadPoolExecutor extends TAbstractExecutorService {
         this.factory = factory != null ? factory : Thread::new;
     }
 
+    /**
+     * When true, tasks run synchronously in the submitting thread. The browser build has one real
+     * thread; running short tasks inline avoids races between cooperatively scheduled fibers (for
+     * example class initialisation interrupted by another fiber). Long-running loops must use a real
+     * {@link Thread}.
+     */
+    private boolean inline = true;
+
+    public TThreadPoolExecutor inline(boolean value) {
+        this.inline = value;
+        return this;
+    }
+
     @Override
     public void execute(TRunnable command) {
         if (command == null) {
@@ -31,6 +44,20 @@ public class TThreadPoolExecutor extends TAbstractExecutorService {
             if (shutdown) {
                 throw new TRejectedExecutionException("Executor has been shut down");
             }
+        }
+        if (inline) {
+            try {
+                command.run();
+            } catch (Throwable e) {
+                Thread t = Thread.currentThread();
+                Thread.UncaughtExceptionHandler h = t.getUncaughtExceptionHandler();
+                if (h != null) {
+                    h.uncaughtException(t, e);
+                }
+            }
+            return;
+        }
+        synchronized (this) {
             queue.add(command);
             if (idle > 0) {
                 notify();

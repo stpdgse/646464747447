@@ -21,14 +21,15 @@ public final class TChannels extends TObject {
 
             @Override
             public int read(TByteBuffer dst) throws IOException {
-                int n = dst.remaining();
+                java.nio.ByteBuffer real = (java.nio.ByteBuffer) (Object) dst;
+                int n = real.remaining();
                 if (n == 0) {
                     return 0;
                 }
                 byte[] buf = new byte[Math.min(n, 8192)];
                 int r = in.read(buf, 0, buf.length);
                 if (r > 0) {
-                    dst.put(buf, 0, r);
+                    real.put(buf, 0, r);
                 }
                 return r;
             }
@@ -52,9 +53,10 @@ public final class TChannels extends TObject {
 
             @Override
             public int write(TByteBuffer src) throws IOException {
-                int n = src.remaining();
+                java.nio.ByteBuffer real = (java.nio.ByteBuffer) (Object) src;
+                int n = real.remaining();
                 byte[] buf = new byte[n];
-                src.get(buf, 0, n);
+                real.get(buf, 0, n);
                 out.write(buf, 0, n);
                 return n;
             }
@@ -86,8 +88,8 @@ public final class TChannels extends TObject {
                 if (len == 0) {
                     return 0;
                 }
-                TByteBuffer buf = TByteBuffer.wrap(b, off, len);
-                return ch.read(buf);
+                java.nio.ByteBuffer buf = java.nio.ByteBuffer.wrap(b, off, len);
+                return ch.read((TByteBuffer) (Object) buf);
             }
 
             @Override
@@ -106,9 +108,9 @@ public final class TChannels extends TObject {
 
             @Override
             public void write(byte[] b, int off, int len) throws IOException {
-                TByteBuffer buf = TByteBuffer.wrap(b, off, len);
+                java.nio.ByteBuffer buf = java.nio.ByteBuffer.wrap(b, off, len);
                 while (buf.hasRemaining()) {
-                    ch.write(buf);
+                    ch.write((TByteBuffer) (Object) buf);
                 }
             }
 

@@ -581,3 +581,13 @@ interface oshi.software.os.OperatingSystem - - -
 class sun.misc.Unsafe java.lang.Object - -
 cut net.minecraft.client.renderer.item.CuboidItemModelWrapper update
 cut net.minecraft.world.level.storage.loot.providers.number.floats.EnchantmentLevelProvider getFloatUnsafe
+noop com.mojang.renderpearl.backend.vulkan.init.VulkanPNextStruct <init>
+noop com.mojang.renderpearl.backend.vulkan.VulkanFeatureSets <clinit>
+noop com.mojang.renderpearl.backend.vulkan.VulkanFeatureSets bootstrap
+noop net.minecraft.util.datafix.DataFixers addFixers
+noop net.minecraft.util.datafix.DataFixers <clinit>
+redirect net.minecraft.util.datafix.DataFixers getDataFixer noDataFixer
+redirect net.minecraft.util.Util doFetchChoiceType nullChoiceType
+redirect net.minecraft.util.datafix.DataFixers optimize noOptimize
+redirect net.minecraft.client.Minecraft fillSystemReport keepReport
+noop net.minecraft.util.Util startTimerHackThread

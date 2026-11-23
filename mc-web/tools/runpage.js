@@ -10,7 +10,7 @@ const srv = http.createServer((q, r) => {
     'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Embedder-Policy': 'require-corp' });
   fs.createReadStream(f).pipe(r);
 }).listen(0, async () => {
-  const b = await chromium.launch({ args: ['--disable-dev-shm-usage', '--no-sandbox', '--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--js-flags=--stack-size=8000'] });
+  const b = await chromium.launch({ args: ['--disable-dev-shm-usage', '--no-sandbox', '--enable-unsafe-swiftshader', '--use-angle=swiftshader'] });
   const p = await b.newPage();
   p.on('console', m => console.log('[console]', m.text()));
   p.on('pageerror', e => console.log('[pageerror]', e.message));

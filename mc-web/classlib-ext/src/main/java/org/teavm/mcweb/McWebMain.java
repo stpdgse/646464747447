@@ -8,7 +8,15 @@ public final class McWebMain {
     private McWebMain() {
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        byte[] archive = org.teavm.mcweb.host.WebHost.archive();
+        if (archive != null) {
+            McWebResources.install(archive);
+            System.out.println("[mcweb] resource archive installed: " + archive.length + " bytes");
+        } else {
+            System.out.println("[mcweb] no resource archive supplied by the page");
+        }
+        McWebResources.ensureDirectory(java.nio.file.Paths.get("/game"));
         String[] launch = {
             "--version", "26.3",
             "--username", "Player",
@@ -16,7 +24,7 @@ public final class McWebMain {
             "--accessToken", "0",
             "--userType", "legacy",
             "--gameDir", "/game",
-            "--assetsDir", "/assets",
+            "--assetsDir", "/launcher-assets",
             "--assetIndex", "34",
             "--width", "854",
             "--height", "480",

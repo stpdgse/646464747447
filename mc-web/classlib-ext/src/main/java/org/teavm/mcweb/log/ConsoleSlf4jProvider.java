@@ -58,13 +58,16 @@ public class ConsoleSlf4jProvider implements SLF4JServiceProvider {
             String text = args == null || args.length == 0 ? msg : MessageFormatter.arrayFormat(msg, args).getMessage();
             String line = "[" + level + "] " + (name == null ? "" : name.substring(name.lastIndexOf('.') + 1)) + ": "
                     + text;
-            if (level == Level.ERROR || level == Level.WARN) {
-                System.err.println(line);
+            // Straight to the browser console: System.out may be redirected back into this logger.
+            if (level == Level.ERROR) {
+                org.teavm.mcweb.host.WebHost.consoleError(line);
+            } else if (level == Level.WARN) {
+                org.teavm.mcweb.host.WebHost.consoleWarn(line);
             } else {
-                System.out.println(line);
+                org.teavm.mcweb.host.WebHost.consoleLog(line);
             }
-            if (t != null) {
-                t.printStackTrace();
+            for (Throwable c = t; c != null; c = c.getCause() == c ? null : c.getCause()) {
+                org.teavm.mcweb.host.WebHost.consoleError("    " + c);
             }
         }
 
@@ -80,12 +83,13 @@ public class ConsoleSlf4jProvider implements SLF4JServiceProvider {
 
         @Override
         public boolean isDebugEnabled() {
-            return true;
+            // Game code behind isDebugEnabled() inspects real stack traces, which TeaVM cannot provide.
+            return false;
         }
 
         @Override
         public boolean isDebugEnabled(Marker m) {
-            return true;
+            return false;
         }
 
         @Override
