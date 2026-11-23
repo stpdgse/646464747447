@@ -394,15 +394,6 @@ class org.lwjgl.util.freetype.FT_Face org.lwjgl.system.Struct - -
 class org.lwjgl.util.freetype.FT_GlyphSlot org.lwjgl.system.Struct - -
 class org.lwjgl.util.freetype.FT_Vector org.lwjgl.system.Struct - org.lwjgl.system.NativeResource
 class org.lwjgl.util.freetype.FreeType java.lang.Object - -
-class org.lwjgl.util.shaderc.Shaderc java.lang.Object - -
-class org.lwjgl.util.shaderc.ShadercIncludeResolve org.lwjgl.system.Callback abstract org.lwjgl.util.shaderc.ShadercIncludeResolveI
-interface org.lwjgl.util.shaderc.ShadercIncludeResolveI - - org.lwjgl.system.CallbackI
-class org.lwjgl.util.shaderc.ShadercIncludeResult org.lwjgl.system.Struct - org.lwjgl.system.NativeResource
-class org.lwjgl.util.shaderc.ShadercIncludeResultRelease org.lwjgl.system.Callback abstract org.lwjgl.util.shaderc.ShadercIncludeResultReleaseI
-interface org.lwjgl.util.shaderc.ShadercIncludeResultReleaseI - - org.lwjgl.system.CallbackI
-class org.lwjgl.util.spvc.Spvc java.lang.Object - -
-class org.lwjgl.util.spvc.SpvcReflectedResource org.lwjgl.system.Struct - org.lwjgl.system.NativeResource
-class org.lwjgl.util.spvc.SpvcReflectedResource$Buffer org.lwjgl.system.StructBuffer - org.lwjgl.system.NativeResource
 class org.lwjgl.util.vma.Vma java.lang.Object - -
 class org.lwjgl.util.vma.VmaAllocationCreateInfo org.lwjgl.system.Struct - org.lwjgl.system.NativeResource
 class org.lwjgl.util.vma.VmaAllocationInfo org.lwjgl.system.Struct - org.lwjgl.system.NativeResource

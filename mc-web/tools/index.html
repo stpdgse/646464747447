@@ -5,6 +5,7 @@
 <canvas id="game" width="854" height="480"></canvas>
 <script>Error.stackTraceLimit = 100;</script>
 <script src="mcweb.js"></script>
+<script src="mcshader.js"></script>
 <script src="game.wasm-runtime.js"></script>
 <script>
 (async () => {
@@ -13,6 +14,7 @@
     if (res.ok) {
       globalThis.mcwebArchive = new Int8Array(await res.arrayBuffer());
     }
+    globalThis.mcshader = await mcshaderLoad(await fetch("mcshader.wasm"));
     const t = await TeaVM.wasmGC.load("game-split.wasm");
     await t.exports.main([]);
   } catch (e) {
