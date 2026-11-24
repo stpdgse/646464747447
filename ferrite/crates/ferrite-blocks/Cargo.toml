@@ -1,0 +1,18 @@
+[package]
+name = "ferrite-blocks"
+description = "Block behaviour: neighbour updates, scheduled ticks, fluids"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ferrite-data.workspace = true
+ferrite-world = { path = "../ferrite-world" }
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

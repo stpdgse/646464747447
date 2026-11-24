@@ -1,0 +1,9 @@
+/target
+/crates/*/fuzz/target
+/crates/*/fuzz/corpus
+/crates/*/fuzz/artifacts
+*.jar
+/gen-work
+/logs
+/versions
+/libraries

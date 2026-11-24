@@ -1,0 +1,15 @@
+[package]
+name = "ferrite-loot"
+description = "Loot table evaluation (what a broken block drops)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ferrite-data.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

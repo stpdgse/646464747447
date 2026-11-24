@@ -1,0 +1,16 @@
+[package]
+name = "ferrite-commands"
+description = "Brigadier-style command trees: the vanilla tree, argument parsing and command lines"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ferrite-data.workspace = true
+ferrite-nbt = { version = "0.1.0", path = "../ferrite-nbt" }
+thiserror.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,28 @@
+[package]
+name = "ferrite-remote-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+ferrite-remote = { path = ".." }
+
+[[bin]]
+name = "query_handler"
+path = "fuzz_targets/query_handler.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "query_parsers"
+path = "fuzz_targets/query_parsers.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]

@@ -1,0 +1,1204 @@
+# recorded from the official server by scripts/record-placement.py
+# target iron_bars at (8, 101, 8); the player stands at (8.5, 99.0, 5.5); cells are relative to the target
+# support iron_bars
+case acacia_button 1 0.7 1.0 0.5 -45.0 0.0
+end
+case acacia_button 0 0.3 0.0 0.1 22.5 0.0
+end
+case acacia_button 2 0.7 0.7 0.0 -67.5 -80.0
+end
+case acacia_door 1 0.5 1.0 0.1 67.5 -20.0
+end
+case acacia_door 0 0.3 0.0 0.5 -135.0 0.0
+end
+case acacia_door 2 0.7 0.1 0.0 -112.5 20.0
+end
+case acacia_fence_gate 1 0.1 1.0 0.3 -45.0 -45.0
+b 0 1 0 acacia_fence_gate[facing=south,in_wall=false,open=false,powered=false]
+end
+case acacia_fence_gate 0 0.9 0.0 0.7 67.5 45.0
+b 0 -1 0 acacia_fence_gate[facing=west,in_wall=false,open=false,powered=false]
+end
+case acacia_fence_gate 4 0.0 0.7 0.7 22.5 20.0
+b -1 0 0 acacia_fence_gate[facing=south,in_wall=false,open=false,powered=false]
+end
+case acacia_hanging_sign 1 0.1 1.0 0.9 45.0 0.0
+end
+case acacia_hanging_sign 0 0.5 0.0 0.3 90.0 45.0
+b 0 -1 0 acacia_hanging_sign[attached=true,rotation=12,waterlogged=false]
+end
+case acacia_hanging_sign 3 0.1 0.3 1.0 -135.0 45.0
+end
+case acacia_pressure_plate 1 0.5 1.0 0.9 67.5 -80.0
+b 0 1 0 acacia_pressure_plate
+end
+case acacia_pressure_plate 0 0.1 0.0 0.7 -67.5 20.0
+end
+case acacia_pressure_plate 2 0.5 0.9 0.0 157.5 80.0
+end
+case acacia_sapling 1 0.3 1.0 0.9 90.0 20.0
+end
+case acacia_sapling 0 0.1 0.0 0.1 22.5 -20.0
+end
+case acacia_sapling 5 1.0 0.3 0.7 -67.5 -80.0
+end
+case acacia_sign 1 0.9 1.0 0.1 0.0 -20.0
+b 0 1 0 acacia_sign
+end
+case acacia_sign 0 0.9 0.0 0.3 157.5 80.0
+end
+case acacia_sign 4 0.0 0.9 0.9 -90.0 20.0
+b -1 0 0 acacia_wall_sign[facing=west,waterlogged=false]
+end
+case acacia_trapdoor 1 0.3 1.0 0.5 22.5 0.0
+b 0 1 0 acacia_trapdoor
+end
+case acacia_trapdoor 0 0.1 0.0 0.7 112.5 -45.0
+b 0 -1 0 acacia_trapdoor[facing=east,half=top,open=false,powered=false,waterlogged=false]
+end
+case acacia_trapdoor 4 0.0 0.5 0.9 157.5 0.0
+b -1 0 0 acacia_trapdoor[facing=west,half=bottom,open=false,powered=false,waterlogged=false]
+end
+case activator_rail 1 0.7 1.0 0.5 135.0 0.0
+end
+case activator_rail 0 0.5 0.0 0.1 -90.0 -80.0
+end
+case activator_rail 4 0.0 0.3 0.1 -90.0 80.0
+end
+case allium 1 0.3 1.0 0.7 -22.5 -80.0
+end
+case allium 0 0.3 0.0 0.5 -180.0 -45.0
+end
+case allium 2 0.5 0.1 0.0 135.0 80.0
+end
+case anvil 1 0.9 1.0 0.1 112.5 45.0
+b 0 1 0 anvil
+end
+case anvil 0 0.9 0.0 0.1 0.0 -20.0
+b 0 -1 0 anvil[facing=west]
+end
+case anvil 5 1.0 0.1 0.9 -67.5 20.0
+b 1 0 0 anvil[facing=south]
+end
+case azalea 1 0.5 1.0 0.7 -157.5 -45.0
+end
+case azalea 0 0.7 0.0 0.3 67.5 80.0
+end
+case azalea 5 1.0 0.5 0.9 112.5 -80.0
+end
+case azalea_leaves 1 0.7 1.0 0.1 -157.5 -20.0
+b 0 1 0 azalea_leaves[distance=7,persistent=true,waterlogged=false]
+end
+case azalea_leaves 0 0.9 0.0 0.5 -135.0 -80.0
+b 0 -1 0 azalea_leaves[distance=7,persistent=true,waterlogged=false]
+end
+case azalea_leaves 4 0.0 0.5 0.7 -90.0 20.0
+b -1 0 0 azalea_leaves[distance=7,persistent=true,waterlogged=false]
+end
+case azure_bluet 1 0.7 1.0 0.3 45.0 20.0
+end
+case azure_bluet 0 0.7 0.0 0.3 22.5 -80.0
+end
+case azure_bluet 4 0.0 0.7 0.9 135.0 0.0
+end
+case bamboo 1 0.7 1.0 0.5 -157.5 20.0
+end
+case bamboo 0 0.9 0.0 0.5 90.0 -20.0
+end
+case bamboo 5 1.0 0.9 0.7 -180.0 -45.0
+end
+case bamboo_block 1 0.5 1.0 0.1 -112.5 0.0
+b 0 1 0 bamboo_block
+end
+case bamboo_block 0 0.5 0.0 0.7 -45.0 45.0
+b 0 -1 0 bamboo_block
+end
+case bamboo_block 2 0.7 0.9 0.0 -112.5 0.0
+b 0 0 -1 bamboo_block[axis=z]
+b 0 0 0 iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+end
+case bamboo_fence 1 0.9 1.0 0.7 -135.0 -45.0
+b 0 1 0 bamboo_fence
+end
+case bamboo_fence 0 0.5 0.0 0.9 -45.0 -80.0
+b 0 -1 0 bamboo_fence
+end
+case bamboo_fence 5 1.0 0.7 0.9 90.0 20.0
+b 1 0 0 bamboo_fence
+end
+case bamboo_mosaic 1 0.7 1.0 0.3 -45.0 -45.0
+b 0 1 0 bamboo_mosaic
+end
+case bamboo_mosaic 0 0.3 0.0 0.5 22.5 45.0
+b 0 -1 0 bamboo_mosaic
+end
+case bamboo_mosaic 3 0.9 0.9 1.0 -112.5 -45.0
+b 0 0 0 iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+b 0 0 1 bamboo_mosaic
+end
+case bamboo_mosaic_slab 1 0.9 1.0 0.3 67.5 0.0
+b 0 1 0 bamboo_mosaic_slab
+end
+case bamboo_mosaic_slab 0 0.9 0.0 0.3 112.5 0.0
+b 0 -1 0 bamboo_mosaic_slab[type=top,waterlogged=false]
+end
+case bamboo_mosaic_slab 2 0.1 0.7 0.0 -90.0 80.0
+b 0 0 -1 bamboo_mosaic_slab[type=top,waterlogged=false]
+end
+case bamboo_mosaic_stairs 1 0.9 1.0 0.1 22.5 0.0
+b 0 1 0 bamboo_mosaic_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]
+end
+case bamboo_mosaic_stairs 0 0.1 0.0 0.3 135.0 80.0
+b 0 -1 0 bamboo_mosaic_stairs[facing=north,half=top,shape=straight,waterlogged=false]
+end
+case bamboo_mosaic_stairs 5 1.0 0.9 0.7 0.0 0.0
+b 1 0 0 bamboo_mosaic_stairs[facing=south,half=top,shape=straight,waterlogged=false]
+end
+case bamboo_planks 1 0.7 1.0 0.7 22.5 -80.0
+b 0 1 0 bamboo_planks
+end
+case bamboo_planks 0 0.1 0.0 0.9 22.5 80.0
+b 0 -1 0 bamboo_planks
+end
+case bamboo_planks 2 0.9 0.3 0.0 -135.0 20.0
+b 0 0 -1 bamboo_planks
+b 0 0 0 iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+end
+case bamboo_shelf 1 0.1 1.0 0.3 -157.5 -20.0
+b 0 1 0 bamboo_shelf[facing=south,powered=false,side_chain=unconnected,waterlogged=false]
+end
+case bamboo_shelf 0 0.5 0.0 0.3 -112.5 80.0
+b 0 -1 0 bamboo_shelf[facing=west,powered=false,side_chain=unconnected,waterlogged=false]
+end
+case bamboo_shelf 5 1.0 0.9 0.7 112.5 -45.0
+b 0 0 0 iron_bars[east=true,north=false,south=false,waterlogged=false,west=false]
+b 1 0 0 bamboo_shelf[facing=east,powered=false,side_chain=unconnected,waterlogged=false]
+end
+case bamboo_slab 1 0.5 1.0 0.9 22.5 80.0
+b 0 1 0 bamboo_slab
+end
+case bamboo_slab 0 0.9 0.0 0.7 -180.0 80.0
+b 0 -1 0 bamboo_slab[type=top,waterlogged=false]
+end
+case bamboo_slab 2 0.3 0.3 0.0 -90.0 45.0
+b 0 0 -1 bamboo_slab
+end
+case bamboo_stairs 1 0.5 1.0 0.7 -90.0 -80.0
+b 0 1 0 bamboo_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]
+end
+case bamboo_stairs 0 0.9 0.0 0.5 -67.5 80.0
+b 0 -1 0 bamboo_stairs[facing=east,half=top,shape=straight,waterlogged=false]
+end
+case bamboo_stairs 4 0.0 0.3 0.5 -112.5 80.0
+b -1 0 0 bamboo_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]
+b 0 0 0 iron_bars[east=false,north=false,south=false,waterlogged=false,west=true]
+end
+case bell 1 0.5 1.0 0.1 22.5 -45.0
+end
+case bell 0 0.5 0.0 0.3 67.5 -45.0
+b 0 -1 0 bell[attachment=ceiling,facing=west,powered=false]
+end
+case bell 2 0.1 0.9 0.0 90.0 45.0
+end
+case big_dripleaf 1 0.3 1.0 0.9 -90.0 -20.0
+end
+case big_dripleaf 0 0.5 0.0 0.7 -112.5 45.0
+end
+case big_dripleaf 2 0.3 0.7 0.0 135.0 0.0
+end
+case black_banner 1 0.9 1.0 0.7 45.0 80.0
+b 0 1 0 black_banner[rotation=10]
+end
+case black_banner 0 0.9 0.0 0.5 -90.0 -20.0
+end
+case black_banner 5 1.0 0.5 0.7 -67.5 0.0
+b 1 0 0 black_wall_banner[facing=east]
+end
+case black_bed 1 0.7 1.0 0.5 -180.0 20.0
+b 0 1 -1 black_bed[facing=north,occupied=false,part=head]
+b 0 1 0 black_bed
+end
+case black_bed 0 0.1 0.0 0.3 22.5 -80.0
+b 0 -1 0 black_bed[facing=south,occupied=false,part=foot]
+b 0 -1 1 black_bed[facing=south,occupied=false,part=head]
+end
+case black_bed 4 0.0 0.3 0.7 -157.5 0.0
+b -1 0 -1 black_bed[facing=north,occupied=false,part=head]
+b -1 0 0 black_bed
+end
+case black_candle 1 0.5 1.0 0.7 -67.5 20.0
+b 0 1 0 black_candle
+end
+case black_candle 0 0.7 0.0 0.5 -180.0 -80.0
+end
+case black_candle 4 0.0 0.5 0.1 67.5 -45.0
+end
+case black_carpet 1 0.3 1.0 0.3 22.5 80.0
+b 0 1 0 black_carpet
+end
+case black_carpet 0 0.9 0.0 0.3 -180.0 45.0
+end
+case black_carpet 5 1.0 0.1 0.1 -180.0 -80.0
+end
+case blue_orchid 1 0.5 1.0 0.5 67.5 -45.0
+end
+case blue_orchid 0 0.1 0.0 0.1 90.0 -80.0
+end
+case blue_orchid 5 1.0 0.1 0.3 -157.5 20.0
+end
+case brain_coral 1 0.7 1.0 0.3 0.0 80.0
+end
+case brain_coral 0 0.1 0.0 0.1 22.5 -45.0
+end
+case brain_coral 3 0.5 0.5 1.0 -112.5 0.0
+end
+case brain_coral_block 1 0.3 1.0 0.1 45.0 80.0
+b 0 1 0 brain_coral_block
+end
+case brain_coral_block 0 0.1 0.0 0.7 -45.0 -45.0
+b 0 -1 0 brain_coral_block
+end
+case brain_coral_block 4 0.0 0.5 0.9 -112.5 -20.0
+b -1 0 0 brain_coral_block
+b 0 0 0 iron_bars[east=false,north=false,south=false,waterlogged=false,west=true]
+end
+case brain_coral_fan 1 0.1 1.0 0.3 -45.0 -80.0
+end
+case brain_coral_fan 0 0.3 0.0 0.3 -180.0 -80.0
+end
+case brain_coral_fan 5 1.0 0.1 0.5 0.0 80.0
+end
+case brown_mushroom 1 0.9 1.0 0.7 45.0 -80.0
+end
+case brown_mushroom 0 0.9 0.0 0.1 -112.5 45.0
+end
+case brown_mushroom 5 1.0 0.3 0.7 -180.0 20.0
+end
+case brown_mushroom_block 1 0.7 1.0 0.3 112.5 45.0
+b 0 1 0 brown_mushroom_block
+end
+case brown_mushroom_block 0 0.3 0.0 0.5 157.5 20.0
+b 0 -1 0 brown_mushroom_block
+end
+case brown_mushroom_block 4 0.0 0.7 0.7 45.0 -80.0
+b -1 0 0 brown_mushroom_block
+b 0 0 0 iron_bars[east=false,north=false,south=false,waterlogged=false,west=true]
+end
+case bush 1 0.9 1.0 0.7 -45.0 -45.0
+end
+case bush 0 0.1 0.0 0.1 45.0 80.0
+end
+case bush 5 1.0 0.7 0.1 -22.5 -45.0
+end
+case cactus 1 0.5 1.0 0.5 -180.0 0.0
+end
+case cactus 0 0.7 0.0 0.1 112.5 -80.0
+end
+case cactus 3 0.7 0.3 1.0 135.0 -20.0
+end
+case cactus_flower 1 0.3 1.0 0.7 -22.5 0.0
+b 0 1 0 cactus_flower
+end
+case cactus_flower 0 0.1 0.0 0.1 135.0 -80.0
+end
+case cactus_flower 5 1.0 0.7 0.9 90.0 0.0
+end
+case cake 1 0.5 1.0 0.5 -112.5 -80.0
+b 0 1 0 cake
+end
+case cake 0 0.5 0.0 0.9 45.0 0.0
+end
+case cake 4 0.0 0.9 0.1 -22.5 80.0
+end
+case chipped_anvil 1 0.7 1.0 0.9 90.0 -45.0
+b 0 1 0 chipped_anvil
+end
+case chipped_anvil 0 0.3 0.0 0.3 45.0 -20.0
+b 0 -1 0 chipped_anvil
+end
+case chipped_anvil 3 0.7 0.7 1.0 157.5 -20.0
+b 0 0 1 chipped_anvil[facing=east]
+end
+case chorus_flower 1 0.1 1.0 0.1 112.5 80.0
+end
+case chorus_flower 0 0.5 0.0 0.1 -112.5 -80.0
+end
+case chorus_flower 5 1.0 0.9 0.5 90.0 0.0
+end
+case chorus_plant 1 0.1 1.0 0.5 45.0 -20.0
+end
+case chorus_plant 0 0.1 0.0 0.7 112.5 -20.0
+end
+case chorus_plant 5 1.0 0.7 0.1 135.0 80.0
+end
+case closed_eyeblossom 1 0.1 1.0 0.7 -45.0 80.0
+end
+case closed_eyeblossom 0 0.5 0.0 0.9 135.0 -45.0
+end
+case closed_eyeblossom 4 0.0 0.3 0.3 -157.5 20.0
+end
+case comparator 1 0.9 1.0 0.9 -90.0 -20.0
+end
+case comparator 0 0.5 0.0 0.1 -67.5 -20.0
+end
+case comparator 3 0.3 0.9 1.0 -157.5 -20.0
+end
+case conduit 1 0.9 1.0 0.3 45.0 0.0
+b 0 1 0 conduit[waterlogged=false]
+end
+case conduit 0 0.9 0.0 0.1 90.0 -20.0
+b 0 -1 0 conduit[waterlogged=false]
+end
+case conduit 3 0.9 0.9 1.0 -157.5 -20.0
+b 0 0 1 conduit[waterlogged=false]
+end
+case copper_door 1 0.5 1.0 0.5 0.0 0.0
+end
+case copper_door 0 0.9 0.0 0.3 -45.0 -20.0
+end
+case copper_door 2 0.7 0.5 0.0 -22.5 0.0
+end
+case copper_lantern 1 0.1 1.0 0.5 -67.5 -20.0
+b 0 1 0 copper_lantern
+end
+case copper_lantern 0 0.9 0.0 0.1 -45.0 45.0
+b 0 -1 0 copper_lantern[hanging=true,waterlogged=false]
+end
+case copper_lantern 5 1.0 0.1 0.5 -112.5 20.0
+end
+case copper_torch 1 0.3 1.0 0.3 22.5 20.0
+b 0 1 0 copper_torch
+end
+case copper_torch 0 0.1 0.0 0.5 -90.0 80.0
+end
+case copper_torch 4 0.0 0.3 0.3 0.0 0.0
+end
+case copper_trapdoor 1 0.7 1.0 0.7 135.0 20.0
+b 0 1 0 copper_trapdoor[facing=south,half=bottom,open=false,powered=false,waterlogged=false]
+end
+case copper_trapdoor 0 0.5 0.0 0.7 157.5 80.0
+b 0 -1 0 copper_trapdoor[facing=south,half=top,open=false,powered=false,waterlogged=false]
+end
+case copper_trapdoor 5 1.0 0.1 0.1 -135.0 -45.0
+b 1 0 0 copper_trapdoor[facing=east,half=bottom,open=false,powered=false,waterlogged=false]
+end
+case cornflower 1 0.9 1.0 0.7 -90.0 20.0
+end
+case cornflower 0 0.9 0.0 0.5 45.0 0.0
+end
+case cornflower 5 1.0 0.7 0.9 157.5 -80.0
+end
+case creeper_head 1 0.9 1.0 0.1 -22.5 20.0
+b 0 1 0 creeper_head[powered=false,rotation=15]
+end
+case creeper_head 0 0.5 0.0 0.5 157.5 45.0
+b 0 -1 0 creeper_head[powered=false,rotation=7]
+end
+case creeper_head 5 1.0 0.3 0.1 157.5 80.0
+b 1 0 0 creeper_wall_head[facing=east,powered=false]
+end
+case crimson_fungus 1 0.5 1.0 0.1 90.0 -80.0
+end
+case crimson_fungus 0 0.9 0.0 0.3 -180.0 -45.0
+end
+case crimson_fungus 2 0.3 0.9 0.0 -135.0 45.0
+end
+case crimson_roots 1 0.3 1.0 0.1 -67.5 45.0
+end
+case crimson_roots 0 0.9 0.0 0.3 -112.5 -20.0
+end
+case crimson_roots 2 0.1 0.1 0.0 -67.5 -45.0
+end
+case crimson_stem 1 0.1 1.0 0.9 -180.0 80.0
+b 0 1 0 crimson_stem
+end
+case crimson_stem 0 0.9 0.0 0.5 157.5 20.0
+b 0 -1 0 crimson_stem
+end
+case crimson_stem 5 1.0 0.9 0.7 22.5 20.0
+b 0 0 0 iron_bars[east=true,north=false,south=false,waterlogged=false,west=false]
+b 1 0 0 crimson_stem[axis=x]
+end
+case damaged_anvil 1 0.1 1.0 0.1 135.0 -20.0
+b 0 1 0 damaged_anvil[facing=east]
+end
+case damaged_anvil 0 0.1 0.0 0.1 157.5 -45.0
+b 0 -1 0 damaged_anvil[facing=east]
+end
+case damaged_anvil 5 1.0 0.7 0.3 112.5 45.0
+b 1 0 0 damaged_anvil
+end
+case dandelion 1 0.7 1.0 0.3 135.0 -45.0
+end
+case dandelion 0 0.5 0.0 0.9 -90.0 45.0
+end
+case dandelion 3 0.5 0.1 1.0 157.5 0.0
+end
+case detector_rail 1 0.5 1.0 0.7 -67.5 45.0
+end
+case detector_rail 0 0.7 0.0 0.5 157.5 45.0
+end
+case detector_rail 5 1.0 0.5 0.7 90.0 -20.0
+end
+case dragon_head 1 0.1 1.0 0.1 -135.0 0.0
+b 0 1 0 dragon_head[powered=false,rotation=10]
+end
+case dragon_head 0 0.5 0.0 0.7 0.0 -45.0
+b 0 -1 0 dragon_head
+end
+case dragon_head 3 0.5 0.7 1.0 -135.0 20.0
+b 0 0 1 dragon_wall_head[facing=south,powered=false]
+end
+case dried_kelp_block 1 0.1 1.0 0.1 -135.0 -45.0
+b 0 1 0 dried_kelp_block
+end
+case dried_kelp_block 0 0.7 0.0 0.3 -90.0 45.0
+b 0 -1 0 dried_kelp_block
+end
+case dried_kelp_block 2 0.7 0.7 0.0 67.5 80.0
+b 0 0 -1 dried_kelp_block
+b 0 0 0 iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+end
+case dripstone_block 1 0.5 1.0 0.5 -112.5 80.0
+b 0 1 0 dripstone_block
+end
+case dripstone_block 0 0.7 0.0 0.5 -45.0 0.0
+b 0 -1 0 dripstone_block
+end
+case dripstone_block 5 1.0 0.7 0.7 22.5 20.0
+b 0 0 0 iron_bars[east=true,north=false,south=false,waterlogged=false,west=false]
+b 1 0 0 dripstone_block
+end
+case fern 1 0.3 1.0 0.3 22.5 -20.0
+end
+case fern 0 0.7 0.0 0.9 -112.5 0.0
+end
+case fern 4 0.0 0.5 0.1 112.5 -20.0
+end
+case firefly_bush 1 0.7 1.0 0.1 90.0 0.0
+end
+case firefly_bush 0 0.7 0.0 0.7 0.0 0.0
+end
+case firefly_bush 4 0.0 0.3 0.1 -45.0 45.0
+end
+case flower_pot 1 0.5 1.0 0.7 -90.0 45.0
+b 0 1 0 flower_pot
+end
+case flower_pot 0 0.9 0.0 0.5 22.5 0.0
+b 0 -1 0 flower_pot
+end
+case flower_pot 5 1.0 0.9 0.1 -22.5 -45.0
+b 1 0 0 flower_pot
+end
+case flowering_azalea 1 0.5 1.0 0.1 -180.0 45.0
+end
+case flowering_azalea 0 0.1 0.0 0.9 90.0 45.0
+end
+case flowering_azalea 4 0.0 0.5 0.9 112.5 20.0
+end
+case flowering_azalea_leaves 1 0.5 1.0 0.7 -67.5 -20.0
+b 0 1 0 flowering_azalea_leaves[distance=7,persistent=true,waterlogged=false]
+end
+case flowering_azalea_leaves 0 0.5 0.0 0.3 -90.0 0.0
+b 0 -1 0 flowering_azalea_leaves[distance=7,persistent=true,waterlogged=false]
+end
+case flowering_azalea_leaves 5 1.0 0.7 0.5 -22.5 -20.0
+b 1 0 0 flowering_azalea_leaves[distance=7,persistent=true,waterlogged=false]
+end
+case frogspawn 1 0.7 1.0 0.7 -45.0 0.0
+end
+case frogspawn 0 0.3 0.0 0.3 -67.5 -20.0
+end
+case frogspawn 3 0.5 0.5 1.0 135.0 20.0
+end
+case glow_lichen 1 0.1 1.0 0.3 112.5 -20.0
+end
+case glow_lichen 0 0.9 0.0 0.1 -135.0 -45.0
+end
+case glow_lichen 2 0.9 0.9 0.0 -135.0 20.0
+end
+case golden_dandelion 1 0.3 1.0 0.7 45.0 -45.0
+end
+case golden_dandelion 0 0.1 0.0 0.3 45.0 45.0
+end
+case golden_dandelion 4 0.0 0.3 0.1 -112.5 -20.0
+end
+case grass_block 1 0.7 1.0 0.3 -112.5 -20.0
+b 0 1 0 grass_block
+end
+case grass_block 0 0.1 0.0 0.5 45.0 20.0
+b 0 -1 0 grass_block
+end
+case grass_block 4 0.0 0.5 0.7 45.0 -80.0
+b -1 0 0 grass_block
+b 0 0 0 iron_bars[east=false,north=false,south=false,waterlogged=false,west=true]
+end
+case hanging_roots 1 0.7 1.0 0.3 0.0 -45.0
+end
+case hanging_roots 0 0.7 0.0 0.7 -22.5 -20.0
+end
+case hanging_roots 2 0.5 0.7 0.0 -180.0 20.0
+end
+case heavy_weighted_pressure_plate 1 0.1 1.0 0.7 -22.5 45.0
+b 0 1 0 heavy_weighted_pressure_plate
+end
+case heavy_weighted_pressure_plate 0 0.9 0.0 0.5 90.0 -45.0
+end
+case heavy_weighted_pressure_plate 4 0.0 0.7 0.9 157.5 0.0
+end
+case hopper 1 0.3 1.0 0.5 45.0 0.0
+b 0 1 0 hopper
+end
+case hopper 0 0.7 0.0 0.1 -45.0 20.0
+b 0 -1 0 hopper
+end
+case hopper 2 0.3 0.1 0.0 -180.0 20.0
+b 0 0 -1 hopper[enabled=true,facing=south]
+end
+case infested_mossy_stone_bricks 1 0.5 1.0 0.3 157.5 -20.0
+b 0 1 0 infested_mossy_stone_bricks
+end
+case infested_mossy_stone_bricks 0 0.7 0.0 0.1 -135.0 45.0
+b 0 -1 0 infested_mossy_stone_bricks
+end
+case infested_mossy_stone_bricks 5 1.0 0.5 0.9 -180.0 45.0
+b 0 0 0 iron_bars[east=true,north=false,south=false,waterlogged=false,west=false]
+b 1 0 0 infested_mossy_stone_bricks
+end
+case iron_door 1 0.9 1.0 0.9 0.0 -20.0
+end
+case iron_door 0 0.9 0.0 0.3 45.0 -80.0
+end
+case iron_door 4 0.0 0.5 0.3 112.5 0.0
+end
+case iron_trapdoor 1 0.3 1.0 0.3 22.5 80.0
+b 0 1 0 iron_trapdoor
+end
+case iron_trapdoor 0 0.5 0.0 0.9 -45.0 80.0
+b 0 -1 0 iron_trapdoor[facing=north,half=top,open=false,powered=false,waterlogged=false]
+end
+case iron_trapdoor 3 0.7 0.7 1.0 157.5 0.0
+b 0 0 1 iron_trapdoor[facing=south,half=top,open=false,powered=false,waterlogged=false]
+end
+case jack_o_lantern 1 0.3 1.0 0.9 -67.5 20.0
+b 0 1 0 jack_o_lantern[facing=west]
+end
+case jack_o_lantern 0 0.9 0.0 0.5 135.0 -20.0
+b 0 -1 0 jack_o_lantern[facing=south]
+end
+case jack_o_lantern 3 0.7 0.9 1.0 -67.5 45.0
+b 0 0 1 jack_o_lantern[facing=west]
+end
+case kelp 1 0.3 1.0 0.1 -180.0 45.0
+end
+case kelp 0 0.3 0.0 0.7 -22.5 0.0
+end
+case kelp 2 0.5 0.3 0.0 67.5 -20.0
+end
+case ladder 1 0.3 1.0 0.9 -67.5 0.0
+end
+case ladder 0 0.7 0.0 0.1 -112.5 -45.0
+end
+case ladder 4 0.0 0.9 0.1 45.0 -45.0
+end
+case lantern 1 0.5 1.0 0.5 22.5 -80.0
+b 0 1 0 lantern
+end
+case lantern 0 0.9 0.0 0.5 135.0 0.0
+b 0 -1 0 lantern[hanging=true,waterlogged=false]
+end
+case lantern 3 0.7 0.9 1.0 0.0 -20.0
+end
+case large_fern 1 0.7 1.0 0.5 157.5 45.0
+end
+case large_fern 0 0.5 0.0 0.1 157.5 45.0
+end
+case large_fern 5 1.0 0.3 0.1 112.5 -45.0
+end
+case leaf_litter 1 0.7 1.0 0.1 -112.5 45.0
+end
+case leaf_litter 0 0.3 0.0 0.9 -180.0 -80.0
+end
+case leaf_litter 5 1.0 0.1 0.5 157.5 0.0
+end
+case lever 1 0.7 1.0 0.3 -157.5 -20.0
+end
+case lever 0 0.1 0.0 0.5 90.0 -80.0
+end
+case lever 5 1.0 0.3 0.1 -135.0 -45.0
+end
+case light_weighted_pressure_plate 1 0.7 1.0 0.9 157.5 80.0
+b 0 1 0 light_weighted_pressure_plate
+end
+case light_weighted_pressure_plate 0 0.1 0.0 0.9 0.0 45.0
+end
+case light_weighted_pressure_plate 5 1.0 0.7 0.5 112.5 45.0
+end
+case lilac 1 0.1 1.0 0.7 112.5 0.0
+end
+case lilac 0 0.1 0.0 0.5 112.5 80.0
+end
+case lilac 3 0.7 0.1 1.0 -90.0 20.0
+end
+case lily_of_the_valley 1 0.1 1.0 0.5 135.0 20.0
+end
+case lily_of_the_valley 0 0.9 0.0 0.9 -135.0 20.0
+end
+case lily_of_the_valley 3 0.5 0.1 1.0 45.0 20.0
+end
+case lily_pad 1 0.1 1.0 0.7 45.0 -45.0
+end
+case lily_pad 0 0.9 0.0 0.9 -45.0 80.0
+end
+case lily_pad 3 0.7 0.7 1.0 -67.5 -45.0
+end
+case mangrove_propagule 1 0.3 1.0 0.3 67.5 -45.0
+end
+case mangrove_propagule 0 0.9 0.0 0.1 -180.0 -45.0
+end
+case mangrove_propagule 4 0.0 0.5 0.1 -180.0 80.0
+end
+case moss_block 1 0.3 1.0 0.1 67.5 80.0
+b 0 1 0 moss_block
+end
+case moss_block 0 0.5 0.0 0.1 -90.0 0.0
+b 0 -1 0 moss_block
+end
+case moss_block 2 0.3 0.5 0.0 -90.0 0.0
+b 0 0 -1 moss_block
+b 0 0 0 iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+end
+case moss_carpet 1 0.9 1.0 0.7 157.5 0.0
+b 0 1 0 moss_carpet
+end
+case moss_carpet 0 0.9 0.0 0.7 0.0 20.0
+end
+case moss_carpet 3 0.9 0.7 1.0 -22.5 80.0
+end
+case mossy_cobblestone 1 0.1 1.0 0.3 -45.0 0.0
+b 0 1 0 mossy_cobblestone
+end
+case mossy_cobblestone 0 0.5 0.0 0.3 -180.0 45.0
+b 0 -1 0 mossy_cobblestone
+end
+case mossy_cobblestone 3 0.1 0.1 1.0 -22.5 45.0
+b 0 0 0 iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+b 0 0 1 mossy_cobblestone
+end
+case mossy_cobblestone_slab 1 0.9 1.0 0.9 90.0 -80.0
+b 0 1 0 mossy_cobblestone_slab
+end
+case mossy_cobblestone_slab 0 0.7 0.0 0.5 112.5 -20.0
+b 0 -1 0 mossy_cobblestone_slab[type=top,waterlogged=false]
+end
+case mossy_cobblestone_slab 5 1.0 0.9 0.7 -157.5 80.0
+b 1 0 0 mossy_cobblestone_slab[type=top,waterlogged=false]
+end
+case mossy_cobblestone_stairs 1 0.3 1.0 0.3 45.0 0.0
+b 0 1 0 mossy_cobblestone_stairs[facing=west,half=bottom,shape=straight,waterlogged=false]
+end
+case mossy_cobblestone_stairs 0 0.7 0.0 0.3 45.0 -20.0
+b 0 -1 0 mossy_cobblestone_stairs[facing=west,half=top,shape=straight,waterlogged=false]
+end
+case mossy_cobblestone_stairs 5 1.0 0.3 0.1 45.0 -80.0
+b 0 0 0 iron_bars[east=true,north=false,south=false,waterlogged=false,west=false]
+b 1 0 0 mossy_cobblestone_stairs[facing=west,half=bottom,shape=straight,waterlogged=false]
+end
+case mossy_cobblestone_wall 1 0.3 1.0 0.3 157.5 20.0
+b 0 1 0 mossy_cobblestone_wall
+end
+case mossy_cobblestone_wall 0 0.7 0.0 0.9 -90.0 0.0
+b 0 -1 0 mossy_cobblestone_wall
+end
+case mossy_cobblestone_wall 3 0.5 0.3 1.0 -112.5 -80.0
+b 0 0 0 iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+b 0 0 1 mossy_cobblestone_wall[east=none,north=low,south=none,up=true,waterlogged=false,west=none]
+end
+case mossy_stone_brick_slab 1 0.5 1.0 0.3 22.5 20.0
+b 0 1 0 mossy_stone_brick_slab
+end
+case mossy_stone_brick_slab 0 0.3 0.0 0.7 67.5 45.0
+b 0 -1 0 mossy_stone_brick_slab[type=top,waterlogged=false]
+end
+case mossy_stone_brick_slab 3 0.7 0.5 1.0 -67.5 0.0
+b 0 0 1 mossy_stone_brick_slab
+end
+case mossy_stone_brick_stairs 1 0.1 1.0 0.7 -157.5 80.0
+b 0 1 0 mossy_stone_brick_stairs
+end
+case mossy_stone_brick_stairs 0 0.5 0.0 0.7 0.0 20.0
+b 0 -1 0 mossy_stone_brick_stairs[facing=south,half=top,shape=straight,waterlogged=false]
+end
+case mossy_stone_brick_stairs 4 0.0 0.1 0.3 -112.5 -80.0
+b -1 0 0 mossy_stone_brick_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]
+b 0 0 0 iron_bars[east=false,north=false,south=false,waterlogged=false,west=true]
+end
+case mossy_stone_brick_wall 1 0.7 1.0 0.5 -90.0 0.0
+b 0 1 0 mossy_stone_brick_wall
+end
+case mossy_stone_brick_wall 0 0.9 0.0 0.7 -135.0 -20.0
+b 0 -1 0 mossy_stone_brick_wall
+end
+case mossy_stone_brick_wall 3 0.7 0.7 1.0 45.0 20.0
+b 0 0 0 iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+b 0 0 1 mossy_stone_brick_wall[east=none,north=low,south=none,up=true,waterlogged=false,west=none]
+end
+case mossy_stone_bricks 1 0.9 1.0 0.1 112.5 -80.0
+b 0 1 0 mossy_stone_bricks
+end
+case mossy_stone_bricks 0 0.1 0.0 0.5 22.5 -80.0
+b 0 -1 0 mossy_stone_bricks
+end
+case mossy_stone_bricks 2 0.9 0.7 0.0 -135.0 20.0
+b 0 0 -1 mossy_stone_bricks
+b 0 0 0 iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+end
+case muddy_mangrove_roots 1 0.5 1.0 0.9 112.5 -45.0
+b 0 1 0 muddy_mangrove_roots
+end
+case muddy_mangrove_roots 0 0.1 0.0 0.5 0.0 80.0
+b 0 -1 0 muddy_mangrove_roots
+end
+case muddy_mangrove_roots 3 0.5 0.7 1.0 45.0 45.0
+b 0 0 0 iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+b 0 0 1 muddy_mangrove_roots[axis=z]
+end
+case mushroom_stem 1 0.7 1.0 0.5 -67.5 0.0
+b 0 1 0 mushroom_stem
+end
+case mushroom_stem 0 0.5 0.0 0.1 -22.5 -80.0
+b 0 -1 0 mushroom_stem
+end
+case mushroom_stem 3 0.7 0.1 1.0 -112.5 80.0
+b 0 0 0 iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+b 0 0 1 mushroom_stem
+end
+case nether_sprouts 1 0.3 1.0 0.9 -45.0 45.0
+end
+case nether_sprouts 0 0.9 0.0 0.9 -22.5 0.0
+end
+case nether_sprouts 2 0.7 0.7 0.0 45.0 -20.0
+end
+case nether_wart 1 0.1 1.0 0.1 -157.5 20.0
+end
+case nether_wart 0 0.3 0.0 0.3 90.0 -80.0
+end
+case nether_wart 4 0.0 0.5 0.1 -22.5 45.0
+end
+case nether_wart_block 1 0.9 1.0 0.3 45.0 0.0
+b 0 1 0 nether_wart_block
+end
+case nether_wart_block 0 0.9 0.0 0.7 -157.5 45.0
+b 0 -1 0 nether_wart_block
+end
+case nether_wart_block 3 0.9 0.7 1.0 67.5 80.0
+b 0 0 0 iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+b 0 0 1 nether_wart_block
+end
+case open_eyeblossom 1 0.5 1.0 0.7 112.5 -45.0
+end
+case open_eyeblossom 0 0.9 0.0 0.5 135.0 45.0
+end
+case open_eyeblossom 2 0.3 0.5 0.0 135.0 45.0
+end
+case orange_tulip 1 0.7 1.0 0.9 90.0 -20.0
+end
+case orange_tulip 0 0.7 0.0 0.3 -45.0 20.0
+end
+case orange_tulip 3 0.3 0.5 1.0 67.5 -80.0
+end
+case oxeye_daisy 1 0.9 1.0 0.1 -180.0 -45.0
+end
+case oxeye_daisy 0 0.9 0.0 0.9 67.5 80.0
+end
+case oxeye_daisy 3 0.9 0.3 1.0 0.0 -80.0
+end
+case pale_hanging_moss 1 0.7 1.0 0.7 0.0 45.0
+end
+case pale_hanging_moss 0 0.7 0.0 0.3 -67.5 80.0
+end
+case pale_hanging_moss 3 0.3 0.9 1.0 -135.0 45.0
+end
+case pale_moss_block 1 0.9 1.0 0.5 -90.0 -20.0
+b 0 1 0 pale_moss_block
+end
+case pale_moss_block 0 0.5 0.0 0.1 -180.0 80.0
+b 0 -1 0 pale_moss_block
+end
+case pale_moss_block 5 1.0 0.5 0.7 90.0 0.0
+b 0 0 0 iron_bars[east=true,north=false,south=false,waterlogged=false,west=false]
+b 1 0 0 pale_moss_block
+end
+case pale_moss_carpet 1 0.9 1.0 0.7 -157.5 20.0
+b 0 1 0 pale_moss_carpet
+end
+case pale_moss_carpet 0 0.1 0.0 0.5 22.5 -45.0
+end
+case pale_moss_carpet 3 0.5 0.5 1.0 157.5 -80.0
+end
+case peony 1 0.3 1.0 0.7 135.0 45.0
+end
+case peony 0 0.3 0.0 0.1 0.0 45.0
+end
+case peony 5 1.0 0.5 0.1 135.0 -20.0
+end
+case piglin_head 1 0.7 1.0 0.3 67.5 0.0
+b 0 1 0 piglin_head[powered=false,rotation=3]
+end
+case piglin_head 0 0.1 0.0 0.5 -67.5 -45.0
+b 0 -1 0 piglin_head[powered=false,rotation=13]
+end
+case piglin_head 3 0.3 0.1 1.0 -90.0 45.0
+b 0 0 1 piglin_wall_head[facing=south,powered=false]
+end
+case pink_petals 1 0.1 1.0 0.1 -45.0 80.0
+end
+case pink_petals 0 0.9 0.0 0.1 -135.0 -20.0
+end
+case pink_petals 5 1.0 0.9 0.3 0.0 45.0
+end
+case pitcher_plant 1 0.7 1.0 0.9 22.5 0.0
+end
+case pitcher_plant 0 0.5 0.0 0.7 45.0 0.0
+end
+case pitcher_plant 2 0.3 0.3 0.0 -112.5 0.0
+end
+case player_head 1 0.3 1.0 0.1 -157.5 0.0
+b 0 1 0 player_head[powered=false,rotation=9]
+end
+case player_head 0 0.3 0.0 0.1 -135.0 80.0
+b 0 -1 0 player_head[powered=false,rotation=10]
+end
+case player_head 3 0.9 0.5 1.0 90.0 20.0
+b 0 0 1 player_wall_head[facing=south,powered=false]
+end
+case pointed_dripstone 1 0.1 1.0 0.5 -135.0 20.0
+end
+case pointed_dripstone 0 0.1 0.0 0.7 -67.5 0.0
+end
+case pointed_dripstone 2 0.3 0.5 0.0 -67.5 -45.0
+end
+case polished_blackstone_button 1 0.1 1.0 0.9 -22.5 20.0
+end
+case polished_blackstone_button 0 0.9 0.0 0.5 -180.0 -80.0
+end
+case polished_blackstone_button 5 1.0 0.1 0.3 112.5 -45.0
+end
+case polished_blackstone_pressure_plate 1 0.1 1.0 0.3 90.0 20.0
+b 0 1 0 polished_blackstone_pressure_plate
+end
+case polished_blackstone_pressure_plate 0 0.9 0.0 0.7 45.0 20.0
+end
+case polished_blackstone_pressure_plate 3 0.9 0.7 1.0 -67.5 -20.0
+end
+case poppy 1 0.1 1.0 0.5 67.5 20.0
+end
+case poppy 0 0.3 0.0 0.5 67.5 -80.0
+end
+case poppy 5 1.0 0.3 0.7 0.0 0.0
+end
+case powered_rail 1 0.9 1.0 0.7 -67.5 -20.0
+end
+case powered_rail 0 0.7 0.0 0.1 -157.5 -45.0
+end
+case powered_rail 2 0.3 0.3 0.0 45.0 80.0
+end
+case rail 1 0.5 1.0 0.3 112.5 -45.0
+end
+case rail 0 0.1 0.0 0.7 112.5 -80.0
+end
+case rail 3 0.1 0.7 1.0 112.5 -80.0
+end
+case red_shrub 1 0.9 1.0 0.9 -135.0 20.0
+end
+case red_shrub 0 0.5 0.0 0.7 -90.0 -20.0
+end
+case red_shrub 4 0.0 0.5 0.1 -22.5 -20.0
+end
+case redstone_torch 1 0.7 1.0 0.7 -22.5 0.0
+b 0 1 0 redstone_torch
+end
+case redstone_torch 0 0.3 0.0 0.1 -180.0 -20.0
+end
+case redstone_torch 2 0.5 0.1 0.0 157.5 80.0
+end
+case repeater 1 0.5 1.0 0.9 -180.0 -45.0
+end
+case repeater 0 0.5 0.0 0.9 22.5 20.0
+end
+case repeater 4 0.0 0.1 0.3 45.0 45.0
+end
+case resin_clump 1 0.3 1.0 0.3 67.5 0.0
+end
+case resin_clump 0 0.1 0.0 0.7 22.5 -45.0
+end
+case resin_clump 2 0.3 0.9 0.0 -67.5 20.0
+end
+case rose_bush 1 0.1 1.0 0.7 45.0 80.0
+end
+case rose_bush 0 0.5 0.0 0.3 22.5 -20.0
+end
+case rose_bush 4 0.0 0.1 0.5 -90.0 45.0
+end
+case scaffolding 1 0.7 1.0 0.3 -180.0 80.0
+end
+case scaffolding 0 0.5 0.0 0.5 -180.0 -20.0
+end
+case scaffolding 5 1.0 0.5 0.1 135.0 80.0
+end
+case sculk_vein 1 0.3 1.0 0.5 112.5 0.0
+end
+case sculk_vein 0 0.7 0.0 0.9 67.5 -20.0
+end
+case sculk_vein 4 0.0 0.5 0.1 90.0 -80.0
+end
+case sea_lantern 1 0.9 1.0 0.3 90.0 20.0
+b 0 1 0 sea_lantern
+end
+case sea_lantern 0 0.9 0.0 0.3 90.0 -45.0
+b 0 -1 0 sea_lantern
+end
+case sea_lantern 2 0.1 0.7 0.0 112.5 45.0
+b 0 0 -1 sea_lantern
+b 0 0 0 iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+end
+case sea_pickle 1 0.7 1.0 0.1 0.0 -20.0
+b 0 1 0 sea_pickle[pickles=1,waterlogged=false]
+end
+case sea_pickle 0 0.3 0.0 0.3 67.5 45.0
+end
+case sea_pickle 3 0.3 0.1 1.0 22.5 0.0
+end
+case seagrass 1 0.7 1.0 0.9 -135.0 20.0
+end
+case seagrass 0 0.9 0.0 0.7 -180.0 -80.0
+end
+case seagrass 4 0.0 0.3 0.1 -22.5 80.0
+end
+case shelf_mushroom 1 0.1 1.0 0.9 67.5 45.0
+end
+case shelf_mushroom 0 0.7 0.0 0.1 22.5 45.0
+end
+case shelf_mushroom 3 0.9 0.3 1.0 -90.0 -20.0
+end
+case short_dry_grass 1 0.1 1.0 0.1 -90.0 20.0
+end
+case short_dry_grass 0 0.9 0.0 0.1 22.5 20.0
+end
+case short_dry_grass 4 0.0 0.3 0.9 -22.5 80.0
+end
+case short_grass 1 0.1 1.0 0.3 45.0 -80.0
+end
+case short_grass 0 0.5 0.0 0.1 0.0 -20.0
+end
+case short_grass 4 0.0 0.7 0.3 -22.5 -45.0
+end
+case skeleton_skull 1 0.7 1.0 0.3 -90.0 -20.0
+b 0 1 0 skeleton_skull[powered=false,rotation=12]
+end
+case skeleton_skull 0 0.1 0.0 0.1 -180.0 -20.0
+b 0 -1 0 skeleton_skull[powered=false,rotation=8]
+end
+case skeleton_skull 3 0.1 0.3 1.0 22.5 -20.0
+b 0 0 1 skeleton_wall_skull[facing=south,powered=false]
+end
+case small_dripleaf 1 0.5 1.0 0.3 -22.5 -45.0
+end
+case small_dripleaf 0 0.7 0.0 0.5 -112.5 45.0
+end
+case small_dripleaf 5 1.0 0.9 0.1 67.5 -45.0
+end
+case snow 1 0.9 1.0 0.5 -22.5 20.0
+end
+case snow 0 0.5 0.0 0.1 -157.5 -45.0
+end
+case snow 5 1.0 0.1 0.5 135.0 -80.0
+end
+case soul_lantern 1 0.9 1.0 0.9 90.0 0.0
+b 0 1 0 soul_lantern
+end
+case soul_lantern 0 0.7 0.0 0.5 -135.0 80.0
+b 0 -1 0 soul_lantern[hanging=true,waterlogged=false]
+end
+case soul_lantern 4 0.0 0.1 0.1 112.5 20.0
+end
+case soul_torch 1 0.1 1.0 0.1 -67.5 20.0
+b 0 1 0 soul_torch
+end
+case soul_torch 0 0.5 0.0 0.9 -67.5 80.0
+end
+case soul_torch 2 0.5 0.1 0.0 90.0 45.0
+end
+case spore_blossom 1 0.7 1.0 0.3 112.5 80.0
+end
+case spore_blossom 0 0.5 0.0 0.7 -180.0 20.0
+b 0 -1 0 spore_blossom
+end
+case spore_blossom 5 1.0 0.5 0.5 -90.0 0.0
+end
+case stone_button 1 0.5 1.0 0.9 157.5 80.0
+end
+case stone_button 0 0.3 0.0 0.7 90.0 -20.0
+end
+case stone_button 2 0.1 0.7 0.0 90.0 80.0
+end
+case stone_pressure_plate 1 0.5 1.0 0.3 -135.0 -45.0
+b 0 1 0 stone_pressure_plate
+end
+case stone_pressure_plate 0 0.3 0.0 0.7 67.5 0.0
+end
+case stone_pressure_plate 5 1.0 0.3 0.9 -90.0 -80.0
+end
+case straw_bed 1 0.5 1.0 0.3 -180.0 80.0
+b 0 1 -1 straw_bed[facing=north,occupied=false,part=head]
+b 0 1 0 straw_bed
+end
+case straw_bed 0 0.7 0.0 0.7 157.5 80.0
+b 0 -1 -1 straw_bed[facing=north,occupied=false,part=head]
+b 0 -1 0 straw_bed
+end
+case straw_bed 2 0.1 0.9 0.0 22.5 -45.0
+end
+case stripped_bamboo_block 1 0.9 1.0 0.5 90.0 -45.0
+b 0 1 0 stripped_bamboo_block
+end
+case stripped_bamboo_block 0 0.7 0.0 0.3 -67.5 -80.0
+b 0 -1 0 stripped_bamboo_block
+end
+case stripped_bamboo_block 3 0.7 0.3 1.0 -157.5 -20.0
+b 0 0 0 iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+b 0 0 1 stripped_bamboo_block[axis=z]
+end
+case stripped_crimson_stem 1 0.5 1.0 0.9 -180.0 -80.0
+b 0 1 0 stripped_crimson_stem
+end
+case stripped_crimson_stem 0 0.5 0.0 0.1 22.5 -20.0
+b 0 -1 0 stripped_crimson_stem
+end
+case stripped_crimson_stem 2 0.9 0.7 0.0 -180.0 -20.0
+b 0 0 -1 stripped_crimson_stem[axis=z]
+b 0 0 0 iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+end
+case stripped_warped_stem 1 0.1 1.0 0.1 67.5 -45.0
+b 0 1 0 stripped_warped_stem
+end
+case stripped_warped_stem 0 0.9 0.0 0.9 112.5 0.0
+b 0 -1 0 stripped_warped_stem
+end
+case stripped_warped_stem 2 0.3 0.5 0.0 135.0 20.0
+b 0 0 -1 stripped_warped_stem[axis=z]
+b 0 0 0 iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+end
+case sugar_cane 1 0.1 1.0 0.5 112.5 -20.0
+end
+case sugar_cane 0 0.1 0.0 0.3 -67.5 -80.0
+end
+case sugar_cane 3 0.3 0.7 1.0 157.5 -20.0
+end
+case sulfur_spike 1 0.1 1.0 0.7 135.0 0.0
+end
+case sulfur_spike 0 0.5 0.0 0.7 45.0 0.0
+end
+case sulfur_spike 5 1.0 0.3 0.3 -45.0 20.0
+end
+case sunflower 1 0.5 1.0 0.9 22.5 -20.0
+end
+case sunflower 0 0.3 0.0 0.1 135.0 -20.0
+end
+case sunflower 5 1.0 0.5 0.1 0.0 -20.0
+end
+case tall_dry_grass 1 0.3 1.0 0.9 -67.5 -45.0
+end
+case tall_dry_grass 0 0.7 0.0 0.5 67.5 80.0
+end
+case tall_dry_grass 4 0.0 0.5 0.5 90.0 45.0
+end
+case tall_grass 1 0.1 1.0 0.5 -67.5 -80.0
+end
+case tall_grass 0 0.1 0.0 0.1 -90.0 80.0
+end
+case tall_grass 3 0.7 0.7 1.0 -135.0 -20.0
+end
+case torch 1 0.7 1.0 0.3 67.5 80.0
+b 0 1 0 torch
+end
+case torch 0 0.3 0.0 0.9 67.5 0.0
+end
+case torch 5 1.0 0.7 0.9 90.0 -80.0
+end
+case torchflower 1 0.9 1.0 0.9 -135.0 -80.0
+end
+case torchflower 0 0.9 0.0 0.3 45.0 -80.0
+end
+case torchflower 4 0.0 0.9 0.1 67.5 80.0
+end
+case tripwire_hook 1 0.3 1.0 0.1 -112.5 20.0
+end
+case tripwire_hook 0 0.9 0.0 0.9 -135.0 0.0
+end
+case tripwire_hook 3 0.3 0.7 1.0 112.5 -80.0
+end
+case twisting_vines 1 0.1 1.0 0.1 90.0 -80.0
+end
+case twisting_vines 0 0.1 0.0 0.3 -22.5 20.0
+end
+case twisting_vines 3 0.3 0.5 1.0 0.0 -20.0
+end
+case vine 1 0.3 1.0 0.1 -45.0 -45.0
+end
+case vine 0 0.3 0.0 0.9 -157.5 45.0
+end
+case vine 2 0.3 0.3 0.0 45.0 0.0
+end
+case warped_wart_block 1 0.9 1.0 0.1 -112.5 80.0
+b 0 1 0 warped_wart_block
+end
+case warped_wart_block 0 0.9 0.0 0.9 90.0 -80.0
+b 0 -1 0 warped_wart_block
+end
+case warped_wart_block 5 1.0 0.5 0.7 135.0 -20.0
+b 0 0 0 iron_bars[east=true,north=false,south=false,waterlogged=false,west=false]
+b 1 0 0 warped_wart_block
+end
+case weeping_vines 1 0.1 1.0 0.5 45.0 80.0
+end
+case weeping_vines 0 0.9 0.0 0.5 -112.5 -80.0
+end
+case weeping_vines 3 0.7 0.3 1.0 157.5 45.0
+end
+case wheat 1 0.7 1.0 0.3 -22.5 45.0
+end
+case wheat 0 0.3 0.0 0.1 45.0 -45.0
+end
+case wheat 5 1.0 0.9 0.7 90.0 45.0
+end
+case wildflowers 1 0.3 1.0 0.1 112.5 80.0
+end
+case wildflowers 0 0.1 0.0 0.7 -112.5 -80.0
+end
+case wildflowers 5 1.0 0.7 0.3 67.5 80.0
+end
+case wither_rose 1 0.9 1.0 0.3 -67.5 20.0
+end
+case wither_rose 0 0.9 0.0 0.7 -112.5 80.0
+end
+case wither_rose 5 1.0 0.7 0.7 45.0 -20.0
+end
+case wither_skeleton_skull 1 0.7 1.0 0.9 -157.5 -45.0
+b 0 1 0 wither_skeleton_skull[powered=false,rotation=9]
+end
+case wither_skeleton_skull 0 0.9 0.0 0.9 67.5 -20.0
+b 0 -1 0 wither_skeleton_skull[powered=false,rotation=3]
+end
+case wither_skeleton_skull 2 0.7 0.7 0.0 45.0 -45.0
+b 0 0 -1 wither_skeleton_wall_skull
+end
+case zombie_head 1 0.5 1.0 0.1 157.5 -20.0
+b 0 1 0 zombie_head[powered=false,rotation=7]
+end
+case zombie_head 0 0.1 0.0 0.9 -67.5 0.0
+b 0 -1 0 zombie_head[powered=false,rotation=13]
+end
+case zombie_head 2 0.9 0.7 0.0 135.0 80.0
+b 0 0 -1 zombie_wall_head
+end

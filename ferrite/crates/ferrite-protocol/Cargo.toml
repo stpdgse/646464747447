@@ -1,0 +1,34 @@
+[package]
+name = "ferrite-protocol"
+description = "Minecraft Java Edition wire protocol: primitives, framing, compression, encryption"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+aes.workspace = true
+bytes.workspace = true
+getrandom = { version = "0.4", features = ["sys_rng"] }
+rsa = { version = "0.10", features = ["std", "pkcs1v15"] }
+sha1.workspace = true
+md-5 = "0.10"
+ferrite-data.workspace = true
+ferrite-nbt = { path = "../ferrite-nbt" }
+libdeflater.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+cfb8 = "0.8"
+criterion.workspace = true
+flate2 = "1"
+proptest.workspace = true
+
+[[bench]]
+name = "protocol"
+harness = false
+
+[lints]
+workspace = true

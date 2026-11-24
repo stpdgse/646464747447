@@ -1,0 +1,6 @@
+[toolchain]
+# Pinned nightly: Ferrite uses nightly-only features (portable SIMD, allocator_api)
+# in hot paths. Bump deliberately, never implicitly.
+channel = "nightly-2026-11-09"
+components = ["rustfmt", "clippy", "rust-src", "miri"]
+profile = "minimal"

@@ -1,0 +1,23 @@
+[package]
+name = "ferrite-sim"
+description = "Region-parallel deterministic simulation scheduler"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ferrite-ecs = { path = "../ferrite-ecs" }
+rayon = "1.12"
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true
+
+[[bench]]
+name = "sim"
+harness = false
+
+[lints]
+workspace = true
