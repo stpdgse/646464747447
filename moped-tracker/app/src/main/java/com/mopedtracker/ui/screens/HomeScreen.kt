@@ -2,6 +2,7 @@ package com.mopedtracker.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +17,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CompareArrows
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FiberManualRecord
+import androidx.compose.material.icons.filled.LocalGasStation
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TwoWheeler
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mopedtracker.core.LiveState
 import com.mopedtracker.core.RideStatus
@@ -41,18 +51,25 @@ import com.mopedtracker.ui.components.RoutePreview
 import com.mopedtracker.ui.components.StatTile
 import com.mopedtracker.ui.components.SurfaceCard
 import com.mopedtracker.ui.theme.Orange
+import com.mopedtracker.ui.theme.WarnAmber
 
 @Composable
 fun HomeScreen(
     sessions: List<SessionEntity>,
     live: LiveState,
     unit: SpeedUnit,
+    starredOnly: Boolean = false,
     onStart: () -> Unit,
     onOpenLive: () -> Unit,
     onOpenSession: (Long) -> Unit,
     onToggleUnit: () -> Unit,
+    onToggleStarred: () -> Unit = {},
+    onOpenRecords: () -> Unit = {},
+    onOpenFuel: () -> Unit = {},
+    onOpenCompare: () -> Unit = {},
 ) {
     val active = live.status != RideStatus.IDLE
+    val shown = if (starredOnly) sessions.filter { it.starred } else sessions
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         LazyColumn(
             Modifier.fillMaxSize().statusBarsPadding(),
@@ -68,10 +85,24 @@ fun HomeScreen(
                     TextButton(onClick = onToggleUnit) { Text(unit.label, fontWeight = FontWeight.Bold) }
                 }
             }
+            item {
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = starredOnly, onClick = onToggleStarred, label = { Text("Starred") },
+                        leadingIcon = { Icon(if (starredOnly) Icons.Filled.Star else Icons.Filled.StarBorder, null, Modifier.size(18.dp)) },
+                    )
+                    AssistChip(onClick = onOpenRecords, label = { Text("Records") }, leadingIcon = { Icon(Icons.Filled.EmojiEvents, null, Modifier.size(18.dp)) })
+                    AssistChip(onClick = onOpenFuel, label = { Text("Fuel") }, leadingIcon = { Icon(Icons.Filled.LocalGasStation, null, Modifier.size(18.dp)) })
+                    AssistChip(onClick = onOpenCompare, label = { Text("Compare") }, leadingIcon = { Icon(Icons.Filled.CompareArrows, null, Modifier.size(18.dp)) })
+                }
+            }
             if (active) item { ActiveBanner(live, unit, onOpenLive) }
             if (sessions.isNotEmpty()) item { Totals(sessions, unit) }
             if (sessions.isEmpty() && !active) item { EmptyState() }
-            items(sessions, key = { it.id }) { SessionCard(it, unit) { onOpenSession(it.id) } }
+            if (starredOnly && shown.isEmpty() && sessions.isNotEmpty()) {
+                item { Text("No starred rides yet. Open a ride and tap the star.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
+            items(shown, key = { it.id }) { SessionCard(it, unit) { onOpenSession(it.id) } }
         }
         ExtendedFloatingActionButton(
             onClick = if (active) onOpenLive else onStart,
@@ -125,14 +156,14 @@ private fun Totals(sessions: List<SessionEntity>, unit: SpeedUnit) {
 private fun SessionCard(s: SessionEntity, unit: SpeedUnit, onClick: () -> Unit) {
     SurfaceCard(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.size(84.dp),
-                contentAlignment = Alignment.Center,
-            ) {
+            Box(Modifier.size(84.dp), contentAlignment = Alignment.Center) {
                 RoutePreview(RouteCodec.decode(s.previewRoute), Orange, Modifier.fillMaxSize())
             }
             Column(Modifier.padding(start = 16.dp).weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(s.name, style = MaterialTheme.typography.titleMedium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(s.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f, fill = false), maxLines = 1)
+                    if (s.starred) Icon(Icons.Filled.Star, "Starred", tint = WarnAmber, modifier = Modifier.padding(start = 6.dp).size(18.dp))
+                }
                 Text(Format.dateTime(s.startTime), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Mini("${Format.distance(s.distanceM, unit)} ${unit.distanceLabel}")
@@ -165,7 +196,7 @@ private fun EmptyState() {
             "Tap Start ride, then go for a spin.\nYour speed, distance and route are saved here.",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
         )
     }
 }

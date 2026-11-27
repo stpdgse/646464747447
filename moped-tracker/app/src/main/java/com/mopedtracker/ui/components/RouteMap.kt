@@ -14,38 +14,26 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.mopedtracker.core.EventType
 import com.mopedtracker.core.LatLon
-import com.mopedtracker.ui.theme.GoodGreen
+import com.mopedtracker.core.RideEvent
+import com.mopedtracker.core.RouteProjection
 import com.mopedtracker.ui.theme.BadRed
+import com.mopedtracker.ui.theme.GoodGreen
+import com.mopedtracker.ui.theme.Teal
 import com.mopedtracker.ui.theme.speedColor
-import kotlin.math.cos
 import kotlin.math.max
-import kotlin.math.min
 
 data class RoutePoint(val lat: Double, val lon: Double, val speedMps: Float)
 
-/** Fits lat/lon points into a canvas, keeping the real-world aspect ratio. */
-private class Projector(points: List<LatLon>, private val width: Float, private val height: Float, pad: Float) {
-    private val minLat = points.minOf { it.lat }
-    private val maxLat = points.maxOf { it.lat }
-    private val minLon = points.minOf { it.lon }
-    private val maxLon = points.maxOf { it.lon }
-    private val lonScale = cos(Math.toRadians((minLat + maxLat) / 2))
-    private val spanX = max((maxLon - minLon) * lonScale, 1e-6)
-    private val spanY = max(maxLat - minLat, 1e-6)
-    private val scale = min((width - 2 * pad) / spanX, (height - 2 * pad) / spanY)
-    private val offX = (width - spanX * scale) / 2
-    private val offY = (height - spanY * scale) / 2
-
-    fun project(p: LatLon): Offset = Offset(
-        (offX + (p.lon - minLon) * lonScale * scale).toFloat(),
-        (height - (offY + (p.lat - minLat) * scale)).toFloat(),
-    )
-}
-
-/** Full route drawing, each segment coloured by the speed at that point. */
+/** Full route drawing, each segment coloured by the speed at that point, with optional event markers. */
 @Composable
-fun RouteMap(points: List<RoutePoint>, maxSpeedMps: Float, modifier: Modifier = Modifier) {
+fun RouteMap(
+    points: List<RoutePoint>,
+    maxSpeedMps: Float,
+    modifier: Modifier = Modifier,
+    events: List<RideEvent> = emptyList(),
+) {
     if (points.size < 2) {
         Box(modifier, contentAlignment = Alignment.Center) {
             Text("No route recorded", color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -55,8 +43,9 @@ fun RouteMap(points: List<RoutePoint>, maxSpeedMps: Float, modifier: Modifier = 
     val grid = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
     Canvas(modifier = modifier) {
         drawGrid(grid)
-        val proj = Projector(points.map { LatLon(it.lat, it.lon) }, size.width, size.height, 28.dp.toPx())
-        val offsets = points.map { proj.project(LatLon(it.lat, it.lon)) }
+        val latLons = points.map { LatLon(it.lat, it.lon) }
+        val proj = RouteProjection(latLons, size.width, size.height, 28.dp.toPx())
+        val offsets = latLons.map { Offset(proj.x(it), proj.y(it)) }
         val top = max(maxSpeedMps, 1f)
         val width = 6.dp.toPx()
         // dark casing underneath for contrast
@@ -66,8 +55,12 @@ fun RouteMap(points: List<RoutePoint>, maxSpeedMps: Float, modifier: Modifier = 
         for (i in 0 until offsets.size - 1) {
             drawLine(speedColor(points[i].speedMps / top), offsets[i], offsets[i + 1], width, StrokeCap.Round)
         }
-        marker(offsets.first(), GoodGreen)
-        marker(offsets.last(), BadRed)
+        marker(offsets.first(), GoodGreen, 9.dp.toPx(), 6.dp.toPx())
+        marker(offsets.last(), BadRed, 9.dp.toPx(), 6.dp.toPx())
+        for (e in events) {
+            val at = Offset(proj.x(LatLon(e.lat, e.lon)), proj.y(LatLon(e.lat, e.lon)))
+            marker(at, if (e.type == EventType.HARD_BRAKE) BadRed else Teal, 8.dp.toPx(), 4.5.dp.toPx(), ring = true)
+        }
     }
 }
 
@@ -79,8 +72,8 @@ fun RoutePreview(points: List<LatLon>, color: Color, modifier: Modifier = Modifi
         return
     }
     Canvas(modifier = modifier) {
-        val proj = Projector(points, size.width, size.height, 8.dp.toPx())
-        val offsets = points.map { proj.project(it) }
+        val proj = RouteProjection(points, size.width, size.height, 8.dp.toPx())
+        val offsets = points.map { Offset(proj.x(it), proj.y(it)) }
         for (i in 0 until offsets.size - 1) {
             drawLine(color, offsets[i], offsets[i + 1], strokeWidth.toPx(), StrokeCap.Round)
         }
@@ -88,9 +81,10 @@ fun RoutePreview(points: List<LatLon>, color: Color, modifier: Modifier = Modifi
     }
 }
 
-private fun DrawScope.marker(at: Offset, color: Color) {
-    drawCircle(Color.White, 9.dp.toPx(), at)
-    drawCircle(color, 6.dp.toPx(), at)
+private fun DrawScope.marker(at: Offset, color: Color, outer: Float, inner: Float, ring: Boolean = false) {
+    drawCircle(Color.White, outer, at)
+    drawCircle(color, inner, at)
+    if (ring) drawCircle(Color.Black.copy(alpha = 0.25f), outer, at, style = androidx.compose.ui.graphics.drawscope.Stroke(1.dp.toPx()))
 }
 
 private fun DrawScope.drawGrid(color: Color) {

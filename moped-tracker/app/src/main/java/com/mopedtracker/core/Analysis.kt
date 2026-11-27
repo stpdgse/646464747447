@@ -26,6 +26,13 @@ object Analysis {
         }
     }
 
+    /** (seconds since start, speed in display unit) pairs, thinned to at most [max] samples. */
+    fun speedSeries(points: List<TrackPointEntity>, unitPerMps: Double, max: Int = 240): List<Pair<Float, Float>> {
+        if (points.isEmpty()) return emptyList()
+        val t0 = points.first().time
+        return thin(points, max).map { ((it.time - t0) / 1000f) to (it.speedMps * unitPerMps).toFloat() }
+    }
+
     /** Keeps at most [max] evenly spaced items so charts stay cheap to draw. */
     fun <T> thin(list: List<T>, max: Int): List<T> {
         if (list.size <= max || max < 2) return list

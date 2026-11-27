@@ -53,6 +53,14 @@ object Format {
 
     fun metres(v: Double): String = String.format(loc, "%.0f", v)
 
+    /** Money in the device's currency, e.g. "€4.80". */
+    fun money(v: Double): String = java.text.NumberFormat.getCurrencyInstance().format(v)
+
+    fun liters(v: Double): String = String.format(loc, "%.2f", v)
+
+    /** Offset into a ride as m:ss or h:mm:ss. */
+    fun offset(ms: Long): String = duration(ms)
+
     fun dateTime(ms: Long): String =
         DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(ms))
 

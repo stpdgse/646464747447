@@ -20,13 +20,17 @@ object SampleData {
         var lon = 11.5754
         var heading = 0.6 + seed
         var t = START
+        var actual = 0.0
         for (i in 0 until 840) {
             val phase = i / 840.0
-            // cruise 35-48 km/h with a few red-light stops and one fast stretch
-            var v = 10.0 + 3.0 * sin(i / 40.0) + 1.5 * sin(i / 9.0)
-            if (i in 180..205 || i in 470..500 || i in 700..715) v = 0.2
-            if (i in 520..600) v += 3.0
-            v = v.coerceAtLeast(0.0)
+            // target: cruise 35-48 km/h with a few red-light stops and one fast stretch
+            var target = 10.0 + 3.0 * sin(i / 40.0) + 1.5 * sin(i / 9.0)
+            if (i in 180..205 || i in 470..500 || i in 700..715) target = 0.0
+            if (i in 520..600) target += 3.0
+            target = target.coerceAtLeast(0.0)
+            // a real moped can't change speed instantly: limit launch and braking rates (m/s^2)
+            actual = if (target > actual) minOf(target, actual + 1.6) else maxOf(target, actual - 3.4)
+            val v = actual
             heading += 0.012 * sin(i / 55.0) + 0.006 * cos(i / 23.0 + seed)
             lat += v * cos(heading) / 111_195.0
             lon += v * sin(heading) / (111_195.0 * cos(Math.toRadians(lat)))
@@ -40,7 +44,7 @@ object SampleData {
         return out
     }
 
-    fun session(id: Long = 1, name: String = "Morning commute", seed: Double = 0.0): Pair<SessionEntity, List<TrackPointEntity>> {
+    fun session(id: Long = 1, name: String = "Morning commute", seed: Double = 0.0, starred: Boolean = false): Pair<SessionEntity, List<TrackPointEntity>> {
         val pts = points(id, seed)
         val acc = StatsAccumulator()
         pts.forEach { acc.add(it.toFix()) }
@@ -54,6 +58,7 @@ object SampleData {
             maxAltitudeM = st.maxAltitudeM, minAltitudeM = st.minAltitudeM,
             avgAccuracyM = st.avgAccuracyM, pointCount = st.pointCount,
             previewRoute = RouteCodec.encode(RouteCodec.downsample(pts.map { LatLon(it.lat, it.lon) }, 60)),
+            starred = starred,
         )
         return s to pts
     }

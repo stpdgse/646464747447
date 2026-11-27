@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
@@ -22,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -53,6 +55,7 @@ fun LiveScreen(
     onPauseResume: () -> Unit,
     onStop: () -> Unit,
     onBack: () -> Unit,
+    onBigMode: () -> Unit = {},
 ) {
     var confirmStop by remember { mutableStateOf(false) }
     val paused = live.status == RideStatus.PAUSED
@@ -74,8 +77,9 @@ fun LiveScreen(
     ) {
         Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onBack) { Text("‹ Rides") }
-            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
+            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                 GpsChip(live.gps, live.accuracyM)
+                IconButton(onClick = onBigMode) { Icon(Icons.Filled.Fullscreen, "Big speed mode") }
             }
         }
 

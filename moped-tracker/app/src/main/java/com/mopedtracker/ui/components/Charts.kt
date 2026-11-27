@@ -80,6 +80,59 @@ fun SpeedChart(values: List<Float>, unitLabel: String, durationLabel: String, mo
     }
 }
 
+/** Two speed curves on one shared time axis. Each series is (seconds, speed in display unit). */
+@Composable
+fun CompareChart(
+    a: List<Pair<Float, Float>>,
+    b: List<Pair<Float, Float>>,
+    colorA: androidx.compose.ui.graphics.Color,
+    colorB: androidx.compose.ui.graphics.Color,
+    unitLabel: String,
+    modifier: Modifier = Modifier,
+) {
+    if (a.size < 2 && b.size < 2) return
+    val top = niceCeil(maxOf(a.maxOfOrNull { it.second } ?: 0f, b.maxOfOrNull { it.second } ?: 0f))
+    val duration = maxOf(a.lastOrNull()?.first ?: 0f, b.lastOrNull()?.first ?: 0f).coerceAtLeast(1f)
+    val grid = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+    val muted = MaterialTheme.colorScheme.onSurfaceVariant
+    Column(modifier) {
+        Row(Modifier.fillMaxWidth().height(170.dp)) {
+            Column(
+                Modifier.fillMaxHeight().padding(end = 8.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.End,
+            ) {
+                Text("${top.toInt()}", style = MaterialTheme.typography.labelMedium, color = muted)
+                Text("${(top / 2).toInt()}", style = MaterialTheme.typography.labelMedium, color = muted)
+                Text("0", style = MaterialTheme.typography.labelMedium, color = muted)
+            }
+            Canvas(Modifier.fillMaxSize()) {
+                for (f in listOf(0f, 0.5f, 1f)) {
+                    val y = size.height * (1f - f)
+                    drawLine(grid, Offset(0f, y), Offset(size.width, y), 1f)
+                }
+                fun line(series: List<Pair<Float, Float>>, color: androidx.compose.ui.graphics.Color) {
+                    if (series.size < 2) return
+                    val path = Path()
+                    series.forEachIndexed { i, (t, v) ->
+                        val x = size.width * t / duration
+                        val y = size.height * (1f - (v / top).coerceIn(0f, 1f))
+                        if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+                    }
+                    drawPath(path, color, style = Stroke(2.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+                }
+                line(a, colorA)
+                line(b, colorB)
+            }
+        }
+        Row(Modifier.fillMaxWidth().padding(start = 28.dp, top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("0:00", style = MaterialTheme.typography.labelMedium, color = muted)
+            Text(unitLabel, style = MaterialTheme.typography.labelMedium, color = muted)
+            Text(com.mopedtracker.ui.Format.duration((duration * 1000).toLong()), style = MaterialTheme.typography.labelMedium, color = muted)
+        }
+    }
+}
+
 /** Horizontal bars: share of ride time spent in each speed band. */
 @Composable
 fun SpeedHistogram(bars: List<HistogramBar>, unitLabel: String, modifier: Modifier = Modifier) {

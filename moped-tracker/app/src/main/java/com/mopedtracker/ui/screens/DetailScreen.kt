@@ -1,5 +1,6 @@
 package com.mopedtracker.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,15 +11,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,8 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mopedtracker.core.Analysis
+import com.mopedtracker.core.EventType
+import com.mopedtracker.core.Events
+import com.mopedtracker.core.RideEvent
 import com.mopedtracker.data.SessionEntity
 import com.mopedtracker.data.TrackPointEntity
 import com.mopedtracker.ui.Format
@@ -45,7 +54,10 @@ import com.mopedtracker.ui.components.SpeedHistogram
 import com.mopedtracker.ui.components.StatGrid
 import com.mopedtracker.ui.components.StatTile
 import com.mopedtracker.ui.components.SurfaceCard
+import com.mopedtracker.ui.theme.BadRed
 import com.mopedtracker.ui.theme.Orange
+import com.mopedtracker.ui.theme.Teal
+import com.mopedtracker.ui.theme.WarnAmber
 import com.mopedtracker.ui.theme.speedColor
 
 sealed interface DetailState {
@@ -61,12 +73,14 @@ fun DetailScreen(
     onBack: () -> Unit,
     onRename: (String) -> Unit,
     onDelete: () -> Unit,
+    onToggleStar: () -> Unit = {},
+    onShare: (SessionEntity, List<TrackPointEntity>) -> Unit = { _, _ -> },
 ) {
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding()) {
         when (state) {
             DetailState.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }
             DetailState.NotFound -> Box(Modifier.fillMaxSize(), Alignment.Center) { Text("This ride no longer exists") }
-            is DetailState.Ready -> ReadyContent(state, unit, onBack, onRename, onDelete)
+            is DetailState.Ready -> ReadyContent(state, unit, onBack, onRename, onDelete, onToggleStar, onShare)
         }
     }
 }
@@ -78,10 +92,13 @@ private fun ReadyContent(
     onBack: () -> Unit,
     onRename: (String) -> Unit,
     onDelete: () -> Unit,
+    onToggleStar: () -> Unit,
+    onShare: (SessionEntity, List<TrackPointEntity>) -> Unit,
 ) {
     val s = state.session
     var renaming by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
+    var menu by remember { mutableStateOf(false) }
 
     val routePoints = remember(state.points) {
         Analysis.thin(state.points, 600).map { RoutePoint(it.lat, it.lon, it.speedMps) }
@@ -90,6 +107,7 @@ private fun ReadyContent(
         Analysis.thin(state.points, 240).map { Format.speedValue(it.speedMps, unit) }
     }
     val histogram = remember(state.points, unit) { Analysis.speedHistogram(state.points, unit.perMps, unit.histogramStep) }
+    val events = remember(state.points) { Events.detect(state.points) }
 
     Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
@@ -97,8 +115,21 @@ private fun ReadyContent(
             Text(s.name, style = MaterialTheme.typography.titleLarge, maxLines = 1)
             Text(Format.dateTime(s.startTime), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        IconButton(onClick = { renaming = true }) { Icon(Icons.Filled.Edit, "Rename") }
-        IconButton(onClick = { deleting = true }) { Icon(Icons.Filled.Delete, "Delete", tint = MaterialTheme.colorScheme.error) }
+        IconButton(onClick = onToggleStar) {
+            Icon(
+                if (s.starred) Icons.Filled.Star else Icons.Filled.StarBorder,
+                if (s.starred) "Remove star" else "Star this ride",
+                tint = if (s.starred) WarnAmber else MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        IconButton(onClick = { onShare(s, state.points) }) { Icon(Icons.Filled.Share, "Share as image") }
+        Box {
+            IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, "More") }
+            DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                DropdownMenuItem(text = { Text("Rename") }, onClick = { menu = false; renaming = true })
+                DropdownMenuItem(text = { Text("Delete", color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; deleting = true })
+            }
+        }
     }
 
     LazyColumn(
@@ -109,7 +140,7 @@ private fun ReadyContent(
         item {
             SurfaceCard(Modifier.fillMaxWidth()) {
                 Column {
-                    RouteMap(routePoints, s.maxSpeedMps, Modifier.fillMaxWidth().height(280.dp))
+                    RouteMap(routePoints, s.maxSpeedMps, Modifier.fillMaxWidth().height(280.dp), events)
                     SpeedLegend(unit, s.maxSpeedMps)
                 }
             }
@@ -146,6 +177,7 @@ private fun ReadyContent(
                 }
             }
         }
+        item { EventsCard(events, unit) }
         if (histogram.isNotEmpty()) {
             item {
                 SurfaceCard(Modifier.fillMaxWidth()) {
@@ -179,6 +211,48 @@ private fun ReadyContent(
             },
             dismissButton = { TextButton(onClick = { deleting = false }) { Text("Cancel") } },
         )
+    }
+}
+
+@Composable
+private fun EventsCard(events: List<RideEvent>, unit: SpeedUnit) {
+    SurfaceCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                Text("Events", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Dot(BadRed, "${events.count { it.type == EventType.HARD_BRAKE }} braking")
+                Dot(Teal, "${events.count { it.type == EventType.HARD_ACCEL }} launches")
+            }
+            if (events.isEmpty()) {
+                Text(
+                    "No hard braking or hard acceleration detected. A smooth ride.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            events.forEach { e ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(12.dp).background(if (e.type == EventType.HARD_BRAKE) BadRed else Teal, androidx.compose.foundation.shape.CircleShape))
+                    Column(Modifier.padding(start = 12.dp).weight(1f)) {
+                        Text(e.type.label, style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            "at ${Format.offset(e.offsetMs)} · ${Format.speed(e.fromMps, unit)} → ${Format.speed(e.toMps, unit)} ${unit.label}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Text(String.format(java.util.Locale.US, "%.1f m/s²", e.accelMps2), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Dot(color: Color, label: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(10.dp).background(color, androidx.compose.foundation.shape.CircleShape))
+        Text("  $label", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
