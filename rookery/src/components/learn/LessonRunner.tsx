@@ -247,7 +247,7 @@ export function LessonRunner({ lesson, items, done: initialDone, viewerId, next 
           {phase === "solving" && <button className={btn} onClick={() => setHintLevel((h) => Math.min(2, h + 1))} disabled={!expected}>{hintLevel === 0 ? "Hint" : "Show the move"}</button>}
           {phase === "solving" && <button className={btn} onClick={showSolution}>Show answer</button>}
           {phase === "solved" && <button className={primary} onClick={goNext}>{doneCount >= total ? "Finish" : "Next exercise"}</button>}
-          {phase === "solved" && cheated && <button className={btn} onClick={() => load(index)}>Try again</button>}
+          {phase === "solved" && <button className={btn} onClick={() => load(index)}>Try again</button>}
           <Link href="/learn" className={`${btn} inline-block`}>All lessons</Link>
         </div>
       </div>

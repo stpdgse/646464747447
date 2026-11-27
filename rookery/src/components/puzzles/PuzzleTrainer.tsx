@@ -78,6 +78,18 @@ export function PuzzleTrainer({ mode }: { mode: "train" | "daily" }) {
     setRecord(afterOpponentOpening(res.puzzle)); setPhase("solving");
   }, [mode]);
 
+  // Same puzzle again from the start. It never touches the rating a second time.
+  const retry = useCallback(async () => {
+    if (!puzzle) return;
+    const my = ++token.current;
+    setMessage(null); setResult(null); setFailed(false); setK(0);
+    played.current = []; submitted.current = true;
+    setRecord(puzzleStart(puzzle)); setPhase("opening");
+    await sleep(700);
+    if (my !== token.current) return;
+    setRecord(afterOpponentOpening(puzzle)); setPhase("solving");
+  }, [puzzle]);
+
   useEffect(() => {
     const t = token; // the ref object itself, so the cleanup bumps the latest value
     queueMicrotask(() => start(""));
@@ -200,6 +212,7 @@ export function PuzzleTrainer({ mode }: { mode: "train" | "daily" }) {
         <div className="flex flex-wrap gap-2">
           {phase === "solving" && <button className={btn} onClick={showSolution}>Show solution</button>}
           {phase === "solved" && mode === "train" && <button className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-brand-ink hover:bg-brand-hi" onClick={() => start(theme)}>Next puzzle</button>}
+          {phase === "solved" && <button className={btn} onClick={retry}>Try this puzzle again</button>}
           {phase === "solved" && <button className={btn} onClick={analyse}>Analyse</button>}
           {mode === "train" && phase === "solving" && <button className={btn} onClick={() => start(theme)}>Skip</button>}
           <Link href="/puzzles" className={`${btn} inline-block`}>Puzzle home</Link>
