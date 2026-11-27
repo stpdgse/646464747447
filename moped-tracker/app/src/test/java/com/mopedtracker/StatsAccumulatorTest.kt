@@ -33,8 +33,8 @@ class StatsAccumulatorTest {
         assertEquals(10f, st.maxSpeedMps, 0.01f)
         assertEquals(10f, st.avgSpeedMps, 0.2f)
         assertEquals(10f, st.avgMovingSpeedMps, 0.2f)
-        assertEquals(60_000, st.movingMs)
-        assertEquals(0, st.stoppedMs)
+        assertEquals(60_000L, st.movingMs)
+        assertEquals(0L, st.stoppedMs)
     }
 
     @Test
@@ -50,7 +50,7 @@ class StatsAccumulatorTest {
         val st = acc.snapshot(60_000)
 
         assertEquals(base.distanceM, st.distanceM, 0.001)
-        assertEquals(30_000, st.stoppedMs, 1500)
+        assertEquals(30_000.0, st.stoppedMs.toDouble(), 1500.0)
         assertTrue(st.avgMovingSpeedMps > st.avgSpeedMps)
         assertEquals(10f, st.avgMovingSpeedMps, 0.3f)
     }
