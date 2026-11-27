@@ -7,10 +7,13 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.mopedtracker.data.FuelEntryEntity
 import com.mopedtracker.data.RideDatabase
+import com.mopedtracker.data.RideRepository
+import com.mopedtracker.data.VehicleEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -25,6 +28,56 @@ class MigrationTest {
         "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
         "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6224c715230182c31c3ff35837c216d0')",
     )
+
+    private val v2Extra = listOf(
+        "ALTER TABLE `sessions` ADD COLUMN `starred` INTEGER NOT NULL DEFAULT 0",
+        "CREATE TABLE IF NOT EXISTS `fuel_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `time` INTEGER NOT NULL, `liters` REAL NOT NULL, `totalCost` REAL NOT NULL, `fullTank` INTEGER NOT NULL, `note` TEXT NOT NULL)",
+    )
+
+    /** A real version-2 database (v1 + stars + fuel) with a starred ride and a fill-up, upgraded to v3. */
+    @Test fun upgradeFromV2AddsVehiclesAndKeepsEverything() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val file = context.getDatabasePath("migration-v2.db").apply { parentFile?.mkdirs(); delete() }
+        SQLiteDatabase.openOrCreateDatabase(file, null).use { db ->
+            v1Tables.forEach(db::execSQL)
+            v2Extra.forEach(db::execSQL)
+            db.execSQL("INSERT INTO sessions VALUES (4, 'Starred ride', 1000, 9000, 0, 5000.0, 8000, 7000, 12.5, 9.0, 10.0, 20.0, 18.0, 530.0, 500.0, 4.0, 2, '', 1)")
+            db.execSQL("INSERT INTO fuel_entries VALUES (1, 5000, 3.2, 5.1, 1, 'Shell')")
+            db.version = 2
+        }
+        val room = Room.databaseBuilder(context, RideDatabase::class.java, "migration-v2.db")
+            .addMigrations(RideDatabase.MIGRATION_1_2, RideDatabase.MIGRATION_2_3)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            val dao = room.dao()
+            val repo = RideRepository(dao)
+            runBlocking {
+                val ride = dao.getSession(4)!!
+                assertEquals(true, ride.starred)
+                assertNull(ride.vehicleId)
+                val fuel = dao.observeFuel().first().single()
+                assertEquals("Shell", fuel.note)
+                assertNull(fuel.vehicleId)
+
+                // vehicles work, and can be linked to old rides and fill-ups
+                val vid = repo.saveVehicle(VehicleEntity(name = "Vespa GTS", hp = 11.5, torqueNm = 10.4, displacementCc = 125.0, photoPath = "/x.jpg"))
+                dao.updateSession(ride.copy(vehicleId = vid))
+                assertEquals("Vespa GTS", dao.getVehicle(vid)!!.name)
+                assertEquals(11.5, dao.getVehicle(vid)!!.hp!!, 0.0)
+                assertNull(dao.getVehicle(vid)!!.year)
+                assertEquals(vid, dao.getSession(4)!!.vehicleId)
+
+                // deleting the vehicle keeps the ride, it just loses the tag
+                repo.deleteVehicle(vid)
+                assertNull(dao.getVehicle(vid))
+                assertEquals("Starred ride", dao.getSession(4)!!.name)
+                assertNull(dao.getSession(4)!!.vehicleId)
+            }
+        } finally {
+            room.close()
+        }
+    }
 
     @Test fun upgradeFromV1KeepsRidesAndAddsStarsAndFuel() {
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -41,7 +94,7 @@ class MigrationTest {
         }
 
         val room = Room.databaseBuilder(context, RideDatabase::class.java, "migration-test.db")
-            .addMigrations(RideDatabase.MIGRATION_1_2)
+            .addMigrations(RideDatabase.MIGRATION_1_2, RideDatabase.MIGRATION_2_3)
             .allowMainThreadQueries()
             .build()
         try {

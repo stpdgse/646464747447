@@ -55,6 +55,7 @@ class TrackingService : Service() {
         const val ACTION_PAUSE = "com.mopedtracker.action.PAUSE"
         const val ACTION_RESUME = "com.mopedtracker.action.RESUME"
         const val ACTION_STOP = "com.mopedtracker.action.STOP"
+        private const val EXTRA_VEHICLE_ID = "vehicleId"
 
         private const val CHANNEL_ID = "tracking"
         private const val NOTIFICATION_ID = 1
@@ -65,6 +66,13 @@ class TrackingService : Service() {
 
         fun send(context: Context, action: String) {
             val intent = Intent(context, TrackingService::class.java).setAction(action)
+            ContextCompat.startForegroundService(context, intent)
+        }
+
+        /** Starts a ride, optionally tagged with the vehicle being ridden. */
+        fun start(context: Context, vehicleId: Long?) {
+            val intent = Intent(context, TrackingService::class.java).setAction(ACTION_START)
+            if (vehicleId != null) intent.putExtra(EXTRA_VEHICLE_ID, vehicleId)
             ContextCompat.startForegroundService(context, intent)
         }
     }
@@ -103,7 +111,7 @@ class TrackingService : Service() {
         // Must be promoted to the foreground immediately after startForegroundService().
         enterForeground()
         when (intent?.action) {
-            ACTION_START -> if (status == RideStatus.IDLE) startRide()
+            ACTION_START -> if (status == RideStatus.IDLE) startRide(intent?.getLongExtra(EXTRA_VEHICLE_ID, -1L)?.takeIf { it >= 0 })
             ACTION_PAUSE -> pauseRide()
             ACTION_RESUME -> resumeRide()
             ACTION_STOP -> stopRide()
@@ -123,12 +131,12 @@ class TrackingService : Service() {
 
     // region ride lifecycle
 
-    private fun startRide() {
+    private fun startRide(vehicleId: Long?) {
         status = RideStatus.RECORDING // claim immediately so a double tap can't start two rides
         scope.launch {
             repo.finalizeOrphans()
             val now = System.currentTimeMillis()
-            sessionId = repo.createSession(now)
+            sessionId = repo.createSession(now, vehicleId)
             startMs = now
             pausedMs = 0
             accumulator = StatsAccumulator()

@@ -31,6 +31,9 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.io.File
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 
 @RunWith(AndroidJUnit4::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -182,6 +185,111 @@ class ScreenshotTest {
         val out = File("build/screenshots/share_card.png").apply { parentFile?.mkdirs() }
         out.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
         assertTrue(out.length() > 20_000)
+    }
+
+    // endregion
+
+    // region vehicles
+
+    private val context: android.content.Context get() = androidx.test.core.app.ApplicationProvider.getApplicationContext()
+    private val garage by lazy {
+        SampleData.vehicles(context).also { vs ->
+            // pre-decode the photos at the sizes the screens use, so screenshots don't race the background loader
+            vs.mapNotNull { it.photoPath }.forEach { path -> listOf(200, 240, 640, 900, 1024).forEach { com.mopedtracker.ui.components.VehiclePhotoCache.getOrDecode(path, it) } }
+        }
+    }
+    private val vehicleRides by lazy {
+        listOf(
+            rides[0].copy(vehicleId = 1),
+            rides[1].copy(vehicleId = 2, maxSpeedMps = 12.2f),
+            rides[2].copy(vehicleId = 1),
+        )
+    }
+    private val noPhotoOps = com.mopedtracker.ui.screens.PhotoOps(
+        import = { null }, delete = {}, cameraTarget = { File("none.jpg") to android.net.Uri.EMPTY },
+    )
+
+    @Test fun garage() {
+        val stats = com.mopedtracker.core.VehicleStatsCalc.compute(vehicleRides)
+        rule.setContent { MopedTheme(true) { com.mopedtracker.ui.screens.GarageScreen(garage, stats, SpeedUnit.KMH, {}, {}, {}) } }
+        shot("garage")
+    }
+
+    @Test @Config(sdk = [35], qualifiers = "w411dp-h1700dp-xxhdpi")
+    fun garageFullPage() {
+        val stats = com.mopedtracker.core.VehicleStatsCalc.compute(vehicleRides)
+        rule.setContent { MopedTheme(true) { com.mopedtracker.ui.screens.GarageScreen(garage, stats, SpeedUnit.KMH, {}, {}, {}) } }
+        shot("garage_full")
+    }
+
+    @Test fun garageEmpty() {
+        rule.setContent { MopedTheme(true) { com.mopedtracker.ui.screens.GarageScreen(emptyList(), emptyMap(), SpeedUnit.KMH, {}, {}, {}) } }
+        shot("garage_empty")
+    }
+
+    @Test fun vehicleEditExisting() {
+        rule.setContent { MopedTheme(true) { com.mopedtracker.ui.screens.VehicleEditScreen(garage[0], noPhotoOps, {}, {}, {}) } }
+        shot("vehicle_edit")
+    }
+
+    @Test @Config(sdk = [35], qualifiers = "w411dp-h1400dp-xxhdpi")
+    fun vehicleEditNewFullPage() {
+        rule.setContent { MopedTheme(true) { com.mopedtracker.ui.screens.VehicleEditScreen(null, noPhotoOps, {}, {}, {}) } }
+        shot("vehicle_new_full")
+    }
+
+    @Test fun vehiclePicker() {
+        rule.setContent {
+            MopedTheme(true) {
+                androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize().padding(20.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    androidx.compose.material3.Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(28.dp)) {
+                        com.mopedtracker.ui.screens.VehiclePickerContent(garage, 2L, {}, {}, {})
+                    }
+                }
+            }
+        }
+        shot("vehicle_picker")
+    }
+
+    @Test fun homeWithVehicles() {
+        rule.setContent {
+            MopedTheme(true) {
+                HomeScreen(vehicleRides, idle, SpeedUnit.KMH, false, {}, {}, {}, {}, vehicles = garage)
+            }
+        }
+        shot("home_vehicles")
+    }
+
+    @Test fun homeFilteredByVehicle() {
+        rule.setContent {
+            MopedTheme(true) {
+                HomeScreen(vehicleRides, idle, SpeedUnit.KMH, false, {}, {}, {}, {}, vehicles = garage, vehicleFilter = 2L)
+            }
+        }
+        shot("home_vehicle_filter")
+    }
+
+    @Test @Config(sdk = [35], qualifiers = "w411dp-h2400dp-xxhdpi")
+    fun detailWithVehicle() {
+        val (_, p) = rideData[0]
+        val s = vehicleRides[0]
+        rule.setContent { MopedTheme(true) { DetailScreen(DetailState.Ready(s, p), SpeedUnit.KMH, {}, {}, {}, vehicle = garage[0]) } }
+        shot("detail_vehicle")
+    }
+
+    @Test fun fuelWithVehicles() {
+        val withVehicles = fuel.mapIndexed { i, e -> e.copy(vehicleId = if (i == 1) 2L else 1L) }
+        val stats = FuelCalc.compute(withVehicles, vehicleRides)
+        rule.setContent { MopedTheme(true) { FuelScreen(withVehicles, stats, SpeedUnit.KMH, {}, {}, {}, vehicles = garage, vehicleFilter = null) } }
+        shot("fuel_vehicles")
+    }
+
+    @Test fun shareCardWithVehicleName() {
+        val (_, p) = rideData[0]
+        val bmp = ShareCard.render(vehicleRides[0], p, SpeedUnit.KMH, "Vespa GTS 125")
+        File("build/screenshots/share_card_vehicle.png").apply { parentFile?.mkdirs() }.outputStream().use {
+            bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+        }
     }
 
     // endregion

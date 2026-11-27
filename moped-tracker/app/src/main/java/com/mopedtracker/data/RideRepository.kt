@@ -22,9 +22,22 @@ class RideRepository(private val dao: RideDao) {
     suspend fun addFuel(entry: FuelEntryEntity) = dao.insertFuel(entry)
     suspend fun deleteFuel(id: Long) = dao.deleteFuel(id)
 
-    suspend fun createSession(startTime: Long): Long {
+    suspend fun createSession(startTime: Long, vehicleId: Long? = null): Long {
         val label = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(startTime))
-        return dao.insertSession(SessionEntity(name = "Ride $label", startTime = startTime))
+        return dao.insertSession(SessionEntity(name = "Ride $label", startTime = startTime, vehicleId = vehicleId))
+    }
+
+    fun observeVehicles() = dao.observeVehicles()
+    suspend fun getVehicle(id: Long) = dao.getVehicle(id)
+
+    /** Inserts when [vehicle].id is 0, otherwise updates. Returns the vehicle's id. */
+    suspend fun saveVehicle(vehicle: VehicleEntity): Long =
+        if (vehicle.id == 0L) dao.insertVehicle(vehicle) else { dao.updateVehicle(vehicle); vehicle.id }
+
+    suspend fun deleteVehicle(id: Long) {
+        dao.clearVehicleFromSessions(id)
+        dao.clearVehicleFromFuel(id)
+        dao.deleteVehicle(id)
     }
 
     suspend fun addPoint(sessionId: Long, fix: Fix, speedMps: Float) = dao.insertPoint(

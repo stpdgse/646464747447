@@ -45,6 +45,12 @@ import com.mopedtracker.core.Events
 import com.mopedtracker.core.RideEvent
 import com.mopedtracker.data.SessionEntity
 import com.mopedtracker.data.TrackPointEntity
+import com.mopedtracker.data.VehicleEntity
+import com.mopedtracker.core.VehicleStatsCalc
+import com.mopedtracker.ui.components.VehiclePhoto
+import com.mopedtracker.ui.components.specParts
+import com.mopedtracker.ui.components.subtitle
+import androidx.compose.ui.draw.clip
 import com.mopedtracker.ui.Format
 import com.mopedtracker.ui.SpeedUnit
 import com.mopedtracker.ui.components.RouteMap
@@ -75,12 +81,13 @@ fun DetailScreen(
     onDelete: () -> Unit,
     onToggleStar: () -> Unit = {},
     onShare: (SessionEntity, List<TrackPointEntity>) -> Unit = { _, _ -> },
+    vehicle: VehicleEntity? = null,
 ) {
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding()) {
         when (state) {
             DetailState.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }
             DetailState.NotFound -> Box(Modifier.fillMaxSize(), Alignment.Center) { Text("This ride no longer exists") }
-            is DetailState.Ready -> ReadyContent(state, unit, onBack, onRename, onDelete, onToggleStar, onShare)
+            is DetailState.Ready -> ReadyContent(state, unit, onBack, onRename, onDelete, onToggleStar, onShare, vehicle)
         }
     }
 }
@@ -94,6 +101,7 @@ private fun ReadyContent(
     onDelete: () -> Unit,
     onToggleStar: () -> Unit,
     onShare: (SessionEntity, List<TrackPointEntity>) -> Unit,
+    vehicle: VehicleEntity?,
 ) {
     val s = state.session
     var renaming by remember { mutableStateOf(false) }
@@ -145,6 +153,7 @@ private fun ReadyContent(
                 }
             }
         }
+        if (vehicle != null) item { VehicleCard(vehicle, s.maxSpeedMps) }
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatTile("Distance", Format.distance(s.distanceM, unit), unit.distanceLabel, Modifier.weight(1f))
@@ -211,6 +220,36 @@ private fun ReadyContent(
             },
             dismissButton = { TextButton(onClick = { deleting = false }) { Text("Cancel") } },
         )
+    }
+}
+
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun VehicleCard(v: VehicleEntity, maxSpeedMps: Float) {
+    val share = VehicleStatsCalc.shareOfClaimedTop(maxSpeedMps, v.claimedTopKmh)
+    SurfaceCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                VehiclePhoto(v.photoPath, Modifier.size(64.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)), maxSide = 240)
+                Column(Modifier.padding(start = 14.dp)) {
+                    Text(v.name, style = MaterialTheme.typography.titleMedium)
+                    Text(v.subtitle(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            val specs = v.specParts()
+            if (specs.isNotEmpty()) {
+                androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    specs.forEach { SpecPill(it) }
+                }
+            }
+            if (share != null) {
+                Text(
+                    "Reached ${(share * 100).toInt()}% of the claimed ${Format.number(v.claimedTopKmh!!)} km/h top speed.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }
 

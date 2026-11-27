@@ -5,6 +5,7 @@ import com.mopedtracker.core.Events
 import com.mopedtracker.core.FuelCalc
 import com.mopedtracker.core.RecordKind
 import com.mopedtracker.core.Records
+import com.mopedtracker.core.VehicleStatsCalc
 import com.mopedtracker.data.FuelEntryEntity
 import com.mopedtracker.data.SessionEntity
 import com.mopedtracker.data.TrackPointEntity
@@ -59,6 +60,43 @@ class FeatureLogicTest {
         val fills = listOf(fill(1, 10 * day, 4.0, 6.0), fill(2, 20 * day, 3.0, 4.5))
         val rides = listOf(ride(1, 5 * day, 999.0), ride(2, 15 * day, 100.0), ride(3, 25 * day, 999.0))
         assertEquals(3.0, FuelCalc.compute(fills, rides).consumptionLPer100Km!!, 1e-9)
+    }
+
+    @Test fun fuelIsCalculatedPerVehicleThenSummed() {
+        fun fillFor(v: Long, id: Long, t: Long, l: Double) = FuelEntryEntity(id, t, l, l * 1.7, true, vehicleId = v)
+        fun rideFor(v: Long, id: Long, t: Long, km: Double) = ride(id, t, km).copy(vehicleId = v)
+        // fill-ups of the two vehicles are interleaved in time, which would corrupt a naive calculation
+        val fills = listOf(fillFor(1, 1, 0, 4.0), fillFor(2, 2, day, 3.0), fillFor(1, 3, 10 * day, 3.0), fillFor(2, 4, 11 * day, 1.5))
+        val rides = listOf(rideFor(1, 1, 5 * day, 100.0), rideFor(2, 2, 6 * day, 30.0))
+
+        assertEquals(3.0, FuelCalc.compute(fills.filter { it.vehicleId == 1L }, rides).consumptionLPer100Km!!, 1e-9)
+        assertEquals(5.0, FuelCalc.compute(fills.filter { it.vehicleId == 2L }, rides).consumptionLPer100Km!!, 1e-9)
+        assertEquals(4.5 / 130 * 100, FuelCalc.compute(fills, rides).consumptionLPer100Km!!, 1e-9)
+    }
+
+    @Test fun ridesOfAnotherVehicleDoNotCountTowardsConsumption() {
+        val fills = listOf(FuelEntryEntity(1, 0, 4.0, 6.0, true, vehicleId = 1), FuelEntryEntity(2, 10 * day, 3.0, 5.0, true, vehicleId = 1))
+        val rides = listOf(ride(1, 5 * day, 100.0).copy(vehicleId = 1), ride(2, 6 * day, 500.0).copy(vehicleId = 2))
+        assertEquals(3.0, FuelCalc.compute(fills, rides).consumptionLPer100Km!!, 1e-9)
+    }
+
+    @Test fun vehicleLifetimeStatsAreGroupedPerVehicle() {
+        val rides = listOf(
+            ride(1, 0, 10.0, maxKmh = 40f).copy(vehicleId = 1),
+            ride(2, day, 20.0, maxKmh = 55f).copy(vehicleId = 1),
+            ride(3, 2 * day, 5.0, maxKmh = 30f).copy(vehicleId = null),
+        )
+        val st = VehicleStatsCalc.compute(rides)
+        assertEquals(2, st[1L]!!.rides)
+        assertEquals(30_000.0, st[1L]!!.distanceM, 1e-6)
+        assertEquals(55f / 3.6f, st[1L]!!.topSpeedMps, 1e-4f)
+        assertEquals(1, st[null]!!.rides)
+    }
+
+    @Test fun shareOfClaimedTopSpeed() {
+        assertEquals(0.8, VehicleStatsCalc.shareOfClaimedTop(40f / 3.6f, 50.0)!!, 1e-9)
+        assertNull(VehicleStatsCalc.shareOfClaimedTop(10f, null))
+        assertNull(VehicleStatsCalc.shareOfClaimedTop(10f, 0.0))
     }
 
     @Test fun mpgConversion() = assertEquals(78.4, FuelCalc.mpg(3.0), 0.1)

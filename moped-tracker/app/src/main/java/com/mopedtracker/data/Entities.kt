@@ -29,6 +29,8 @@ data class SessionEntity(
     /** Down-sampled route as "lat,lon;lat,lon;..." for list thumbnails. */
     val previewRoute: String = "",
     @ColumnInfo(defaultValue = "0") val starred: Boolean = false,
+    /** The vehicle used for this ride, or null if none was chosen (or it was deleted). */
+    val vehicleId: Long? = null,
 )
 
 @Entity(tableName = "fuel_entries")
@@ -40,6 +42,7 @@ data class FuelEntryEntity(
     /** Filled to the brim: needed for the full-to-full consumption calculation. */
     val fullTank: Boolean,
     val note: String = "",
+    val vehicleId: Long? = null,
 )
 
 @Entity(
@@ -65,4 +68,24 @@ data class TrackPointEntity(
     val accuracyM: Float,
     val speedAccuracyMps: Float?,
     val bearing: Float?,
+)
+
+@Entity(tableName = "vehicles")
+data class VehicleEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    /** Moped, Scooter, Motorcycle, E-bike or Other. */
+    val kind: String = "Moped",
+    val hp: Double? = null,
+    val torqueNm: Double? = null,
+    val displacementCc: Double? = null,
+    val weightKg: Double? = null,
+    val year: Int? = null,
+    val tankLiters: Double? = null,
+    /** Manufacturer's top speed, in km/h. */
+    val claimedTopKmh: Double? = null,
+    val notes: String = "",
+    /** Absolute path of the photo inside the app's private storage. */
+    val photoPath: String? = null,
+    val createdAt: Long = System.currentTimeMillis(),
 )

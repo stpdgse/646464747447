@@ -47,11 +47,30 @@ interface RideDao {
 
     @Query("DELETE FROM fuel_entries WHERE id = :id")
     suspend fun deleteFuel(id: Long)
+
+    @Insert suspend fun insertVehicle(vehicle: VehicleEntity): Long
+    @Update suspend fun updateVehicle(vehicle: VehicleEntity)
+
+    @Query("SELECT * FROM vehicles ORDER BY createdAt")
+    fun observeVehicles(): Flow<List<VehicleEntity>>
+
+    @Query("SELECT * FROM vehicles WHERE id = :id")
+    suspend fun getVehicle(id: Long): VehicleEntity?
+
+    @Query("DELETE FROM vehicles WHERE id = :id")
+    suspend fun deleteVehicle(id: Long)
+
+    /** Keeps rides and fill-ups when their vehicle is deleted: they just become "no vehicle". */
+    @Query("UPDATE sessions SET vehicleId = NULL WHERE vehicleId = :id")
+    suspend fun clearVehicleFromSessions(id: Long)
+
+    @Query("UPDATE fuel_entries SET vehicleId = NULL WHERE vehicleId = :id")
+    suspend fun clearVehicleFromFuel(id: Long)
 }
 
 @Database(
-    entities = [SessionEntity::class, TrackPointEntity::class, FuelEntryEntity::class],
-    version = 2,
+    entities = [SessionEntity::class, TrackPointEntity::class, FuelEntryEntity::class, VehicleEntity::class],
+    version = 3,
     exportSchema = false,
 )
 abstract class RideDatabase : RoomDatabase() {
@@ -66,6 +85,20 @@ abstract class RideDatabase : RoomDatabase() {
                     "CREATE TABLE IF NOT EXISTS `fuel_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         "`time` INTEGER NOT NULL, `liters` REAL NOT NULL, `totalCost` REAL NOT NULL, " +
                         "`fullTank` INTEGER NOT NULL, `note` TEXT NOT NULL)",
+                )
+            }
+        }
+
+        /** v2 -> v3: vehicles. Existing rides and fill-ups simply have no vehicle. */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `sessions` ADD COLUMN `vehicleId` INTEGER")
+                db.execSQL("ALTER TABLE `fuel_entries` ADD COLUMN `vehicleId` INTEGER")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vehicles` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`name` TEXT NOT NULL, `kind` TEXT NOT NULL, `hp` REAL, `torqueNm` REAL, `displacementCc` REAL, " +
+                        "`weightKg` REAL, `year` INTEGER, `tankLiters` REAL, `claimedTopKmh` REAL, `notes` TEXT NOT NULL, " +
+                        "`photoPath` TEXT, `createdAt` INTEGER NOT NULL)",
                 )
             }
         }

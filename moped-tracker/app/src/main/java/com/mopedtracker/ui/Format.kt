@@ -23,6 +23,11 @@ class Settings(context: Context) {
     val unitFlow: StateFlow<SpeedUnit> = _unit.asStateFlow()
     val unit: SpeedUnit get() = _unit.value
 
+    /** The vehicle chosen for the previous ride, preselected in the start dialog. */
+    var lastVehicleId: Long?
+        get() = prefs.getLong("lastVehicleId", -1L).takeIf { it >= 0 }
+        set(v) = prefs.edit { if (v == null) remove("lastVehicleId") else putLong("lastVehicleId", v) }
+
     fun setUnit(unit: SpeedUnit) {
         prefs.edit { putString("unit", unit.name) }
         _unit.value = unit
@@ -57,6 +62,9 @@ object Format {
     fun money(v: Double): String = java.text.NumberFormat.getCurrencyInstance().format(v)
 
     fun liters(v: Double): String = String.format(loc, "%.2f", v)
+
+    /** 12.0 -> "12", 12.5 -> "12.5". */
+    fun number(v: Double): String = if (v % 1.0 == 0.0) v.toLong().toString() else String.format(loc, "%.1f", v)
 
     /** Offset into a ride as m:ss or h:mm:ss. */
     fun offset(ms: Long): String = duration(ms)

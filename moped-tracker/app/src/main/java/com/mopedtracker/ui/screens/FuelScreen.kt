@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +27,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,12 +47,14 @@ import androidx.compose.ui.unit.dp
 import com.mopedtracker.core.FuelCalc
 import com.mopedtracker.core.FuelStats
 import com.mopedtracker.data.FuelEntryEntity
+import com.mopedtracker.data.VehicleEntity
 import com.mopedtracker.ui.Format
 import com.mopedtracker.ui.SpeedUnit
 import com.mopedtracker.ui.components.StatTile
 import com.mopedtracker.ui.components.SurfaceCard
 import com.mopedtracker.ui.theme.Orange
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FuelScreen(
     entries: List<FuelEntryEntity>,
@@ -58,7 +63,12 @@ fun FuelScreen(
     onBack: () -> Unit,
     onAdd: (FuelEntryEntity) -> Unit,
     onDelete: (Long) -> Unit,
+    vehicles: List<VehicleEntity> = emptyList(),
+    vehicleFilter: Long? = null,
+    onVehicleFilter: (Long?) -> Unit = {},
+    defaultVehicleId: Long? = null,
 ) {
+    val vehicleNames = vehicles.associate { it.id to it.name }
     var adding by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf<FuelEntryEntity?>(null) }
 
@@ -76,10 +86,16 @@ fun FuelScreen(
                 contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 120.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                if (vehicles.isNotEmpty()) item {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(selected = vehicleFilter == null, onClick = { onVehicleFilter(null) }, label = { Text("All vehicles") })
+                        vehicles.forEach { v -> FilterChip(selected = vehicleFilter == v.id, onClick = { onVehicleFilter(v.id) }, label = { Text(v.name) }) }
+                    }
+                }
                 item { Summary(stats, unit) }
                 if (entries.isEmpty()) item { Hint("Log your first fill-up with the button below. Fill to the brim each time (tick \"Full tank\") and the app works out your consumption and cost per km from your recorded rides.") }
                 else if (stats.consumptionLPer100Km == null) item { Hint("Consumption appears once you have two full-tank fill-ups with recorded rides in between.") }
-                items(entries, key = { it.id }) { e -> EntryRow(e, onDelete = { deleting = e }) }
+                items(entries, key = { it.id }) { e -> EntryRow(e, vehicleNames[e.vehicleId], onDelete = { deleting = e }) }
             }
         }
         ExtendedFloatingActionButton(
@@ -94,7 +110,7 @@ fun FuelScreen(
         }
     }
 
-    if (adding) AddFuelDialog(onDismiss = { adding = false }, onSave = { adding = false; onAdd(it) })
+    if (adding) AddFuelDialog(vehicles, vehicleFilter ?: defaultVehicleId, onDismiss = { adding = false }, onSave = { adding = false; onAdd(it) })
     deleting?.let { e ->
         AlertDialog(
             onDismissRequest = { deleting = null },
@@ -133,7 +149,7 @@ private fun Hint(text: String) {
 }
 
 @Composable
-private fun EntryRow(e: FuelEntryEntity, onDelete: () -> Unit) {
+private fun EntryRow(e: FuelEntryEntity, vehicleName: String?, onDelete: () -> Unit) {
     SurfaceCard(Modifier.fillMaxWidth()) {
         Row(Modifier.padding(start = 18.dp, top = 12.dp, bottom = 12.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -143,9 +159,9 @@ private fun EntryRow(e: FuelEntryEntity, onDelete: () -> Unit) {
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                if (e.fullTank || e.note.isNotBlank()) {
+                if (e.fullTank || e.note.isNotBlank() || vehicleName != null) {
                     Text(
-                        listOfNotNull("Full tank".takeIf { e.fullTank }, e.note.takeIf { it.isNotBlank() }).joinToString(" · "),
+                        listOfNotNull(vehicleName, "Full tank".takeIf { e.fullTank }, e.note.takeIf { it.isNotBlank() }).joinToString(" · "),
                         style = MaterialTheme.typography.labelMedium,
                         color = Orange,
                     )
@@ -159,9 +175,10 @@ private fun EntryRow(e: FuelEntryEntity, onDelete: () -> Unit) {
 /** Accepts "3,45" and "3.45" so it works with any keyboard locale. */
 private fun parseNumber(s: String): Double? = s.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it > 0 && it.isFinite() }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun AddFuelDialog(onDismiss: () -> Unit, onSave: (FuelEntryEntity) -> Unit) {
+private fun AddFuelDialog(vehicles: List<VehicleEntity>, preselected: Long?, onDismiss: () -> Unit, onSave: (FuelEntryEntity) -> Unit) {
+    var vehicleId by remember { mutableStateOf(preselected?.takeIf { id -> vehicles.any { it.id == id } } ?: vehicles.firstOrNull()?.id) }
     var liters by remember { mutableStateOf("") }
     var cost by remember { mutableStateOf("") }
     var full by remember { mutableStateOf(true) }
@@ -180,6 +197,11 @@ private fun AddFuelDialog(onDismiss: () -> Unit, onSave: (FuelEntryEntity) -> Un
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 TextButton(onClick = { pickingDate = true }) { Text("Date: ${Format.date(time)}") }
+                if (vehicles.isNotEmpty()) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        vehicles.forEach { v -> FilterChip(selected = vehicleId == v.id, onClick = { vehicleId = v.id }, label = { Text(v.name) }) }
+                    }
+                }
                 OutlinedTextField(liters, { liters = it }, label = { Text("Litres") }, singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
                 OutlinedTextField(cost, { cost = it }, label = { Text("Total cost") }, singleLine = true,
@@ -195,7 +217,7 @@ private fun AddFuelDialog(onDismiss: () -> Unit, onSave: (FuelEntryEntity) -> Un
         confirmButton = {
             TextButton(
                 enabled = l != null && c != null,
-                onClick = { onSave(FuelEntryEntity(time = time, liters = l!!, totalCost = c!!, fullTank = full, note = note.trim())) },
+                onClick = { onSave(FuelEntryEntity(time = time, liters = l!!, totalCost = c!!, fullTank = full, note = note.trim(), vehicleId = vehicleId)) },
             ) { Text("Save") }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },

@@ -35,7 +35,7 @@ object ShareCard {
     private val medium = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     private val regular = Typeface.create("sans-serif", Typeface.NORMAL)
 
-    fun render(session: SessionEntity, points: List<TrackPointEntity>, unit: SpeedUnit): Bitmap {
+    fun render(session: SessionEntity, points: List<TrackPointEntity>, unit: SpeedUnit, vehicleName: String? = null): Bitmap {
         val bmp = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
 
@@ -48,7 +48,7 @@ object ShareCard {
         // header
         text(c, "MOPED TRACKER", 70f, 110f, 34f, ORANGE, bold, letterSpacing = 0.18f)
         text(c, fit(session.name, 940f, 74f, bold), 70f, 205f, 74f, WHITE, bold)
-        text(c, Format.dateTime(session.startTime), 70f, 262f, 38f, MUTED, regular)
+        text(c, fit(listOfNotNull(Format.dateTime(session.startTime), vehicleName).joinToString(" · "), 940f, 38f, regular), 70f, 262f, 38f, MUTED, regular)
 
         // route panel
         val panel = RectF(60f, 310f, 1020f, 880f)
