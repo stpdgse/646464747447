@@ -1,5 +1,6 @@
 package com.mopedtracker.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -27,6 +28,18 @@ data class SessionEntity(
     val pointCount: Int = 0,
     /** Down-sampled route as "lat,lon;lat,lon;..." for list thumbnails. */
     val previewRoute: String = "",
+    @ColumnInfo(defaultValue = "0") val starred: Boolean = false,
+)
+
+@Entity(tableName = "fuel_entries")
+data class FuelEntryEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val time: Long,
+    val liters: Double,
+    val totalCost: Double,
+    /** Filled to the brim: needed for the full-to-full consumption calculation. */
+    val fullTank: Boolean,
+    val note: String = "",
 )
 
 @Entity(

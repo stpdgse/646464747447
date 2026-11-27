@@ -8,7 +8,9 @@ import com.mopedtracker.ui.Settings
 
 class MopedApp : Application() {
     val database: RideDatabase by lazy {
-        Room.databaseBuilder(this, RideDatabase::class.java, "rides.db").build()
+        Room.databaseBuilder(this, RideDatabase::class.java, "rides.db")
+            .addMigrations(RideDatabase.MIGRATION_1_2)
+            .build()
     }
     val repository: RideRepository by lazy { RideRepository(database.dao()) }
     val settings: Settings by lazy { Settings(this) }

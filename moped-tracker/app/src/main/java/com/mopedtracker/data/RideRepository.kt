@@ -16,6 +16,11 @@ class RideRepository(private val dao: RideDao) {
     suspend fun getActiveSessionOrNull() = dao.getActiveSessions().firstOrNull()
     suspend fun delete(id: Long) = dao.deleteSession(id)
     suspend fun rename(id: Long, name: String) = dao.rename(id, name.trim().ifEmpty { "Ride" })
+    suspend fun setStarred(id: Long, starred: Boolean) = dao.setStarred(id, starred)
+
+    fun observeFuel() = dao.observeFuel()
+    suspend fun addFuel(entry: FuelEntryEntity) = dao.insertFuel(entry)
+    suspend fun deleteFuel(id: Long) = dao.deleteFuel(id)
 
     suspend fun createSession(startTime: Long): Long {
         val label = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(startTime))
