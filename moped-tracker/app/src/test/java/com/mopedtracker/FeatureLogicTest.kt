@@ -94,7 +94,7 @@ class FeatureLogicTest {
     }
 
     @Test fun shareOfClaimedTopSpeed() {
-        assertEquals(0.8, VehicleStatsCalc.shareOfClaimedTop(40f / 3.6f, 50.0)!!, 1e-9)
+        assertEquals(0.8, VehicleStatsCalc.shareOfClaimedTop(40f / 3.6f, 50.0)!!, 1e-4) // speed is a Float
         assertNull(VehicleStatsCalc.shareOfClaimedTop(10f, null))
         assertNull(VehicleStatsCalc.shareOfClaimedTop(10f, 0.0))
     }
