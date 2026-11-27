@@ -96,8 +96,8 @@ fun CompareScreen(
                                 if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
                                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Text(r.label, Modifier.weight(1.2f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Value(r.a, r.aValue > r.bValue, ColorA, Modifier.weight(1f))
-                                    Value(r.b, r.bValue > r.aValue, ColorB, Modifier.weight(1f))
+                                    Value(r.a, r.a != r.b && r.aValue > r.bValue, ColorA, Modifier.weight(1f))
+                                    Value(r.b, r.a != r.b && r.bValue > r.aValue, ColorB, Modifier.weight(1f))
                                 }
                             }
                         }
@@ -171,7 +171,7 @@ private fun Picker(tag: String, color: Color, sessions: List<SessionEntity>, sel
                     Text(tag, color = Color.Black, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
                 }
                 Column(Modifier.padding(start = 10.dp).weight(1f)) {
-                    Text(selected?.name ?: "Choose ride", style = MaterialTheme.typography.titleMedium, maxLines = 1)
+                    Text(selected?.name ?: "Choose ride", style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     Text(selected?.let { Format.date(it.startTime) } ?: "", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Icon(Icons.Filled.ArrowDropDown, null)

@@ -115,6 +115,14 @@ class ScreenshotTest {
         shot("detail_dark")
     }
 
+    /** A very tall screen so the whole page, including the Events card, is captured. */
+    @Test @Config(sdk = [35], qualifiers = "w411dp-h2400dp-xxhdpi")
+    fun detailFullPage() {
+        val (s, p) = rideData[0]
+        rule.setContent { MopedTheme(true) { DetailScreen(DetailState.Ready(s, p), SpeedUnit.KMH, {}, {}, {}) } }
+        shot("detail_full")
+    }
+
     @Test fun detailLightMph() {
         val (s, p) = rideData[0]
         rule.setContent { MopedTheme(false) { DetailScreen(DetailState.Ready(s, p), SpeedUnit.MPH, {}, {}, {}) } }
