@@ -199,7 +199,7 @@ private fun SessionCard(s: SessionEntity, unit: SpeedUnit, vehicleName: String?,
                     Text(s.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f, fill = false), maxLines = 1)
                     if (s.starred) Icon(Icons.Filled.Star, "Starred", tint = WarnAmber, modifier = Modifier.padding(start = 6.dp).size(18.dp))
                 }
-                Text(listOfNotNull(Format.dateTime(s.startTime), vehicleName).joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+                Text(listOfNotNull(Format.dateTime(s.startTime), vehicleName).joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Mini("${Format.distance(s.distanceM, unit)} ${unit.distanceLabel}")
                     Mini(Format.duration(s.elapsedMs))
