@@ -1,0 +1,7 @@
+{
+  "pack": {
+    "description": "OpenFPV resources",
+    "pack_format": 3,
+    "_comment": "pack_format 3 = Minecraft 1.11-1.12.2"
+  }
+}

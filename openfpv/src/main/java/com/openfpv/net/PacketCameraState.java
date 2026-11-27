@@ -1,0 +1,84 @@
+package com.openfpv.net;
+
+import com.openfpv.client.FpvClient;
+import com.openfpv.oc.CameraEnvironment;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+/** Server -> client: the camera state of one drone. */
+public class PacketCameraState implements IMessage {
+    public int entityId;
+    public boolean active, night, thermal, returning, lights = true;
+    public float fov, tilt, pan, energy, range;
+    public double x, y, z;
+    public int modules;
+
+    public PacketCameraState() {}
+
+    public static PacketCameraState of(CameraEnvironment e) {
+        PacketCameraState p = new PacketCameraState();
+        p.entityId = e.entityId();
+        p.active = e.isActive();
+        p.night = e.isNight();
+        p.thermal = e.isThermal();
+        p.returning = e.isReturning();
+        p.lights = e.lights();
+        p.fov = e.fov();
+        p.tilt = e.tilt();
+        p.pan = e.pan();
+        p.energy = e.energyFraction();
+        p.modules = e.modules();
+        p.range = (float) e.range();
+        net.minecraft.entity.Entity ent = (net.minecraft.entity.Entity) e.drone();
+        p.x = ent.posX;
+        p.y = ent.posY;
+        p.z = ent.posZ;
+        return p;
+    }
+
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        entityId = buf.readInt();
+        int flags = buf.readByte();
+        active = (flags & 1) != 0;
+        night = (flags & 2) != 0;
+        thermal = (flags & 4) != 0;
+        returning = (flags & 8) != 0;
+        lights = (flags & 16) != 0;
+        fov = buf.readFloat();
+        tilt = buf.readFloat();
+        pan = buf.readFloat();
+        energy = buf.readFloat();
+        modules = buf.readInt();
+        range = buf.readFloat();
+        x = buf.readDouble();
+        y = buf.readDouble();
+        z = buf.readDouble();
+    }
+
+    @Override
+    public void toBytes(ByteBuf buf) {
+        buf.writeInt(entityId);
+        buf.writeByte((active ? 1 : 0) | (night ? 2 : 0) | (thermal ? 4 : 0) | (returning ? 8 : 0) | (lights ? 16 : 0));
+        buf.writeFloat(fov);
+        buf.writeFloat(tilt);
+        buf.writeFloat(pan);
+        buf.writeFloat(energy);
+        buf.writeInt(modules);
+        buf.writeFloat(range);
+        buf.writeDouble(x);
+        buf.writeDouble(y);
+        buf.writeDouble(z);
+    }
+
+    public static class Handler implements IMessageHandler<PacketCameraState, IMessage> {
+        @Override
+        public IMessage onMessage(PacketCameraState msg, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> FpvClient.onState(msg));
+            return null;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+[
+{
+  "modid": "openfpv",
+  "name": "OpenFPV",
+  "description": "First-person-view camera upgrades and modules for OpenComputers drones.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Tom Pearl"],
+  "credits": "OpenComputers by Sangar and the OC community; Minecraft Forge.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": ["opencomputers"]
+}
+]
