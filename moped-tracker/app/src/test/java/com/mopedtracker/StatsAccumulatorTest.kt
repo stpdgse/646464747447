@@ -76,6 +76,48 @@ class StatsAccumulatorTest {
         assertEquals(1, acc.snapshot(1000).pointCount)
     }
 
+    /** Fix whose position is junk (pocket) but whose Doppler speed is still measured well. */
+    private fun pocketFix(secs: Int, speed: Float, speedAcc: Float = 0.6f) = Fix(
+        timeMs = secs * 1000L,
+        lat = 48.0 + 0.01 * (secs % 7), // wildly wrong position
+        lon = 11.0 + 0.01 * (secs % 5),
+        speedMps = speed,
+        accuracyM = 45f,
+        speedAccuracyMps = speedAcc,
+    )
+
+    @Test
+    fun pocketStretchWithPoorPositionStillCountsDistanceAndSpeed() {
+        val acc = StatsAccumulator()
+        for (s in 0..10) acc.add(northFix(s, 10f))
+        for (s in 11..40) {
+            val r = acc.add(pocketFix(s, 10f))
+            assertTrue(r.accepted)
+            assertFalse(r.positionTrusted)
+        }
+        // good fixes resume further along the same straight road
+        for (s in 41..60) acc.add(northFix(s, 10f))
+        val st = acc.snapshot(60_000)
+
+        assertEquals(600.0, st.distanceM, 12.0) // not 200 m (only the good fixes), and not double counted
+        assertEquals(10f, st.maxSpeedMps, 0.01f)
+        assertEquals(60_000.0, st.movingMs.toDouble(), 1500.0)
+    }
+
+    @Test
+    fun poorPositionWithUncertainSpeedIsStillRejected() {
+        val acc = StatsAccumulator()
+        for (s in 0..5) acc.add(northFix(s, 10f))
+        assertFalse(acc.add(pocketFix(6, 10f, speedAcc = 3f)).accepted)
+        assertFalse(acc.add(pocketFix(7, 10f).copy(accuracyM = 90f)).accepted)
+    }
+
+    @Test
+    fun pocketFixesBeforeAnyGoodFixAreIgnored() {
+        val acc = StatsAccumulator()
+        assertFalse(acc.add(pocketFix(0, 10f)).accepted)
+    }
+
     @Test
     fun maxSpeedRequiresGoodSpeedAccuracy() {
         val acc = StatsAccumulator()

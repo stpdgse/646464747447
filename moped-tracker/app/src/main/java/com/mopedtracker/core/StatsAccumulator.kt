@@ -56,13 +56,25 @@ class StatsAccumulator(private val cfg: Config = Config()) {
         val elevationThresholdM: Double = 3.0,
         val maxGapMs: Long = 10_000,
         val resyncAfterRejects: Int = 3,
+        /** Position worse than this is unusable, but the Doppler speed may still be good (phone in a pocket). */
+        val maxDegradedAccuracyM: Float = 60f,
+        val degradedSpeedAccuracyMps: Float = 1.5f,
     )
 
-    data class Result(val accepted: Boolean, val speedMps: Float)
+    /**
+     * [positionTrusted] is false when only the Doppler speed was usable: the stats were updated,
+     * but the fix's coordinates must not be drawn on the route.
+     */
+    data class Result(val accepted: Boolean, val speedMps: Float, val positionTrusted: Boolean = true)
 
     private var last: Fix? = null
     private var lastSpeed = 0f
     private var rejectStreak = 0
+
+    /** Time of the most recent fix of any kind (trusted or speed-only). */
+    private var lastTimeMs: Long? = null
+    /** Distance already added from speed integration since the last trusted position. */
+    private var integratedSinceTrusted = 0.0
 
     private var distanceM = 0.0
     private var movingMs = 0L
@@ -79,38 +91,49 @@ class StatsAccumulator(private val cfg: Config = Config()) {
     /** Forget the previous fix (use after a pause so the gap isn't counted as travel). */
     fun breakLink() {
         last = null
+        lastTimeMs = null
+        integratedSinceTrusted = 0.0
         rejectStreak = 0
     }
 
     fun add(fix: Fix): Result {
-        if (fix.accuracyM > cfg.maxAccuracyM) return Result(false, 0f)
+        if (fix.accuracyM > cfg.maxAccuracyM) return addSpeedOnly(fix)
 
         val prev = last
-        var dt = 0.0
+        var dtPos = 0.0 // time since the last trusted position (for deriving speed)
         var segment = 0.0
         if (prev != null) {
-            dt = (fix.timeMs - prev.timeMs) / 1000.0
-            if (dt <= 0.0) return Result(false, 0f) // duplicate or out-of-order fix
+            dtPos = (fix.timeMs - prev.timeMs) / 1000.0
+            if (dtPos <= 0.0) return Result(false, 0f) // duplicate or out-of-order fix
             segment = Geo.distanceM(prev.lat, prev.lon, fix.lat, fix.lon)
         }
+        // Time since the latest fix of any kind (moving time was already credited up to there).
+        val refTime = lastTimeMs ?: prev?.timeMs
+        val dt = if (refTime != null) (fix.timeMs - refTime) / 1000.0 else 0.0
+        if (refTime != null && dt <= 0.0) return Result(false, 0f)
 
-        val speed = fix.speedMps ?: if (prev != null) (segment / dt).toFloat() else 0f
+        val speed = fix.speedMps ?: if (prev != null) (segment / dtPos).toFloat() else 0f
         if (speed.isNaN() || speed < 0f || speed > cfg.maxPlausibleSpeedMps) return reject()
 
-        if (prev != null) {
+        if (refTime != null) {
             val accel = abs(speed - lastSpeed) / dt
             if (accel > cfg.maxAccelMps2 && rejectStreak < cfg.resyncAfterRejects) return reject()
         }
         rejectStreak = 0
 
         val moving = speed >= cfg.movingThresholdMps
-        if (prev != null) {
-            val dtMs = (dt * 1000).toLong().coerceAtMost(cfg.maxGapMs)
-            if (moving) {
-                movingMs += dtMs
-                if (segment >= cfg.minSegmentM) distanceM += segment
-            }
+        if (refTime != null && moving) {
+            movingMs += (dt * 1000).toLong().coerceAtMost(cfg.maxGapMs)
         }
+        if (prev != null && moving) {
+            // If speed integration already covered part of this stretch, only add what the straight
+            // line exceeds it by; the integrated path (which follows the curves) is the better estimate.
+            val extra = if (integratedSinceTrusted > 0.0) (segment - integratedSinceTrusted).coerceAtLeast(0.0)
+            else if (segment >= cfg.minSegmentM) segment else 0.0
+            distanceM += extra
+        }
+        integratedSinceTrusted = 0.0
+        lastTimeMs = fix.timeMs
 
         val speedTrusted = fix.speedAccuracyMps == null || fix.speedAccuracyMps <= cfg.maxSpeedAccuracyForMaxMps
         if (speedTrusted && speed > maxSpeed) maxSpeed = speed
@@ -122,6 +145,41 @@ class StatsAccumulator(private val cfg: Config = Config()) {
         last = fix
         lastSpeed = speed
         return Result(true, speed)
+    }
+
+    /**
+     * Fix with poor position accuracy (typical with the phone in a pocket). The position is useless but
+     * the Doppler speed is measured independently of it, so a fix whose speed accuracy is good still
+     * counts: its speed feeds the max/moving time and distance advances by speed x time.
+     */
+    private fun addSpeedOnly(fix: Fix): Result {
+        val ref = lastTimeMs ?: return Result(false, 0f) // need a starting point
+        val speed = fix.speedMps
+        val speedAcc = fix.speedAccuracyMps
+        if (speed == null || speedAcc == null || speedAcc > cfg.degradedSpeedAccuracyMps ||
+            fix.accuracyM > cfg.maxDegradedAccuracyM
+        ) return Result(false, 0f)
+
+        val dt = (fix.timeMs - ref) / 1000.0
+        if (dt <= 0.0) return Result(false, 0f)
+        if (speed.isNaN() || speed < 0f || speed > cfg.maxPlausibleSpeedMps) return Result(false, 0f)
+        if (abs(speed - lastSpeed) / dt > cfg.maxAccelMps2 && rejectStreak < cfg.resyncAfterRejects) {
+            rejectStreak++
+            return Result(false, 0f)
+        }
+        rejectStreak = 0
+
+        if (speed >= cfg.movingThresholdMps) {
+            val capped = dt.coerceAtMost(cfg.maxGapMs / 1000.0)
+            movingMs += (capped * 1000).toLong()
+            val d = (lastSpeed + speed) / 2.0 * capped // trapezoid between the two speed samples
+            distanceM += d
+            integratedSinceTrusted += d
+        }
+        if (speed > maxSpeed) maxSpeed = speed
+        lastTimeMs = fix.timeMs
+        lastSpeed = speed
+        return Result(true, speed, positionTrusted = false)
     }
 
     fun snapshot(elapsedMs: Long): RideStats {

@@ -264,6 +264,7 @@ class TrackingService : Service() {
         val result = accumulator.add(fix)
         if (!result.accepted) return
         currentSpeed = result.speedMps
+        if (!result.positionTrusted) return // speed-only fix: counted in the stats, but its position is unreliable
         route.add(LatLon(fix.lat, fix.lon))
         val id = sessionId
         scope.launch(Dispatchers.IO) { repo.addPoint(id, fix, result.speedMps) }
