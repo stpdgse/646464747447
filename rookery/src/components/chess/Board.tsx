@@ -42,10 +42,7 @@ export function Board({ view, variant, orientation, movable, settings, isPromoti
   const [pending, setPending] = useState<{ from: Square; to: Square } | null>(null);
 
   // Latest props for chessground's long-lived event callback.
-  const latest = useRef({ view, isPromotion, onMove });
-  useEffect(() => {
-    latest.current = { view, isPromotion, onMove };
-  });
+  const latest = useRef({ view, isPromotion, onMove, config: (): Config => ({}) });
 
   const configFor = useCallback(
     (): Config => ({
@@ -73,6 +70,14 @@ export function Board({ view, variant, orientation, movable, settings, isPromoti
     [view, orientation, movable, settings, variant, shapes],
   );
 
+  useEffect(() => {
+    latest.current = { view, isPromotion, onMove, config: configFor };
+  });
+
+  // Put the board back exactly as the props describe it. Restoring only the FEN is not enough: after a
+  // rejected move chessground has already handed the turn to the opponent, so nothing could be moved again.
+  const resync = useCallback(() => apiRef.current?.set(latest.current.config()), []);
+
   // Create once.
   useEffect(() => {
     const el = hostRef.current;
@@ -88,7 +93,7 @@ export function Board({ view, variant, orientation, movable, settings, isPromoti
               setPending({ from, to });
               return;
             }
-            if (!cur.onMove(from, to)) apiRef.current?.set({ fen: cur.view.fen, lastMove: cur.view.lastMove });
+            if (!cur.onMove(from, to)) apiRef.current?.set(cur.config());
           },
         },
       },
@@ -113,10 +118,7 @@ export function Board({ view, variant, orientation, movable, settings, isPromoti
     }
   }, [configFor, settings.coordinates]);
 
-  const revert = useCallback(() => {
-    const cur = latest.current.view;
-    apiRef.current?.set({ fen: cur.fen, lastMove: cur.lastMove });
-  }, []);
+  const revert = resync;
 
   const choose = (role: PromotionRole) => {
     if (!pending) return;
