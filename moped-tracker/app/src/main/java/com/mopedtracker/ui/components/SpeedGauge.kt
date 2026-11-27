@@ -1,10 +1,11 @@
 package com.mopedtracker.ui.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,9 @@ import com.mopedtracker.ui.theme.speedColor
 private const val START_ANGLE = 150f
 private const val SWEEP = 240f
 
+// The 240 degree arc never reaches the bottom quarter of its circle, so the box is cropped to this ratio.
+private const val HEIGHT_RATIO = 0.80f
+
 /**
  * Big arc speedometer. [value] and [max] are in the display unit (km/h or mph).
  * The arc is painted in small segments so the colour ramps from blue to red as the speed rises.
@@ -33,11 +37,13 @@ fun SpeedGauge(
     modifier: Modifier = Modifier,
 ) {
     val track = MaterialTheme.colorScheme.surfaceVariant
-    Box(modifier = modifier.fillMaxWidth().aspectRatio(1f), contentAlignment = Alignment.Center) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth().aspectRatio(1f / HEIGHT_RATIO)) {
+        val diameter = maxWidth
         Canvas(modifier = Modifier.matchParentSize()) {
             val stroke = 22.dp.toPx()
             val inset = stroke / 2 + 4.dp.toPx()
-            val arcSize = Size(size.width - 2 * inset, size.height - 2 * inset)
+            val d = size.width - 2 * inset
+            val arcSize = Size(d, d)
             val topLeft = Offset(inset, inset)
             drawArc(
                 color = track, startAngle = START_ANGLE, sweepAngle = SWEEP, useCenter = false,
@@ -55,7 +61,11 @@ fun SpeedGauge(
                 )
             }
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        // Centre the readout on the circle's centre, not the cropped box's centre.
+        Column(
+            Modifier.align(Alignment.TopCenter).padding(top = diameter / 2 - 66.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text(valueText, style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onBackground)
             Text(unitLabel, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

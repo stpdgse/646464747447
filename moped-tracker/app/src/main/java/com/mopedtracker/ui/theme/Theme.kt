@@ -1,7 +1,10 @@
 package com.mopedtracker.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -52,7 +55,15 @@ private val AppTypography = Typography(
 
 @Composable
 fun MopedTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = if (darkTheme) Dark else Light, typography = AppTypography, content = content)
+    MaterialTheme(colorScheme = if (darkTheme) Dark else Light, typography = AppTypography) {
+        // Surface supplies the default content colour; without it text outside cards would be black.
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            content = content,
+        )
+    }
 }
 
 /** Maps 0..1 to a blue -> green -> yellow -> red ramp used for speed colouring. */
