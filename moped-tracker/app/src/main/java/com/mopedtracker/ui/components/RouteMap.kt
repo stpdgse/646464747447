@@ -25,7 +25,7 @@ import kotlin.math.min
 data class RoutePoint(val lat: Double, val lon: Double, val speedMps: Float)
 
 /** Fits lat/lon points into a canvas, keeping the real-world aspect ratio. */
-private class Projector(points: List<LatLon>, width: Float, height: Float, pad: Float) {
+private class Projector(points: List<LatLon>, private val width: Float, private val height: Float, pad: Float) {
     private val minLat = points.minOf { it.lat }
     private val maxLat = points.maxOf { it.lat }
     private val minLon = points.minOf { it.lon }
